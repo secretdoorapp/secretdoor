@@ -102,6 +102,8 @@ private const val MAXIMUM_ACCOUNT_LIMIT = 5
  * @param isAddAccountAvailable Whether the "Add account" button is available. Note that even
  * when `true`, this button may be hidden when there are more than [MAXIMUM_ACCOUNT_LIMIT] accounts
  * present.
+ * @param isLogoutAvailable Whether the "Log out" / "Remove account" options are offered when an
+ * account is long-pressed.
  * @param modifier A [Modifier] for the composable.
  * @param topAppBarScrollBehavior Used to derive the background color of the content and keep it in
  * sync with the associated app bar.
@@ -123,6 +125,7 @@ fun BitwardenAccountSwitcher(
         .union(WindowInsets.navigationBars)
         .only(WindowInsetsSides.Horizontal),
     isAddAccountAvailable: Boolean = true,
+    isLogoutAvailable: Boolean = true,
 ) {
     // Track the actual visibility (according to the internal transitions) so that we know when we
     // can safely show dialogs.
@@ -139,6 +142,7 @@ fun BitwardenAccountSwitcher(
         lockOrLogoutAccount != null -> {
             LockOrLogoutDialog(
                 accountSummary = requireNotNull(lockOrLogoutAccount),
+                isLogoutAvailable = isLogoutAvailable,
                 onDismissRequest = { lockOrLogoutAccount = null },
                 onLockAccountClick = {
                     onLockAccountClick(it)
@@ -377,6 +381,7 @@ private fun AccountSummaryItem(
 @Composable
 private fun LockOrLogoutDialog(
     accountSummary: AccountSummary,
+    isLogoutAvailable: Boolean,
     onDismissRequest: () -> Unit,
     onLockAccountClick: (AccountSummary) -> Unit,
     onLogoutAccountClick: (AccountSummary) -> Unit,
@@ -394,14 +399,14 @@ private fun LockOrLogoutDialog(
                     },
                 )
             }
-            if (accountSummary.isLoggedIn) {
+            if (isLogoutAvailable && accountSummary.isLoggedIn) {
                 BitwardenBasicDialogRow(
                     text = stringResource(id = BitwardenString.log_out),
                     onClick = {
                         onLogoutAccountClick(accountSummary)
                     },
                 )
-            } else {
+            } else if (isLogoutAvailable) {
                 BitwardenBasicDialogRow(
                     text = stringResource(id = BitwardenString.remove_account),
                     onClick = {

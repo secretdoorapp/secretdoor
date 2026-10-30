@@ -244,10 +244,6 @@ private fun VaultScreenScaffold(
                     BitwardenOverflowActionItem(
                         menuItemDataList = persistentListOf(
                             OverflowMenuItemData(
-                                text = stringResource(id = BitwardenString.sync),
-                                onClick = vaultHandlers.syncAction,
-                            ),
-                            OverflowMenuItemData(
                                 text = stringResource(id = BitwardenString.lock),
                                 onClick = vaultHandlers.lockAction,
                             ),
@@ -317,6 +313,8 @@ private fun VaultScreenScaffold(
                 onAddAccountClick = vaultHandlers.addAccountClickAction,
                 onDismissRequest = { updateAccountMenuVisibility(false) },
                 topAppBarScrollBehavior = scrollBehavior,
+                isAddAccountAvailable = false,
+                isLogoutAvailable = false,
                 modifier = Modifier.fillMaxSize(),
             )
         },

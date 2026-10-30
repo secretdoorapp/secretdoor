@@ -170,11 +170,10 @@ class VaultUnlockViewModel @Inject constructor(
     }
 
     private fun handleDismissBiometricsNoLongerSupportedDialog() {
+        // SecretDoor: keep the vault; the user can still unlock with the master password.
         mutableStateFlow.update {
             it.copy(dialog = null)
         }
-        authRepository.logout(reason = LogoutReason.Biometrics.NoLongerSupported)
-        authRepository.hasPendingAccountAddition = true
     }
 
     private fun handleAddAccountClick() {

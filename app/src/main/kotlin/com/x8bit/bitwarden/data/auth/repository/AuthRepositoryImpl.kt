@@ -144,7 +144,7 @@ import javax.inject.Singleton
  * Placeholder access token stored for a local vault account so that it is treated as logged in.
  * It is not a JWT and is never accepted by any server.
  */
-private const val LOCAL_VAULT_ACCESS_TOKEN: String = "secretdoor-local-vault"
+internal const val LOCAL_VAULT_ACCESS_TOKEN: String = "secretdoor-local-vault"
 
 /**
  * Suffix used to build the local-only email (master key salt) of a local vault account.
@@ -319,33 +319,24 @@ internal class AuthRepositoryImpl(
 
     override suspend fun deleteAccountWithMasterPassword(
         masterPassword: String,
-    ): DeleteAccountResult {
-        val masterPasswordUnlock = authDiskSource
-            .userState
-            ?.activeAccount
-            ?.profile
-            ?.userDecryptionOptions
-            ?.masterPasswordUnlock
-            ?: return DeleteAccountResult.Error(
-                message = null,
-                error = MissingPropertyException("Master Password Unlock"),
-            )
-        userStateManager.hasPendingAccountDeletion = true
-        return authSdkSource
-            .hashPassword(
-                salt = masterPasswordUnlock.salt,
-                password = masterPassword,
-                kdf = masterPasswordUnlock.kdf.toKdf(),
-                purpose = HashPurpose.SERVER_AUTHORIZATION,
-            )
-            .flatMap { hashedPassword ->
-                accountsService.deleteAccount(
-                    masterPasswordHash = hashedPassword,
-                    oneTimePassword = null,
-                )
+    ): DeleteAccountResult =
+        // SecretDoor: there is no server account. Deleting the account erases the local vault
+        // once the master password has been confirmed.
+        when (val result = validatePassword(password = masterPassword)) {
+            is ValidatePasswordResult.Error -> {
+                DeleteAccountResult.Error(message = null, error = result.error)
             }
-            .finalizeDeleteAccount()
-    }
+
+            is ValidatePasswordResult.Success -> {
+                if (result.isValid) {
+                    userStateManager.hasPendingAccountDeletion = true
+                    logout(reason = LogoutReason.AccountDelete)
+                    DeleteAccountResult.Success
+                } else {
+                    DeleteAccountResult.Error(message = null, error = null)
+                }
+            }
+        }
 
     override suspend fun deleteAccountWithOneTimePassword(
         oneTimePassword: String,

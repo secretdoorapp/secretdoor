@@ -121,10 +121,6 @@ fun VerificationCodeScreen(
                     BitwardenOverflowActionItem(
                         menuItemDataList = persistentListOf(
                             OverflowMenuItemData(
-                                text = stringResource(id = BitwardenString.sync),
-                                onClick = verificationCodeHandler.syncClick,
-                            ),
-                            OverflowMenuItemData(
                                 text = stringResource(id = BitwardenString.lock),
                                 onClick = verificationCodeHandler.lockClick,
                             ),

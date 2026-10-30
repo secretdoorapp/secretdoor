@@ -1559,7 +1559,7 @@ class VaultUnlockViewModelTest : BaseViewModelTest() {
 
     @Suppress("MaxLineLength")
     @Test
-    fun `on DismissBiometricsNoLongerSupportedDialog should dismiss dialog state and log the user out`() {
+    fun `on DismissBiometricsNoLongerSupportedDialog should dismiss dialog state and keep the vault`() {
         val viewModel = createViewModel()
         viewModel.trySendAction(VaultUnlockAction.DismissBiometricsNoLongerSupportedDialog)
         assertEquals(
@@ -1568,8 +1568,8 @@ class VaultUnlockViewModelTest : BaseViewModelTest() {
             ),
             viewModel.stateFlow.value,
         )
-        verify(exactly = 1) {
-            authRepository.logout(reason = LogoutReason.Biometrics.NoLongerSupported)
+        verify(exactly = 0) {
+            authRepository.logout(reason = any())
             authRepository.hasPendingAccountAddition = true
         }
     }

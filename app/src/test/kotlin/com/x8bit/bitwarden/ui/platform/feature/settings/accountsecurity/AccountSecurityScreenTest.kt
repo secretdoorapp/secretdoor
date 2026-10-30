@@ -101,12 +101,6 @@ class AccountSecurityScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `on Log out click should send LogoutClick`() {
-        composeTestRule.onNodeWithText("Log out").performScrollTo().performClick()
-        verify { viewModel.trySendAction(AccountSecurityAction.LogoutClick) }
-    }
-
-    @Test
     fun `on NavigateToApplicationDataSettings should launch the correct intent`() {
         mockkStatic(IntentManager::startAppSettingsActivity) {
             every { intentManager.startAppSettingsActivity() } returns true
@@ -358,7 +352,7 @@ class AccountSecurityScreenTest : BitwardenComposeTest() {
         composeTestRule
             .onAllNodesWithText(
                 text = "Your PIN must be at least 4 characters. Your PIN settings will be reset " +
-                    "if you manually log out of the Bitwarden app.",
+                    "if you manually log out of the SecretDoor app.",
             )
             .filterToOne(hasAnyAncestor(isDialog()))
             .assertIsDisplayed()
@@ -1208,7 +1202,7 @@ class AccountSecurityScreenTest : BitwardenComposeTest() {
         composeTestRule
             .onAllNodesWithText("Log out")
             .filterToOne(hasAnyAncestor(isDialog()))
-            .assertIsDisplayed()
+            .assertDoesNotExist()
         composeTestRule
             .onAllNodesWithText("Cancel")
             .filterToOne(hasAnyAncestor(isDialog()))
@@ -1243,108 +1237,6 @@ class AccountSecurityScreenTest : BitwardenComposeTest() {
             )
         }
         composeTestRule.assertNoDialogExists()
-    }
-
-    @Test
-    fun `on session timeout action dialog Logout click should open a confirmation dialog`() {
-        composeTestRule.assertNoDialogExists()
-        composeTestRule
-            .onNodeWithContentDescription(label = "Lock. Session timeout action")
-            .performScrollTo()
-            .performClick()
-
-        composeTestRule
-            .onAllNodesWithText("Log out")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .assertIsDisplayed()
-            .performClick()
-
-        composeTestRule
-            .onAllNodesWithText("Set session timeout to “Log out”?")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .assertIsDisplayed()
-        composeTestRule
-            .onAllNodesWithText(
-                text = "After the timeout period, you will be logged out. You will need to be " +
-                    "connected to the internet to log in and access your vault again. Your " +
-                    "settings and PIN saved on this device won’t change.",
-            )
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .assertIsDisplayed()
-        composeTestRule
-            .onAllNodesWithText("Cancel")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .assertIsDisplayed()
-        composeTestRule
-            .onAllNodesWithText("Yes")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .assertIsDisplayed()
-
-        verify(exactly = 0) { viewModel.trySendAction(any()) }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `on session timeout action Logout confirmation dialog cancel click should dismiss the dialog`() {
-        composeTestRule.assertNoDialogExists()
-        composeTestRule
-            .onNodeWithContentDescription(label = "Lock. Session timeout action")
-            .performScrollTo()
-            .performClick()
-
-        composeTestRule
-            .onAllNodesWithText("Log out")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .assertIsDisplayed()
-            .performClick()
-
-        composeTestRule
-            .onAllNodesWithText("Set session timeout to “Log out”?")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .assertIsDisplayed()
-        composeTestRule
-            .onAllNodesWithText("Cancel")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .assertIsDisplayed()
-            .performClick()
-
-        composeTestRule.assertNoDialogExists()
-        verify(exactly = 0) { viewModel.trySendAction(any()) }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `on session timeout action Logout confirmation dialog Yes click should dismiss the dialog and send VaultTimeoutActionSelect`() {
-        composeTestRule.assertNoDialogExists()
-        composeTestRule
-            .onNodeWithContentDescription(label = "Lock. Session timeout action")
-            .performScrollTo()
-            .performClick()
-
-        composeTestRule
-            .onAllNodesWithText("Log out")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .assertIsDisplayed()
-            .performClick()
-
-        composeTestRule
-            .onAllNodesWithText("Set session timeout to “Log out”?")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .assertIsDisplayed()
-        composeTestRule
-            .onAllNodesWithText("Yes")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .assertIsDisplayed()
-            .performClick()
-
-        composeTestRule.assertNoDialogExists()
-        verify {
-            viewModel.trySendAction(
-                AccountSecurityAction.VaultTimeoutActionSelect(
-                    VaultTimeoutAction.LOGOUT,
-                ),
-            )
-        }
     }
 
     @Test
@@ -1439,7 +1331,7 @@ class AccountSecurityScreenTest : BitwardenComposeTest() {
 
     @Test
     fun `on delete account click should send DeleteAccountClick`() {
-        composeTestRule.onNodeWithText("Delete account").performScrollTo().performClick()
+        composeTestRule.onNodeWithText("Delete vault").performScrollTo().performClick()
         verify { viewModel.trySendAction(AccountSecurityAction.DeleteAccountClick) }
     }
 

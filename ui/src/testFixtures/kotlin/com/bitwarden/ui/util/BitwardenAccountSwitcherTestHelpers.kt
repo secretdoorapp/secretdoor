@@ -1,6 +1,8 @@
 package com.bitwarden.ui.util
 
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.filter
 import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasTextExactly
@@ -9,6 +11,7 @@ import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
@@ -66,6 +69,7 @@ fun ComposeContentTestRule.assertSwitcherIsNotDisplayed(
  */
 fun ComposeContentTestRule.assertLockOrLogoutDialogIsDisplayed(
     accountSummary: AccountSummary,
+    isLogoutButtonVisible: Boolean = true,
 ) {
     this
         .onNode(isDialog())
@@ -74,10 +78,14 @@ fun ComposeContentTestRule.assertLockOrLogoutDialogIsDisplayed(
         .onAllNodesWithText("Lock")
         .filterToOne(hasAnyAncestor(isDialog()))
         .assertIsDisplayed()
-    this
+    val logoutNodes = this
         .onAllNodesWithText("Log out")
-        .filterToOne(hasAnyAncestor(isDialog()))
-        .assertIsDisplayed()
+        .filter(hasAnyAncestor(isDialog()))
+    if (isLogoutButtonVisible) {
+        logoutNodes.onFirst().assertIsDisplayed()
+    } else {
+        logoutNodes.assertCountEquals(0)
+    }
     this
         .onAllNodesWithText(accountSummary.email, substring = true)
         .filterToOne(hasAnyAncestor(isDialog()))

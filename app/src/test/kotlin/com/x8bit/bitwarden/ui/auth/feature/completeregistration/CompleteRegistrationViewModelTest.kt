@@ -621,6 +621,7 @@ class CompleteRegistrationViewModelTest : BaseViewModelTest() {
         specialCircumstanceManager = specialCircumstanceManager,
         generatorRepository = generatorRepository,
         toastManager = toastManager,
+        vaultBackupManager = mockk(),
     )
 
     companion object {

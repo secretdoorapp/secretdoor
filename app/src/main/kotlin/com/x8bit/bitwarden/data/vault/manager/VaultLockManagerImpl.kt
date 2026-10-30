@@ -697,7 +697,8 @@ internal class VaultLockManagerImpl(
             }
 
             VaultTimeoutAction.LOGOUT -> {
-                userLogoutManager.softLogout(userId = userId, reason = LogoutReason.Timeout)
+                // SecretDoor: logging out would erase the only copy of the vault, so lock instead.
+                setVaultToLocked(userId = userId)
             }
         }
     }

@@ -57,7 +57,7 @@ class LocalNetworkAccessScreenTest : BitwardenComposeTest() {
             .assertIsDisplayed()
         composeTestRule
             .onNodeWithText(
-                text = "Bitwarden needs local network access to sync with your server. Without " +
+                text = "SecretDoor needs local network access to sync with your server. Without " +
                     "this permission, the app won’t be able to connect.",
             )
             .assertIsDisplayed()
@@ -101,7 +101,7 @@ class LocalNetworkAccessScreenTest : BitwardenComposeTest() {
             .performClick()
         composeTestRule
             .onNodeWithText(
-                text = "Without this permission, Bitwarden won’t be able to connect and sync " +
+                text = "Without this permission, SecretDoor won’t be able to connect and sync " +
                     "with your server. You can enable this in your device settings.",
             )
             .assertIsDisplayed()

@@ -81,6 +81,7 @@ class RetrofitsTest {
         headersInterceptor = headersInterceptors,
         certificateProvider = certificateProvider,
         json = json,
+        allowedHostsInterceptor = { it.proceed(it.request()) },
     )
 
     private var isAuthInterceptorCalled = false
@@ -347,6 +348,7 @@ class RetrofitsTest {
                 certificateProvider = certificateProvider,
                 permissionInterceptor = permissionInterceptor,
                 json = json,
+                allowedHostsInterceptor = { it.proceed(it.request()) },
             )
 
             retrofits.createStaticRetrofit()

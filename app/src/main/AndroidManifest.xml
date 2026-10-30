@@ -349,12 +349,6 @@
             android:name="android.content.APP_RESTRICTIONS"
             android:resource="@xml/app_restrictions" />
 
-        <service
-            android:name="com.x8bit.bitwarden.data.platform.service.AuthenticatorBridgeService"
-            android:exported="true"
-            android:permission="${applicationId}.permission.AUTHENTICATOR_BRIDGE_SERVICE" />
-
-        <!-- Firebase SDK initOrder is 100. We use a higher order to initialize first -->
         <provider
             android:name=".data.platform.contentprovider.UncaughtErrorLoggingContentProvider"
             android:authorities="${applicationId}"

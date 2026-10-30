@@ -414,16 +414,7 @@ fun AccountSecurityScreen(
                 )
             }
             BitwardenTextRow(
-                text = stringResource(id = BitwardenString.log_out),
-                onClick = { viewModel.trySendAction(AccountSecurityAction.LogoutClick) },
-                cardStyle = CardStyle.Middle(),
-                modifier = Modifier
-                    .testTag("LogOutLabel")
-                    .standardHorizontalMargin()
-                    .fillMaxWidth(),
-            )
-            BitwardenTextRow(
-                text = stringResource(id = BitwardenString.delete_account),
+                text = stringResource(id = BitwardenString.delete_vault),
                 onClick = { viewModel.trySendAction(AccountSecurityAction.DeleteAccountClick) },
                 cardStyle = CardStyle.Bottom,
                 modifier = Modifier
@@ -564,48 +555,23 @@ private fun SessionTimeoutActionRow(
     modifier: Modifier = Modifier,
     resources: Resources = LocalResources.current,
 ) {
-    var shouldShowLogoutActionConfirmationDialog by rememberSaveable { mutableStateOf(false) }
+    // SecretDoor: logging out would erase the only copy of the vault, so it is not offered.
+    val actions = VaultTimeoutAction.entries.filter { it != VaultTimeoutAction.LOGOUT }
     BitwardenMultiSelectButton(
         isEnabled = isEnabled,
         label = stringResource(id = BitwardenString.session_timeout_action),
-        options = VaultTimeoutAction.entries.map { it.displayLabel() }.toImmutableList(),
+        options = actions.map { it.displayLabel() }.toImmutableList(),
         selectedOption = selectedVaultTimeoutAction.displayLabel(),
         onOptionSelected = { action ->
-            val selectedAction = VaultTimeoutAction.entries.first {
-                it.displayLabel.toString(resources) == action
-            }
-            if (selectedAction == VaultTimeoutAction.LOGOUT) {
-                shouldShowLogoutActionConfirmationDialog = true
-            } else {
-                onVaultTimeoutActionSelect(selectedAction)
-            }
+            onVaultTimeoutActionSelect(
+                actions.first { it.displayLabel.toString(resources) == action },
+            )
         },
         supportingText = supportingText,
         textFieldTestTag = "SessionTimeoutActionStatusLabel",
         cardStyle = cardStyle,
         modifier = modifier,
     )
-
-    if (shouldShowLogoutActionConfirmationDialog) {
-        BitwardenTwoButtonDialog(
-            title = stringResource(id = BitwardenString.vault_timeout_log_out_confirmation_title),
-            message = stringResource(
-                id = BitwardenString.vault_timeout_log_out_confirmation_message,
-            ),
-            confirmButtonText = stringResource(id = BitwardenString.yes),
-            dismissButtonText = stringResource(id = BitwardenString.cancel),
-            onConfirmClick = {
-                shouldShowLogoutActionConfirmationDialog = false
-                onVaultTimeoutActionSelect(VaultTimeoutAction.LOGOUT)
-            },
-            onDismissClick = {
-                shouldShowLogoutActionConfirmationDialog = false
-            },
-            onDismissRequest = {
-                shouldShowLogoutActionConfirmationDialog = false
-            },
-        )
-    }
 }
 
 @Composable

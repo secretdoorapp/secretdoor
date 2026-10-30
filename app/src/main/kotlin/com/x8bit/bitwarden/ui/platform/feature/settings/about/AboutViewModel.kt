@@ -62,14 +62,17 @@ class AboutViewModel @Inject constructor(
             deviceData = buildInfoManager.deviceData.asText(),
             ciData = buildInfoManager.ciBuildInfo?.let { "\n$it" }.orEmpty().asText(),
             isSubmitCrashLogsEnabled = logsManager.isEnabled,
-            shouldShowCrashLogsButton = !buildInfoManager.isFdroid,
+            // SecretDoor has no crash reporting service to submit logs to.
+            shouldShowCrashLogsButton = false,
             isFlightRecorderEnabled = settingsRepository
                 .flightRecorderData
                 .hasActiveFlightRecorderData,
             flightRecorderSubtext = settingsRepository
                 .flightRecorderData
                 .getStopsLoggingStringForActiveLog(clock = clock),
-            copyrightInfo = "© Bitwarden Inc. 2015-${Year.now(clock).value}".asText(),
+            copyrightInfo = ("SecretDoor is based on Bitwarden.\n" +
+                "© Bitwarden Inc. 2015-${Year.now(clock).value}. Licensed under GPLv3.")
+                .asText(),
         )
     },
 ) {

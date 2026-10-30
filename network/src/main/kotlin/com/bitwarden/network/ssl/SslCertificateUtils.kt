@@ -1,5 +1,6 @@
 package com.bitwarden.network.ssl
 
+import com.bitwarden.network.interceptor.AllowedHostsInterceptor
 import okhttp3.OkHttpClient
 import java.security.KeyStore
 import javax.net.ssl.SSLContext
@@ -15,6 +16,7 @@ import javax.net.ssl.X509TrustManager
  */
 fun CertificateProvider.createMtlsOkHttpClient(): OkHttpClient =
     OkHttpClient.Builder()
+        .addInterceptor(AllowedHostsInterceptor())
         .configureSsl(certificateProvider = this)
         .build()
 

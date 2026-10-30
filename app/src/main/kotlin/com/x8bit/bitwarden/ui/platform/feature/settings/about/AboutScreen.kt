@@ -71,15 +71,15 @@ fun AboutScreen(
             AboutEvent.NavigateToRecordedLogs -> onNavigateToRecordedLogs()
 
             AboutEvent.NavigateToFlightRecorderHelp -> {
-                intentManager.launchUri("https://bitwarden.com/help/flight-recorder".toUri())
+                intentManager.launchUri("https://github.com/zcoklin/secretdoor#readme".toUri())
             }
 
             AboutEvent.NavigateToHelpCenter -> {
-                intentManager.launchUri("https://bitwarden.com/help".toUri())
+                intentManager.launchUri("https://github.com/zcoklin/secretdoor#readme".toUri())
             }
 
             AboutEvent.NavigateToPrivacyPolicy -> {
-                intentManager.launchUri("https://bitwarden.com/privacy".toUri())
+                intentManager.launchUri("https://github.com/zcoklin/secretdoor#privacy".toUri())
             }
 
             AboutEvent.NavigateToLearnAboutOrganizations -> {
@@ -108,9 +108,6 @@ fun AboutScreen(
             modifier = Modifier.fillMaxSize(),
             onHelpCenterClick = { viewModel.trySendAction(AboutAction.HelpCenterClick) },
             onPrivacyPolicyClick = { viewModel.trySendAction(AboutAction.PrivacyPolicyClick) },
-            onLearnAboutOrgsClick = {
-                viewModel.trySendAction(AboutAction.LearnAboutOrganizationsClick)
-            },
             onSubmitCrashLogsCheckedChange = {
                 viewModel.trySendAction(AboutAction.SubmitCrashLogsClick(it))
             },
@@ -124,7 +121,6 @@ fun AboutScreen(
                 viewModel.trySendAction(AboutAction.ViewRecordedLogsClick)
             },
             onVersionClick = { viewModel.trySendAction(AboutAction.VersionClick) },
-            onWebVaultClick = { viewModel.trySendAction(AboutAction.WebVaultClick) },
         )
     }
 }
@@ -135,13 +131,11 @@ private fun AboutScreenContent(
     state: AboutState,
     onHelpCenterClick: () -> Unit,
     onPrivacyPolicyClick: () -> Unit,
-    onLearnAboutOrgsClick: () -> Unit,
     onSubmitCrashLogsCheckedChange: (Boolean) -> Unit,
     onFlightRecorderCheckedChange: (Boolean) -> Unit,
     onFlightRecorderTooltipClick: () -> Unit,
     onViewRecordedLogsClick: () -> Unit,
     onVersionClick: () -> Unit,
-    onWebVaultClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -188,34 +182,6 @@ private fun AboutScreenContent(
                 .standardHorizontalMargin()
                 .fillMaxWidth()
                 .testTag(tag = "PrivacyPolicyRow"),
-        )
-        BitwardenExternalLinkRow(
-            text = stringResource(id = BitwardenString.web_vault),
-            onConfirmClick = onWebVaultClick,
-            dialogTitle = stringResource(id = BitwardenString.continue_to_web_app),
-            dialogMessage = stringResource(
-                id = BitwardenString.explore_more_features_of_your_bitwarden_account_on_the_web_app,
-            ),
-            withDivider = false,
-            cardStyle = CardStyle.Middle(),
-            modifier = Modifier
-                .standardHorizontalMargin()
-                .fillMaxWidth()
-                .testTag(tag = "BitwardenWebVaultRow"),
-        )
-        BitwardenExternalLinkRow(
-            text = stringResource(id = BitwardenString.learn_org),
-            onConfirmClick = onLearnAboutOrgsClick,
-            dialogTitle = stringResource(id = BitwardenString.continue_to_x, "bitwarden.com"),
-            dialogMessage = stringResource(
-                id = BitwardenString.learn_about_organizations_description_long,
-            ),
-            withDivider = false,
-            cardStyle = CardStyle.Middle(),
-            modifier = Modifier
-                .standardHorizontalMargin()
-                .fillMaxWidth()
-                .testTag(tag = "LearnAboutOrganizationsRow"),
         )
         CopyRow(
             text = state.version,
@@ -342,13 +308,11 @@ private fun AboutScreenContent_preview() {
             ),
             onHelpCenterClick = {},
             onPrivacyPolicyClick = {},
-            onLearnAboutOrgsClick = {},
             onSubmitCrashLogsCheckedChange = { },
             onFlightRecorderCheckedChange = { },
             onFlightRecorderTooltipClick = {},
             onViewRecordedLogsClick = {},
             onVersionClick = {},
-            onWebVaultClick = {},
         )
     }
 }

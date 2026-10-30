@@ -37,6 +37,7 @@ import com.bitwarden.ui.platform.base.util.EventsEffect
 import com.bitwarden.ui.platform.base.util.standardHorizontalMargin
 import com.bitwarden.ui.platform.components.appbar.BitwardenTopAppBar
 import com.bitwarden.ui.platform.components.button.BitwardenFilledButton
+import com.bitwarden.ui.platform.components.button.BitwardenOutlinedButton
 import com.bitwarden.ui.platform.components.card.BitwardenActionCardSmall
 import com.bitwarden.ui.platform.components.card.color.bitwardenCardColors
 import com.bitwarden.ui.platform.components.dialog.BitwardenBasicDialog
@@ -52,6 +53,8 @@ import com.bitwarden.ui.platform.components.snackbar.model.rememberBitwardenSnac
 import com.bitwarden.ui.platform.components.text.BitwardenClickableText
 import com.bitwarden.ui.platform.components.toggle.BitwardenSwitch
 import com.bitwarden.ui.platform.components.util.rememberVectorPainter
+import com.bitwarden.ui.platform.composition.LocalIntentManager
+import com.bitwarden.ui.platform.manager.IntentManager
 import com.bitwarden.ui.platform.model.WindowSize
 import com.bitwarden.ui.platform.resource.BitwardenDrawable
 import com.bitwarden.ui.platform.resource.BitwardenString
@@ -59,6 +62,7 @@ import com.bitwarden.ui.platform.theme.BitwardenTheme
 import com.bitwarden.ui.platform.util.rememberWindowSize
 import com.x8bit.bitwarden.ui.auth.feature.completeregistration.handlers.CompleteRegistrationHandler
 import com.x8bit.bitwarden.ui.auth.feature.completeregistration.handlers.rememberCompleteRegistrationHandler
+import com.x8bit.bitwarden.ui.platform.components.dialog.BitwardenMasterPasswordDialog
 
 /**
  * Top level composable for the complete registration screen.
@@ -70,10 +74,16 @@ fun CompleteRegistrationScreen(
     onNavigateBack: () -> Unit,
     onNavigateToPasswordGuidance: () -> Unit,
     onNavigateToPreventAccountLockout: () -> Unit,
+    intentManager: IntentManager = LocalIntentManager.current,
     viewModel: CompleteRegistrationViewModel = hiltViewModel(),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     val handler = rememberCompleteRegistrationHandler(viewModel = viewModel)
+    val backupFileLauncher = intentManager.getActivityResultLauncher { activityResult ->
+        intentManager.getFileDataFromActivityResult(activityResult)?.let {
+            handler.onBackupFileReceive(it.uri)
+        }
+    }
     val snackbarHostState = rememberBitwardenSnackbarHostState()
 
     EventsEffect(viewModel) { event ->
@@ -86,6 +96,12 @@ fun CompleteRegistrationScreen(
             CompleteRegistrationEvent.NavigateToMakePasswordStrong -> onNavigateToPasswordGuidance()
             CompleteRegistrationEvent.NavigateToPreventAccountLockout -> {
                 onNavigateToPreventAccountLockout()
+            }
+
+            CompleteRegistrationEvent.NavigateToSelectBackupFile -> {
+                backupFileLauncher.launch(
+                    intentManager.createFileChooserIntent(withCameraIntents = false),
+                )
             }
         }
     }
@@ -115,6 +131,22 @@ fun CompleteRegistrationScreen(
 
         CompleteRegistrationDialog.Loading -> {
             BitwardenLoadingDialog(text = stringResource(id = BitwardenString.create_vault))
+        }
+
+        CompleteRegistrationDialog.RestoreMasterPassword -> {
+            BitwardenMasterPasswordDialog(
+                title = stringResource(id = BitwardenString.restore_from_backup),
+                message = stringResource(
+                    id = BitwardenString.enter_the_master_password_of_the_vault_in_this_backup,
+                ),
+                confirmButtonText = stringResource(id = BitwardenString.restore),
+                onConfirmClick = handler.onRestoreMasterPasswordSubmit,
+                onDismissRequest = handler.onDismissErrorDialog,
+            )
+        }
+
+        CompleteRegistrationDialog.RestoringVault -> {
+            BitwardenLoadingDialog(text = stringResource(id = BitwardenString.restoring_vault))
         }
 
         null -> Unit
@@ -290,6 +322,15 @@ private fun CompleteRegistrationContent(
                 .fillMaxWidth()
                 .standardHorizontalMargin(),
         )
+        Spacer(modifier = Modifier.height(height = 12.dp))
+        BitwardenOutlinedButton(
+            label = stringResource(id = BitwardenString.restore_from_backup),
+            onClick = handler.onRestoreFromBackupClick,
+            modifier = Modifier
+                .testTag("RestoreFromBackupButton")
+                .fillMaxWidth()
+                .standardHorizontalMargin(),
+        )
     }
 }
 
@@ -372,6 +413,9 @@ private fun CompleteRegistrationContentOldUI_preview() {
                 onLearnToPreventLockout = {},
                 onMakeStrongPassword = {},
                 onCallToAction = {},
+                onRestoreFromBackupClick = {},
+                onBackupFileReceive = {},
+                onRestoreMasterPasswordSubmit = {},
             ),
             callToActionText = "Next",
             nextButtonEnabled = true,

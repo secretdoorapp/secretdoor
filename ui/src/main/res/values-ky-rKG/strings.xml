@@ -75,9 +75,9 @@
     <string name="yes">Ооба</string>
     <string name="account">Аккаунт</string>
     <string name="account_created_success">Сиздин жаңы аккаунт түзүлдү!</string>
-    <string name="set_bitwarden_as_passkey_manager_description">Түзмөк орнотууларында Bitwardenди өтүү ачкыч провайдери катары коюңуз.</string>
+    <string name="set_bitwarden_as_passkey_manager_description">Түзмөк орнотууларында SecretDoorди өтүү ачкыч провайдери катары коюңуз.</string>
     <string name="avoid_ambiguous_characters">Эки маанилүү белгилерден алыс болуу</string>
-    <string name="bitwarden_autofill_service">Bitwarden Автолуктоо Кызматы</string>
+    <string name="bitwarden_autofill_service">SecretDoor Автолуктоо Кызматы</string>
     <string name="change_master_password">Башкы сырсөздү өзгөртүү</string>
     <string name="close">Жабуу</string>
     <string name="close_app">Колдонмону жабуу</string>
@@ -108,7 +108,7 @@
     <string name="vault_timeout_log_out_confirmation_title">Сессиянын бүтүү убактысын “Чыгуу” кылып коюу?</string>
     <string name="vault_timeout_log_out_confirmation_message">Убакыт бүткөндөн кийин, сиз чыгарыласыз. Кайра кирүү жана купчулуңузга кирүү үчүн интернетке туташууңуз керек болот. Бул түзмөктө сакталган орнотууларыңыз жана PIN өзгөрбөйт.</string>
     <string name="logging_in">Кирүүдө…</string>
-    <string name="login_to_bitwarden">Bitwardenге кирүү</string>
+    <string name="login_to_bitwarden">SecretDoorге кирүү</string>
     <string name="master_password_confirmation_val_message">Сырсөздү ырастоо туура эмес.</string>
     <string name="master_password_description">Башкы сырсөз бул сиз купчулуңузга кирүү үчүн колдонгон сырсөз. Башкы сырсөзүңүздү унутпоо өтө маанилүү. Эгерде сиз аны унутсаңыз, сырсөздү калыбына келтирүүнүн эч кандай жолу жок.</string>
     <string name="master_password_hint">Башкы сырсөз боюнча кеңеш (милдеттүү эмес)</string>
@@ -169,14 +169,14 @@
     <string name="view_identity">Иденттүүлүктү көрүү</string>
     <string name="view_note">Эскертүүнү көрүү</string>
     <string name="view_ssh_key">SSH ачкычын көрүү</string>
-    <string name="web_vault">Bitwarden веб купчу</string>
+    <string name="web_vault">SecretDoor веб купчу</string>
     <string name="items">Элементтер</string>
     <string name="items_for_uri">%1$s үчүн элементтер</string>
     <string name="no_items_for_uri">%1$s үчүн купчулда эч кандай элементтер жок.</string>
     <string name="no_items_for_vault">Сиздин купчулда “%1$s” дал келген эч кандай элементтер жок</string>
     <string name="search_for_a_login_or_add_a_new_login">Кирүүнү издеңиз же жаңы кирүү кошуңуз</string>
     <string name="disabled">Өчүрүлгөн</string>
-    <string name="bitwarden_autofill_service_alert2">Купчулуңузга жаңы кирүүлөрдү кошуунун эң оңой жолу - Bitwarden Автолуктоо Кызматы аркылуу. Bitwarden Автолуктоо Кызматын колдонуу жөнүндө көбүрөөк билүү үчүн “Орнотуулар” бетине өтүңүз.</string>
+    <string name="bitwarden_autofill_service_alert2">Купчулуңузга жаңы кирүүлөрдү кошуунун эң оңой жолу - SecretDoor Автолуктоо Кызматы аркылуу. SecretDoor Автолуктоо Кызматын колдонуу жөнүндө көбүрөөк билүү үчүн “Орнотуулар” бетине өтүңүз.</string>
     <string name="autofill_noun">Автолуктоо</string>
     <string name="autofill_verb">Автолуктоо</string>
     <string name="autofill_or_view">Бул элементти автолуктоону же көрүүнү каалайсызбы?</string>
@@ -228,7 +228,7 @@
     <string name="environment_saved">Чөйрөнүн URL даректери сакталды.</string>
     <string name="identity_url">Иденттүүлүк серверинин URL дареги</string>
     <string name="self_hosted_environment">Өзүн өзү камсыздоочу чөйрө</string>
-    <string name="self_hosted_environment_footer">Өзүңүздүн ички сервериңизде жайгашкан Bitwarden орнотмосунун базалык URL дарегин көрсөтүңүз.</string>
+    <string name="self_hosted_environment_footer">Өзүңүздүн ички сервериңизде жайгашкан SecretDoor орнотмосунун базалык URL дарегин көрсөтүңүз.</string>
     <string name="server_url">Сервердин URL дареги</string>
     <string name="web_vault_url">Веб купч серверинин URL дареги</string>
     <string name="custom_fields">Ыңгайлаштырылган талаалар</string>
@@ -298,7 +298,7 @@
     <string name="no_items_folder">Бул папкада эч кандай элементтер жок.</string>
     <string name="no_items_trash">Себетте эч кандай элементтер жок.</string>
     <string name="autofill_accessibility_summary">Башка колдонмолордо жана вебде колдонуучу аты жана сырсөз талааларын толтурууга жардам берүү.</string>
-    <string name="autofill_service_description">Bitwarden автолуктоо кызматы түзмөгүңүздөгү башка колдонмолорго кирүү маалыматтарын толтурууга жардам берүү үчүн Android Автолуктоо рамкасын колдонот.</string>
+    <string name="autofill_service_description">SecretDoor автолуктоо кызматы түзмөгүңүздөгү башка колдонмолорго кирүү маалыматтарын толтурууга жардам берүү үчүн Android Автолуктоо рамкасын колдонот.</string>
     <string name="bitwarden_autofill_go_to_settings">Биз сиз үчүн Android автолуктоо орнотуулар менюсун автоматтык түрдө ача албай калдык. Сиз Android Орнотуулар &gt; Система &gt; Тилдер жана киргизүү &gt; Кошумча &gt; Автолуктоо кызматы аркылуу автолуктоо орнотуулар менюсуна кол менен өтө аласыз.</string>
     <string name="custom_field_name">Ыңгайлаштырылган талаанын аты</string>
     <string name="field_type_boolean">Логикалык</string>
@@ -373,7 +373,7 @@
     <string name="pin">PIN</string>
     <string name="unlock">Ачуу</string>
     <string name="thirty_minutes">30 мүнөт</string>
-    <string name="set_pin_description">PIN кеминде 4 белгиден турушу керек. Эгерде сиз Bitwarden колдонмосунан кол менен чыксаңыз, PIN орнотууларыңыз кайра орнотулат.</string>
+    <string name="set_pin_description">PIN кеминде 4 белгиден турушу керек. Эгерде сиз SecretDoor колдонмосунан кол менен чыксаңыз, PIN орнотууларыңыз кайра орнотулат.</string>
     <string name="logged_in_as_on">%2$s түзмөгүндө %1$s катары кирдиңиз.</string>
     <string name="vault_locked_master_password">Сиздин купчул кулпуланган. Улантуу үчүн башкы сырсөзүңүздү текшериңиз.</string>
     <string name="vault_locked_pin">Сиздин купчул кулпуланган. Улантуу үчүн PIN кодуңузду текшериңиз.</string>
@@ -387,7 +387,7 @@
     <string name="clear_clipboard">Буферди тазалоо</string>
     <string name="clear_clipboard_description">Көчүрүлгөн маанилерди буферден автоматтык түрдө тазалоо.</string>
     <string name="default_uri_match_detection">Баштапкы URI дал келүүсүн аныктоо</string>
-    <string name="default_uri_match_detection_description">URI дал келүүсүн аныктоо Bitwardenдин автолуктоо сунуштарын кантип аныкташын көзөмөлдөйт.</string>
+    <string name="default_uri_match_detection_description">URI дал келүүсүн аныктоо SecretDoorдин автолуктоо сунуштарын кантип аныкташын көзөмөлдөйт.</string>
     <string name="theme">Тема</string>
     <string name="theme_description">Колдонмонун түс темасын өзгөртүү</string>
     <string name="copy_notes">Эскертүүнү көчүрүү</string>
@@ -423,7 +423,7 @@
     <string name="password_generator_policy_in_effect">Бир же бир нече уюм саясаты сиздин генератор орнотууларыңызга таасир этүүдө</string>
     <string name="unable_to_save_attachment">Бул тиркемени сактоодо көйгөй чыкты. Эгерде көйгөй уланса, аны веб купчулдан сактай аласыз.</string>
     <string name="save_attachment_success">Тиркеме ийгиликтүү сакталды</string>
-    <string name="autofill_tile_accessibility_required">Автолуктоо плиткасын колдонуу үчүн Bitwarden Орнотууларынан “Автолуктоо Жеткиликтүүлүк Кызматын” күйгүзүңүз.</string>
+    <string name="autofill_tile_accessibility_required">Автолуктоо плиткасын колдонуу үчүн SecretDoor Орнотууларынан “Автолуктоо Жеткиликтүүлүк Кызматын” күйгүзүңүз.</string>
     <string name="autofill_tile_uri_not_found">Сырсөз талаалары аныкталган жок</string>
     <string name="soft_deleting">Себетке жөнөтүлүүдө…</string>
     <string name="item_soft_deleted">Элемент себетке жөнөтүлдү.</string>
@@ -636,9 +636,9 @@
     <string name="catch_all_email_description">Домениңиздин конфигурацияланган бардык каттарды кабыл алуучу кирүү кутусун колдонуу.</string>
     <string name="forwarded_email_description">Сырткы кайра жөнөтүү кызматы менен электрондук почтанын псевдонимирин түзүү.</string>
     <string name="accessibility_service_disclosure">Жеткиликтүүлүк Кызматынын Ачыкка Чыгаруусу</string>
-    <string name="accessibility_disclosure_text">Bitwarden колдонмолордон жана веб-сайттардан кирүү талааларын издөө үчүн Жеткиликтүүлүк Кызматын колдонот, андан кийин колдонмо же сайт үчүн дал келүү табылганда колдонуучу аты жана сырсөз киргизүү үчүн тийиштүү талаа IDлерин аныктайт. Биз кызмат тарабынан бизге берилген эч кандай маалыматты сактабайбыз, ошондой эле маалыматтардын тексттик киргизүүсүнөн тышкары экрандагы эч кандай элементтерди көзөмөлдөөгө аракет кылбайбыз.</string>
-    <string name="accessibility_disclosure_start_up_text_1">Bitwarden жеткиликтүүлүккө негизделген автолуктоону сунуштай электе бул эскертүү талап кылынат.</string>
-    <string name="accessibility_disclosure_start_up_text_2">Bitwarden кирүү талааларын аныктоо үчүн Androidдин Жеткиликтүүлүк Кызматын колдонгон милдеттүү эмес автолуктоо ыкмасын сунуштайт. Эгерде сиз аны иштетсеңиз, Bitwarden тийиштүү талааларды аныктап, дал келүү табылганда маалыматтарыңызды толтурат.</string>
+    <string name="accessibility_disclosure_text">SecretDoor колдонмолордон жана веб-сайттардан кирүү талааларын издөө үчүн Жеткиликтүүлүк Кызматын колдонот, андан кийин колдонмо же сайт үчүн дал келүү табылганда колдонуучу аты жана сырсөз киргизүү үчүн тийиштүү талаа IDлерин аныктайт. Биз кызмат тарабынан бизге берилген эч кандай маалыматты сактабайбыз, ошондой эле маалыматтардын тексттик киргизүүсүнөн тышкары экрандагы эч кандай элементтерди көзөмөлдөөгө аракет кылбайбыз.</string>
+    <string name="accessibility_disclosure_start_up_text_1">SecretDoor жеткиликтүүлүккө негизделген автолуктоону сунуштай электе бул эскертүү талап кылынат.</string>
+    <string name="accessibility_disclosure_start_up_text_2">SecretDoor кирүү талааларын аныктоо үчүн Androidдин Жеткиликтүүлүк Кызматын колдонгон милдеттүү эмес автолуктоо ыкмасын сунуштайт. Эгерде сиз аны иштетсеңиз, SecretDoor тийиштүү талааларды аныктап, дал келүү табылганда маалыматтарыңызды толтурат.</string>
     <string name="accessibility_disclosure_start_up_text_3">Биз Жеткиликтүүлүк Кызматын колдонуп жатканыңызда экранда эмне болуп жатканы тууралуу эч кандай маалыматты сактабайбыз жана маалыматтарды киргизүүдөн тышкары экрандагы эч кандай элементтерди көзөмөлдөбөйбүз.</string>
     <string name="i_understand">Түшүндүм</string>
     <string name="accept">Кабыл алуу</string>
@@ -647,7 +647,7 @@
     <string name="login_attempt_from_x_do_you_want_to_switch_to_this_account">Кирүү аракети:
 %1$s
 Бул аккаунтка өткүңүз келеби?</string>
-    <string name="new_to_bitwarden">Bitwarden жаңыбы?</string>
+    <string name="new_to_bitwarden">SecretDoor жаңыбы?</string>
     <string name="get_master_passwordword_hint">Башкы сырсөз боюнча кеңеш алуу</string>
     <string name="logging_in_as_x_on_y">%2$s түзмөгүндө %1$s катары кирүү</string>
     <string name="not_you">Сиз эмессизби?</string>
@@ -704,7 +704,7 @@
     <string name="invalid_uri">URI туура эмес</string>
     <string name="the_urix_is_already_blocked">%1$s URI мурун эле бөгөттөлгөн</string>
     <string name="login_approved">Кирүү бекитилди</string>
-    <string name="log_in_with_device_must_be_set_up_in_the_settings_of_the_bitwarden_app">Түзмөк менен кирүү Bitwarden колдонмосунун орнотууларында орнотулушу керек.</string>
+    <string name="log_in_with_device_must_be_set_up_in_the_settings_of_the_bitwarden_app">Түзмөк менен кирүү SecretDoor колдонмосунун орнотууларында орнотулушу керек.</string>
     <string name="need_another_option_view_all_login_options">Башка вариант керекпи? <annotation link="viewAll">Бардык кирүү варианттарын көрүү</annotation></string>
     <string name="log_in_with_device">Түзмөк менен кирүү</string>
     <string name="logging_in_on">Кирүүдө</string>
@@ -713,14 +713,14 @@
     <string name="select_vault">Select vault</string>
     <string name="appearance">Көрүнүшү</string>
     <string name="account_security">Аккаунт коопсуздугу</string>
-    <string name="bitwarden_help_center">Bitwarden жардам борбору</string>
+    <string name="bitwarden_help_center">SecretDoor жардам борбору</string>
     <string name="sync_now">Азыр синхрондоштуруу</string>
     <string name="unlock_options">Ачуу параметрлери</string>
     <string name="session_timeout">Сессиянын бүтүү убактысы</string>
     <string name="session_timeout_action">Сессия бүткөндөгү аракет</string>
     <string name="account_fingerprint_phrase">Аккаунттун манжа изи фразасы</string>
-    <string name="passkey_management_explanation_long">Жаңы өтүү ачкычтарын сактоо жана купчулуңузда сакталган өтүү ачкычтары менен кирүү үчүн Bitwardenди колдонуңуз.</string>
-    <string name="autofill_services_explanation_long">Bitwardenге түзмөгүңүздөгү башка колдонмолорго кирүү үчүн сакталган кирүү маалыматтарыңызды колдонууга уруксат бериңиз.</string>
+    <string name="passkey_management_explanation_long">Жаңы өтүү ачкычтарын сактоо жана купчулуңузда сакталган өтүү ачкычтары менен кирүү үчүн SecretDoorди колдонуңуз.</string>
+    <string name="autofill_services_explanation_long">SecretDoorге түзмөгүңүздөгү башка колдонмолорго кирүү үчүн сакталган кирүү маалыматтарыңызды колдонууга уруксат бериңиз.</string>
     <string name="use_inline_autofill_explanation_long">Түзмөгүңүздөгү башка колдонмолорго киргениңизде автолуктоо сунуштарыңыз кантип пайда болорун тандаңыз.</string>
     <string name="additional_options">Кошумча параметрлер</string>
     <string name="continue_to_web_app">Веб колдонмого улантуу?</string>
@@ -728,12 +728,12 @@
     <string name="continue_to_help_center">Жардам борборуна улантуу?</string>
     <string name="continue_to_privacy_policy">Купуялык саясатына улантуу?</string>
     <string name="continue_to_device_settings">Түзмөк Орнотууларына улантуу?</string>
-    <string name="two_step_login_description_long">Bitwarden веб колдонмосунда эки кадамдуу кирүүнү орнотуу менен аккаунтуңузду коопсуз кылыңыз.</string>
-    <string name="change_master_password_description_long">Сиз башкы сырсөзүңүздү Bitwarden веб колдонмосунда өзгөртө аласыз.</string>
-    <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Bitwardenди кантип колдонуу жөнүндө Жардам борборунан көбүрөөк билүү.</string>
+    <string name="two_step_login_description_long">SecretDoor веб колдонмосунда эки кадамдуу кирүүнү орнотуу менен аккаунтуңузду коопсуз кылыңыз.</string>
+    <string name="change_master_password_description_long">Сиз башкы сырсөзүңүздү SecretDoor веб колдонмосунда өзгөртө аласыз.</string>
+    <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">SecretDoorди кантип колдонуу жөнүндө Жардам борборунан көбүрөөк билүү.</string>
     <string name="privacy_policy_description_long">bitwarden.com сайтындагы купуялык саясатыбыз менен таанышыңыз.</string>
-    <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Bitwarden аккаунтуңуздун дагы көп функцияларын веб колдонмодо изилдеңиз.</string>
-    <string name="learn_about_organizations_description_long">Bitwarden уюмду колдонуу менен купчул элементтериңизди башкалар менен бөлүшүүгө мүмкүнчүлүк берет. bitwarden.com веб-сайтында көбүрөөк билип алыңыз.</string>
+    <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">SecretDoor аккаунтуңуздун дагы көп функцияларын веб колдонмодо изилдеңиз.</string>
+    <string name="learn_about_organizations_description_long">SecretDoor уюмду колдонуу менен купчул элементтериңизди башкалар менен бөлүшүүгө мүмкүнчүлүк берет. bitwarden.com веб-сайтында көбүрөөк билип алыңыз.</string>
     <string name="created_x">%1$s түзүлгөн</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Уюмуңуз сизден башкы сырсөз коюуну талап кылат.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Купчул убактыңыздын аракетин өзгөртүү үчүн ачуу параметрин орнотуңуз.</string>
@@ -743,8 +743,8 @@
     <string name="duo_two_step_login_is_required_for_your_account">Сиздин аккаунтуңуз үчүн Duo эки кадамдуу кирүү талап кылынат.</string>
     <string name="follow_the_steps_from_duo_to_finish_logging_in">Кирүүнү аяктоо үчүн Duo кадамдарын аткарыңыз.</string>
     <string name="launch_duo">Duo ишке киргизүү</string>
-    <string name="your_passkey_will_be_saved_to_your_bitwarden_vault_for_x">Сиздин өтүү ачкычыңыз %1$s үчүн Bitwarden купчулуңузга сакталат</string>
-    <string name="your_password_will_be_saved_to_your_bitwarden_vault_for_x">Сиздин сырсөзүңүз %1$s үчүн Bitwarden купчулуңузга сакталат</string>
+    <string name="your_passkey_will_be_saved_to_your_bitwarden_vault_for_x">Сиздин өтүү ачкычыңыз %1$s үчүн SecretDoor купчулуңузга сакталат</string>
+    <string name="your_password_will_be_saved_to_your_bitwarden_vault_for_x">Сиздин сырсөзүңүз %1$s үчүн SecretDoor купчулуңузга сакталат</string>
     <string name="passkeys_not_supported_for_this_app">Бул колдонмо үчүн өтүү ачкычтары колдоого алынбайт</string>
     <string name="passkey_operation_failed_because_browser_is_not_privileged">Өтүү ачкычы операциясы ишке ашпай калды, анткени браузер артыкчылыктуу эмес</string>
     <string name="passkey_operation_failed_because_browser_signature_does_not_match">Өтүү ачкычы операциясы ишке ашпай калды, анткени браузердин кол тамгасы дал келбейт</string>
@@ -770,15 +770,15 @@
     <string name="check_your_email">Электрондук почтаңызды текшериңиз</string>
     <string name="open_email_app">Электрондук почта колдонмосун ачуу</string>
     <string name="email_verified">Электрондук почта текшерилди</string>
-    <string name="get_emails_from_bitwarden_for_announcements_advices_and_research_opportunities_unsubscribe_any_time">Bitwardenден жарыялар, кеңештер жана изилдөө мүмкүнчүлүктөрү үчүн электрондук каттарды алыңыз. Каалаган убакта <annotation link="unsubscribe">Жазылуудан баш тартуу</annotation>.</string>
+    <string name="get_emails_from_bitwarden_for_announcements_advices_and_research_opportunities_unsubscribe_any_time">SecretDoorден жарыялар, кеңештер жана изилдөө мүмкүнчүлүктөрү үчүн электрондук каттарды алыңыз. Каалаган убакта <annotation link="unsubscribe">Жазылуудан баш тартуу</annotation>.</string>
     <string name="security_prioritized">Коопсуздук, биринчи орунда</string>
-    <string name="welcome_message_1">Кирүүлөрдү, карталарды жана иденттүүлүктөрдү коопсуз купчулуңузга сактаңыз. Bitwarden сиз үчүн маанилүү нерселерди коргоо үчүн нөлдүк билимди, учтан-учка шифрлөөнү колдонот.</string>
+    <string name="welcome_message_1">Кирүүлөрдү, карталарды жана иденттүүлүктөрдү коопсуз купчулуңузга сактаңыз. SecretDoor сиз үчүн маанилүү нерселерди коргоо үчүн нөлдүк билимди, учтан-учка шифрлөөнү колдонот.</string>
     <string name="welcome_message_2">Бир да тамга терип кирбестен эсептериңизге кирүү үчүн биометриялык ачууну жана автолуктоону орнотуңуз.</string>
     <string name="quick_and_easy_login">Тез жана оңой кирүү</string>
     <string name="level_up_your_logins">Кирүүлөрүңүздү жакшыртыңыз</string>
     <string name="welcome_message_3">Бардык эсептериңиз үчүн күчтүү, уникалдуу сырсөздөрдү түзүү жана сактоо үчүн генераторду колдонуңуз.</string>
     <string name="your_data_when_and_where_you_need_it">Сиздин маалыматтарыңыз, керек болгон убакта жана жерде</string>
-    <string name="welcome_message_4">Bitwarden мобилдик, браузер жана иш такта колдонмолору менен чектөөсүз түзмөктөрдө чектөөсүз сырсөздөрдү сактаңыз.</string>
+    <string name="welcome_message_4">SecretDoor мобилдик, браузер жана иш такта колдонмолору менен чектөөсүз түзмөктөрдө чектөөсүз сырсөздөрдү сактаңыз.</string>
     <string name="remove_passkey">Өтүү ачкычын алып салуу</string>
     <string name="passkey_removed">Өтүү ачкычы алып салынды</string>
     <string name="what_makes_a_password_strong">Сырсөздү эмне күчтүү кылат?</string>
@@ -808,8 +808,8 @@
     <string name="select_the_link_in_the_email_to_verify_your_email_address_and_continue_creating_your_account">Электрондук почта дарегиңизди текшерүү жана аккаунт түзүүнү улантуу үчүн электрондук каттагы шилтемени тандаңыз.</string>
     <string name="change_email_address">Электрондук почта дарегин өзгөртүү</string>
     <string name="next">Кийинки</string>
-    <string name="bitwarden_cannot_recover_a_lost_or_forgotten_master_password">Bitwarden жоготулган же унутулган башкы сырсөздү калыбына келтире албайт.</string>
-    <string name="bitwarden_cannot_reset_a_lost_or_forgotten_master_password">Bitwarden жоготулган же унутулган башкы сырсөздү кайра орното албайт.</string>
+    <string name="bitwarden_cannot_recover_a_lost_or_forgotten_master_password">SecretDoor жоготулган же унутулган башкы сырсөздү калыбына келтире албайт.</string>
+    <string name="bitwarden_cannot_reset_a_lost_or_forgotten_master_password">SecretDoor жоготулган же унутулган башкы сырсөздү кайра орното албайт.</string>
     <string name="choose_your_master_password">Башкы сырсөзүңүздү тандаңыз</string>
     <string name="choose_a_unique_and_strong_password_to_keep_your_information_safe">Маалыматыңызды коопсуз сактоо үчүн уникалдуу жана күчтүү сырсөздү тандаңыз.</string>
     <plurals name="minimum_characters">
@@ -825,16 +825,16 @@
     <string name="turn_on_autofill">Автолуктоону күйгүзүү</string>
     <string name="autofill_setup">Автолуктоо орнотуу</string>
     <string name="turn_on_browser_autofill_integration">Браузер автолуктоо интеграциясын күйгүзүү</string>
-    <string name="browser_requires_special_permissions_for_bitwarden_singular">Сиз Bitwardenдин сырсөздөрүңүздү автолуктоосу үчүн атайын уруксаттарды талап кылган браузерди колдонуп жатасыз.</string>
-    <string name="browser_requires_special_permissions_for_bitwarden_plural">Сиз Bitwardenдин сырсөздөрүңүздү автолуктоосу үчүн атайын уруксаттарды талап кылган браузерлерди колдонуп жатасыз.</string>
-    <string name="youre_using_a_browser_that_requires_special_permissions_singular">Сиз Bitwardenдин сырсөздөрүңүздү автолуктоосу үчүн атайын уруксаттарды талап кылган браузерди колдонуп жатасыз. Төмөндө каалаган автолуктоо интеграцияңызды иштетиңиз.</string>
-    <string name="youre_using_a_browser_that_requires_special_permissions_plural">Сиз Bitwardenдин сырсөздөрүңүздү автолуктоосу үчүн атайын уруксаттарды талап кылган браузерлерди колдонуп жатасыз. Улантуу үчүн бардык орнотулган браузерлериңиз үчүн автолуктоону иштетиңиз.</string>
+    <string name="browser_requires_special_permissions_for_bitwarden_singular">Сиз SecretDoorдин сырсөздөрүңүздү автолуктоосу үчүн атайын уруксаттарды талап кылган браузерди колдонуп жатасыз.</string>
+    <string name="browser_requires_special_permissions_for_bitwarden_plural">Сиз SecretDoorдин сырсөздөрүңүздү автолуктоосу үчүн атайын уруксаттарды талап кылган браузерлерди колдонуп жатасыз.</string>
+    <string name="youre_using_a_browser_that_requires_special_permissions_singular">Сиз SecretDoorдин сырсөздөрүңүздү автолуктоосу үчүн атайын уруксаттарды талап кылган браузерди колдонуп жатасыз. Төмөндө каалаган автолуктоо интеграцияңызды иштетиңиз.</string>
+    <string name="youre_using_a_browser_that_requires_special_permissions_plural">Сиз SecretDoorдин сырсөздөрүңүздү автолуктоосу үчүн атайын уруксаттарды талап кылган браузерлерди колдонуп жатасыз. Улантуу үчүн бардык орнотулган браузерлериңиз үчүн автолуктоону иштетиңиз.</string>
     <string name="use_autofill_to_log_into_your_accounts">Бир басуу менен эсептериңизге кирүү үчүн автолуктоону колдонуңуз.</string>
     <string name="turn_on_later">Кийин күйгүзүү</string>
     <string name="turn_on_autofill_later">Автолуктоону кийин күйгүзүү?</string>
     <string name="turn_on_browser_autofill_integration_later">Браузер автолуктоо интеграциясын кийин күйгүзүү?</string>
     <string name="return_to_complete_this_step_anytime_in_settings">Сиз бул кадамды аяктоо үчүн каалаган убакта Орнотууларга кайта аласыз.</string>
-    <string name="what_bitwarden_has_to_offer">Эми сиз Bitwarden сунуш кылган бардык нерсени изилдей аласыз жана сырсөздөрүңүздү коопсуз башкара баштай аласыз.</string>
+    <string name="what_bitwarden_has_to_offer">Эми сиз SecretDoor сунуш кылган бардык нерсени изилдей аласыз жана сырсөздөрүңүздү коопсуз башкара баштай аласыз.</string>
     <string name="youre_all_set">Баары даяр!</string>
     <string name="error_connecting_with_the_duo_service_use_a_different_two_step_login_method_or_contact_duo_for_assistance">Duo кызматы менен байланышууда ката. Башка эки кадамдуу кирүү ыкмасын колдонуңуз же жардам алуу үчүн Duo менен байланышыңыз.</string>
     <string name="master_password_hint_not_specified">Башкы сырсөз боюнча кеңеш</string>
@@ -853,7 +853,7 @@
     <string name="do_you_have_a_computer_available">Сизде компьютер барбы?</string>
     <string name="the_following_instructions_will_guide_you_through_importing_logins">Төмөнкү нускамалар сизди иш такта же ноутбук компьютериңизден кирүүлөрдү импорттоо аркылуу жетектейт</string>
     <string name="import_logins">Кирүүлөрдү импорттоо</string>
-    <string name="from_your_computer_follow_these_instructions_to_export_saved_passwords">Компьютериңизден, браузериңизден же башка сырсөз башкаруучудан сакталган сырсөздөрдү экспорттоо үчүн бул нускамаларды аткарыңыз. Андан кийин, аларды Bitwardenге коопсуз импорттоңуз.</string>
+    <string name="from_your_computer_follow_these_instructions_to_export_saved_passwords">Компьютериңизден, браузериңизден же башка сырсөз башкаруучудан сакталган сырсөздөрдү экспорттоо үчүн бул нускамаларды аткарыңыз. Андан кийин, аларды SecretDoorге коопсуз импорттоңуз.</string>
     <string name="give_your_vault_a_head_start">Купчулуңузга баштоо мүмкүнчүлүгүн бериңиз</string>
     <string name="class_3_biometrics_description">Биометрия менен ачуу күчтүү биометриялык аутентификацияны талап кылат жана бул түзмөктөгү бардык биометриялык параметрлер менен шайкеш келбеши мүмкүн.</string>
     <string name="class_2_biometrics_description">Биометрия менен ачуу күчтүү биометриялык аутентификацияны талап кылат жана бул түзмөктө жеткиликтүү биометриялык параметрлер менен шайкеш келбейт.</string>
@@ -864,28 +864,28 @@
     <string name="export_your_saved_logins">Сакталган кирүүлөрүңүздү экспорттоо</string>
     <string name="delete_this_file_after_import_is_complete">Сиз импорт аяктагандан кийин бул файлды өчүрөсүз.</string>
     <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Компьютериңизде, жаңы браузер баракчасын ачып, <annotation emphasis="bold"><annotation arg="0">%1$s</annotation> дарегине өтүңүз</annotation></string>
-    <string name="log_in_to_the_bitwarden_web_app">Bitwarden веб колдонмосуна кириңиз.</string>
+    <string name="log_in_to_the_bitwarden_web_app">SecretDoor веб колдонмосуна кириңиз.</string>
     <string name="step_2_of_3">3 ичинен 2-кадам</string>
-    <string name="log_in_to_bitwarden">Bitwardenге кирүү</string>
+    <string name="log_in_to_bitwarden">SecretDoorге кирүү</string>
     <string name="step_3_of_3">3 ичинен 3-кадам</string>
-    <string name="import_logins_to_bitwarden">Кирүүлөрдү Bitwardenге импорттоо</string>
-    <string name="in_the_bitwarden_navigation_find_the_tools_option_and_select_import_data">Bitwarden навигациясында, <annotation emphasis="bold">Куралдар параметрин табыңыз</annotation> жана <annotation emphasis="bold">Маалыматтарды импорттоону тандаңыз.</annotation></string>
+    <string name="import_logins_to_bitwarden">Кирүүлөрдү SecretDoorге импорттоо</string>
+    <string name="in_the_bitwarden_navigation_find_the_tools_option_and_select_import_data">SecretDoor навигациясында, <annotation emphasis="bold">Куралдар параметрин табыңыз</annotation> жана <annotation emphasis="bold">Маалыматтарды импорттоону тандаңыз.</annotation></string>
     <string name="fill_out_the_form_and_import_your_saved_password_file">Форманы толтуруп, <annotation emphasis="bold">сакталган сырсөз файлыңызды импорттоңуз.</annotation></string>
     <string name="for_your_security_be_sure_to_delete_your_saved_password_file">Коопсуздугуңуз үчүн, <annotation emphasis="bold">сакталган сырсөз файлыңызды өчүрүүнү унутпаңыз.</annotation></string>
     <string name="need_help_check_out_import_help">Жардам керекпи? <annotation link="importHelp">Импортко жардам</annotation> бөлүмүн карап көрүңүз.</string>
     <string name="import_help">импортко жардам</string>
     <string name="save_the_exported_file_somewhere_on_your_computer_you_can_find_easily"><annotation emphasis="bold">Экспорттолгон файлды</annotation> компьютериңиздин оңой таба турган жерине сактаңыз.</string>
-    <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Бул таанылган Bitwarden сервери эмес. Провайдериңизден текшеришиңиз же сервериңизди жаңыртышыңыз керек болушу мүмкүн.</string>
+    <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Бул таанылган SecretDoor сервери эмес. Провайдериңизден текшеришиңиз же сервериңизди жаңыртышыңыз керек болушу мүмкүн.</string>
     <string name="syncing_logins_loading_message">Кирүүлөрдү синхрондоштуруу…</string>
     <string name="download_the_browser_extension">Браузер кошумча мүмкүнчүлүгүн жүктөп алуу</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Үзгүлтүксүз тажрыйба үчүн Bitwardenди сүйүктүү браузериңизге интеграциялоо үчүн bitwarden.com/download дарегине өтүңүз.</string>
+    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Үзгүлтүксүз тажрыйба үчүн SecretDoorди сүйүктүү браузериңизге интеграциялоо үчүн bitwarden.com/download дарегине өтүңүз.</string>
     <string name="use_the_web_app">Веб колдонмону колдонуу</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Аккаунтуңузду оңой башкаруу жана орнотууларды жаңыртуу үчүн bitwarden.com сайтына кириңиз.</string>
     <string name="autofill_passwords">Сырсөздөрдү автолуктоо</string>
     <string name="set_up_autofill_on_all_your_devices">Кайсы жерде болбосун бир басуу менен кирүү үчүн бардык түзмөктөрүңүздө автолуктоону орнотуңуз.</string>
     <string name="import_successful">Импорт ийгиликтүү!</string>
-    <string name="manage_your_logins_from_anywhere_with_bitwarden_tools">Веб жана иш такта үчүн Bitwarden куралдары менен кирүүлөрүңүздү каалаган жерден башкарыңыз.</string>
-    <string name="bitwarden_tools">Bitwarden Куралдары</string>
+    <string name="manage_your_logins_from_anywhere_with_bitwarden_tools">Веб жана иш такта үчүн SecretDoor куралдары менен кирүүлөрүңүздү каалаган жерден башкарыңыз.</string>
+    <string name="bitwarden_tools">SecretDoor Куралдары</string>
     <string name="got_it">Түшүндүм</string>
     <string name="no_logins_were_imported">Эч кандай кирүүлөр импорттолгон жок</string>
     <string name="import_error">Импорттоо катасы</string>
@@ -903,7 +903,7 @@
         <item quantity="other">%d билдирүү</item>
     </plurals>
     <string name="log_in_quickly_and_easily_across_devices">Түзмөктөрдө тез жана оңой кирүү</string>
-    <string name="bitwarden_can_notify_you_each_time_you_receive_a_new_login_request_from_another_device">Bitwarden башка түзмөктөн жаңы кирүү сурамын алган сайын сизге билдире алат.</string>
+    <string name="bitwarden_can_notify_you_each_time_you_receive_a_new_login_request_from_another_device">SecretDoor башка түзмөктөн жаңы кирүү сурамын алган сайын сизге билдире алат.</string>
     <string name="skip_for_now">Азыр өткөрүп жиберүү</string>
     <string name="done_text">Бүттү</string>
     <string name="page_number_x_of_y">%2$s ичинен %1$s</string>
@@ -928,7 +928,7 @@
     <string name="add_a_number_or_symbol_to_make_it_even_stronger">Аны дагы күчтүүрөөк кылуу үчүн <annotation emphasis="bold">сан же белги кошуңуз</annotation>. Эми сизде уникалдуу, коопсуз жана эсте кала турган шифрфраза бар!</string>
     <string name="need_some_inspiration">Шыктандыруу керекпи?</string>
     <string name="check_out_the_passphrase_generator">Шифрфраза генераторун карап көрүңүз</string>
-    <string name="we_couldnt_verify_the_servers_certificate">Биз сервердин сертификатын текшере албайбыз. Сертификат чынжыры же түзмөгүңүздөгү прокси орнотуулары же Bitwarden сервериңиз туура орнотулбаган болушу мүмкүн.</string>
+    <string name="we_couldnt_verify_the_servers_certificate">Биз сервердин сертификатын текшере албайбыз. Сертификат чынжыры же түзмөгүңүздөгү прокси орнотуулары же SecretDoor сервериңиз туура орнотулбаган болушу мүмкүн.</string>
     <string name="copy_private_key">Жеке ачкычты көчүрүү</string>
     <string name="login_credentials">Кирүү маалыматтары</string>
     <string name="autofill_options">Автолуктоо параметрлери</string>
@@ -955,7 +955,7 @@
     <string name="coachmark_5_of_6">6 ичинен 5</string>
     <string name="coachmark_6_of_6">6 ичинен 6</string>
     <string name="use_these_options_to_adjust_your_password_to_your_account_requirements">Сырсөзүңүздү эсебиңиздин веб-сайтынын талаптарына ылайыкташтыруу үчүн бул параметрлерди колдонуңуз.</string>
-    <string name="after_you_save_your_new_password_to_bitwarden_don_t_forget_to_update_it_on_your_account_website">Жаңы сырсөзүңүздү Bitwardenге сактагандан кийин, аны эсебиңиздин веб-сайтында жаңыртууну унутпаңыз.</string>
+    <string name="after_you_save_your_new_password_to_bitwarden_don_t_forget_to_update_it_on_your_account_website">Жаңы сырсөзүңүздү SecretDoorге сактагандан кийин, аны эсебиңиздин веб-сайтында жаңыртууну унутпаңыз.</string>
     <string name="verify_your_identity">Иденттүүлүгүңүздү текшериңиз</string>
     <string name="error_loading_certificate">Сертификатты жүктөөдө ката</string>
     <string name="certificate_alias">Сертификаттын псевдоними</string>
@@ -966,7 +966,7 @@
     <string name="unsupported_certificate_type">Колдоого алынбаган сертификат түрү</string>
     <string name="certificate_password_incorrect">Сертификаттын сырсөзү туура эмес</string>
     <string name="invalid_certificate_chain">Сертификат чынжыры туура эмес</string>
-    <string name="system_certificates_are_not_as_secure_as_importing_certificates_to_bitwarden">Система сертификатын колдонуу сертификатты Bitwarden менен сактоого караганда коопсуз эмес. Улантуу, эгерде бирөө мурун эле орнотулган болсо, жеткиликтүү системалык сертификаттардын тизмесин көрсөтөт.</string>
+    <string name="system_certificates_are_not_as_secure_as_importing_certificates_to_bitwarden">Система сертификатын колдонуу сертификатты SecretDoor менен сактоого караганда коопсуз эмес. Улантуу, эгерде бирөө мурун эле орнотулган болсо, жеткиликтүү системалык сертификаттардын тизмесин көрсөтөт.</string>
     <string name="link">Шилтеме</string>
     <string name="passkey_operation_failed_because_host_url_is_not_present_in_request">Өтүү ачкычы операциясы ишке ашпай калды, анткени хост URL дареги сурамда жок.</string>
     <string name="passkey_operation_failed_because_app_signature_is_invalid">Өтүү ачкычы операциясы ишке ашпай калды, анткени колдонмонун кол тамгасы туура эмес.</string>
@@ -1004,8 +1004,8 @@
     <string name="experiencing_an_issue">Көйгөйгө туш болуп жатасызбы?</string>
     <string name="enable_temporary_logging_to_collect_and_inspect_logs_locally">Журналдарды жергиликтүү түрдө чогултуу жана текшерүү үчүн убактылуу журналдоону иштетиңиз. Иштетилгенде, колдонмонун абалдары жана тармактык чакыруулар журналга жазылышы мүмкүн—эч качан купчулдун купуя маалыматтары эмес.</string>
     <string name="to_get_started_set_a_logging_duration">Баштоо үчүн, журналдоо узактыгын коюңуз. Бул мөөнөттөн кийин журналдоо автоматтык түрдө өчөт, бул сизге көйгөйлөрдү кайра жаратуу учурунда активдүүлүктү жазууга убакыт берет.</string>
-    <string name="logs_will_be_automatically_deleted_after_30_days">Журналдар 30 күндөн кийин автоматтык түрдө өчүрүлөт. Bitwarden сиздин журнал маалыматтарыңызга аны бөлүшкөнүңүздө гана кире алат.</string>
-    <string name="for_details_on_what_is_and_isnt_logged">Эмне жазылып, эмне жазылбаганы тууралуу маалымат алуу үчүн\n<annotation link="helpCenter">Bitwarden жардам борборуна</annotation> кириңиз.</string>
+    <string name="logs_will_be_automatically_deleted_after_30_days">Журналдар 30 күндөн кийин автоматтык түрдө өчүрүлөт. SecretDoor сиздин журнал маалыматтарыңызга аны бөлүшкөнүңүздө гана кире алат.</string>
+    <string name="for_details_on_what_is_and_isnt_logged">Эмне жазылып, эмне жазылбаганы тууралуу маалымат алуу үчүн\n<annotation link="helpCenter">SecretDoor жардам борборуна</annotation> кириңиз.</string>
     <string name="logging_duration">Журналдоо узактыгы</string>
     <string name="flight_recorder_one_hour">1 саат</string>
     <string name="flight_recorder_eight_hours">8 саат</string>
@@ -1036,29 +1036,29 @@
     <string name="unable_to_read_certificate">Сертификатты окуу мүмкүн эмес.</string>
     <string name="cannot_delete_your_account">Каттоо эсебиңизди өчүрүү мүмкүн эмес</string>
     <string name="cannot_delete_your_account_explanation">Бул аракетти бүтүрүү мүмкүн эмес, анткени сиздин аккаунтуңуз уюмга таандык. Кошумча маалымат алуу үчүн уюмуңуздун администраторуна кайрылыңыз.</string>
-    <string name="this_account_will_soon_be_deleted_log_in_at_x_to_continue_using_bitwarden">Бул аккаунт жакында өчүрүлөт. Bitwardenди колдонууну улантуу үчүн %1$s дарегине кириңиз.</string>
+    <string name="this_account_will_soon_be_deleted_log_in_at_x_to_continue_using_bitwarden">Бул аккаунт жакында өчүрүлөт. SecretDoorди колдонууну улантуу үчүн %1$s дарегине кириңиз.</string>
     <string name="view_file_send">Файл Sendди көрүү</string>
     <string name="view_text_send">Текст Sendди көрүү</string>
     <string name="delete_send">Sendди өчүрүү</string>
     <string name="missing_send_resync_your_vault">Send жок, сейфти кайра синхрондоштуруңуз</string>
     <string name="use_dynamic_colors">Динамикалык түстөрдү колдонуу</string>
     <string name="use_dynamic_colors_question">Динамикалык түстөрдү колдонуу?</string>
-    <string name="dynamic_colors_may_not_adhere_to_accessibility_guidelines">Бул түс схемасы учурдагы обоиңузга жараша Bitwardenге система түстөрүн автоматтык түрдө колдонот. Бул түстөр бардык жеткиликтүүлүк эрежелерине жооп бере бербеши мүмкүн.</string>
+    <string name="dynamic_colors_may_not_adhere_to_accessibility_guidelines">Бул түс схемасы учурдагы обоиңузга жараша SecretDoorге система түстөрүн автоматтык түрдө колдонот. Бул түстөр бардык жеткиликтүүлүк эрежелерине жооп бере бербеши мүмкүн.</string>
     <string name="passkey_operation_failed_because_browser_x_is_not_trusted">Браузер (%1$s) таанылбагандыктан, өтмө ачкыч операциясы ийгиликсиз болду. %1$s ти жергиликтүү ишенимдүү тиркемелердин тизмесине кошуу үчүн “Ишенүү” баскычын тандаңыз.</string>
     <string name="passkey_operation_failed_because_the_browser_is_not_trusted">Браузер ишенимдүү эмес болгондуктан, өтмө ачкыч операциясы ийгиликсиз болду.</string>
     <string name="trust">Ишенүү</string>
-    <string name="trusted_by_you_learn_more">Булар Bitwarden дөөлөтү боюнча ишенбеген, бирок сиз өтмө ачкыч операцияларын аткарууга ишенген тиркемелер же браузерлер.</string>
-    <string name="trusted_by_community_learn_more">Булар Google Play Storeго кирбеген, бирок Bitwarden коомчулук мүчөлөрү аларды колдонуп, коопсуз деп билдиргенден кийин өтмө ачкыч операцияларын аткарууга ишенген тиркемелер.</string>
+    <string name="trusted_by_you_learn_more">Булар SecretDoor дөөлөтү боюнча ишенбеген, бирок сиз өтмө ачкыч операцияларын аткарууга ишенген тиркемелер же браузерлер.</string>
+    <string name="trusted_by_community_learn_more">Булар Google Play Storeго кирбеген, бирок SecretDoor коомчулук мүчөлөрү аларды колдонуп, коопсуз деп билдиргенден кийин өтмө ачкыч операцияларын аткарууга ишенген тиркемелер.</string>
     <string name="trusted_by_google_learn_more">Булар Google коопсуз деп эсептеген жана Google Play Storeдо жеткиликтүү тиркемелер.</string>
     <string name="trusted_by_you">Сиз ишенгендер</string>
     <string name="trusted_by_the_community">Коомчулук ишенгендер</string>
     <string name="trusted_by_google">Google ишенгендер</string>
-    <string name="privileged_apps_description">Колдонуучуларды фишинг аракеттеринен коргоо үчүн, Bitwarden дөөлөтү боюнча өтмө ачкыч операцияларын Google же Bitwarden коомчулугу ишенген тиркемелер же веб-браузерлер аркылуу гана аткарат.</string>
+    <string name="privileged_apps_description">Колдонуучуларды фишинг аракеттеринен коргоо үчүн, SecretDoor дөөлөтү боюнча өтмө ачкыч операцияларын Google же SecretDoor коомчулугу ишенген тиркемелер же веб-браузерлер аркылуу гана аткарат.</string>
     <string name="about_privileged_applications">Артыкчылыктуу тиркемелер жөнүндө</string>
     <string name="learn_more_about_privileged_apps">Артыкчылыктуу тиркемелер тууралуу көбүрөөк билүү</string>
     <string name="privileged_apps">Артыкчылыктуу тиркемелер</string>
     <string name="unrecognized_browser">Таанылбаган браузер</string>
-    <string name="learn_more_about_using_passkeys_with_bitwarden">Bitwarden менен өтмө ачкычтарды колдонуу жөнүндө көбүрөөк билүү.</string>
+    <string name="learn_more_about_using_passkeys_with_bitwarden">SecretDoor менен өтмө ачкычтарды колдонуу жөнүндө көбүрөөк билүү.</string>
     <string name="all_trusted_apps">Бардык ишенимдүү тиркемелер</string>
     <string name="are_you_sure_you_want_to_stop_trusting_x">%s ге ишенүүнү токтоткуңуз келерине ишенесизби?</string>
     <string name="installed_apps">Орнотулган тиркемелер</string>
@@ -1086,7 +1086,7 @@
     <string name="information">Маалымат</string>
     <string name="otp_type">OTP түрү</string>
     <string name="search_codes">Коддорду издөө</string>
-    <string name="secure_your_accounts_with_bitwarden_authenticator">Bitwarden Authenticator менен каттоо эсептериңизди коргоңуз</string>
+    <string name="secure_your_accounts_with_bitwarden_authenticator">SecretDoor Authenticator менен каттоо эсептериңизди коргоңуз</string>
     <string name="get_verification_codes_for_all_your_accounts">2-кадамдык текшерүүнү колдогон бардык каттоо эсептериңиз үчүн текшерүү коддорун алыңыз.</string>
     <string name="use_your_device_camera_to_scan_codes">Коддорду сканерлөө үчүн түзмөгүңүздүн камерасын колдонуңуз</string>
     <string name="scan_the_qr_code_in_your_2_step_verification_settings_for_any_account">Кандайдыр бир каттоо эсебиңиздин 2-кадамдык текшерүү жөндөөлөрүндөгү QR кодду сканерлеңиз.</string>
@@ -1107,7 +1107,7 @@
     <string name="too_many_failed_biometric_attempts">Биометриялык аракеттер өтө көп ийгиликсиз болду.</string>
     <string name="version">Версиясы</string>
     <string name="version_x" comment="%1$s is the version string (e.g. 2025.1.0 (1234)).">Версия: %1$s</string>
-    <string name="learn_more_about_how_to_use_bitwarden_authenticator_on_the_help_center">Bitwarden Authenticatorду кантип колдонуу керектиги жөнүндө Жардам борборунда көбүрөөк билүү.</string>
+    <string name="learn_more_about_how_to_use_bitwarden_authenticator_on_the_help_center">SecretDoor Authenticatorду кантип колдонуу керектиги жөнүндө Жардам борборунда көбүрөөк билүү.</string>
     <string name="key">Ачкыч</string>
     <string name="create_verification_code">Текшерүү кодун түзүү</string>
     <string name="key_is_required">Ачкыч талап кылынат.</string>
@@ -1118,30 +1118,30 @@
     <string name="key_is_invalid">Ачкыч жараксыз.</string>
     <string name="backup">Көчүрмө</string>
     <string name="data_backup_title">Маалыматтардын көчүрмөсү</string>
-    <string name="data_backup_message">Bitwarden Authenticator маалыматтарынын көчүрмөсү алынып, аны түзмөгүңүздүн үзгүлтүксүз пландаштырылган көчүрмөлөрү менен калыбына келтирсеңиз болот.</string>
+    <string name="data_backup_message">SecretDoor Authenticator маалыматтарынын көчүрмөсү алынып, аны түзмөгүңүздүн үзгүлтүксүз пландаштырылган көчүрмөлөрү менен калыбына келтирсеңиз болот.</string>
     <string name="import_2fas_password_protected_not_supported">2FAS сырсөз менен корголгон файлдардан импорттоо колдоого алынбайт. Сырсөз менен корголбогон экспорттолгон файл менен кайра аракет кылыңыз.</string>
-    <string name="import_bitwarden_unsupported_format">Bitwarden CSV файлдарын импорттоо колдоого алынбайт. Экспорттолгон JSON файлы менен кайра аракет кылыңыз.</string>
-    <string name="download_bitwarden_card_title">Bitwarden колдонмосун жүктөп алыңыз</string>
+    <string name="import_bitwarden_unsupported_format">SecretDoor CSV файлдарын импорттоо колдоого алынбайт. Экспорттолгон JSON файлы менен кайра аракет кылыңыз.</string>
+    <string name="download_bitwarden_card_title">SecretDoor колдонмосун жүктөп алыңыз</string>
     <string name="download_bitwarden_card_message">Бардык кирүү маалыматтарыңызды сактап, текшерүү коддорун Authenticator колдонмосу менен түздөн-түз синхрондоштуруңуз.</string>
     <string name="download_now">Азыр жүктөп алуу</string>
-    <string name="sync_with_bitwarden_app">Bitwarden колдонмосу менен синхрондоштуруу</string>
+    <string name="sync_with_bitwarden_app">SecretDoor колдонмосу менен синхрондоштуруу</string>
     <string name="learn_more_link"><annotation link="learnMore">Көбүрөөк билүү</annotation></string>
-    <string name="shared_codes_error">Bitwarden колдонмосунан коддорду синхрондоштуруу мүмкүн эмес. Эки колдонмо тең акыркы версияга жаңыртылганын текшериңиз. Сиз дагы эле учурдагы коддорго Bitwarden колдонмосунда кире аласыз.</string>
-    <string name="sync_with_the_bitwarden_app">Bitwarden колдонмосу менен синхрондоштуруу</string>
+    <string name="shared_codes_error">SecretDoor колдонмосунан коддорду синхрондоштуруу мүмкүн эмес. Эки колдонмо тең акыркы версияга жаңыртылганын текшериңиз. Сиз дагы эле учурдагы коддорго SecretDoor колдонмосунда кире аласыз.</string>
+    <string name="sync_with_the_bitwarden_app">SecretDoor колдонмосу менен синхрондоштуруу</string>
     <string name="sync_with_bitwarden_action_card_message">Бул жерде бардык текшерүү коддорун көрүү үчүн Authenticator колдонмосундагы синхрондоштурууга жөндөөлөрдө уруксат бериңиз.</string>
     <string name="take_me_to_app_settings">Колдонмо жөндөөлөрүнө өтүү</string>
     <string name="something_went_wrong">Бир нерсе туура эмес кетти</string>
     <string name="please_try_again">Кайра аракет кылыңыз</string>
-    <string name="copy_to_bitwarden_vault">Bitwarden сейфине көчүрүү</string>
+    <string name="copy_to_bitwarden_vault">SecretDoor сейфине көчүрүү</string>
     <string name="default_save_option">Дөөлөттүү сактоо опциясы</string>
-    <string name="save_to_bitwarden">Bitwardenге сактоо</string>
+    <string name="save_to_bitwarden">SecretDoorге сактоо</string>
     <string name="save_here">Ушул жерге сактоо</string>
     <string name="none">Эч нерсе</string>
     <string name="default_save_options_subtitle">Жаңы текшерүү коддорун кайсы жерге сактоону каалаарыңызды тандаңыз.</string>
     <string name="verification_code_created">Текшерүү коду түзүлдү</string>
-    <string name="choose_save_location_message">Бул аутентификатор ачкычын ушул жерге сактаңыз же Bitwarden колдонмосуңуздагы кирүү маалыматына кошуңуз.</string>
+    <string name="choose_save_location_message">Бул аутентификатор ачкычын ушул жерге сактаңыз же SecretDoor колдонмосуңуздагы кирүү маалыматына кошуңуз.</string>
     <string name="save_option_as_default">Сактоо опциясын дөөлөттүү кылып коюу</string>
-    <string name="account_synced_from_bitwarden_app">Bitwarden колдонмосунан синхрондоштурулган каттоо эсеби</string>
+    <string name="account_synced_from_bitwarden_app">SecretDoor колдонмосунан синхрондоштурулган каттоо эсеби</string>
     <string name="local_codes">Жергиликтүү коддор (%1$d)</string>
     <string name="required_information_missing">Талап кылынган маалымат жок</string>
     <string name="required_information_missing_message">Талап кылынган маалымат жок (мисалы, ‘services’ же ‘secret’). Файлыңызды текшерип, кайра аракет кылыңыз. Жардам алуу үчүн bitwarden.com/help сайтына кириңиз</string>
@@ -1150,10 +1150,10 @@
     <string name="get_help">Жардам алуу</string>
     <string name="error_cannot_decrypt">[ката: чечүү мүмкүн эмес]</string>
     <string name="copy_error_report">Ката отчетун көчүрүү</string>
-    <string name="bitwarden_could_not_decrypt_this_vault_item_description_long">Bitwarden бул купчул элементин чече албай калды. Кошумча маалымат жоготууну болтурбоо үчүн бул ката отчетун көчүрүп, кардарларды тейлөө бөлүмү менен бөлүшүңүз.</string>
+    <string name="bitwarden_could_not_decrypt_this_vault_item_description_long">SecretDoor бул купчул элементин чече албай калды. Кошумча маалымат жоготууну болтурбоо үчүн бул ката отчетун көчүрүп, кардарларды тейлөө бөлүмү менен бөлүшүңүз.</string>
     <plurals name="bitwarden_could_not_decrypt_x_vault_item_copy_and_share_description_long">
-        <item quantity="one">Bitwarden %1$d сейф буюмун чечүү мүмкүн болбой калды. Кошумча маалымат жоготууга жол бербөө үчүн бул ката билдирүүсүн көчүрүп, кардарларды колдоо кызматына бөлүшүңүз.</item>
-        <item quantity="other">Bitwarden %1$d сейф буюмун чечүү мүмкүн болбой калды. Кошумча маалымат жоготууга жол бербөө үчүн бул ката билдирүүсүн көчүрүп, кардарларды колдоо кызматына бөлүшүңүз.</item>
+        <item quantity="one">SecretDoor %1$d сейф буюмун чечүү мүмкүн болбой калды. Кошумча маалымат жоготууга жол бербөө үчүн бул ката билдирүүсүн көчүрүп, кардарларды колдоо кызматына бөлүшүңүз.</item>
+        <item quantity="other">SecretDoor %1$d сейф буюмун чечүү мүмкүн болбой калды. Кошумча маалымат жоготууга жол бербөө үчүн бул ката билдирүүсүн көчүрүп, кардарларды колдоо кызматына бөлүшүңүз.</item>
     </plurals>
     <string name="select_a_card_for_x">%s үчүн картаны тандаңыз</string>
     <string name="choose_an_identity">Choose an identity</string>
@@ -1162,8 +1162,8 @@
     <string name="keep_your_credential_secure">Кыйгам укук маалыматтарыңызды коопсуз сактаңыз</string>
     <string name="learn_more_about_how_to_keep_credentirals_secure">“%1$s” колдонгондо кыйгам укук маалыматтарын кантип коопсуз сактоо керектиги жөнүндө көбүрөөк билүү.</string>
     <string name="are_you_sure_you_want_to_use">“%1$s” колдонгуңуз келерине ишенесизби?</string>
-    <string name="default_uri_match_detection_description_advanced_options_incorrectly">URI дал келүүсүн аныктоо Bitwardenдин автотолтуруу сунуштарын кантип аныкташын көзөмөлдөйт.\n<annotation emphasis="bold">Эскертүү:</annotation> “Кадимки туюнтма” туура эмес колдонулганда кыйгам укук маалыматтарын ачыкка чыгаруу коркунучу жогору болгон кеңейтилген параметр.</string>
-    <string name="default_uri_match_detection_description_advanced_options">URI дал келүүсүн аныктоо Bitwardenдин автотолтуруу сунуштарын кантип аныкташын көзөмөлдөйт.\n<annotation emphasis="bold">Эскертүү:</annotation> “Башталат” кыйгам укук маалыматтарын ачыкка чыгаруу коркунучу жогору болгон кеңейтилген параметр.</string>
+    <string name="default_uri_match_detection_description_advanced_options_incorrectly">URI дал келүүсүн аныктоо SecretDoorдин автотолтуруу сунуштарын кантип аныкташын көзөмөлдөйт.\n<annotation emphasis="bold">Эскертүү:</annotation> “Кадимки туюнтма” туура эмес колдонулганда кыйгам укук маалыматтарын ачыкка чыгаруу коркунучу жогору болгон кеңейтилген параметр.</string>
+    <string name="default_uri_match_detection_description_advanced_options">URI дал келүүсүн аныктоо SecretDoorдин автотолтуруу сунуштарын кантип аныкташын көзөмөлдөйт.\n<annotation emphasis="bold">Эскертүү:</annotation> “Башталат” кыйгам укук маалыматтарын ачыкка чыгаруу коркунучу жогору болгон кеңейтилген параметр.</string>
     <string name="advanced_option_with_increased_risk_of_exposing_credentials">“Башталат” кыйгам укук маалыматтарын ачыкка чыгаруу коркунучу жогору болгон кеңейтилген параметр.</string>
     <string name="advanced_option_increased_risk_exposing_credentials_used_incorrectly">“Кадимки туюнтма” туура эмес колдонулганда кыйгам укук маалыматтарын ачыкка чыгаруу коркунучу жогору болгон кеңейтилген параметр.</string>
     <string name="later">Кийин</string>
@@ -1188,17 +1188,17 @@
         <item quantity="other">%1$d буюм сейфиңизге импорттолду.</item>
     </plurals>
     <string name="enable_browser_autofill_to_keep_filling_passwords">Сырсөздөрдү толтурууну улантуу үчүн браузердин Автотолтуруусун күйгүзүңүз</string>
-    <string name="your_browser_recently_updated_how_autofill_works_singular">Сиздин браузериңиз жакында жаңыртылды, бул Bitwarden автотолтуруусун өчүрүп койду. Bitwarden менен сырсөздөрүңүздү толтурууну улантуу үчүн, автотолтуруу жөндөөлөрүндө браузердин автотолтуруусун күйгүзүңүз.</string>
+    <string name="your_browser_recently_updated_how_autofill_works_singular">Сиздин браузериңиз жакында жаңыртылды, бул SecretDoor автотолтуруусун өчүрүп койду. SecretDoor менен сырсөздөрүңүздү толтурууну улантуу үчүн, автотолтуруу жөндөөлөрүндө браузердин автотолтуруусун күйгүзүңүз.</string>
     <string name="not_now">Азыр эмес</string>
-    <string name="import_from_bitwarden">Bitwardenден импорттоо</string>
+    <string name="import_from_bitwarden">SecretDoorден импорттоо</string>
     <string name="select_account">Каттоо эсебин тандаңыз</string>
     <string name="no_accounts_available">Каттоо эсептери жеткиликтүү эмес</string>
-    <string name="you_dont_have_any_accounts_you_can_import_from">Импорттоого боло турган каттоо эсептериңиз жок. Уюмуңуздун коопсуздук саясаты буюмдарды Bitwardenден башка колдонмого импорттоону чектеши мүмкүн.</string>
+    <string name="you_dont_have_any_accounts_you_can_import_from">Импорттоого боло турган каттоо эсептериңиз жок. Уюмуңуздун коопсуздук саясаты буюмдарды SecretDoorден башка колдонмого импорттоону чектеши мүмкүн.</string>
     <string name="import_restricted_unable_to_import_credit_cards">Импорт чектелди, бул каттоо эсебинен карталарды импорттоо мүмкүн эмес.</string>
     <string name="verify_your_master_password">Башкы сырсөзүңүздү текшериңиз</string>
     <string name="having_trouble_with_autofill">Автотолтурууда көйгөй барбы?</string>
     <string name="access_help_and_troubleshooting_documentation_here">Жардам жана көйгөйлөрдү чечүү боюнча документтерге ушул жерден кириңиз</string>
-    <string name="import_passwords_passkeys_and_other_item_types_from_your_vault">Bitwarden сейфиңизден сырсөздөрдү, өтмө ачкычтарды жана башка буюм түрлөрүн импорттоо.</string>
+    <string name="import_passwords_passkeys_and_other_item_types_from_your_vault">SecretDoor сейфиңизден сырсөздөрдү, өтмө ачкычтарды жана башка буюм түрлөрүн импорттоо.</string>
     <string name="items_to_import">Импорттоо үчүн буюмдар</string>
     <string name="exporting_items">Буюмдарды экспорттоо…</string>
     <string name="export_failed">Экспорт ишке ашпай калды</string>
@@ -1262,7 +1262,7 @@
     <string name="only_include_the_following_domains_x_please_review_and_try_again">Only include the following domains: %1$s. Please review and try again.</string>
     <string name="enter_at_least_one_valid_email_address_to_share_this_send">Бул Sendди бөлүшүү үчүн жок дегенде бир туура электрондук почта даректи киргизиңиз.</string>
     <string name="sync_with_browser">Браузер менен синхрондоштуруу</string>
-    <string name="sync_with_browser_description">%1$s туташуу үчүн, дөөлөттүү браузериңизди Bitwarden мобилдик колдонмосу менен синхрондоштуруңуз. Браузериңиз ачылганда, суралса кирүүнү аяктаңыз.\nСинхрондоштуруу аяктагандан кийин, сиз ушул колдонмого кайтарыласыз.</string>
+    <string name="sync_with_browser_description">%1$s туташуу үчүн, дөөлөттүү браузериңизди SecretDoor мобилдик колдонмосу менен синхрондоштуруңуз. Браузериңиз ачылганда, суралса кирүүнү аяктаңыз.\nСинхрондоштуруу аяктагандан кийин, сиз ушул колдонмого кайтарыласыз.</string>
     <string name="launch_browser">Браузерди ачуу</string>
     <string name="continue_without_syncing">Синхрондоштуруусуз улантуу</string>
     <string name="external_link">Сырткы шилтеме</string>
@@ -1288,7 +1288,7 @@
     <string name="trusted">Ишенимдүү</string>
     <string name="preview_not_available_for_files">%1$s файлдары үчүн алдын ала көрүү жеткиликтүү эмес. Аны көрүү үчүн дагы эле жүктөп алсаңыз болот.</string>
     <string name="this_file_is_too_large_to_preview">Бул файл алдын ала көрүү үчүн өтө чоң. Аны көрүү үчүн дагы эле жүктөп алсаңыз болот.</string>
-    <string name="bitwarden_could_not_decrypt_this_file_so_the_preview_cannot_be_displayed">Bitwarden бул файлды чечүү мүмкүн болбой калды, ошондуктан алдын ала көрүүнү көрсөтүү мүмкүн эмес.</string>
+    <string name="bitwarden_could_not_decrypt_this_file_so_the_preview_cannot_be_displayed">SecretDoor бул файлды чечүү мүмкүн болбой калды, ошондуктан алдын ала көрүүнү көрсөтүү мүмкүн эмес.</string>
     <string name="preview_unavailable_for_this_file">Бул файл үчүн алдын ала көрүү жеткиликтүү эмес. Аны көрүү үчүн дагы эле жүктөп алсаңыз болот.</string>
     <string name="preview_unavailable">Алдын ала көрүү жеткиликтүү эмес</string>
     <string name="download_attachment">Тиркемени жүктөп алуу</string>
@@ -1330,7 +1330,7 @@
     <string name="billing_rate_per_year">%1$s / жыл</string>
     <string name="billing_rate_per_month">%1$s / ай</string>
     <string name="manage_plan">Планды башкаруу</string>
-    <string name="manage_your_subscription_plan_in_the_bitwarden_web_app">Жазылуу планыңызды Bitwarden веб-колдонмосунда башкарыңыз.</string>
+    <string name="manage_your_subscription_plan_in_the_bitwarden_web_app">Жазылуу планыңызды SecretDoor веб-колдонмосунда башкарыңыз.</string>
     <string name="cancel_premium">Premiumди жокко чыгаруу</string>
     <string name="subscription_status_active">Активдүү</string>
     <string name="subscription_status_canceled">Жокко чыгарылган</string>
@@ -1421,8 +1421,8 @@
     <string name="local_network_access_required">Жергиликтүү тармакка кирүү талап кылынат</string>
     <string name="ask_again_later">Кийинчерээк сура</string>
     <string name="enable_local_network_access">Жергиликтүү тармакка кирүүнү күйгүзүү</string>
-    <string name="bitwarden_needs_local_network_access_to_sync_with_your_server">Bitwarden сервериңиз менен синхрондоштуруу үчүн жергиликтүү тармакка кирүүнү талап кылат. Бул уруксатсыз колдонмо туташа албайт.</string>
-    <string name="without_this_permission_bitwarden_wont_be_able_to_sync_with_your_server">Бул уруксатсыз Bitwarden сервериңизге туташа жана синхрондошо албайт. Сиз муну түзмөк жөндөөлөрүңүздө күйгүзө аласыз.</string>
+    <string name="bitwarden_needs_local_network_access_to_sync_with_your_server">SecretDoor сервериңиз менен синхрондоштуруу үчүн жергиликтүү тармакка кирүүнү талап кылат. Бул уруксатсыз колдонмо туташа албайт.</string>
+    <string name="without_this_permission_bitwarden_wont_be_able_to_sync_with_your_server">Бул уруксатсыз SecretDoor сервериңизге туташа жана синхрондошо албайт. Сиз муну түзмөк жөндөөлөрүңүздө күйгүзө аласыз.</string>
     <string name="your_request_was_interrupted_because_the_app_needs_local_network_access">Колдонмо жергиликтүү тармакка кирүүнү талап кылгандыктан, суранычыңыз үзгүлтүккө учурады. Сиз муну түзмөк жөндөөлөрүңүздө күйгүзө аласыз.</string>
     <string name="continue_to_stripe">Stripeге улантыңызбы?</string>
     <string name="youll_be_taken_to_stripe_to_manage_your_subscription_cancellation">Жазылууңуздун жокко чыгарылышын башкаруу үчүн Stripeге өтөсүз.</string>
@@ -1444,7 +1444,7 @@
     <string name="use_this_username">Use this username</string>
     <string name="create_login">Create login</string>
     <string name="keep_unlocking_with_biometrics">Keep unlocking with biometrics</string>
-    <string name="weve_made_a_security_update">We’ve made a security update. Confirm your biometrics again to keep using them to unlock Bitwarden.</string>
+    <string name="weve_made_a_security_update">We’ve made a security update. Confirm your biometrics again to keep using them to unlock SecretDoor.</string>
     <string name="turn_off">Turn off</string>
     <string name="turn_off_biometric_question">Turn off biometrics?</string>
     <string name="unlocking_will_require_your_master_password">Unlocking will require your master password. You can turn biometrics back on in Settings.</string>

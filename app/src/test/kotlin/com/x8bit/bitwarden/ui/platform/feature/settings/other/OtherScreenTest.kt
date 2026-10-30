@@ -74,12 +74,6 @@ class OtherScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `on allow sync toggle should send AllowSyncToggle`() {
-        composeTestRule.onNodeWithText("Allow sync on refresh").performClick()
-        verify { viewModel.trySendAction(OtherAction.AllowSyncToggle(true)) }
-    }
-
-    @Test
     fun `on back click should send BackClick`() {
         composeTestRule.onNodeWithContentDescription("Back").performClick()
         verify { viewModel.trySendAction(OtherAction.BackClick) }
@@ -138,12 +132,6 @@ class OtherScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `on sync now button click should send SyncNowButtonClick`() {
-        composeTestRule.onNodeWithText("Sync now").performClick()
-        verify { viewModel.trySendAction(OtherAction.SyncNowButtonClick) }
-    }
-
-    @Test
     fun `on NavigateBack should call onNavigateBack`() {
         mutableEventFlow.tryEmit(OtherEvent.NavigateBack)
         assertTrue(haveCalledNavigateBack)
@@ -170,10 +158,10 @@ class OtherScreenTest : BitwardenComposeTest() {
         mutableStateFlow.update { it.copy(isPreAuth = false) }
         composeTestRule
             .onNodeWithText(text = "Allow sync on refresh")
-            .assertExists()
+            .assertDoesNotExist()
         composeTestRule
             .onNodeWithText(text = "Sync now")
-            .assertExists()
+            .assertDoesNotExist()
         composeTestRule
             .onNodeWithText(text = "Clear clipboard", useUnmergedTree = true)
             .assertExists()

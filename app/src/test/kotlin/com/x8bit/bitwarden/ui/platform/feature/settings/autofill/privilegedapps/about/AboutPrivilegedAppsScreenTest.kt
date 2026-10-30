@@ -35,9 +35,9 @@ class AboutPrivilegedAppsScreenTest : BitwardenComposeTest() {
     fun `content is displayed correctly`() {
         composeTestRule
             .onNodeWithText(
-                "To protect users from phishing attempts, by default, Bitwarden only completes " +
+                "To protect users from phishing attempts, by default, SecretDoor only completes " +
                     "passkey operations through applications or web browsers trusted by Google " +
-                    "or the Bitwarden community.",
+                    "or the SecretDoor community.",
             )
             .assertIsDisplayed()
 
@@ -47,7 +47,7 @@ class AboutPrivilegedAppsScreenTest : BitwardenComposeTest() {
 
         composeTestRule
             .onNodeWithText(
-                "These are applications or browsers that Bitwarden does not trust by default, " +
+                "These are applications or browsers that SecretDoor does not trust by default, " +
                     "but you trust to perform passkey operations.",
             )
             .assertIsDisplayed()
@@ -58,7 +58,7 @@ class AboutPrivilegedAppsScreenTest : BitwardenComposeTest() {
 
         composeTestRule
             .onNodeWithText(
-                "These are applications not included in the Google Play Store, but Bitwarden " +
+                "These are applications not included in the Google Play Store, but SecretDoor " +
                     "trusts to perform passkey operations after community members use and report " +
                     "them as safe.",
             )

@@ -805,13 +805,10 @@ class AccountSecurityViewModelTest : BaseViewModelTest() {
         }
 
     @Test
-    fun `when version is at least 31 should show authenticator sync UI`() {
+    fun `authenticator sync UI should never be shown`() {
         every { isBuildVersionAtLeast(Build.VERSION_CODES.S) } returns true
         val vm = createViewModel(initialState = null)
-        assertEquals(
-            DEFAULT_STATE.copy(shouldShowEnableAuthenticatorSync = true),
-            vm.stateFlow.value,
-        )
+        assertEquals(DEFAULT_STATE, vm.stateFlow.value)
     }
 
     @Test

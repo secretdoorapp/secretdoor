@@ -430,10 +430,6 @@ private fun VaultItemListingScaffold(
                         isVisible = state.shouldShowOverflowMenu,
                         menuItemDataList = persistentListOf(
                             OverflowMenuItemData(
-                                text = stringResource(id = BitwardenString.sync),
-                                onClick = vaultItemListingHandlers.syncClick,
-                            ),
-                            OverflowMenuItemData(
                                 text = stringResource(id = BitwardenString.lock),
                                 onClick = vaultItemListingHandlers.lockClick,
                             ),
@@ -465,6 +461,7 @@ private fun VaultItemListingScaffold(
                 onDismissRequest = { isAccountMenuVisible = false },
                 isAddAccountAvailable = false,
                 topAppBarScrollBehavior = scrollBehavior,
+                isLogoutAvailable = false,
                 modifier = Modifier.fillMaxSize(),
             )
         },

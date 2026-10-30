@@ -1,5 +1,6 @@
 package com.x8bit.bitwarden.ui.auth.feature.completeregistration.handlers
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.x8bit.bitwarden.ui.auth.feature.completeregistration.CompleteRegistrationAction
@@ -20,6 +21,9 @@ class CompleteRegistrationHandler(
     val onMakeStrongPassword: () -> Unit,
     val onLearnToPreventLockout: () -> Unit,
     val onCallToAction: () -> Unit,
+    val onRestoreFromBackupClick: () -> Unit,
+    val onBackupFileReceive: (Uri) -> Unit,
+    val onRestoreMasterPasswordSubmit: (String) -> Unit,
 ) {
     @Suppress("UndocumentedPublicClass")
     companion object {
@@ -72,6 +76,17 @@ class CompleteRegistrationHandler(
             },
             onCallToAction = {
                 viewModel.trySendAction(CompleteRegistrationAction.CallToActionClick)
+            },
+            onRestoreFromBackupClick = {
+                viewModel.trySendAction(CompleteRegistrationAction.RestoreFromBackupClick)
+            },
+            onBackupFileReceive = {
+                viewModel.trySendAction(CompleteRegistrationAction.BackupFileReceive(it))
+            },
+            onRestoreMasterPasswordSubmit = {
+                viewModel.trySendAction(
+                    CompleteRegistrationAction.RestoreMasterPasswordSubmit(it),
+                )
             },
         )
     }

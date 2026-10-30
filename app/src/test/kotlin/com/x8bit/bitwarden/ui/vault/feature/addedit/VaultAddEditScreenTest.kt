@@ -639,7 +639,7 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
         )
 
         composeTestRule
-            .onAllNodesWithText("Bitwarden Autofill Service")
+            .onAllNodesWithText("SecretDoor Autofill Service")
             .filterToOne(hasAnyAncestor(isDialog()))
             .assertIsDisplayed()
 

@@ -51,6 +51,10 @@ internal class UserLogoutManagerImpl(
     override fun logout(userId: String, reason: LogoutReason) {
         authDiskSource.userState ?: return
         Timber.d("logout reason=$reason")
+        if (!reason.isVaultDeletion) {
+            Timber.w("Ignoring logout: only deleting the vault may erase local data")
+            return
+        }
         val isSecurityStamp = reason == LogoutReason.SecurityStamp
         if (isSecurityStamp) {
             showToast(message = BitwardenString.login_expired)
@@ -74,6 +78,10 @@ internal class UserLogoutManagerImpl(
 
     override fun softLogout(userId: String, reason: LogoutReason) {
         Timber.d("softLogout reason=$reason")
+        if (!reason.isVaultDeletion) {
+            Timber.w("Ignoring soft logout: only deleting the vault may erase local data")
+            return
+        }
         val isSecurityStamp = reason == LogoutReason.SecurityStamp
         if (isSecurityStamp) {
             showToast(message = BitwardenString.login_expired)
@@ -180,3 +188,11 @@ internal class UserLogoutManagerImpl(
         }
     }
 }
+
+/**
+ * SecretDoor keeps the only copy of the vault on this device, so logging out (which erases all
+ * local data) is only allowed when the user explicitly deletes the vault. Every other reason
+ * (timeouts, too many unlock attempts, biometric changes, server signals) is ignored.
+ */
+private val LogoutReason.isVaultDeletion: Boolean
+    get() = this == LogoutReason.AccountDelete

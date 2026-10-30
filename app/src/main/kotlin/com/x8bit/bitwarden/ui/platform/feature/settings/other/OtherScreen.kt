@@ -1,19 +1,15 @@
 package com.x8bit.bitwarden.ui.platform.feature.settings.other
 
 import android.content.res.Resources
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -21,7 +17,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalResources
@@ -33,7 +28,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bitwarden.ui.platform.base.util.EventsEffect
 import com.bitwarden.ui.platform.base.util.standardHorizontalMargin
 import com.bitwarden.ui.platform.components.appbar.BitwardenTopAppBar
-import com.bitwarden.ui.platform.components.button.BitwardenOutlinedButton
 import com.bitwarden.ui.platform.components.dialog.BitwardenBasicDialog
 import com.bitwarden.ui.platform.components.dialog.BitwardenLoadingDialog
 import com.bitwarden.ui.platform.components.dialog.BitwardenTwoButtonDialog
@@ -46,7 +40,6 @@ import com.bitwarden.ui.platform.components.toggle.BitwardenSwitch
 import com.bitwarden.ui.platform.components.util.rememberVectorPainter
 import com.bitwarden.ui.platform.resource.BitwardenDrawable
 import com.bitwarden.ui.platform.resource.BitwardenString
-import com.bitwarden.ui.platform.theme.BitwardenTheme
 import com.x8bit.bitwarden.data.platform.repository.model.ClearClipboardFrequency
 import com.x8bit.bitwarden.data.platform.repository.util.displayLabel
 import kotlinx.collections.immutable.toImmutableList
@@ -94,8 +87,6 @@ fun OtherScreen(
     ) {
         OtherContent(
             state = state,
-            onEnableSyncCheckChange = { viewModel.trySendAction(OtherAction.AllowSyncToggle(it)) },
-            onSyncClick = { viewModel.trySendAction(OtherAction.SyncNowButtonClick) },
             onClipboardFrequencyChange = {
                 viewModel.trySendAction(OtherAction.ClearClipboardFrequencyChange(it))
             },
@@ -111,8 +102,6 @@ fun OtherScreen(
 @Composable
 private fun OtherContent(
     state: OtherState,
-    onEnableSyncCheckChange: (Boolean) -> Unit,
-    onSyncClick: () -> Unit,
     onClipboardFrequencyChange: (ClearClipboardFrequency) -> Unit,
     onScreenCaptureChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -122,57 +111,6 @@ private fun OtherContent(
     ) {
         Spacer(modifier = Modifier.height(height = 12.dp))
         if (!state.isPreAuth) {
-            BitwardenSwitch(
-                label = stringResource(id = BitwardenString.enable_sync_on_refresh),
-                supportingText = stringResource(
-                    id = BitwardenString.enable_sync_on_refresh_description,
-                ),
-                isChecked = state.allowSyncOnRefresh,
-                onCheckedChange = onEnableSyncCheckChange,
-                cardStyle = CardStyle.Full,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag(tag = "SyncOnRefreshSwitch")
-                    .standardHorizontalMargin(),
-            )
-
-            Spacer(modifier = Modifier.height(height = 16.dp))
-
-            BitwardenOutlinedButton(
-                onClick = onSyncClick,
-                label = stringResource(id = BitwardenString.sync_now),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag(tag = "SyncNowButton")
-                    .standardHorizontalMargin(),
-            )
-
-            Spacer(modifier = Modifier.height(height = 8.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag(tag = "LastSyncLabel")
-                    .standardHorizontalMargin()
-                    .padding(horizontal = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
-            ) {
-                Text(
-                    text = stringResource(id = BitwardenString.last_sync),
-                    style = BitwardenTheme.typography.bodySmall,
-                    color = BitwardenTheme.colorScheme.text.secondary,
-                    modifier = Modifier.padding(end = 2.dp),
-                )
-                Text(
-                    text = state.lastSyncTime,
-                    style = BitwardenTheme.typography.bodySmall,
-                    color = BitwardenTheme.colorScheme.text.secondary,
-                )
-            }
-
-            Spacer(modifier = Modifier.height(height = 16.dp))
-
             ClearClipboardFrequencyRow(
                 currentSelection = state.clearClipboardFrequency,
                 onFrequencySelection = onClipboardFrequencyChange,

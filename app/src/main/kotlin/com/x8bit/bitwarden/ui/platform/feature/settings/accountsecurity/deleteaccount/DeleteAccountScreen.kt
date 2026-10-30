@@ -71,7 +71,7 @@ fun DeleteAccountScreen(
         DeleteAccountState.DeleteAccountDialog.DeleteSuccess -> BitwardenBasicDialog(
             title = null,
             message = stringResource(
-                id = BitwardenString.your_account_has_been_permanently_deleted,
+                id = BitwardenString.your_vault_has_been_deleted,
             ),
             onDismissRequest = {
                 viewModel.trySendAction(DeleteAccountAction.AccountDeletionConfirm)
@@ -99,7 +99,7 @@ fun DeleteAccountScreen(
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             BitwardenTopAppBar(
-                title = stringResource(id = BitwardenString.delete_account),
+                title = stringResource(id = BitwardenString.delete_vault),
                 scrollBehavior = scrollBehavior,
                 navigationIcon = rememberVectorPainter(id = BitwardenDrawable.ic_close),
                 navigationIconContentDescription = stringResource(id = BitwardenString.close),
@@ -124,9 +124,9 @@ fun DeleteAccountScreen(
             } else {
                 WarningMessageCard(
                     headerText = stringResource(
-                        id = BitwardenString.deleting_your_account_is_permanent,
+                        id = BitwardenString.deleting_your_vault_is_permanent,
                     ),
-                    subtitleText = stringResource(id = BitwardenString.delete_account_explanation),
+                    subtitleText = stringResource(id = BitwardenString.your_vault_and_all_its_items_will_be_erased_from_this_device),
                     modifier = Modifier.standardHorizontalMargin(),
                 )
                 Spacer(modifier = Modifier.height(24.dp))
@@ -179,7 +179,7 @@ private fun DeleteAccountButton(
     }
 
     BitwardenFilledErrorButton(
-        label = stringResource(id = BitwardenString.delete_account),
+        label = stringResource(id = BitwardenString.delete_vault),
         onClick = {
             if (isUnlockWithPasswordEnabled) {
                 showPasswordDialog = true

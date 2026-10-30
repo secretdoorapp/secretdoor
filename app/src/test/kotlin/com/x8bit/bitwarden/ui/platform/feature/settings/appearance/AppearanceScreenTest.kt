@@ -168,25 +168,6 @@ class AppearanceScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `on show website icons row click should send ShowWebsiteIconsToggled`() {
-        composeTestRule.onNodeWithText("Show website icons")
-            .performScrollTo()
-            .performClick()
-        verify { viewModel.trySendAction(AppearanceAction.ShowWebsiteIconsToggle(true)) }
-    }
-
-    @Test
-    fun `on show website icons tooltip click should send ShowWebsiteIconsToggled`() {
-        composeTestRule
-            .onNodeWithContentDescription(label = "Show website icons help, External link")
-            .performScrollTo()
-            .performClick()
-        verify {
-            viewModel.trySendAction(AppearanceAction.ShowWebsiteIconsTooltipClick)
-        }
-    }
-
-    @Test
     fun `on NavigateBack should call onNavigateBack`() {
         mutableEventFlow.tryEmit(AppearanceEvent.NavigateBack)
         assertTrue(haveCalledNavigateBack)

@@ -9,9 +9,7 @@ import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.isDialog
-import androidx.compose.ui.test.isPopup
 import androidx.compose.ui.test.onAllNodesWithText
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performKeyPress
@@ -24,19 +22,13 @@ import com.bitwarden.ui.platform.components.account.model.AccountSummary
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.asText
 import com.bitwarden.ui.util.assertLockOrLogoutDialogIsDisplayed
-import com.bitwarden.ui.util.assertLogoutConfirmationDialogIsDisplayed
 import com.bitwarden.ui.util.assertNoDialogExists
-import com.bitwarden.ui.util.assertRemovalConfirmationDialogIsDisplayed
 import com.bitwarden.ui.util.assertSwitcherIsDisplayed
 import com.bitwarden.ui.util.assertSwitcherIsNotDisplayed
 import com.bitwarden.ui.util.performAccountClick
 import com.bitwarden.ui.util.performAccountIconClick
 import com.bitwarden.ui.util.performAccountLongClick
-import com.bitwarden.ui.util.performAddAccountClick
 import com.bitwarden.ui.util.performLockAccountClick
-import com.bitwarden.ui.util.performLogoutAccountClick
-import com.bitwarden.ui.util.performRemoveAccountClick
-import com.bitwarden.ui.util.performYesDialogButtonClick
 import com.x8bit.bitwarden.data.auth.repository.model.VaultUnlockType
 import com.x8bit.bitwarden.ui.credentials.manager.CredentialProviderCompletionManager
 import com.x8bit.bitwarden.ui.credentials.manager.model.AssertFido2CredentialResult
@@ -170,6 +162,7 @@ class VaultUnlockScreenTest : BitwardenComposeTest() {
 
         composeTestRule.assertSwitcherIsDisplayed(
             accountSummaries = ACCOUNT_SUMMARIES,
+            isAddAccountButtonVisible = false,
         )
     }
 
@@ -191,20 +184,6 @@ class VaultUnlockScreenTest : BitwardenComposeTest() {
 
     @Suppress("MaxLineLength")
     @Test
-    fun `add account click in the account switcher should send AddAccountClick and close switcher`() {
-        // Open the Account Switcher
-        composeTestRule.performAccountIconClick()
-
-        composeTestRule.performAddAccountClick()
-
-        verify { viewModel.trySendAction(VaultUnlockAction.AddAccountClick) }
-        composeTestRule.assertSwitcherIsNotDisplayed(
-            accountSummaries = ACCOUNT_SUMMARIES,
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
     fun `account long click in the account switcher should show the lock-or-logout dialog and close the switcher`() {
         // Show the account switcher
         composeTestRule.performAccountIconClick()
@@ -216,6 +195,7 @@ class VaultUnlockScreenTest : BitwardenComposeTest() {
 
         composeTestRule.assertLockOrLogoutDialogIsDisplayed(
             accountSummary = ACTIVE_ACCOUNT_SUMMARY,
+            isLogoutButtonVisible = false,
         )
     }
 
@@ -307,124 +287,6 @@ class VaultUnlockScreenTest : BitwardenComposeTest() {
             viewModel.trySendAction(VaultUnlockAction.LockAccountClick(ACTIVE_ACCOUNT_SUMMARY))
         }
         composeTestRule.assertNoDialogExists()
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `logout button click in the lock-or-logout dialog should show the logout confirmation dialog and hide the lock-or-logout dialog`() {
-        // Show the lock-or-logout dialog
-        composeTestRule.performAccountIconClick()
-        composeTestRule.performAccountLongClick(ACTIVE_ACCOUNT_SUMMARY)
-
-        composeTestRule.performLogoutAccountClick()
-
-        composeTestRule.assertLogoutConfirmationDialogIsDisplayed(
-            accountSummary = ACTIVE_ACCOUNT_SUMMARY,
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `logout button click in the logout confirmation dialog should send LogoutAccountClick action and close the dialog`() {
-        // Show the logout confirmation dialog
-        composeTestRule.performAccountIconClick()
-        composeTestRule.performAccountLongClick(ACTIVE_ACCOUNT_SUMMARY)
-        composeTestRule.performLogoutAccountClick()
-
-        composeTestRule.performYesDialogButtonClick()
-
-        verify {
-            viewModel.trySendAction(VaultUnlockAction.LogoutAccountClick(ACTIVE_ACCOUNT_SUMMARY))
-        }
-        composeTestRule.assertNoDialogExists()
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `remove account button click in the lock-or-logout dialog should show the remove account confirmation dialog and hide the lock-or-logout dialog`() {
-        // Show the lock-or-logout dialog
-        val activeAccountSummary = ACTIVE_ACCOUNT_SUMMARY.copy(isLoggedIn = false)
-        mutableStateFlow.update {
-            it.copy(accountSummaries = persistentListOf(activeAccountSummary))
-        }
-        composeTestRule.performAccountIconClick()
-        composeTestRule.performAccountLongClick(activeAccountSummary)
-
-        composeTestRule.performRemoveAccountClick()
-
-        composeTestRule.assertRemovalConfirmationDialogIsDisplayed(activeAccountSummary)
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `remove account button click in the remove account confirmation dialog should send LogoutAccountClick action and close the dialog`() {
-        // Show the remove account confirmation dialog
-        val activeAccountSummary = ACTIVE_ACCOUNT_SUMMARY.copy(isLoggedIn = false)
-        mutableStateFlow.update {
-            it.copy(accountSummaries = persistentListOf(activeAccountSummary))
-        }
-        composeTestRule.performAccountIconClick()
-        composeTestRule.performAccountLongClick(activeAccountSummary)
-        composeTestRule.performRemoveAccountClick()
-
-        composeTestRule.performYesDialogButtonClick()
-
-        verify {
-            viewModel.trySendAction(VaultUnlockAction.LogoutAccountClick(activeAccountSummary))
-        }
-        composeTestRule.assertNoDialogExists()
-    }
-
-    @Test
-    fun `logout click in the overflow menu should show the logout confirmation dialog`() {
-        // Confirm neither the popup nor the dialog are showing
-        composeTestRule.onNode(isPopup()).assertDoesNotExist()
-        composeTestRule.onNode(isDialog()).assertDoesNotExist()
-
-        // Expand the overflow menu
-        composeTestRule.onNodeWithContentDescription("More options").performClick()
-        composeTestRule.onNode(isPopup()).assertIsDisplayed()
-        composeTestRule.onNode(isDialog()).assertDoesNotExist()
-
-        // Click on the logout item
-        composeTestRule
-            .onAllNodesWithText("Log out")
-            .filterToOne(hasAnyAncestor(isPopup()))
-            .performClick()
-
-        // Check for the dialog
-        composeTestRule
-            .onNode(isDialog())
-            .assertIsDisplayed()
-        composeTestRule
-            .onAllNodesWithText("Log out")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .assertIsDisplayed()
-        composeTestRule
-            .onAllNodesWithText("Are you sure you want to log out?")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun `Yes click in the logout confirmation dialog should send the ConfirmLogoutClick action`() {
-        // Expand the overflow menu
-        composeTestRule.onNodeWithContentDescription("More options").performClick()
-
-        // Click on the logout item to display the dialog
-        composeTestRule
-            .onAllNodesWithText("Log out")
-            .filterToOne(hasAnyAncestor(isPopup()))
-            .performClick()
-        composeTestRule.onNode(isDialog()).assertIsDisplayed()
-
-        // Click on the Yes button in the dialog
-        composeTestRule
-            .onAllNodesWithText("Yes")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .performClick()
-
-        verify { viewModel.trySendAction(VaultUnlockAction.ConfirmLogoutClick) }
     }
 
     @Test

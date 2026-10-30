@@ -1,9 +1,6 @@
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.variant.impl.VariantOutputImpl
 import com.android.utils.cxx.io.removeExtensionIfPresent
-import com.google.firebase.crashlytics.buildtools.gradle.tasks.InjectMappingFileIdTask
-import com.google.firebase.crashlytics.buildtools.gradle.tasks.UploadMappingFileTask
-import com.google.gms.googleservices.GoogleServicesTask
 import org.gradle.kotlin.dsl.support.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
@@ -12,15 +9,11 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.androidx.room3)
-    // Crashlytics is enabled for all builds initially but removed for FDroid builds in gradle and
-    // standardDebug builds in the merged manifest.
-    alias(libs.plugins.crashlytics)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.compose.compiler)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.google.services)
 }
 
 /**
@@ -291,9 +284,6 @@ dependencies {
 
     // Standard-specific flavor dependencies
     standardImplementation(libs.google.billing)
-    standardImplementation(platform(libs.google.firebase.bom))
-    standardImplementation(libs.google.firebase.cloud.messaging)
-    standardImplementation(libs.google.firebase.crashlytics)
     standardImplementation(libs.google.mlkit.text.recognition)
     standardImplementation(libs.google.play.review)
 
@@ -313,16 +303,6 @@ dependencies {
     testImplementation(libs.mockk.mockk)
     testImplementation(libs.robolectric.robolectric)
     testImplementation(libs.square.turbine)
-}
-
-afterEvaluate {
-    // Disable Fdroid-specific tasks that we want to exclude
-    val fdroidTasksToDisable = tasks.withType<GoogleServicesTask>() +
-        tasks.withType<InjectMappingFileIdTask>() +
-        tasks.withType<UploadMappingFileTask>()
-    fdroidTasksToDisable
-        .filter { it.name.contains("Fdroid") }
-        .forEach { it.enabled = false }
 }
 
 private fun renameFile(path: String, newName: String) {

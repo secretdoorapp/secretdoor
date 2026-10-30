@@ -71,7 +71,7 @@ class UpdateBiometricsScreenTest : BitwardenComposeTest() {
         composeTestRule
             .onNodeWithText(
                 text = "We’ve made a security update. " +
-                    "Confirm your biometrics again to keep using them to unlock Bitwarden.",
+                    "Confirm your biometrics again to keep using them to unlock SecretDoor.",
             )
             .performScrollTo()
             .assertIsDisplayed()

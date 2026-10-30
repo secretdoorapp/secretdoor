@@ -993,7 +993,7 @@ class PlanScreenTest : BitwardenComposeTest() {
             .assertExists()
         composeTestRule
             .onAllNodesWithText(
-                "Manage your subscription plan in the Bitwarden web app.",
+                "Manage your subscription plan in the SecretDoor web app.",
             )
             .filterToOne(hasAnyAncestor(isDialog()))
             .assertExists()

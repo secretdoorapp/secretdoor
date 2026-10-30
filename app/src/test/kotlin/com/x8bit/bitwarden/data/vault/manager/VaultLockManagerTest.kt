@@ -316,11 +316,30 @@ class VaultLockManagerTest {
                 userLogoutManager.softLogout(userId = any(), reason = any())
             }
         }
+    }
 
-        // Test Logout action
+    @Test
+    fun `app coming into background with the Logout timeout action should lock instead of logging out`() {
+        setAccountTokens()
+        fakeAuthDiskSource.userState = MOCK_USER_STATE
+
+        // Start in a foregrounded state.
+        fakeAppStateManager.appForegroundState = AppForegroundState.FOREGROUNDED
+
+        // Will be used within each loop to reset the test to a suitable initial state.
+        fun resetTest(vaultTimeout: VaultTimeout) {
+            clearVerifications(userLogoutManager)
+            mutableVaultTimeoutStateFlow.value = vaultTimeout
+            fakeAppStateManager.appForegroundState = AppForegroundState.FOREGROUNDED
+            verifyUnlockedVaultBlocking(userId = USER_ID)
+            assertTrue(vaultLockManager.isVaultUnlocked(USER_ID))
+        }
+
+        // SecretDoor: the Logout action locks the vault so its only copy is never erased.
         mutableVaultTimeoutActionStateFlow.value = VaultTimeoutAction.LOGOUT
         MOCK_TIMEOUTS.forEach { vaultTimeout ->
             resetTest(vaultTimeout = vaultTimeout)
+
             fakeAppStateManager.appForegroundState = AppForegroundState.BACKGROUNDED
             // Advance by 6 minutes. Only actions with a timeout less than this will be triggered.
             testDispatcher.scheduler.advanceTimeBy(delayTimeMillis = 6 * 60 * 1000L)
@@ -335,9 +354,7 @@ class VaultLockManagerTest {
                 VaultTimeout.FourHours,
                 is VaultTimeout.Custom,
                     -> {
-                    verify(exactly = 0) {
-                        userLogoutManager.softLogout(userId = any(), reason = any())
-                    }
+                    assertTrue(vaultLockManager.isVaultUnlocked(USER_ID))
                 }
 
                 // Before 6 minutes
@@ -345,13 +362,12 @@ class VaultLockManagerTest {
                 VaultTimeout.OneMinute,
                 VaultTimeout.FiveMinutes,
                     -> {
-                    verify(exactly = 1) {
-                        userLogoutManager.softLogout(
-                            userId = USER_ID,
-                            reason = LogoutReason.Timeout,
-                        )
-                    }
+                    assertFalse(vaultLockManager.isVaultUnlocked(USER_ID))
                 }
+            }
+
+            verify(exactly = 0) {
+                userLogoutManager.softLogout(userId = any(), reason = any())
             }
         }
     }
@@ -482,41 +498,6 @@ class VaultLockManagerTest {
             }
             verify(exactly = 0) { userLogoutManager.softLogout(userId = any(), reason = any()) }
         }
-
-        // Test Logout action
-        mutableVaultTimeoutActionStateFlow.value = VaultTimeoutAction.LOGOUT
-        MOCK_TIMEOUTS.forEach { vaultTimeout ->
-            resetTest(vaultTimeout = vaultTimeout)
-
-            fakeAppStateManager.appCreationState =
-                AppCreationState.Created(isAutoFill = false)
-            // Advance by 6 minutes. Only actions with a timeout less than this will be triggered.
-            testDispatcher.scheduler.advanceTimeBy(delayTimeMillis = 6 * 60 * 1000L)
-
-            assertTrue(vaultLockManager.isVaultUnlocked(USER_ID))
-            when (vaultTimeout) {
-                VaultTimeout.OnAppRestart -> {
-                    verify(exactly = 1) {
-                        userLogoutManager.softLogout(userId = any(), reason = LogoutReason.Timeout)
-                    }
-                }
-
-                is VaultTimeout.Custom,
-                VaultTimeout.FifteenMinutes,
-                VaultTimeout.FiveMinutes,
-                VaultTimeout.FourHours,
-                VaultTimeout.Immediately,
-                VaultTimeout.Never,
-                VaultTimeout.OneHour,
-                VaultTimeout.OneMinute,
-                VaultTimeout.ThirtyMinutes,
-                    -> {
-                    verify(exactly = 0) {
-                        userLogoutManager.softLogout(userId = any(), reason = any())
-                    }
-                }
-            }
-        }
     }
 
     @Suppress("MaxLineLength")
@@ -629,50 +610,6 @@ class VaultLockManagerTest {
             }
 
             verify(exactly = 0) { userLogoutManager.softLogout(userId = any(), reason = any()) }
-        }
-
-        // Test Logout action
-        mutableVaultTimeoutActionStateFlow.value = VaultTimeoutAction.LOGOUT
-        MOCK_TIMEOUTS.forEach { vaultTimeout ->
-            resetTest(vaultTimeout = vaultTimeout)
-
-            val activeUserCheck = fakeAuthDiskSource.userState?.activeUserId == USER_ID
-            val activeUserId = if (activeUserCheck) userId2 else USER_ID
-            val inactiveUserId = if (activeUserCheck) USER_ID else userId2
-            fakeAuthDiskSource.userState = fakeAuthDiskSource.userState?.copy(
-                activeUserId = activeUserId,
-            )
-            // Advance by 6 minutes. Only actions with a timeout less than this will be triggered.
-            testDispatcher.scheduler.advanceTimeBy(delayTimeMillis = 6 * 60 * 1000L)
-
-            when (vaultTimeout) {
-                // After 6 minutes (or action should not be performed)
-                VaultTimeout.Never,
-                VaultTimeout.OnAppRestart,
-                VaultTimeout.FifteenMinutes,
-                VaultTimeout.ThirtyMinutes,
-                VaultTimeout.OneHour,
-                VaultTimeout.FourHours,
-                is VaultTimeout.Custom,
-                    -> {
-                    verify(exactly = 0) {
-                        userLogoutManager.softLogout(userId = any(), reason = any())
-                    }
-                }
-
-                // Before 6 minutes
-                VaultTimeout.Immediately,
-                VaultTimeout.OneMinute,
-                VaultTimeout.FiveMinutes,
-                    -> {
-                    verify(exactly = 0) {
-                        userLogoutManager.softLogout(userId = activeUserId, reason = any())
-                    }
-                    verify(exactly = 1) {
-                        userLogoutManager.softLogout(userId = inactiveUserId, reason = any())
-                    }
-                }
-            }
         }
     }
 

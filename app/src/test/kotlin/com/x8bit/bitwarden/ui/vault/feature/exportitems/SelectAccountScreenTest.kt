@@ -146,7 +146,7 @@ class SelectAccountScreenTest : BitwardenComposeTest() {
             .assertIsDisplayed()
 
         val text = "You don’t have any accounts you can import from. Your organization’s " +
-            "security policy may restrict importing items from Bitwarden to another app."
+            "security policy may restrict importing items from SecretDoor to another app."
         composeTestRule
             .onNodeWithText(text = text)
             .assertIsDisplayed()

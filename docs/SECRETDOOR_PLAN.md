@@ -68,8 +68,12 @@ stored key material.
     decrypted from a cache copy when opened, deleted with the attachment or cipher.
   - [x] Credential Exchange import saves ciphers to disk.
   - [ ] Delete attachment files when the vault is deleted (logout / account removal).
-  - [ ] Logout currently deletes the local vault (there is no server copy); decide whether to
-    hide or rename "Log out" before release.
+  - [x] Logout: "Log out" is removed everywhere (Settings, unlock screen, account switcher) and
+    the "Log out" session timeout action is gone (stored values lock instead).
+    `UserLogoutManagerImpl` refuses to erase anything unless the reason is
+    `LogoutReason.AccountDelete`, so timeouts, too many unlock attempts, biometric changes and
+    server signals can never wipe the vault. "Delete account" is now "Delete vault": it checks the
+    master password locally and erases the vault.
 
 ### Phase 3: Remove server-only features and network code
 - Delete organizations, collections, Send, emergency access, billing, push, events, config/feature
@@ -99,18 +103,42 @@ stored key material.
     them needs a database migration and a regenerated schema, so do it with a build.
   - [x] Bug fixed: saving an item no longer requires an internet connection
     (`VaultAddEditViewModel` no longer depends on `NetworkConnectionManager`).
-  - [ ] Sync UI (vault and item listing pull-to-refresh, "Sync" menu, Settings > Other "Sync
-    now") still shows "Internet connection required" when offline. Remove the sync UI.
+  - [x] Sync UI removed: "Sync" overflow items (vault, item listing, verification codes),
+    Settings > Other "Sync now", last sync and "Allow sync on refresh" (pull-to-refresh stays off).
+  - [x] Website icons are never downloaded (`isIconLoadingDisabled` is always true) and the
+    "Show website icons" switch is gone.
+  - [x] Firebase removed: Crashlytics, Firebase Cloud Messaging service, Google services plugin,
+    Bitwarden's `google-services.json`. One `LogsManagerImpl` (no crash reporting) for all flavors.
+  - [x] Network guard: `AllowedHostsInterceptor` (network module) refuses every request except to
+    `api.pwnedpasswords.com` before any connection is made. This also stops leftover calls such as
+    the server config fetch in `NetworkConfigManagerImpl`.
+  - [x] `:authenticator` app module removed; the Authenticator bridge service is no longer exported
+    and "Sync with Authenticator" is hidden.
+  - [ ] Delete the unused Authenticator bridge code (`:authenticatorbridge`, bridge
+    repository/processor/service, sync unlock key, key rotation).
+  - [ ] Remaining server code (services in `:network`, push, auth requests, Key Connector,
+    devices, Fill Assist) is unreachable behind the network guard; delete it over time.
 
 ### Phase 4: Backup and restore
-- Free: "Export encrypted backup" saves the password-protected file wherever the user picks
-  (`ACTION_CREATE_DOCUMENT`); the user can upload it anywhere themselves.
-- Paid: Settings > Backup: choose a cloud folder (`ACTION_OPEN_DOCUMENT_TREE`, persisted
-  permission), set a backup password, "Back up now", and a schedule (off/daily/weekly) run by
-  WorkManager. Gate this behind a paid entitlement (billing approach TBD; Google Play Billing for
-  the `standard` flavor, F-Droid needs a separate model).
-- Restore: pick a backup file (`ACTION_OPEN_DOCUMENT`), enter its password, import into the vault.
-- Backup files are named with a timestamp; keep the last N.
+- Format: a ZIP with `manifest.json`, `account.json` (account, KDF settings, master-key-wrapped
+  user key, hint), `account_keys.json`, `folders.json`, `ciphers.json` and
+  `attachments/<cipherId>/<attachmentId>`. Everything is stored exactly as encrypted on the
+  device, so writing a backup never needs the vault unlocked; restoring needs the master password.
+  (The SDK cannot import Bitwarden's encrypted JSON export, so the backup is SecretDoor's own
+  format. "Export vault" stays for moving to other password managers.)
+- Progress:
+  - [x] `VaultBackupManager`: write, read (rejects non-backups, newer versions and unsafe entry
+    names) and restore (only when no vault exists; a wrong password rolls everything back).
+  - [x] Settings > Vault > Backup: "Save backup file" (`ACTION_CREATE_DOCUMENT`, free).
+  - [x] Automatic backup: pick a file once (`ACTION_CREATE_DOCUMENT`, persisted permission; Google
+    Drive does not support folder picking), Off/Daily/Weekly via WorkManager
+    (`AutoBackupWorker`), "Back up now", last backup status. Each run overwrites the file; Google
+    Drive keeps earlier versions.
+  - [x] Restore: "Restore from backup" on the Create vault screen (pick file, enter master
+    password).
+  - [ ] Paid gate: `AutoBackupManager.isAutoBackupAvailable` is `true` until billing exists
+    (Google Play Billing for `standard`; F-Droid needs a separate model).
+  - [ ] Restore into an existing vault (merge) is not supported yet.
 
 ### Phase 5: Branding cleanup
 - Replace remaining user-visible "Bitwarden" strings, icons, About screen, links, and README.
@@ -120,7 +148,11 @@ stored key material.
     splash icon, autofill/suggestion logo, notification icon, Import logins shield glyph.
     Illustrations recolored to navy/tan/gold. Unused `logo_bitwarden` deleted.
     Review page and generators: `design/icon-review/`, `design/icon-tools/`.
-  - [ ] `logo_authenticator` stays until the `:authenticator` module is removed.
+  - [x] "Bitwarden" replaced by "SecretDoor" in the text of every string resource (all
+    languages); resource names unchanged.
+  - [x] About: help center and privacy links point to the GitHub README; Web vault, Learn about
+    organizations and Submit crash logs rows removed; copyright line credits Bitwarden (GPLv3).
+  - [x] README rewritten for SecretDoor (features, privacy, backups, building, license).
 
 ## Build Prerequisites
 - `user.properties` with `gitHubToken=<classic PAT with read:packages>` to download

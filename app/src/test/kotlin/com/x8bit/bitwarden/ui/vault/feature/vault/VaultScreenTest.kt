@@ -32,20 +32,14 @@ import com.bitwarden.ui.platform.manager.IntentManager
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.asText
 import com.bitwarden.ui.util.assertLockOrLogoutDialogIsDisplayed
-import com.bitwarden.ui.util.assertLogoutConfirmationDialogIsDisplayed
 import com.bitwarden.ui.util.assertNoDialogExists
-import com.bitwarden.ui.util.assertRemovalConfirmationDialogIsDisplayed
 import com.bitwarden.ui.util.assertSwitcherIsDisplayed
 import com.bitwarden.ui.util.assertSwitcherIsNotDisplayed
 import com.bitwarden.ui.util.onNodeWithTextAfterScroll
 import com.bitwarden.ui.util.performAccountClick
 import com.bitwarden.ui.util.performAccountIconClick
 import com.bitwarden.ui.util.performAccountLongClick
-import com.bitwarden.ui.util.performAddAccountClick
 import com.bitwarden.ui.util.performLockAccountClick
-import com.bitwarden.ui.util.performLogoutAccountClick
-import com.bitwarden.ui.util.performRemoveAccountClick
-import com.bitwarden.ui.util.performYesDialogButtonClick
 import com.bitwarden.vault.CipherType
 import com.x8bit.bitwarden.data.billing.model.PremiumCard
 import com.x8bit.bitwarden.data.platform.repository.model.VaultSection
@@ -256,6 +250,7 @@ class VaultScreenTest : BitwardenComposeTest() {
 
         composeTestRule.assertSwitcherIsDisplayed(
             accountSummaries = accountSummaries,
+            isAddAccountButtonVisible = false,
         )
         assertTrue(onDimBottomNavBarRequestCalled)
     }
@@ -277,21 +272,6 @@ class VaultScreenTest : BitwardenComposeTest() {
 
     @Suppress("MaxLineLength")
     @Test
-    fun `Add Account click in the account switcher should send AddAccountClick and close switcher`() {
-        // Open the Account Switcher
-        val accountSummaries = DEFAULT_STATE.accountSummaries
-        composeTestRule.performAccountIconClick()
-
-        composeTestRule.performAddAccountClick()
-
-        verify { viewModel.trySendAction(VaultAction.AddAccountClick) }
-        composeTestRule.assertSwitcherIsNotDisplayed(
-            accountSummaries = accountSummaries,
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
     fun `account long click in the account switcher should show the lock-or-logout dialog and close the switcher`() {
         // Show the account switcher
         composeTestRule.performAccountIconClick()
@@ -303,6 +283,7 @@ class VaultScreenTest : BitwardenComposeTest() {
 
         composeTestRule.assertLockOrLogoutDialogIsDisplayed(
             accountSummary = ACTIVE_ACCOUNT_SUMMARY,
+            isLogoutButtonVisible = false,
         )
     }
 
@@ -319,68 +300,6 @@ class VaultScreenTest : BitwardenComposeTest() {
         composeTestRule.assertNoDialogExists()
     }
 
-    @Suppress("MaxLineLength")
-    @Test
-    fun `logout button click in the lock-or-logout dialog should show the logout confirmation dialog and hide the lock-or-logout dialog`() {
-        // Show the lock-or-logout dialog
-        composeTestRule.performAccountIconClick()
-        composeTestRule.performAccountLongClick(ACTIVE_ACCOUNT_SUMMARY)
-
-        composeTestRule.performLogoutAccountClick()
-
-        composeTestRule.assertLogoutConfirmationDialogIsDisplayed(
-            accountSummary = ACTIVE_ACCOUNT_SUMMARY,
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `logout button click in the logout confirmation dialog should send LogoutAccountClick action and close the dialog`() {
-        // Show the logout confirmation dialog
-        composeTestRule.performAccountIconClick()
-        composeTestRule.performAccountLongClick(ACTIVE_ACCOUNT_SUMMARY)
-        composeTestRule.performLogoutAccountClick()
-
-        composeTestRule.performYesDialogButtonClick()
-
-        verify { viewModel.trySendAction(VaultAction.LogoutAccountClick(ACTIVE_ACCOUNT_SUMMARY)) }
-        composeTestRule.assertNoDialogExists()
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `remove account button click in the lock-or-logout dialog should show the remove account confirmation dialog and hide the lock-or-logout dialog`() {
-        // Show the lock-or-logout dialog
-        val activeAccountSummary = ACTIVE_ACCOUNT_SUMMARY.copy(isLoggedIn = false)
-        mutableStateFlow.update {
-            it.copy(accountSummaries = persistentListOf(activeAccountSummary))
-        }
-        composeTestRule.performAccountIconClick()
-        composeTestRule.performAccountLongClick(activeAccountSummary)
-
-        composeTestRule.performRemoveAccountClick()
-
-        composeTestRule.assertRemovalConfirmationDialogIsDisplayed(activeAccountSummary)
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `remove account button click in the remove account confirmation dialog should send LogoutAccountClick action and close the dialog`() {
-        // Show the remove account confirmation dialog
-        val activeAccountSummary = ACTIVE_ACCOUNT_SUMMARY.copy(isLoggedIn = false)
-        mutableStateFlow.update {
-            it.copy(accountSummaries = persistentListOf(activeAccountSummary))
-        }
-        composeTestRule.performAccountIconClick()
-        composeTestRule.performAccountLongClick(activeAccountSummary)
-        composeTestRule.performRemoveAccountClick()
-
-        composeTestRule.performYesDialogButtonClick()
-
-        verify { viewModel.trySendAction(VaultAction.LogoutAccountClick(activeAccountSummary)) }
-        composeTestRule.assertNoDialogExists()
-    }
-
     @Test
     fun `overflow button click should show the overflow menu`() {
         composeTestRule.onNode(isPopup()).assertDoesNotExist()
@@ -393,24 +312,11 @@ class VaultScreenTest : BitwardenComposeTest() {
         composeTestRule
             .onAllNodesWithText("Sync")
             .filterToOne(hasAnyAncestor(isPopup()))
-            .assertIsDisplayed()
+            .assertDoesNotExist()
         composeTestRule
             .onAllNodesWithText("Lock")
             .filterToOne(hasAnyAncestor(isPopup()))
             .assertIsDisplayed()
-    }
-
-    @Test
-    fun `sync click in the overflow menu should send SyncClick`() {
-        // Expand the overflow menu
-        composeTestRule.onNodeWithContentDescription("More options").performClick()
-
-        composeTestRule
-            .onAllNodesWithText("Sync")
-            .filterToOne(hasAnyAncestor(isPopup()))
-            .performClick()
-
-        verify { viewModel.trySendAction(VaultAction.SyncClick) }
     }
 
     @Test
@@ -617,7 +523,7 @@ class VaultScreenTest : BitwardenComposeTest() {
     fun `cipher decryption error dialog should be shown or hidden according to the state`() {
         val errorTitle = "Decryption error"
         val errorMessage =
-            "Bitwarden could not decrypt this vault item. Copy and share this error report with customer success to avoid additional data loss."
+            "SecretDoor could not decrypt this vault item. Copy and share this error report with customer success to avoid additional data loss."
         composeTestRule.assertNoDialogExists()
         composeTestRule
             .onNodeWithText(errorTitle)
@@ -651,7 +557,7 @@ class VaultScreenTest : BitwardenComposeTest() {
     fun `share and copy button click on the CipherDecryptionError screen should send ShareCipherDecryptionErrorClick`() {
         val errorTitle = "Decryption error"
         val errorMessage =
-            "Bitwarden could not decrypt this vault item. Copy and share this error report with customer success to avoid additional data loss."
+            "SecretDoor could not decrypt this vault item. Copy and share this error report with customer success to avoid additional data loss."
         val shareAndCopyText = "Copy error report"
         mutableStateFlow.update {
             it.copy(
@@ -679,7 +585,7 @@ class VaultScreenTest : BitwardenComposeTest() {
     fun `close button click on the CipherDecryptionError screen should send DialogDismiss`() {
         val errorTitle = "Decryption error"
         val errorMessage =
-            "Bitwarden could not decrypt this vault item. Copy and share this error report with customer success to avoid additional data loss."
+            "SecretDoor could not decrypt this vault item. Copy and share this error report with customer success to avoid additional data loss."
         val closeText = "Close"
         mutableStateFlow.update {
             it.copy(
@@ -707,7 +613,7 @@ class VaultScreenTest : BitwardenComposeTest() {
     fun `vault load cipher decryption error dialog should be shown or hidden according to the state`() {
         val errorTitle = "Decryption error"
         val errorMessage =
-            "Bitwarden could not decrypt 1 vault item. Copy and share this error report with customer success to avoid additional data loss."
+            "SecretDoor could not decrypt 1 vault item. Copy and share this error report with customer success to avoid additional data loss."
         composeTestRule.assertNoDialogExists()
         composeTestRule
             .onNodeWithText(errorTitle)
@@ -740,7 +646,7 @@ class VaultScreenTest : BitwardenComposeTest() {
     fun `vault load cipher decryption error dialog should show plural when error is more than one`() {
         val errorTitle = "Decryption error"
         val errorMessage =
-            "Bitwarden could not decrypt 3 vault items. Copy and share this error report with customer success to avoid additional data loss."
+            "SecretDoor could not decrypt 3 vault items. Copy and share this error report with customer success to avoid additional data loss."
         composeTestRule.assertNoDialogExists()
         composeTestRule
             .onNodeWithText(errorTitle)

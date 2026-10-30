@@ -27,6 +27,8 @@ import com.x8bit.bitwarden.ui.platform.feature.settings.autofill.blockautofill.n
 import com.x8bit.bitwarden.ui.platform.feature.settings.autofill.navigateToAutoFill
 import com.x8bit.bitwarden.ui.platform.feature.settings.autofill.privilegedapps.list.navigateToPrivilegedAppsList
 import com.x8bit.bitwarden.ui.platform.feature.settings.autofill.privilegedapps.list.privilegedAppsListDestination
+import com.x8bit.bitwarden.ui.platform.feature.settings.backup.backupDestination
+import com.x8bit.bitwarden.ui.platform.feature.settings.backup.navigateToBackup
 import com.x8bit.bitwarden.ui.platform.feature.settings.flightrecorder.flightRecorderDestination
 import com.x8bit.bitwarden.ui.platform.feature.settings.flightrecorder.navigateToFlightRecorder
 import com.x8bit.bitwarden.ui.platform.feature.settings.flightrecorder.recordedLogs.navigateToRecordedLogs
@@ -178,7 +180,9 @@ fun NavGraphBuilder.settingsGraph(
             onNavigateToFolders = onNavigateToFolders,
             onNavigateToImportLogins = onNavigateToImportLogins,
             onNavigateToImportItems = onNavigateToImportItems,
+            onNavigateToBackup = { navController.navigateToBackup() },
         )
+        backupDestination(onNavigateBack = { navController.popBackStack() })
         importItemsDestination(
             onNavigateBack = { navController.popBackStack() },
             onNavigateToImportLogins = onNavigateToImportLogins,

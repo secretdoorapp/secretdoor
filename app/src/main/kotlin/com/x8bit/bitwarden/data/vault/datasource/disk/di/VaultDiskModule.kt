@@ -1,10 +1,14 @@
 package com.x8bit.bitwarden.data.vault.datasource.disk.di
 
 import android.app.Application
+import android.content.SharedPreferences
 import androidx.room3.Room
 import androidx.sqlite.driver.AndroidSQLiteDriver
 import com.bitwarden.core.data.manager.dispatcher.DispatcherManager
+import com.bitwarden.data.datasource.disk.di.UnencryptedPreferences
 import com.x8bit.bitwarden.data.platform.manager.DatabaseSchemeManager
+import com.x8bit.bitwarden.data.vault.datasource.disk.AutoBackupDiskSource
+import com.x8bit.bitwarden.data.vault.datasource.disk.AutoBackupDiskSourceImpl
 import com.x8bit.bitwarden.data.vault.datasource.disk.VaultDiskSource
 import com.x8bit.bitwarden.data.vault.datasource.disk.VaultDiskSourceImpl
 import com.x8bit.bitwarden.data.vault.datasource.disk.callback.DatabaseSchemeCallback
@@ -62,6 +66,12 @@ class VaultDiskModule {
     @Provides
     @Singleton
     fun provideSendDao(database: VaultDatabase): SendsDao = database.sendsDao()
+
+    @Provides
+    @Singleton
+    fun provideAutoBackupDiskSource(
+        @UnencryptedPreferences sharedPreferences: SharedPreferences,
+    ): AutoBackupDiskSource = AutoBackupDiskSourceImpl(sharedPreferences = sharedPreferences)
 
     @Provides
     @Singleton

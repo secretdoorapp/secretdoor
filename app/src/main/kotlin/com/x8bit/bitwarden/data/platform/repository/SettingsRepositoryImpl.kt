@@ -169,23 +169,13 @@ class SettingsRepositoryImpl(
             }
         }
 
+    // SecretDoor never downloads website icons: each request would tell the icon server which
+    // websites the user has logins for.
     override var isIconLoadingDisabled: Boolean
-        get() = settingsDiskSource.isIconLoadingDisabled ?: false
-        set(value) {
-            settingsDiskSource.isIconLoadingDisabled = value
-        }
+        get() = true
+        set(_) = Unit
 
-    override val isIconLoadingDisabledFlow: StateFlow<Boolean>
-        get() = settingsDiskSource
-            .isIconLoadingDisabledFlow
-            .map { it ?: false }
-            .stateIn(
-                scope = unconfinedScope,
-                started = SharingStarted.Eagerly,
-                initialValue = settingsDiskSource
-                    .isIconLoadingDisabled
-                    ?: false,
-            )
+    override val isIconLoadingDisabledFlow: StateFlow<Boolean> = MutableStateFlow(true)
     override var clearClipboardFrequency: ClearClipboardFrequency
         get() = activeUserId
             ?.let { userId ->

@@ -254,9 +254,11 @@ private val DEFAULT_ABOUT_STATE: AboutState = AboutState(
     serverData = "\uD83C\uDF29 Server: 2025.7.1".asText(),
     deviceData = "<device_data>".asText(),
     ciData = "<ci_info>".asText(),
-    copyrightInfo = "© Bitwarden Inc. 2015-${Year.now(FIXED_CLOCK).value}".asText(),
+    copyrightInfo = ("SecretDoor is based on Bitwarden.\n" +
+        "© Bitwarden Inc. 2015-${Year.now(FIXED_CLOCK).value}. Licensed under GPLv3.")
+        .asText(),
     isSubmitCrashLogsEnabled = false,
-    shouldShowCrashLogsButton = true,
+    shouldShowCrashLogsButton = false,
     isFlightRecorderEnabled = false,
     flightRecorderSubtext = null,
 )

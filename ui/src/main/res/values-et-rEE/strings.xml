@@ -75,9 +75,9 @@
     <string name="yes">Jah</string>
     <string name="account">Konto</string>
     <string name="account_created_success">Uus konto loodud!</string>
-    <string name="set_bitwarden_as_passkey_manager_description">Määra Bitwarden enda pääsuvõtme pakkujana telefoni seadetes.</string>
+    <string name="set_bitwarden_as_passkey_manager_description">Määra SecretDoor enda pääsuvõtme pakkujana telefoni seadetes.</string>
     <string name="avoid_ambiguous_characters">Väldi ebamääraseid kirjamärke</string>
-    <string name="bitwarden_autofill_service">Bitwardeni automaattäite teenus</string>
+    <string name="bitwarden_autofill_service">SecretDoori automaattäite teenus</string>
     <string name="change_master_password">Muuda ülemparooli</string>
     <string name="close">Sulge</string>
     <string name="close_app">Sulge rakendus</string>
@@ -108,7 +108,7 @@
     <string name="vault_timeout_log_out_confirmation_title">Määra seansi ajalõpp väärtusele „Logi välja”?</string>
     <string name="vault_timeout_log_out_confirmation_message">Pärast ajalõpuperioodi logitakse teid välja. Uuesti sisselogimiseks ja varale juurdepääsemiseks peate olema Internetiga ühendatud. Teie seaded ja sellel seadmel salvestatud PIN ei muutu.</string>
     <string name="logging_in">Sisselogimine…</string>
-    <string name="login_to_bitwarden">Logi sisse Bitwardenisse</string>
+    <string name="login_to_bitwarden">Logi sisse SecretDoorisse</string>
     <string name="master_password_confirmation_val_message">Parooli kinnitus ei ole õige.</string>
     <string name="master_password_description">Ülemparool on parool, millega pääsed oma kontole ligi. On äärmiselt tähtis, et ülemparool ei ununeks. Selle parooli taastamine ei ole mingil moel võimalik.</string>
     <string name="master_password_hint">Ülemparooli vihje (ei ole kohustuslik)</string>
@@ -169,14 +169,14 @@
     <string name="view_identity">Vaata identiteeti</string>
     <string name="view_note">Vaata märget</string>
     <string name="view_ssh_key">Vaata SSH-võtit</string>
-    <string name="web_vault">Bitwarden veebihoidla</string>
+    <string name="web_vault">SecretDoor veebihoidla</string>
     <string name="items">Kirjet</string>
     <string name="items_for_uri">%1$s kontoandmed</string>
     <string name="no_items_for_uri">Hoidlas puuduvad %1$s kontod.</string>
     <string name="no_items_for_vault">Hoidlas puuduvad kirjed, mis sobituksid sõnaga \"%1$s\"</string>
     <string name="search_for_a_login_or_add_a_new_login">Otsige sisselogimist või lisage uus sisselogimine</string>
     <string name="disabled">Keelatud</string>
-    <string name="bitwarden_autofill_service_alert2">Lihtsaim viis uute sisselogimiste lisamiseks oma varasse on Bitwardeni automaattäite teenuse kaudu. Lisateavet Bitwardeni automaattäite teenuse kasutamise kohta saate, kui liikute ekraanile „Seaded”.</string>
+    <string name="bitwarden_autofill_service_alert2">Lihtsaim viis uute sisselogimiste lisamiseks oma varasse on SecretDoori automaattäite teenuse kaudu. Lisateavet SecretDoori automaattäite teenuse kasutamise kohta saate, kui liikute ekraanile „Seaded”.</string>
     <string name="autofill_noun">Automaattäide</string>
     <string name="autofill_verb">Täida automaatselt</string>
     <string name="autofill_or_view">Soovid seda kirjet sisestada või vaadata?</string>
@@ -228,7 +228,7 @@ Skaneerimine toimub automaatselt.</string>
     <string name="environment_saved">The environment URLs have been saved.</string>
     <string name="identity_url">Identifitseerimise serveri URL</string>
     <string name="self_hosted_environment">Enda majutatud keskkond</string>
-    <string name="self_hosted_environment_footer">Sisesta baas URL, kus sinu või ettevõtte majutatud Bitwarden asub.</string>
+    <string name="self_hosted_environment_footer">Sisesta baas URL, kus sinu või ettevõtte majutatud SecretDoor asub.</string>
     <string name="server_url">Serveri URL</string>
     <string name="web_vault_url">Veebihoidla serveri URL</string>
     <string name="custom_fields">Kohandatud väljad</string>
@@ -298,7 +298,7 @@ Skaneerimine toimub automaatselt.</string>
     <string name="no_items_folder">Selles kaustas ei ole kirjeid.</string>
     <string name="no_items_trash">Prügikast on tühi.</string>
     <string name="autofill_accessibility_summary">Abistab kasutajanime ja parooli väljade täitmisel teistes rakendustes ja veebis.</string>
-    <string name="autofill_service_description">Bitwardeni automaattäite teenus kasutab Androidi Autofill raamistikku. See aitab telefonis olevatesse rakendustesse sisestada kontoandmeid, krediitkaardi andmeid ja muud personaalset infot.</string>
+    <string name="autofill_service_description">SecretDoori automaattäite teenus kasutab Androidi Autofill raamistikku. See aitab telefonis olevatesse rakendustesse sisestada kontoandmeid, krediitkaardi andmeid ja muud personaalset infot.</string>
     <string name="bitwarden_autofill_go_to_settings">Meil ei õnnestu Androidi sisestusabi seadeid avada. Võid selle ise avada, navigeerides Seaded &gt; Süsteem &gt; Keeled ja sisend &gt; Täpsemad &gt; Sisestusabi.</string>
     <string name="custom_field_name">Kohandatud välja nimi</string>
     <string name="field_type_boolean">Boolean</string>
@@ -373,7 +373,7 @@ Skaneerimine toimub automaatselt.</string>
     <string name="pin">PIN</string>
     <string name="unlock">Lukusta lahti</string>
     <string name="thirty_minutes">30 minuti pärast</string>
-    <string name="set_pin_description">Määra Bitwardeni lahtilukustamiseks PIN kood. Rakendusest täielikult välja logides nullitakse ka PIN koodi seaded.</string>
+    <string name="set_pin_description">Määra SecretDoori lahtilukustamiseks PIN kood. Rakendusest täielikult välja logides nullitakse ka PIN koodi seaded.</string>
     <string name="logged_in_as_on">Sisse logitud kontoga %1$s lehel %2$s.</string>
     <string name="vault_locked_master_password">Hoidla on lukus. Jätkamiseks sisesta ülemparool.</string>
     <string name="vault_locked_pin">Hoidla on lukus. Jätkamiseks sisesta PIN kood.</string>
@@ -387,7 +387,7 @@ Skaneerimine toimub automaatselt.</string>
     <string name="clear_clipboard">Lõikelaua puhastamine</string>
     <string name="clear_clipboard_description">Puhastab automaatselt lõikelauale kopeeritud sisu.</string>
     <string name="default_uri_match_detection">Vaike URI sobivuse tuvastamine</string>
-    <string name="default_uri_match_detection_description">URI vaste tuvastamine kontrollib, kuidas Bitwarden tuvastab, kus pakkuda automaatse täitmise soovitusi.</string>
+    <string name="default_uri_match_detection_description">URI vaste tuvastamine kontrollib, kuidas SecretDoor tuvastab, kus pakkuda automaatse täitmise soovitusi.</string>
     <string name="theme">Kujundus</string>
     <string name="theme_description">Muuda rakenduse värviteemat</string>
     <string name="copy_notes">Kopeeri märkus</string>
@@ -423,7 +423,7 @@ Skaneerimine toimub automaatselt.</string>
     <string name="password_generator_policy_in_effect">Organisatsiooni seaded mõjutavad parooli genereerija sätteid</string>
     <string name="unable_to_save_attachment">Manuse salvestamisel ilmnes tõrge. Probleemi jätkumisel lisa fail läbi veebihoidla.</string>
     <string name="save_attachment_success">Manus on edukalt lisatud</string>
-    <string name="autofill_tile_accessibility_required">Automaattäite paani kasutamiseks lülitage Bitwardeni seadetes sisse „Automaattäite ligipääsetavusteenus”.</string>
+    <string name="autofill_tile_accessibility_required">Automaattäite paani kasutamiseks lülitage SecretDoori seadetes sisse „Automaattäite ligipääsetavusteenus”.</string>
     <string name="autofill_tile_uri_not_found">Paroolivälju ei tuvastatud</string>
     <string name="soft_deleting">Prügikasti saatmine…</string>
     <string name="item_soft_deleted">Kirje on prügikasti saadetud.</string>
@@ -636,9 +636,9 @@ Skaneerimine toimub automaatselt.</string>
     <string name="catch_all_email_description">Kasutage oma domeeni konfigureeritud kõik-püüdvat postkasti.</string>
     <string name="forwarded_email_description">Genereeri e-posti alias, kasutades selleks välist teenuspakkujat.</string>
     <string name="accessibility_service_disclosure">Juurdepääsetavuse Teenuse Teavitus</string>
-    <string name="accessibility_disclosure_text">Bitwarden kasutab ligipääsetavusteenust, et otsida rakendustest ja veebisaitidest sisselogimisvälju, seejärel määrata sobivad välja ID-d kasutajanime ja parooli sisestamiseks, kui rakendusele või saidile vastavus leitakse. Me ei salvesta ühtegi teenuse poolt meile edastatud teavet ega ürita kontrollida ühtegi ekraanielementi peale mandaatide tekstisisestuse.</string>
-    <string name="accessibility_disclosure_start_up_text_1">See teade on nõutav enne, kui Bitwarden saab pakkuda ligipääsetavuspõhist automaattäidet.</string>
-    <string name="accessibility_disclosure_start_up_text_2">Bitwarden pakub valikulist automaattäite meetodit, mis kasutab Androidi ligipääsetavusteenust sisselogimisväljade tuvastamiseks. Kui lubate selle, tuvastab Bitwarden sobivad väljad ja täidab teie mandaadid, kui vastavus leitakse.</string>
+    <string name="accessibility_disclosure_text">SecretDoor kasutab ligipääsetavusteenust, et otsida rakendustest ja veebisaitidest sisselogimisvälju, seejärel määrata sobivad välja ID-d kasutajanime ja parooli sisestamiseks, kui rakendusele või saidile vastavus leitakse. Me ei salvesta ühtegi teenuse poolt meile edastatud teavet ega ürita kontrollida ühtegi ekraanielementi peale mandaatide tekstisisestuse.</string>
+    <string name="accessibility_disclosure_start_up_text_1">See teade on nõutav enne, kui SecretDoor saab pakkuda ligipääsetavuspõhist automaattäidet.</string>
+    <string name="accessibility_disclosure_start_up_text_2">SecretDoor pakub valikulist automaattäite meetodit, mis kasutab Androidi ligipääsetavusteenust sisselogimisväljade tuvastamiseks. Kui lubate selle, tuvastab SecretDoor sobivad väljad ja täidab teie mandaadid, kui vastavus leitakse.</string>
     <string name="accessibility_disclosure_start_up_text_3">Me ei salvesta mingeid andmeid selle kohta, mis ekraanil kuvatakse, kui te ligipääsetavusteenust kasutate, ja me ei kontrolli ühtegi ekraanielementi peale mandaatide sisestuse.</string>
     <string name="i_understand">Ma saan aru</string>
     <string name="accept">Nõustu</string>
@@ -647,7 +647,7 @@ Skaneerimine toimub automaatselt.</string>
     <string name="login_attempt_from_x_do_you_want_to_switch_to_this_account">Sisselogimise päring:
 %1$s
 Soovid selle konto peale lülituda?</string>
-    <string name="new_to_bitwarden">Kas olete Bitwardenis uus?</string>
+    <string name="new_to_bitwarden">Kas olete SecretDooris uus?</string>
     <string name="get_master_passwordword_hint">Tuleta ülemparooli vihjega meelde</string>
     <string name="logging_in_as_x_on_y">Sisselogimas kui %1$s lehel %2$s</string>
     <string name="not_you">Pole sina?</string>
@@ -663,7 +663,7 @@ Soovid selle konto peale lülituda?</string>
     <string name="no_pending_requests">Ootel taotlused puuduvad</string>
     <string name="enable_camer_permission_to_use_the_scanner">Kaamera kasutamiseks luba ligipääs kaamerale</string>
     <string name="language">Keel</string>
-    <string name="language_change_x_description">Rakenduse keel muudeti %1$s-ks. Muudatuste rakendamiseks taaskäivita Bitwarden</string>
+    <string name="language_change_x_description">Rakenduse keel muudeti %1$s-ks. Muudatuste rakendamiseks taaskäivita SecretDoor</string>
     <string name="default_system">Vaikeväärtus (süsteem)</string>
     <string name="weak_master_password">Nõrk ülemparool</string>
     <string name="weak_password_identified_use_a_strong_password_to_protect_your_account">Tuvastati nõrk ülemparool. Kasuta konto paremaks turvamiseks tugevamat parooli. Oled kindel, et soovid nõrga parooliga jätkata?</string>
@@ -704,7 +704,7 @@ Soovid selle konto peale lülituda?</string>
     <string name="invalid_uri">Vale URI</string>
     <string name="the_urix_is_already_blocked">URI %1$s on juba keelatud</string>
     <string name="login_approved">Sisselogimine kinnitatud</string>
-    <string name="log_in_with_device_must_be_set_up_in_the_settings_of_the_bitwarden_app">Sisselogimine seadmega tuleb seadistada Bitwardeni rakenduse seadetes.</string>
+    <string name="log_in_with_device_must_be_set_up_in_the_settings_of_the_bitwarden_app">Sisselogimine seadmega tuleb seadistada SecretDoori rakenduse seadetes.</string>
     <string name="need_another_option_view_all_login_options">Kas vajate teist võimalust? <annotation link="viewAll">Vaata kõiki sisselogimisvõimalusi</annotation></string>
     <string name="log_in_with_device">Logi sisse teise seadmega</string>
     <string name="logging_in_on">Sisselogimas kui</string>
@@ -713,13 +713,13 @@ Soovid selle konto peale lülituda?</string>
     <string name="select_vault">Select vault</string>
     <string name="appearance">Välimus</string>
     <string name="account_security">Konto turvalisus</string>
-    <string name="bitwarden_help_center">Bitwardeni abikeskus</string>
+    <string name="bitwarden_help_center">SecretDoori abikeskus</string>
     <string name="sync_now">Sünkroniseeri kohe</string>
     <string name="unlock_options">Avamise valikud</string>
     <string name="session_timeout">Sessiooni ajalõpp</string>
     <string name="session_timeout_action">Ajalõpule järgnev tegevus</string>
     <string name="account_fingerprint_phrase">Konto unikaalne sõnajada</string>
-    <string name="passkey_management_explanation_long">Kasuta Bitwardenit uute pääsuvõtmete salvestamiseks hoidlas ja nendega sisse logimiseks.</string>
+    <string name="passkey_management_explanation_long">Kasuta SecretDoorit uute pääsuvõtmete salvestamiseks hoidlas ja nendega sisse logimiseks.</string>
     <string name="autofill_services_explanation_long">Android Autofill Raamistiku kasutatakse teistesse rakendustesse sisselogimisel andmete automaatse täitmise lihtsustamiseks.</string>
     <string name="use_inline_autofill_explanation_long">Valige, kuidas teie automaattäite soovitused kuvatakse, kui logite sisse teistesse rakendustesse oma seadmes.</string>
     <string name="additional_options">Muud valikud</string>
@@ -730,10 +730,10 @@ Soovid selle konto peale lülituda?</string>
     <string name="continue_to_device_settings">Kas soovid avada Seaded?</string>
     <string name="two_step_login_description_long">Muuda oma konto turvalisemaks seadistades brauseris kahe-astmeline sisselogimine.</string>
     <string name="change_master_password_description_long">Ülemparooli saab muuta veebibrauseris.</string>
-    <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Uuri teisigi Bitwardeni kasutusvõimalusi Abikeskuses.</string>
+    <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Uuri teisigi SecretDoori kasutusvõimalusi Abikeskuses.</string>
     <string name="privacy_policy_description_long">Vaadake meie privaatsuspoliitikat veebilehel bitwarden.com.</string>
-    <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Uuri ka teisi Bitwardeni konto funktsioone veebibrauseris.</string>
-    <string name="learn_about_organizations_description_long">Bitwarden võimaldab sul hoidla sisu teiste kasutajatega jagada, kasutades selleks organisatsiooni kontot. Uuri lähemalt www.bitwarden.com.</string>
+    <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Uuri ka teisi SecretDoori konto funktsioone veebibrauseris.</string>
+    <string name="learn_about_organizations_description_long">SecretDoor võimaldab sul hoidla sisu teiste kasutajatega jagada, kasutades selleks organisatsiooni kontot. Uuri lähemalt www.bitwarden.com.</string>
     <string name="created_x">Loodud %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Sinu organisatsioon nõuab sult ülemparooli seadistamist.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Hoidla ajalõpu muutmiseks vali esmalt lahtilukustamise meetod.</string>
@@ -743,8 +743,8 @@ Soovid selle konto peale lülituda?</string>
     <string name="duo_two_step_login_is_required_for_your_account">Duo kahe-astmeline sisselogimine on sinu kontol nõutud.</string>
     <string name="follow_the_steps_from_duo_to_finish_logging_in">Sisselogimise lõpetamiseks järgige Duo juhiseid.</string>
     <string name="launch_duo">Käivita Duo</string>
-    <string name="your_passkey_will_be_saved_to_your_bitwarden_vault_for_x">Teie pääsukood salvestatakse teie Bitwardeni varahoidlasse %1$s jaoks</string>
-    <string name="your_password_will_be_saved_to_your_bitwarden_vault_for_x">Teie parool salvestatakse teie Bitwardeni varahoidlasse %1$s jaoks</string>
+    <string name="your_passkey_will_be_saved_to_your_bitwarden_vault_for_x">Teie pääsukood salvestatakse teie SecretDoori varahoidlasse %1$s jaoks</string>
+    <string name="your_password_will_be_saved_to_your_bitwarden_vault_for_x">Teie parool salvestatakse teie SecretDoori varahoidlasse %1$s jaoks</string>
     <string name="passkeys_not_supported_for_this_app">See rakendus ei toeta pääsuvõtmeid</string>
     <string name="passkey_operation_failed_because_browser_is_not_privileged">Pääsuvõtme funktsiooni kasutamine ebaõnnestus, sest see brauser ei ole toetatud</string>
     <string name="passkey_operation_failed_because_browser_signature_does_not_match">Pääsuvõtme funktsiooni kasutamine ebaõnnestus, sest brauseri sõrmejälg ei ühti</string>
@@ -770,15 +770,15 @@ Soovid selle konto peale lülituda?</string>
     <string name="check_your_email">Kontrolli oma postkasti</string>
     <string name="open_email_app">Ava emaili rakendus</string>
     <string name="email_verified">Email kinnitatud</string>
-    <string name="get_emails_from_bitwarden_for_announcements_advices_and_research_opportunities_unsubscribe_any_time">Saate Bitwardenilt teadaannete, nõuannete ja teadusvõimaluste kohta e-kirju. <annotation link="unsubscribe">Loobuge tellimusest</annotation> igal ajal.</string>
+    <string name="get_emails_from_bitwarden_for_announcements_advices_and_research_opportunities_unsubscribe_any_time">Saate SecretDoorilt teadaannete, nõuannete ja teadusvõimaluste kohta e-kirju. <annotation link="unsubscribe">Loobuge tellimusest</annotation> igal ajal.</string>
     <string name="security_prioritized">Turvalisus on esikohal</string>
-    <string name="welcome_message_1">Salvestage sisselogimised, kaardid ja identiteedid oma turvalisse varasse. Bitwarden kasutab nullteadmuspõhist otspunktkrüptimist, et kaitsta teie jaoks olulist.</string>
+    <string name="welcome_message_1">Salvestage sisselogimised, kaardid ja identiteedid oma turvalisse varasse. SecretDoor kasutab nullteadmuspõhist otspunktkrüptimist, et kaitsta teie jaoks olulist.</string>
     <string name="welcome_message_2">Seadistage biomeetriline avamine ja automaattäide, et logida oma kontodesse sisse ilma ühtegi tähte tippimata.</string>
     <string name="quick_and_easy_login">Kiire ja lihtne sisselogimine</string>
     <string name="level_up_your_logins">Tõstke oma sisselogimised uuele tasemele</string>
     <string name="welcome_message_3">Kasutage generaatorit, et luua ja salvestada kõigile oma kontodele tugevad ja kordumatud paroolid.</string>
     <string name="your_data_when_and_where_you_need_it">Teie andmed, millal ja kus te neid vajate</string>
-    <string name="welcome_message_4">Salvestage piiramatult paroole piiramatul arvul seadmetes Bitwardeni mobiili-, veebi- ja töölauarakendustega.</string>
+    <string name="welcome_message_4">Salvestage piiramatult paroole piiramatul arvul seadmetes SecretDoori mobiili-, veebi- ja töölauarakendustega.</string>
     <string name="remove_passkey">Eemalda pääsuvõti</string>
     <string name="passkey_removed">Pääsuvõti eemaldatud</string>
     <string name="what_makes_a_password_strong">Mis muudab parooli tugevaks?</string>
@@ -808,8 +808,8 @@ Soovid selle konto peale lülituda?</string>
     <string name="select_the_link_in_the_email_to_verify_your_email_address_and_continue_creating_your_account">E-posti aadressi kinnitamiseks ja konto loomise jätkamiseks valige e-kirjas link.</string>
     <string name="change_email_address">Muuda e-posti aadressi</string>
     <string name="next">Järgmine</string>
-    <string name="bitwarden_cannot_recover_a_lost_or_forgotten_master_password">Bitwarden ei saa kaotatud või unustatud peaparooli taastada.</string>
-    <string name="bitwarden_cannot_reset_a_lost_or_forgotten_master_password">Bitwarden ei saa kaotatud või unustatud peaparooli lähtestada.</string>
+    <string name="bitwarden_cannot_recover_a_lost_or_forgotten_master_password">SecretDoor ei saa kaotatud või unustatud peaparooli taastada.</string>
+    <string name="bitwarden_cannot_reset_a_lost_or_forgotten_master_password">SecretDoor ei saa kaotatud või unustatud peaparooli lähtestada.</string>
     <string name="choose_your_master_password">Valige oma peaparool</string>
     <string name="choose_a_unique_and_strong_password_to_keep_your_information_safe">Valige ainulaadne ja tugev parool, et hoida oma andmed turvalisena.</string>
     <plurals name="minimum_characters">
@@ -825,16 +825,16 @@ Soovid selle konto peale lülituda?</string>
     <string name="turn_on_autofill">Lülita automaattäide sisse</string>
     <string name="autofill_setup">Automaattäite seadistamine</string>
     <string name="turn_on_browser_autofill_integration">Lülita sisse brauseri automaattäite integreerimine</string>
-    <string name="browser_requires_special_permissions_for_bitwarden_singular">Kasutate brauserit, mis nõuab Bitwardenilt teie paroolide automaatseks täitmiseks erilube.</string>
-    <string name="browser_requires_special_permissions_for_bitwarden_plural">Kasutate brausereid, mis nõuavad Bitwardenilt teie paroolide automaatseks täitmiseks erilube.</string>
-    <string name="youre_using_a_browser_that_requires_special_permissions_singular">Kasutate brauserit, mis nõuab Bitwardenilt teie paroolide automaatseks täitmiseks erilube. Lubage allpool oma eelistatud automaattäite integreerimine.</string>
-    <string name="youre_using_a_browser_that_requires_special_permissions_plural">Kasutate brausereid, mis nõuavad Bitwardenilt teie paroolide automaatseks täitmiseks erilube. Jätkamiseks lubage automaattäide kõigi installitud brauserite jaoks.</string>
+    <string name="browser_requires_special_permissions_for_bitwarden_singular">Kasutate brauserit, mis nõuab SecretDoorilt teie paroolide automaatseks täitmiseks erilube.</string>
+    <string name="browser_requires_special_permissions_for_bitwarden_plural">Kasutate brausereid, mis nõuavad SecretDoorilt teie paroolide automaatseks täitmiseks erilube.</string>
+    <string name="youre_using_a_browser_that_requires_special_permissions_singular">Kasutate brauserit, mis nõuab SecretDoorilt teie paroolide automaatseks täitmiseks erilube. Lubage allpool oma eelistatud automaattäite integreerimine.</string>
+    <string name="youre_using_a_browser_that_requires_special_permissions_plural">Kasutate brausereid, mis nõuavad SecretDoorilt teie paroolide automaatseks täitmiseks erilube. Jätkamiseks lubage automaattäide kõigi installitud brauserite jaoks.</string>
     <string name="use_autofill_to_log_into_your_accounts">Kasutage oma kontodesse sisselogimiseks ühe puudutusega automaattäidet.</string>
     <string name="turn_on_later">Lülita sisse hiljem</string>
     <string name="turn_on_autofill_later">Lülitada automaattäide sisse hiljem?</string>
     <string name="turn_on_browser_autofill_integration_later">Lülita brauseri automaattäite integreerimine sisse hiljem?</string>
     <string name="return_to_complete_this_step_anytime_in_settings">Saate selle sammu lõpule viimiseks igal ajal Seadetesse naasta.</string>
-    <string name="what_bitwarden_has_to_offer">Nüüd saate uurida kõike, mida Bitwarden pakub, ja alustada paroolide turvalist haldamist.</string>
+    <string name="what_bitwarden_has_to_offer">Nüüd saate uurida kõike, mida SecretDoor pakub, ja alustada paroolide turvalist haldamist.</string>
     <string name="youre_all_set">Kõik on valmis!</string>
     <string name="error_connecting_with_the_duo_service_use_a_different_two_step_login_method_or_contact_duo_for_assistance">Duo teenustega ühendamine ebaõnnestus. Kasuta teist kahe-astmelise sisselogimise meetodit või kontakteeru Duoga.</string>
     <string name="master_password_hint_not_specified">Ülemparooli vihje</string>
@@ -853,7 +853,7 @@ Soovid selle konto peale lülituda?</string>
     <string name="do_you_have_a_computer_available">Kas teil on arvuti saadaval?</string>
     <string name="the_following_instructions_will_guide_you_through_importing_logins">Järgmised juhised aitavad teil sisselogimisi teie laua- või sülearvutist importida</string>
     <string name="import_logins">Impordi sisselogimised</string>
-    <string name="from_your_computer_follow_these_instructions_to_export_saved_passwords">Järgige arvutis neid juhiseid, et eksportida salvestatud paroolid oma brauserist või muust paroolihaldurist. Seejärel importige need turvaliselt Bitwardenisse.</string>
+    <string name="from_your_computer_follow_these_instructions_to_export_saved_passwords">Järgige arvutis neid juhiseid, et eksportida salvestatud paroolid oma brauserist või muust paroolihaldurist. Seejärel importige need turvaliselt SecretDoorisse.</string>
     <string name="give_your_vault_a_head_start">Andke oma varale eelis</string>
     <string name="class_3_biometrics_description">Biomeetriline avamine nõuab tugevat biomeetrilist autentimist ja ei pruugi ühilduda kõigi selle seadme biomeetriliste valikutega.</string>
     <string name="class_2_biometrics_description">Biomeetriline avamine nõuab tugevat biomeetrilist autentimist ega ühildu sellel seadmel saadaolevate biomeetriliste valikutega.</string>
@@ -864,28 +864,28 @@ Soovid selle konto peale lülituda?</string>
     <string name="export_your_saved_logins">Ekspordi salvestatud sisselogimised</string>
     <string name="delete_this_file_after_import_is_complete">Kustutate selle faili pärast importimise lõpetamist.</string>
     <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Oma arvutis avage uus brauseri vahekaart ja <annotation emphasis="bold">minge aadressile <annotation arg="0">%1$s</annotation></annotation></string>
-    <string name="log_in_to_the_bitwarden_web_app">Logige sisse Bitwardeni veebirakendusse.</string>
+    <string name="log_in_to_the_bitwarden_web_app">Logige sisse SecretDoori veebirakendusse.</string>
     <string name="step_2_of_3">Samm 2 / 3</string>
-    <string name="log_in_to_bitwarden">Logi sisse Bitwardenisse</string>
+    <string name="log_in_to_bitwarden">Logi sisse SecretDoorisse</string>
     <string name="step_3_of_3">Samm 3 / 3</string>
-    <string name="import_logins_to_bitwarden">Impordi sisselogimised Bitwardenisse</string>
-    <string name="in_the_bitwarden_navigation_find_the_tools_option_and_select_import_data">Bitwardeni navigeerimisel <annotation emphasis="bold">leidke valik Tööriistad</annotation> ja <annotation emphasis="bold">valige Impordi andmed.</annotation></string>
+    <string name="import_logins_to_bitwarden">Impordi sisselogimised SecretDoorisse</string>
+    <string name="in_the_bitwarden_navigation_find_the_tools_option_and_select_import_data">SecretDoori navigeerimisel <annotation emphasis="bold">leidke valik Tööriistad</annotation> ja <annotation emphasis="bold">valige Impordi andmed.</annotation></string>
     <string name="fill_out_the_form_and_import_your_saved_password_file">Täitke vorm ja <annotation emphasis="bold">importige oma salvestatud paroolifail.</annotation></string>
     <string name="for_your_security_be_sure_to_delete_your_saved_password_file">Turvalisuse huvides <annotation emphasis="bold">kustutage kindlasti oma salvestatud paroolifail.</annotation></string>
     <string name="need_help_check_out_import_help">Vajate abi? Vaadake <annotation link="importHelp">importimise abi</annotation>.</string>
     <string name="import_help">importimise abi</string>
     <string name="save_the_exported_file_somewhere_on_your_computer_you_can_find_easily"><annotation emphasis="bold">Salvestage eksporditud fail</annotation> arvutisse kohta, kust leiate selle hõlpsasti.</string>
-    <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">See ei ole tunnustatud Bitwardeni server. Peate võib-olla kontrollima oma teenusepakkujat või uuendama oma serverit.</string>
+    <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">See ei ole tunnustatud SecretDoori server. Peate võib-olla kontrollima oma teenusepakkujat või uuendama oma serverit.</string>
     <string name="syncing_logins_loading_message">Sisselogimiste sünkroonimine…</string>
     <string name="download_the_browser_extension">Laadige alla brauserilaiendus</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Minge aadressile bitwarden.com/download, et integreerida Bitwarden oma lemmikbrauserisse sujuva kogemuse saamiseks.</string>
+    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Minge aadressile bitwarden.com/download, et integreerida SecretDoor oma lemmikbrauserisse sujuva kogemuse saamiseks.</string>
     <string name="use_the_web_app">Kasutage veebirakendust</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Logige sisse aadressil bitwarden.com, et hõlpsasti oma kontot hallata ja seadeid uuendada.</string>
     <string name="autofill_passwords">Paroolide automaattäide</string>
     <string name="set_up_autofill_on_all_your_devices">Seadistage automaattäide kõigil oma seadmetel, et logida sisse ühe puudutusega kõikjal.</string>
     <string name="import_successful">Importimine õnnestus!</string>
-    <string name="manage_your_logins_from_anywhere_with_bitwarden_tools">Hallake oma sisselogimisi kõikjalt Bitwardeni veebi- ja töölauatööriistadega.</string>
-    <string name="bitwarden_tools">Bitwardeni tööriistad</string>
+    <string name="manage_your_logins_from_anywhere_with_bitwarden_tools">Hallake oma sisselogimisi kõikjalt SecretDoori veebi- ja töölauatööriistadega.</string>
+    <string name="bitwarden_tools">SecretDoori tööriistad</string>
     <string name="got_it">Selge</string>
     <string name="no_logins_were_imported">Ühtegi sisselogimist ei imporditud</string>
     <string name="import_error">Tõrge importimisel</string>
@@ -903,7 +903,7 @@ Soovid selle konto peale lülituda?</string>
         <item quantity="other">%d märguannet</item>
     </plurals>
     <string name="log_in_quickly_and_easily_across_devices">Logige kiiresti ja hõlpsalt sisse erinevates seadmetes</string>
-    <string name="bitwarden_can_notify_you_each_time_you_receive_a_new_login_request_from_another_device">Bitwarden saab teile teada anda iga kord, kui saate teiselt seadmelt uue sisselogimistaotluse.</string>
+    <string name="bitwarden_can_notify_you_each_time_you_receive_a_new_login_request_from_another_device">SecretDoor saab teile teada anda iga kord, kui saate teiselt seadmelt uue sisselogimistaotluse.</string>
     <string name="skip_for_now">Jäta vahele</string>
     <string name="done_text">Valmis</string>
     <string name="page_number_x_of_y">%1$s / %2$s</string>
@@ -928,7 +928,7 @@ Soovid selle konto peale lülituda?</string>
     <string name="add_a_number_or_symbol_to_make_it_even_stronger"><annotation emphasis="bold">Lisage number või sümbol</annotation>, et muuta see veelgi tugevamaks. Nüüd on teil ainulaadne, turvaline ja meeldejääv paroolilause!</string>
     <string name="need_some_inspiration">Kas vajate inspiratsiooni?</string>
     <string name="check_out_the_passphrase_generator">Vaadake paroolilause generaatorit</string>
-    <string name="we_couldnt_verify_the_servers_certificate">Me ei suutnud serveri sertifikaati kinnitada. Sertifikaadiahel või seadme või Bitwardeni serveri puhverserveri seaded ei pruugi olla õigesti seadistatud.</string>
+    <string name="we_couldnt_verify_the_servers_certificate">Me ei suutnud serveri sertifikaati kinnitada. Sertifikaadiahel või seadme või SecretDoori serveri puhverserveri seaded ei pruugi olla õigesti seadistatud.</string>
     <string name="copy_private_key">Kopeeri privaatvõti</string>
     <string name="login_credentials">Sisselogimismandaadid</string>
     <string name="autofill_options">Automaattäite valikud</string>
@@ -955,7 +955,7 @@ Soovid selle konto peale lülituda?</string>
     <string name="coachmark_5_of_6">5 / 6</string>
     <string name="coachmark_6_of_6">6 / 6</string>
     <string name="use_these_options_to_adjust_your_password_to_your_account_requirements">Kasutage neid valikuid, et kohandada oma parool vastavalt konto veebisaidi nõuetele.</string>
-    <string name="after_you_save_your_new_password_to_bitwarden_don_t_forget_to_update_it_on_your_account_website">Kui olete uue parooli Bitwardenisse salvestanud, ärge unustage seda oma konto veebisaidil uuendada.</string>
+    <string name="after_you_save_your_new_password_to_bitwarden_don_t_forget_to_update_it_on_your_account_website">Kui olete uue parooli SecretDoorisse salvestanud, ärge unustage seda oma konto veebisaidil uuendada.</string>
     <string name="verify_your_identity">Kinnitage oma identiteet</string>
     <string name="error_loading_certificate">Sertifikaadi laadimise viga</string>
     <string name="certificate_alias">Sertifikaadi nimi</string>
@@ -966,7 +966,7 @@ Soovid selle konto peale lülituda?</string>
     <string name="unsupported_certificate_type">Toetamata sertifikaadi tüüp</string>
     <string name="certificate_password_incorrect">Sertifikaadi parool on vale</string>
     <string name="invalid_certificate_chain">Vigane sertifikaadiahel</string>
-    <string name="system_certificates_are_not_as_secure_as_importing_certificates_to_bitwarden">Süsteemi sertifikaadi kasutamine on vähem turvaline kui sertifikaadi hoidmine Bitwardenis. Jätkamine kuvab saadaolevate süsteemisertifikaatide loendi, kui üks on juba installitud.</string>
+    <string name="system_certificates_are_not_as_secure_as_importing_certificates_to_bitwarden">Süsteemi sertifikaadi kasutamine on vähem turvaline kui sertifikaadi hoidmine SecretDooris. Jätkamine kuvab saadaolevate süsteemisertifikaatide loendi, kui üks on juba installitud.</string>
     <string name="link">Link</string>
     <string name="passkey_operation_failed_because_host_url_is_not_present_in_request">Pääsukoodi toiming ebaõnnestus, kuna päritav URL ei sisaldu päringus.</string>
     <string name="passkey_operation_failed_because_app_signature_is_invalid">Pääsukoodi toiming ebaõnnestus, kuna rakenduse allkiri on vigane.</string>
@@ -1004,8 +1004,8 @@ Soovid selle konto peale lülituda?</string>
     <string name="experiencing_an_issue">Kas teil on probleem?</string>
     <string name="enable_temporary_logging_to_collect_and_inspect_logs_locally">Lubage ajutine logimine, et koguda ja uurida logisid kohapeal. Kui see on lubatud, võidakse logida rakenduse olekuid ja võrgupäringuid – kunagi tundlikke varateavet.</string>
     <string name="to_get_started_set_a_logging_duration">Alustamiseks määrake logimise kestus. Logimine lülitub pärast seda perioodi automaatselt välja, andes teile aega tegevuste jäädvustamiseks probleemide taasesitamise ajal.</string>
-    <string name="logs_will_be_automatically_deleted_after_30_days">Logid kustutatakse automaatselt 30 päeva pärast. Bitwarden pääseb teie logiandmetele juurde ainult siis, kui te neid jagate.</string>
-    <string name="for_details_on_what_is_and_isnt_logged">Lisateabe saamiseks selle kohta, mida logitakse ja mida mitte, külastage\n<annotation link="helpCenter">Bitwardeni abikeskust.</annotation></string>
+    <string name="logs_will_be_automatically_deleted_after_30_days">Logid kustutatakse automaatselt 30 päeva pärast. SecretDoor pääseb teie logiandmetele juurde ainult siis, kui te neid jagate.</string>
+    <string name="for_details_on_what_is_and_isnt_logged">Lisateabe saamiseks selle kohta, mida logitakse ja mida mitte, külastage\n<annotation link="helpCenter">SecretDoori abikeskust.</annotation></string>
     <string name="logging_duration">Logimise kestus</string>
     <string name="flight_recorder_one_hour">1 tunni pärast</string>
     <string name="flight_recorder_eight_hours">8 tundi</string>
@@ -1036,29 +1036,29 @@ Soovid selle konto peale lülituda?</string>
     <string name="unable_to_read_certificate">Sertifikaati ei õnnestunud lugeda.</string>
     <string name="cannot_delete_your_account">Teie kontot ei saa kustutada</string>
     <string name="cannot_delete_your_account_explanation">Seda käsku ei õnnestunud täita, sest sinu konto kuulub organisatsioonile. Lisadetailide jaoks võta ühendust oma organisatsiooni administraatoriga.</string>
-    <string name="this_account_will_soon_be_deleted_log_in_at_x_to_continue_using_bitwarden">See konto kustutatakse peagi. Bitwardeni kasutamise jätkamiseks logige sisse aadressil %1$s.</string>
+    <string name="this_account_will_soon_be_deleted_log_in_at_x_to_continue_using_bitwarden">See konto kustutatakse peagi. SecretDoori kasutamise jätkamiseks logige sisse aadressil %1$s.</string>
     <string name="view_file_send">Vaata failisaadetist</string>
     <string name="view_text_send">Vaata tekstisaadetist</string>
     <string name="delete_send">Kustuta Send</string>
     <string name="missing_send_resync_your_vault">Saadetis puudub, sünkroonige oma vara uuesti</string>
     <string name="use_dynamic_colors">Kasuta dünaamilisi värve</string>
     <string name="use_dynamic_colors_question">Kasutada dünaamilisi värve?</string>
-    <string name="dynamic_colors_may_not_adhere_to_accessibility_guidelines">See värviskeem rakendab Bitwardenile automaatselt teie praeguse taustapildi põhjal süsteemivärve. Need värvid ei pruugi vastata kõikidele ligipääsetavuse juhistele.</string>
+    <string name="dynamic_colors_may_not_adhere_to_accessibility_guidelines">See värviskeem rakendab SecretDoorile automaatselt teie praeguse taustapildi põhjal süsteemivärve. Need värvid ei pruugi vastata kõikidele ligipääsetavuse juhistele.</string>
     <string name="passkey_operation_failed_because_browser_x_is_not_trusted">Pääsukoodi toiming ebaõnnestus, kuna brauser (%1$s) pole tuvastatud. %1$s kohalikult usaldatud rakenduste loendisse lisamiseks valige „Usalda”.</string>
     <string name="passkey_operation_failed_because_the_browser_is_not_trusted">Pääsukoodi toiming ebaõnnestus, kuna brauser pole usaldusväärne.</string>
     <string name="trust">Usalda</string>
-    <string name="trusted_by_you_learn_more">Need on rakendused või brauserid, mida Bitwarden vaikimisi ei usalda, kuid mida teie usaldate pääsukooditoimingute tegemiseks.</string>
-    <string name="trusted_by_community_learn_more">Need on rakendused, mida Google Play poes pole, kuid Bitwarden usaldab pärast seda, kui kogukonna liikmed neid kasutavad ja teatavad need ohututena.</string>
+    <string name="trusted_by_you_learn_more">Need on rakendused või brauserid, mida SecretDoor vaikimisi ei usalda, kuid mida teie usaldate pääsukooditoimingute tegemiseks.</string>
+    <string name="trusted_by_community_learn_more">Need on rakendused, mida Google Play poes pole, kuid SecretDoor usaldab pärast seda, kui kogukonna liikmed neid kasutavad ja teatavad need ohututena.</string>
     <string name="trusted_by_google_learn_more">Need on rakendused, mida Google peab ohutuks ja mis on saadaval Google Play poes.</string>
     <string name="trusted_by_you">Teie poolt usaldatud</string>
     <string name="trusted_by_the_community">Kogukonna poolt usaldatud</string>
     <string name="trusted_by_google">Google’i poolt usaldatud</string>
-    <string name="privileged_apps_description">Kasutajate kaitsmiseks andmepüügikatsete eest teostab Bitwarden vaikimisi pääsukooditoiminguid ainult rakenduste või veebibrauserite kaudu, mida usaldavad Google või Bitwardeni kogukond.</string>
+    <string name="privileged_apps_description">Kasutajate kaitsmiseks andmepüügikatsete eest teostab SecretDoor vaikimisi pääsukooditoiminguid ainult rakenduste või veebibrauserite kaudu, mida usaldavad Google või SecretDoori kogukond.</string>
     <string name="about_privileged_applications">Privilegeeritud rakendustest</string>
     <string name="learn_more_about_privileged_apps">Lisateave privilegeeritud rakenduste kohta</string>
     <string name="privileged_apps">Privilegeeritud rakendused</string>
     <string name="unrecognized_browser">Tundmatu brauser</string>
-    <string name="learn_more_about_using_passkeys_with_bitwarden">Lisateave pääsukoodide kasutamise kohta Bitwardeniga.</string>
+    <string name="learn_more_about_using_passkeys_with_bitwarden">Lisateave pääsukoodide kasutamise kohta SecretDooriga.</string>
     <string name="all_trusted_apps">Kõik usaldatud rakendused</string>
     <string name="are_you_sure_you_want_to_stop_trusting_x">Kas olete kindel, et soovite lõpetada %s usaldamise?</string>
     <string name="installed_apps">Installitud rakendused</string>
@@ -1086,7 +1086,7 @@ Soovid selle konto peale lülituda?</string>
     <string name="information">Teave</string>
     <string name="otp_type">OTP tüüp</string>
     <string name="search_codes">Otsi koode</string>
-    <string name="secure_your_accounts_with_bitwarden_authenticator">Turva oma kontod Bitwarden Authenticator\'iga</string>
+    <string name="secure_your_accounts_with_bitwarden_authenticator">Turva oma kontod SecretDoor Authenticator\'iga</string>
     <string name="get_verification_codes_for_all_your_accounts">Hangi kinnitamiskoodid kõikidele sinu kontodele, mis toetavad 2-astmelist kinnitamist.</string>
     <string name="use_your_device_camera_to_scan_codes">Kasuta koodide skänneerimiseks oma seadme kaamerat</string>
     <string name="scan_the_qr_code_in_your_2_step_verification_settings_for_any_account">Skänneeri ükskõik millise konto jaoks oma QR-kood 2-astmelise kinnitamise seadetes.</string>
@@ -1107,7 +1107,7 @@ Soovid selle konto peale lülituda?</string>
     <string name="too_many_failed_biometric_attempts">Liiga palju ebaõnnestunud biomeetriaga katseid.</string>
     <string name="version">Versioon</string>
     <string name="version_x" comment="%1$s is the version string (e.g. 2025.1.0 (1234)).">Versioon: %1$s</string>
-    <string name="learn_more_about_how_to_use_bitwarden_authenticator_on_the_help_center">Uuri teisigi Bitwardeni kasutusvõimalusi Abikeskuses.</string>
+    <string name="learn_more_about_how_to_use_bitwarden_authenticator_on_the_help_center">Uuri teisigi SecretDoori kasutusvõimalusi Abikeskuses.</string>
     <string name="key">Võti</string>
     <string name="create_verification_code">Loo kinnituskood</string>
     <string name="key_is_required">Võti on nõutud.</string>
@@ -1118,30 +1118,30 @@ Soovid selle konto peale lülituda?</string>
     <string name="key_is_invalid">Võti on kehtimatu.</string>
     <string name="backup">Varundus</string>
     <string name="data_backup_title">Andmete varundamine</string>
-    <string name="data_backup_message">Bitwarden Authenticator\'i andmed on varundatud ja neid saab taastada sinu regulaarsetest seadme varukoopiatest.</string>
+    <string name="data_backup_message">SecretDoor Authenticator\'i andmed on varundatud ja neid saab taastada sinu regulaarsetest seadme varukoopiatest.</string>
     <string name="import_2fas_password_protected_not_supported">2FAS-i parooliga kaitstud failide importimine ei ole toetatud. Proovi uuesti eksporditud failiga, mis ei ole parooliga kaitstud.</string>
-    <string name="import_bitwarden_unsupported_format">Bitwardeni CSV failide importimine ei ole toetatud. Proovi uuesti eksporditud JSON failiga.</string>
-    <string name="download_bitwarden_card_title">Lae alla Bitwarden\'i rakendus</string>
+    <string name="import_bitwarden_unsupported_format">SecretDoori CSV failide importimine ei ole toetatud. Proovi uuesti eksporditud JSON failiga.</string>
+    <string name="download_bitwarden_card_title">Lae alla SecretDoor\'i rakendus</string>
     <string name="download_bitwarden_card_message">Hoiusta kõiki oma kasutajakonto andmeid ja sünkroniseeri oma kinnituskoode otse Authenticatori rakenduse kaudu.</string>
     <string name="download_now">Laadi kohe alla</string>
-    <string name="sync_with_bitwarden_app">Sünkroniseeri Bitwardeni rakendusega</string>
+    <string name="sync_with_bitwarden_app">Sünkroniseeri SecretDoori rakendusega</string>
     <string name="learn_more_link"><annotation link="learnMore">Uuri lähemalt</annotation></string>
-    <string name="shared_codes_error">Ei õnnestunud sünkroniseerida koode Bitwardeni rakendusega. Kontrolli, et mõlemad rakendused on värskendatud. Oma olemasolevatele koodidele pääsed jätkuvalt Bitwardeni rakenduse kaudu ligi.</string>
-    <string name="sync_with_the_bitwarden_app">Sünkroniseeri Bitwardeni rakendusega</string>
+    <string name="shared_codes_error">Ei õnnestunud sünkroniseerida koode SecretDoori rakendusega. Kontrolli, et mõlemad rakendused on värskendatud. Oma olemasolevatele koodidele pääsed jätkuvalt SecretDoori rakenduse kaudu ligi.</string>
+    <string name="sync_with_the_bitwarden_app">Sünkroniseeri SecretDoori rakendusega</string>
     <string name="sync_with_bitwarden_action_card_message">Selleks, et näha kõiki oma kinnituskoode, pead lubama kõigil oma kontodel sünkroniseerimise.</string>
     <string name="take_me_to_app_settings">Vii mind rakenduse seadetesse</string>
     <string name="something_went_wrong">Midagi läks valesti</string>
     <string name="please_try_again">Palun proovi uuesti</string>
-    <string name="copy_to_bitwarden_vault">Kopeeri Bitwardeni hoidlasse</string>
+    <string name="copy_to_bitwarden_vault">Kopeeri SecretDoori hoidlasse</string>
     <string name="default_save_option">Vaikimisi määratud salvestuse valik</string>
-    <string name="save_to_bitwarden">Salvesta Bitwardenisse</string>
+    <string name="save_to_bitwarden">Salvesta SecretDoorisse</string>
     <string name="save_here">Salvesta siia</string>
     <string name="none">Puudub</string>
     <string name="default_save_options_subtitle">Vali, kuhu sooviksid salvestada uued kinnituskoodid.</string>
     <string name="verification_code_created">Kinnituskood loodud</string>
-    <string name="choose_save_location_message">Salvesta see autentikaatori võti siia või lisa see oma Bitwardeni rakenduses kirjele.</string>
+    <string name="choose_save_location_message">Salvesta see autentikaatori võti siia või lisa see oma SecretDoori rakenduses kirjele.</string>
     <string name="save_option_as_default">Salvesta valik vaikimisi kasutamiseks</string>
-    <string name="account_synced_from_bitwarden_app">Konto sünkroniseeritud Bitwardeni rakendusest</string>
+    <string name="account_synced_from_bitwarden_app">Konto sünkroniseeritud SecretDoori rakendusest</string>
     <string name="local_codes">Kohalikud koodid (%1$d)</string>
     <string name="required_information_missing">Puudub nõutud informatsiooni</string>
     <string name="required_information_missing_message">Puudub nõutud informatsiooni (nt \"teenused\" või \"saladused\"). Kontrolli oma faili ja proovi uuesti. Abi saamiseks külasta bitwarden.com/help</string>
@@ -1150,10 +1150,10 @@ Soovid selle konto peale lülituda?</string>
     <string name="get_help">Klienditugi</string>
     <string name="error_cannot_decrypt">[error: dekrüpteerimine ebaõnnestus]</string>
     <string name="copy_error_report">Kopeeri veateade</string>
-    <string name="bitwarden_could_not_decrypt_this_vault_item_description_long">Bitwarden ei suutnud dekrüpteerida seda hoidla kirjet. Edasise andmekaotuse vältimiseks kopeeri ja jaga seda veateadet klienditeenindusega.</string>
+    <string name="bitwarden_could_not_decrypt_this_vault_item_description_long">SecretDoor ei suutnud dekrüpteerida seda hoidla kirjet. Edasise andmekaotuse vältimiseks kopeeri ja jaga seda veateadet klienditeenindusega.</string>
     <plurals name="bitwarden_could_not_decrypt_x_vault_item_copy_and_share_description_long">
-        <item quantity="one">Bitwarden ei suutnud dekrüpteerida [%1$d] kirjet. Edasise andmekaotuse vältimiseks kopeeri ja jaga seda veateadet klienditeenindusega.</item>
-        <item quantity="other">Bitwarden ei suutnud dekrüpteerida [%1$d] kirjet. Edasise andmekaotuse vältimiseks kopeeri ja jaga seda veateadet klienditeenindusega.</item>
+        <item quantity="one">SecretDoor ei suutnud dekrüpteerida [%1$d] kirjet. Edasise andmekaotuse vältimiseks kopeeri ja jaga seda veateadet klienditeenindusega.</item>
+        <item quantity="other">SecretDoor ei suutnud dekrüpteerida [%1$d] kirjet. Edasise andmekaotuse vältimiseks kopeeri ja jaga seda veateadet klienditeenindusega.</item>
     </plurals>
     <string name="select_a_card_for_x">Valige kaart %s jaoks</string>
     <string name="choose_an_identity">Choose an identity</string>
@@ -1162,8 +1162,8 @@ Soovid selle konto peale lülituda?</string>
     <string name="keep_your_credential_secure">Hoia oma andmed turvalisena</string>
     <string name="learn_more_about_how_to_keep_credentirals_secure">Uuri lähemalt kuidas hoida oma isikuandmeid ohutuna kasutades vahendit \"%1$s\".</string>
     <string name="are_you_sure_you_want_to_use">Kas olete kindel, et soovite kasutada „%1$s”?</string>
-    <string name="default_uri_match_detection_description_advanced_options_incorrectly">URI vastavuse tuvastamine kontrollib, kuidas Bitwarden automaattäite soovitusi tuvastab.\n<annotation emphasis="bold">Hoiatus:</annotation> „Regulaaravaldis” on täpsem valik, millega kaasneb vale kasutamise korral suurem risk mandaatide paljastamiseks.</string>
-    <string name="default_uri_match_detection_description_advanced_options">URI vastavuse tuvastamine kontrollib, kuidas Bitwarden automaattäite soovitusi tuvastab.\n<annotation emphasis="bold">Hoiatus:</annotation> „Algab sõnaga” on täpsem valik, millega kaasneb suurem risk mandaatide paljastamiseks.</string>
+    <string name="default_uri_match_detection_description_advanced_options_incorrectly">URI vastavuse tuvastamine kontrollib, kuidas SecretDoor automaattäite soovitusi tuvastab.\n<annotation emphasis="bold">Hoiatus:</annotation> „Regulaaravaldis” on täpsem valik, millega kaasneb vale kasutamise korral suurem risk mandaatide paljastamiseks.</string>
+    <string name="default_uri_match_detection_description_advanced_options">URI vastavuse tuvastamine kontrollib, kuidas SecretDoor automaattäite soovitusi tuvastab.\n<annotation emphasis="bold">Hoiatus:</annotation> „Algab sõnaga” on täpsem valik, millega kaasneb suurem risk mandaatide paljastamiseks.</string>
     <string name="advanced_option_with_increased_risk_of_exposing_credentials">„Algab sõnaga” on täpsem valik, millega kaasneb suurem risk mandaatide paljastamiseks.</string>
     <string name="advanced_option_increased_risk_exposing_credentials_used_incorrectly">„Regulaaravaldis” on täpsem valik, millega kaasneb vale kasutamise korral suurem risk mandaatide paljastamiseks.</string>
     <string name="later">Hiljem</string>
@@ -1188,17 +1188,17 @@ Soovid selle konto peale lülituda?</string>
         <item quantity="other">%1$d üksust on teie varahoidlasse imporditud.</item>
     </plurals>
     <string name="enable_browser_autofill_to_keep_filling_passwords">Paroolide täitmise jätkamiseks lubage brauseri automaattäide</string>
-    <string name="your_browser_recently_updated_how_autofill_works_singular">Teie brauser on hiljuti uuendatud, mis on Bitwardeni automaattäite keelanud. Bitwardeniga paroolide täitmise jätkamiseks lubage automaattäite seadetes brauseri automaattäide.</string>
+    <string name="your_browser_recently_updated_how_autofill_works_singular">Teie brauser on hiljuti uuendatud, mis on SecretDoori automaattäite keelanud. SecretDooriga paroolide täitmise jätkamiseks lubage automaattäite seadetes brauseri automaattäide.</string>
     <string name="not_now">Mitte praegu</string>
-    <string name="import_from_bitwarden">Impordi Bitwardenist</string>
+    <string name="import_from_bitwarden">Impordi SecretDoorist</string>
     <string name="select_account">Vali konto</string>
     <string name="no_accounts_available">Kontod pole saadaval</string>
-    <string name="you_dont_have_any_accounts_you_can_import_from">Teil pole ühtegi kontot, kust importida. Teie organisatsiooni turvapoliitika võib piirata üksuste importimist Bitwardenist teise rakendusse.</string>
+    <string name="you_dont_have_any_accounts_you_can_import_from">Teil pole ühtegi kontot, kust importida. Teie organisatsiooni turvapoliitika võib piirata üksuste importimist SecretDoorist teise rakendusse.</string>
     <string name="import_restricted_unable_to_import_credit_cards">Importimine piiratud, sellelt kontolt ei saa kaarte importida.</string>
     <string name="verify_your_master_password">Kinnitage oma peaparool</string>
     <string name="having_trouble_with_autofill">Kas teil on automaattäitega probleeme?</string>
     <string name="access_help_and_troubleshooting_documentation_here">Juurdepääs abi- ja tõrkeotsingu dokumentatsioonile siin</string>
-    <string name="import_passwords_passkeys_and_other_item_types_from_your_vault">Importige paroolid, pääsukoodid ja muud üksuse tüübid oma Bitwardeni varast.</string>
+    <string name="import_passwords_passkeys_and_other_item_types_from_your_vault">Importige paroolid, pääsukoodid ja muud üksuse tüübid oma SecretDoori varast.</string>
     <string name="items_to_import">Importitavad üksused</string>
     <string name="exporting_items">Üksuste eksportimine…</string>
     <string name="export_failed">Eksportimine ebaõnnestus</string>
@@ -1262,7 +1262,7 @@ Soovid selle konto peale lülituda?</string>
     <string name="only_include_the_following_domains_x_please_review_and_try_again">Only include the following domains: %1$s. Please review and try again.</string>
     <string name="enter_at_least_one_valid_email_address_to_share_this_send">Selle saadetise jagamiseks sisestage vähemalt üks kehtiv e-posti aadress.</string>
     <string name="sync_with_browser">Sünkrooni brauseriga</string>
-    <string name="sync_with_browser_description">%1$s ühendamiseks sünkroonige oma vaikebrauser Bitwardeni mobiilirakendusega. Kui brauser avaneb, lõpetage sisselogimine, kui seda palutakse.\nKui sünkroonimine on lõppenud, naasete sellesse rakendusse.</string>
+    <string name="sync_with_browser_description">%1$s ühendamiseks sünkroonige oma vaikebrauser SecretDoori mobiilirakendusega. Kui brauser avaneb, lõpetage sisselogimine, kui seda palutakse.\nKui sünkroonimine on lõppenud, naasete sellesse rakendusse.</string>
     <string name="launch_browser">Käivita brauser</string>
     <string name="continue_without_syncing">Jätka ilma sünkroonimata</string>
     <string name="external_link">Väline link</string>
@@ -1288,7 +1288,7 @@ Soovid selle konto peale lülituda?</string>
     <string name="trusted">Usaldatud</string>
     <string name="preview_not_available_for_files">Eelvaade pole %1$s failide jaoks saadaval. Saate selle siiski alla laadida, et seda oma seadmes vaadata.</string>
     <string name="this_file_is_too_large_to_preview">See fail on eelvaate jaoks liiga suur. Saate selle siiski alla laadida, et seda oma seadmes vaadata.</string>
-    <string name="bitwarden_could_not_decrypt_this_file_so_the_preview_cannot_be_displayed">Bitwarden ei suutnud seda faili dekrüptida, seega ei saa eelvaadet kuvada.</string>
+    <string name="bitwarden_could_not_decrypt_this_file_so_the_preview_cannot_be_displayed">SecretDoor ei suutnud seda faili dekrüptida, seega ei saa eelvaadet kuvada.</string>
     <string name="preview_unavailable_for_this_file">Selle faili eelvaade pole saadaval. Saate selle siiski alla laadida, et seda oma seadmes vaadata.</string>
     <string name="preview_unavailable">Eelvaade pole saadaval</string>
     <string name="download_attachment">Laadi manus alla</string>
@@ -1330,7 +1330,7 @@ Soovid selle konto peale lülituda?</string>
     <string name="billing_rate_per_year">%1$s / aasta</string>
     <string name="billing_rate_per_month">%1$s / kuu</string>
     <string name="manage_plan">Halda plaani</string>
-    <string name="manage_your_subscription_plan_in_the_bitwarden_web_app">Hallake oma tellimuse plaani Bitwardeni veebirakenduses.</string>
+    <string name="manage_your_subscription_plan_in_the_bitwarden_web_app">Hallake oma tellimuse plaani SecretDoori veebirakenduses.</string>
     <string name="cancel_premium">Tühista Premium</string>
     <string name="subscription_status_active">Aktiivne</string>
     <string name="subscription_status_canceled">Tühistatud</string>
@@ -1421,8 +1421,8 @@ Soovid selle konto peale lülituda?</string>
     <string name="local_network_access_required">Kohaliku võrgu juurdepääs vajalik</string>
     <string name="ask_again_later">Küsi hiljem uuesti</string>
     <string name="enable_local_network_access">Luba kohaliku võrgu juurdepääs</string>
-    <string name="bitwarden_needs_local_network_access_to_sync_with_your_server">Bitwarden vajab teie serveriga sünkroonimiseks kohaliku võrgu juurdepääsu. Ilma selle loata ei saa rakendus ühendust luua.</string>
-    <string name="without_this_permission_bitwarden_wont_be_able_to_sync_with_your_server">Ilma selle loata ei saa Bitwarden teie serveriga ühendust luua ja sünkroonida. Saate selle lubada oma seadme seadetes.</string>
+    <string name="bitwarden_needs_local_network_access_to_sync_with_your_server">SecretDoor vajab teie serveriga sünkroonimiseks kohaliku võrgu juurdepääsu. Ilma selle loata ei saa rakendus ühendust luua.</string>
+    <string name="without_this_permission_bitwarden_wont_be_able_to_sync_with_your_server">Ilma selle loata ei saa SecretDoor teie serveriga ühendust luua ja sünkroonida. Saate selle lubada oma seadme seadetes.</string>
     <string name="your_request_was_interrupted_because_the_app_needs_local_network_access">Teie päring katkestati, kuna rakendus vajab kohaliku võrgu juurdepääsu. Saate selle lubada oma seadme seadetes.</string>
     <string name="continue_to_stripe">Jätkake Stripe\'i?</string>
     <string name="youll_be_taken_to_stripe_to_manage_your_subscription_cancellation">Tellimuse tühistamise haldamiseks suunatakse teid Stripe\'i.</string>
@@ -1444,7 +1444,7 @@ Soovid selle konto peale lülituda?</string>
     <string name="use_this_username">Use this username</string>
     <string name="create_login">Create login</string>
     <string name="keep_unlocking_with_biometrics">Keep unlocking with biometrics</string>
-    <string name="weve_made_a_security_update">We’ve made a security update. Confirm your biometrics again to keep using them to unlock Bitwarden.</string>
+    <string name="weve_made_a_security_update">We’ve made a security update. Confirm your biometrics again to keep using them to unlock SecretDoor.</string>
     <string name="turn_off">Turn off</string>
     <string name="turn_off_biometric_question">Turn off biometrics?</string>
     <string name="unlocking_will_require_your_master_password">Unlocking will require your master password. You can turn biometrics back on in Settings.</string>

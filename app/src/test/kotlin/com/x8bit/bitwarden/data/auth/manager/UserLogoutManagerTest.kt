@@ -93,7 +93,7 @@ class UserLogoutManagerTest {
         val userId = USER_ID_1
         every { authDiskSource.userState } returns SINGLE_USER_STATE_1
 
-        userLogoutManager.logout(userId = USER_ID_1, reason = LogoutReason.Timeout)
+        userLogoutManager.logout(userId = USER_ID_1, reason = LogoutReason.AccountDelete)
 
         coVerify {
             authDiskSource.userState = null
@@ -108,7 +108,7 @@ class UserLogoutManagerTest {
         val userId = USER_ID_1
         every { authDiskSource.userState } returns MULTI_USER_STATE
 
-        userLogoutManager.logout(userId = USER_ID_1, reason = LogoutReason.Timeout)
+        userLogoutManager.logout(userId = USER_ID_1, reason = LogoutReason.AccountDelete)
 
         verify {
             authDiskSource.userState = SINGLE_USER_STATE_2
@@ -123,25 +123,42 @@ class UserLogoutManagerTest {
         val userId = USER_ID_2
         every { authDiskSource.userState } returns MULTI_USER_STATE
 
-        userLogoutManager.logout(userId = USER_ID_2, reason = LogoutReason.Timeout)
+        userLogoutManager.logout(userId = USER_ID_2, reason = LogoutReason.AccountDelete)
 
         verify { authDiskSource.userState = SINGLE_USER_STATE_1 }
         assertDataCleared(userId = userId)
     }
 
-    @Suppress("MaxLineLength")
     @Test
-    fun `logout with security stamp reason should switch active user and display the login expired toast`() {
-        val userId = USER_ID_1
+    fun `logout for any reason other than deleting the vault should not clear any data`() {
         every { authDiskSource.userState } returns MULTI_USER_STATE
 
-        userLogoutManager.logout(userId = userId, reason = LogoutReason.SecurityStamp)
-
-        verify(exactly = 1) {
-            authDiskSource.userState = SINGLE_USER_STATE_2
-            toastManager.show(messageId = BitwardenString.login_expired)
+        listOf(
+            LogoutReason.Timeout,
+            LogoutReason.SecurityStamp,
+            LogoutReason.TooManyUnlockAttempts,
+            LogoutReason.Biometrics.Lockout,
+        ).forEach { reason ->
+            userLogoutManager.logout(userId = USER_ID_1, reason = reason)
         }
-        assertDataCleared(userId = userId)
+
+        verify(exactly = 0) {
+            authDiskSource.userState = any()
+            authDiskSource.clearData(userId = any())
+            vaultSdkSource.clearCrypto(userId = any())
+        }
+        coVerify(exactly = 0) { vaultDiskSource.deleteVaultData(userId = any()) }
+    }
+
+    @Test
+    fun `softLogout for any reason other than deleting the vault should not clear any data`() {
+        userLogoutManager.softLogout(userId = USER_ID_1, reason = LogoutReason.Timeout)
+
+        verify(exactly = 0) {
+            authDiskSource.clearData(userId = any())
+            vaultSdkSource.clearCrypto(userId = any())
+        }
+        coVerify(exactly = 0) { vaultDiskSource.deleteVaultData(userId = any()) }
     }
 
     @Suppress("MaxLineLength")
@@ -190,7 +207,7 @@ class UserLogoutManagerTest {
             authDiskSource.storeEncryptedPin(userId = userId, encryptedPin = encryptedPin)
         } just runs
 
-        userLogoutManager.softLogout(userId = userId, reason = LogoutReason.Timeout)
+        userLogoutManager.softLogout(userId = userId, reason = LogoutReason.AccountDelete)
 
         assertDataCleared(userId = userId)
 
@@ -272,7 +289,7 @@ class UserLogoutManagerTest {
             authDiskSource.storeEncryptedPin(userId = userId, encryptedPin = encryptedPin)
         } just runs
 
-        userLogoutManager.softLogout(userId = userId, reason = LogoutReason.Timeout)
+        userLogoutManager.softLogout(userId = userId, reason = LogoutReason.AccountDelete)
 
         verify(exactly = 1) {
             settingsDiskSource.storeVaultTimeoutInMinutes(
@@ -311,7 +328,7 @@ class UserLogoutManagerTest {
             settingsDiskSource.getVaultPolicyBannerDismissedDate(userId = userId)
         } returns DISMISSAL_REVISION_DATE
 
-        userLogoutManager.softLogout(userId = userId, reason = LogoutReason.Timeout)
+        userLogoutManager.softLogout(userId = userId, reason = LogoutReason.AccountDelete)
 
         assertDataCleared(userId = userId)
         verify(exactly = 0) {
@@ -334,7 +351,7 @@ class UserLogoutManagerTest {
             settingsDiskSource.getVaultPolicyBannerDismissedDate(userId = userId)
         } returns DISMISSAL_REVISION_DATE
 
-        userLogoutManager.softLogout(userId = userId, reason = LogoutReason.Timeout)
+        userLogoutManager.softLogout(userId = userId, reason = LogoutReason.AccountDelete)
 
         assertDataCleared(userId = userId)
         verify(exactly = 1) {
@@ -356,7 +373,7 @@ class UserLogoutManagerTest {
         } returns false
         every { settingsDiskSource.getVaultPolicyBannerDismissedDate(userId = userId) } returns null
 
-        userLogoutManager.softLogout(userId = userId, reason = LogoutReason.Timeout)
+        userLogoutManager.softLogout(userId = userId, reason = LogoutReason.AccountDelete)
 
         assertDataCleared(userId = userId)
         verify(exactly = 1) {
@@ -372,7 +389,7 @@ class UserLogoutManagerTest {
         val userId = USER_ID_1
         every { authDiskSource.userState } returns SINGLE_USER_STATE_1
 
-        userLogoutManager.logout(userId = userId, reason = LogoutReason.Timeout)
+        userLogoutManager.logout(userId = userId, reason = LogoutReason.AccountDelete)
 
         assertDataCleared(userId = userId)
         verify(exactly = 0) {

@@ -1,6 +1,7 @@
 package com.bitwarden.network.retrofit
 
 import com.bitwarden.network.core.NetworkResultCallAdapterFactory
+import com.bitwarden.network.interceptor.AllowedHostsInterceptor
 import com.bitwarden.network.interceptor.AuthTokenManager
 import com.bitwarden.network.interceptor.BaseUrlInterceptor
 import com.bitwarden.network.interceptor.BaseUrlInterceptors
@@ -12,6 +13,7 @@ import com.bitwarden.network.ssl.CertificateProvider
 import com.bitwarden.network.ssl.configureSsl
 import com.bitwarden.network.util.HEADER_KEY_AUTHORIZATION
 import kotlinx.serialization.json.Json
+import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -33,6 +35,7 @@ internal class RetrofitsImpl(
     private val permissionInterceptor: PermissionInterceptor,
     private val certificateProvider: CertificateProvider,
     private val logHttpBody: Boolean = false,
+    private val allowedHostsInterceptor: Interceptor = AllowedHostsInterceptor(),
 ) : Retrofits {
     //region Authenticated Retrofits
 
@@ -108,6 +111,7 @@ internal class RetrofitsImpl(
     }
 
     private val baseOkHttpClient: OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(allowedHostsInterceptor)
         .addInterceptor(headersInterceptor)
         .addNetworkInterceptor(cookieInterceptor)
         .configureSsl(certificateProvider = certificateProvider)
@@ -117,6 +121,7 @@ internal class RetrofitsImpl(
     // it treats all 302s as Bitwarden load-balancer auth redirects, which is only correct for
     // Bitwarden's own infrastructure.
     private val externalOkHttpClient: OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(allowedHostsInterceptor)
         .addInterceptor(headersInterceptor)
         .configureSsl(certificateProvider = certificateProvider)
         .build()

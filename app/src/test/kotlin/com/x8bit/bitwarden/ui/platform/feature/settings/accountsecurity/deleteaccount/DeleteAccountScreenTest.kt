@@ -104,7 +104,7 @@ class DeleteAccountScreenTest : BitwardenComposeTest() {
 
     @Test
     fun `delete success dialog presence should update with dialog state`() {
-        val message = "Your account has been permanently deleted"
+        val message = "Your vault has been deleted"
         composeTestRule
             .onAllNodesWithText(message)
             .filterToOne(hasAnyAncestor(isDialog()))
@@ -144,7 +144,7 @@ class DeleteAccountScreenTest : BitwardenComposeTest() {
             .assertDoesNotExist()
 
         composeTestRule
-            .onAllNodesWithText("Delete account")
+            .onAllNodesWithText("Delete vault")
             .filterToOne(hasClickAction())
             .performScrollTo()
             .performClick()
@@ -174,7 +174,7 @@ class DeleteAccountScreenTest : BitwardenComposeTest() {
             .assertDoesNotExist()
 
         composeTestRule
-            .onAllNodesWithText("Delete account")
+            .onAllNodesWithText("Delete vault")
             .filterToOne(hasClickAction())
             .performScrollTo()
             .performClick()
@@ -230,7 +230,7 @@ class DeleteAccountScreenTest : BitwardenComposeTest() {
             .assertDoesNotExist()
 
         composeTestRule
-            .onAllNodesWithText("Delete account")
+            .onAllNodesWithText("Delete vault")
             .filterToOne(hasClickAction())
             .assertExists()
 
@@ -251,7 +251,7 @@ class DeleteAccountScreenTest : BitwardenComposeTest() {
             .assertExists()
 
         composeTestRule
-            .onAllNodesWithText("Delete account")
+            .onAllNodesWithText("Delete vault")
             .filterToOne(hasClickAction())
             .assertDoesNotExist()
     }

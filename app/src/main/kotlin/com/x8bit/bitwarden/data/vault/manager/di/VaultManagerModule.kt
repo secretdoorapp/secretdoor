@@ -24,8 +24,11 @@ import com.x8bit.bitwarden.data.platform.manager.ReviewPromptManager
 import com.x8bit.bitwarden.data.platform.manager.keyrotation.KeyRotationManager
 import com.x8bit.bitwarden.data.platform.manager.policy.PasswordPolicyManager
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
+import com.x8bit.bitwarden.data.vault.datasource.disk.AutoBackupDiskSource
 import com.x8bit.bitwarden.data.vault.datasource.disk.VaultDiskSource
 import com.x8bit.bitwarden.data.vault.datasource.sdk.VaultSdkSource
+import com.x8bit.bitwarden.data.vault.manager.AutoBackupManager
+import com.x8bit.bitwarden.data.vault.manager.AutoBackupManagerImpl
 import com.x8bit.bitwarden.data.vault.manager.CipherManager
 import com.x8bit.bitwarden.data.vault.manager.CipherManagerImpl
 import com.x8bit.bitwarden.data.vault.manager.CredentialExchangeImportManager
@@ -36,15 +39,19 @@ import com.x8bit.bitwarden.data.vault.manager.PinProtectedUserKeyManager
 import com.x8bit.bitwarden.data.vault.manager.PinProtectedUserKeyManagerImpl
 import com.x8bit.bitwarden.data.vault.manager.TotpCodeManager
 import com.x8bit.bitwarden.data.vault.manager.TotpCodeManagerImpl
+import com.x8bit.bitwarden.data.vault.manager.VaultBackupManager
+import com.x8bit.bitwarden.data.vault.manager.VaultBackupManagerImpl
 import com.x8bit.bitwarden.data.vault.manager.VaultLockManager
 import com.x8bit.bitwarden.data.vault.manager.VaultLockManagerImpl
 import com.x8bit.bitwarden.data.vault.manager.VaultSyncManager
 import com.x8bit.bitwarden.data.vault.manager.VaultSyncManagerImpl
+import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.serialization.json.Json
 import java.time.Clock
 import javax.inject.Singleton
 
@@ -58,6 +65,47 @@ object VaultManagerModule {
     @Provides
     @Singleton
     fun provideCardScanManager(): CardScanManager = CardScanManagerImpl()
+
+    @Provides
+    @Singleton
+    @Suppress("LongParameterList")
+    fun provideVaultBackupManager(
+        @ApplicationContext context: Context,
+        authDiskSource: AuthDiskSource,
+        vaultDiskSource: VaultDiskSource,
+        vaultRepository: VaultRepository,
+        userStateManager: UserStateManager,
+        settingsRepository: SettingsRepository,
+        fileManager: FileManager,
+        json: Json,
+        clock: Clock,
+        dispatcherManager: DispatcherManager,
+    ): VaultBackupManager = VaultBackupManagerImpl(
+        context = context,
+        authDiskSource = authDiskSource,
+        vaultDiskSource = vaultDiskSource,
+        vaultRepository = vaultRepository,
+        userStateManager = userStateManager,
+        settingsRepository = settingsRepository,
+        fileManager = fileManager,
+        json = json,
+        clock = clock,
+        dispatcherManager = dispatcherManager,
+    )
+
+    @Provides
+    @Singleton
+    fun provideAutoBackupManager(
+        @ApplicationContext context: Context,
+        autoBackupDiskSource: AutoBackupDiskSource,
+        vaultBackupManager: VaultBackupManager,
+        clock: Clock,
+    ): AutoBackupManager = AutoBackupManagerImpl(
+        context = context,
+        autoBackupDiskSource = autoBackupDiskSource,
+        vaultBackupManager = vaultBackupManager,
+        clock = clock,
+    )
 
     @Provides
     @Singleton

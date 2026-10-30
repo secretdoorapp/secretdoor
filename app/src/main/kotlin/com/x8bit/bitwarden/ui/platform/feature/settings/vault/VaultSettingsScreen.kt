@@ -56,6 +56,7 @@ fun VaultSettingsScreen(
     onNavigateToFolders: () -> Unit,
     onNavigateToImportLogins: () -> Unit,
     onNavigateToImportItems: () -> Unit,
+    onNavigateToBackup: () -> Unit,
     viewModel: VaultSettingsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
@@ -66,6 +67,7 @@ fun VaultSettingsScreen(
             VaultSettingsEvent.NavigateBack -> onNavigateBack()
             VaultSettingsEvent.NavigateToExportVault -> onNavigateToExportVault()
             VaultSettingsEvent.NavigateToFolders -> onNavigateToFolders()
+            VaultSettingsEvent.NavigateToBackup -> onNavigateToBackup()
             is VaultSettingsEvent.NavigateToImportVault -> onNavigateToImportLogins()
             is VaultSettingsEvent.NavigateToImportItems -> onNavigateToImportItems()
             is VaultSettingsEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.data)
@@ -132,6 +134,17 @@ fun VaultSettingsScreen(
                 cardStyle = CardStyle.Top(),
                 modifier = Modifier
                     .testTag("FoldersLabel")
+                    .standardHorizontalMargin()
+                    .fillMaxWidth(),
+            )
+
+            BitwardenTextRow(
+                text = stringResource(BitwardenString.backup),
+                onClick = { viewModel.trySendAction(VaultSettingsAction.BackupClick) },
+                withDivider = false,
+                cardStyle = CardStyle.Middle(),
+                modifier = Modifier
+                    .testTag("BackupLabel")
                     .standardHorizontalMargin()
                     .fillMaxWidth(),
             )

@@ -107,7 +107,7 @@ class AboutScreenTest : BitwardenComposeTest() {
     @Test
     fun `on bitwarden help center click should display confirmation dialog and confirm click should emit HelpCenterClick`() {
         composeTestRule.onNode(isDialog()).assertDoesNotExist()
-        composeTestRule.onNodeWithText("Bitwarden help center").performClick()
+        composeTestRule.onNodeWithText("SecretDoor help center").performClick()
         composeTestRule.onNode(isDialog()).assertExists()
         composeTestRule
             .onAllNodesWithText("Continue")
@@ -135,41 +135,6 @@ class AboutScreenTest : BitwardenComposeTest() {
         }
     }
 
-    @Suppress("MaxLineLength")
-    @Test
-    fun `on bitwarden web vault click should display confirmation dialog and confirm click should emit WebVaultClick`() {
-        composeTestRule.onNode(isDialog()).assertDoesNotExist()
-        composeTestRule.onNodeWithText("Bitwarden web vault").performClick()
-        composeTestRule.onNode(isDialog()).assertExists()
-        composeTestRule
-            .onAllNodesWithText("Continue")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .performClick()
-        composeTestRule.onNode(isDialog()).assertDoesNotExist()
-        verify {
-            viewModel.trySendAction(AboutAction.WebVaultClick)
-        }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `on learn about organizations click should display confirmation dialog and confirm click should emit LearnAboutOrganizationsClick`() {
-        composeTestRule.onNode(isDialog()).assertDoesNotExist()
-        composeTestRule
-            .onNodeWithText("Learn about organizations")
-            .performScrollTo()
-            .performClick()
-        composeTestRule.onNode(isDialog()).assertExists()
-        composeTestRule
-            .onAllNodesWithText("Continue")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .performClick()
-        composeTestRule.onNode(isDialog()).assertDoesNotExist()
-        verify {
-            viewModel.trySendAction(AboutAction.LearnAboutOrganizationsClick)
-        }
-    }
-
     @Test
     fun `on NavigateBack should call onNavigateBack`() {
         mutableEventFlow.tryEmit(AboutEvent.NavigateBack)
@@ -192,7 +157,7 @@ class AboutScreenTest : BitwardenComposeTest() {
     fun `on NavigateToFlightRecorderHelp should call launchUri on IntentManager`() {
         mutableEventFlow.tryEmit(AboutEvent.NavigateToFlightRecorderHelp)
         verify(exactly = 1) {
-            intentManager.launchUri("https://bitwarden.com/help/flight-recorder".toUri())
+            intentManager.launchUri("https://github.com/zcoklin/secretdoor#readme".toUri())
         }
     }
 
@@ -200,7 +165,7 @@ class AboutScreenTest : BitwardenComposeTest() {
     fun `on NavigateToHelpCenter should call launchUri on IntentManager`() {
         mutableEventFlow.tryEmit(AboutEvent.NavigateToHelpCenter)
         verify {
-            intentManager.launchUri("https://bitwarden.com/help".toUri())
+            intentManager.launchUri("https://github.com/zcoklin/secretdoor#readme".toUri())
         }
     }
 
@@ -208,7 +173,7 @@ class AboutScreenTest : BitwardenComposeTest() {
     fun `on NavigateToPrivacyPolicy should call launchUri on IntentManager`() {
         mutableEventFlow.tryEmit(AboutEvent.NavigateToPrivacyPolicy)
         verify {
-            intentManager.launchUri("https://bitwarden.com/privacy".toUri())
+            intentManager.launchUri("https://github.com/zcoklin/secretdoor#privacy".toUri())
         }
     }
 

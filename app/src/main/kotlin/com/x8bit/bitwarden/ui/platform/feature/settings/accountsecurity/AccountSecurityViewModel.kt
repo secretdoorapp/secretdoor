@@ -1,11 +1,9 @@
 package com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity
 
-import android.os.Build
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.bitwarden.core.data.manager.model.FlagKey
-import com.bitwarden.core.util.isBuildVersionAtLeast
 import com.bitwarden.data.repository.util.baseWebVaultUrlOrDefault
 import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BaseViewModel
@@ -69,7 +67,8 @@ class AccountSecurityViewModel @Inject constructor(
             isUnlockWithPasswordEnabled = userState.activeAccount.hasMasterPassword,
             isUnlockWithPinEnabled = settingsRepository.isUnlockWithPinEnabled,
             isManageDevicesEnabled = featureFlagManager.getFeatureFlag(FlagKey.ManageDevices),
-            shouldShowEnableAuthenticatorSync = isBuildVersionAtLeast(Build.VERSION_CODES.S),
+            // SecretDoor has no companion authenticator app to share codes with.
+            shouldShowEnableAuthenticatorSync = false,
             userId = userId,
             vaultTimeout = settingsRepository.vaultTimeout,
             vaultTimeoutAction = settingsRepository.vaultTimeoutAction,

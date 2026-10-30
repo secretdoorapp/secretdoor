@@ -17,6 +17,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
+import com.bitwarden.ui.platform.manager.IntentManager
 import com.bitwarden.ui.util.asText
 import com.x8bit.bitwarden.ui.auth.feature.completeregistration.CompleteRegistrationAction.CheckDataBreachesToggle
 import com.x8bit.bitwarden.ui.auth.feature.completeregistration.CompleteRegistrationAction.ConfirmPasswordInputChange
@@ -49,10 +50,11 @@ class CompleteRegistrationScreenTest : BitwardenComposeTest() {
         every { eventFlow } returns mutableEventFlow
         every { trySendAction(any()) } just runs
     }
+    private val intentManager = mockk<IntentManager>(relaxed = true)
 
     @Before
     fun setup() {
-        setContent {
+        setContent(intentManager = intentManager) {
             CompleteRegistrationScreen(
                 onNavigateBack = { onNavigateBackCalled = true },
                 onNavigateToPasswordGuidance = { onNavigateToPasswordGuidanceCalled = true },

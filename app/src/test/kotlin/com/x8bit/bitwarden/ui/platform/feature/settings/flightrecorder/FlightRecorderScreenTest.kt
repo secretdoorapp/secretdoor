@@ -75,9 +75,9 @@ class FlightRecorderScreenTest : BitwardenComposeTest() {
     @Test
     fun `on help center click should emit HelpCenterClick action`() {
         composeTestRule
-            .onNodeWithText(text = "Bitwarden help center", substring = true)
+            .onNodeWithText(text = "SecretDoor help center", substring = true)
             .performScrollTo()
-            .performCustomAccessibilityAction(label = "Bitwarden help center, External link")
+            .performCustomAccessibilityAction(label = "SecretDoor help center, External link")
         verify(exactly = 1) {
             viewModel.trySendAction(FlightRecorderAction.HelpCenterClick)
         }

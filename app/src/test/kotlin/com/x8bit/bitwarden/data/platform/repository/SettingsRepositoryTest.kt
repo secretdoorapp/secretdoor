@@ -333,16 +333,14 @@ class SettingsRepositoryTest {
     }
 
     @Test
-    fun `isIconLoadingDisabled should pull from and update SettingsDiskSource`() {
-        assertFalse(settingsRepository.isIconLoadingDisabled)
-
-        // Updates to the disk source change the repository value.
-        fakeSettingsDiskSource.isIconLoadingDisabled = true
+    fun `isIconLoadingDisabled should always be true`() {
         assertTrue(settingsRepository.isIconLoadingDisabled)
 
-        // Updates to the repository change the disk source value
+        fakeSettingsDiskSource.isIconLoadingDisabled = false
         settingsRepository.isIconLoadingDisabled = false
-        assertFalse(fakeSettingsDiskSource.isIconLoadingDisabled!!)
+
+        assertTrue(settingsRepository.isIconLoadingDisabled)
+        assertTrue(settingsRepository.isIconLoadingDisabledFlow.value)
     }
 
     @Test

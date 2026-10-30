@@ -413,28 +413,12 @@ class VerificationCodeScreenTest : BitwardenComposeTest() {
         composeTestRule
             .onAllNodesWithText(text = "Sync")
             .filterToOne(hasAnyAncestor(isPopup()))
-            .assertIsDisplayed()
+            .assertDoesNotExist()
 
         composeTestRule
             .onAllNodesWithText(text = "Lock")
             .filterToOne(hasAnyAncestor(isPopup()))
             .assertIsDisplayed()
-    }
-
-    @Test
-    fun `on sync click should send SyncClick`() {
-        composeTestRule
-            .onNodeWithContentDescription(label = "More options")
-            .performClick()
-
-        composeTestRule
-            .onAllNodesWithText(text = "Sync")
-            .filterToOne(hasAnyAncestor(isPopup()))
-            .performClick()
-
-        verify {
-            viewModel.trySendAction(VerificationCodeAction.SyncClick)
-        }
     }
 
     @Test

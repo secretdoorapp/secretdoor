@@ -37,10 +37,7 @@ import com.bitwarden.ui.platform.base.util.EventsEffect
 import com.bitwarden.ui.platform.base.util.standardHorizontalMargin
 import com.bitwarden.ui.platform.components.account.BitwardenAccountActionItem
 import com.bitwarden.ui.platform.components.account.BitwardenAccountSwitcher
-import com.bitwarden.ui.platform.components.account.dialog.BitwardenLogoutConfirmationDialog
 import com.bitwarden.ui.platform.components.appbar.BitwardenTopAppBar
-import com.bitwarden.ui.platform.components.appbar.action.BitwardenOverflowActionItem
-import com.bitwarden.ui.platform.components.appbar.model.OverflowMenuItemData
 import com.bitwarden.ui.platform.components.button.BitwardenFilledButton
 import com.bitwarden.ui.platform.components.button.BitwardenOutlinedButton
 import com.bitwarden.ui.platform.components.button.BitwardenTextButton
@@ -64,7 +61,6 @@ import com.x8bit.bitwarden.ui.credentials.manager.model.GetCredentialsResult
 import com.x8bit.bitwarden.ui.platform.composition.LocalBiometricsManager
 import com.x8bit.bitwarden.ui.platform.composition.LocalCredentialProviderCompletionManager
 import com.x8bit.bitwarden.ui.platform.manager.biometrics.BiometricsManager
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
 import javax.crypto.Cipher
 import kotlin.time.Duration.Companion.milliseconds
@@ -182,16 +178,6 @@ fun VaultUnlockScreen(
         )
     }
 
-    var showLogoutConfirmationDialog by remember { mutableStateOf(false) }
-    if (showLogoutConfirmationDialog) {
-        BitwardenLogoutConfirmationDialog(
-            onDismissRequest = { showLogoutConfirmationDialog = false },
-            onConfirmClick = {
-                showLogoutConfirmationDialog = false
-                viewModel.trySendAction(VaultUnlockAction.ConfirmLogoutClick)
-            },
-        )
-    }
 
     // Content
     BitwardenScaffold(
@@ -219,14 +205,6 @@ fun VaultUnlockScreen(
                             },
                         )
                     }
-                    BitwardenOverflowActionItem(
-                        menuItemDataList = persistentListOf(
-                            OverflowMenuItemData(
-                                text = stringResource(id = BitwardenString.log_out),
-                                onClick = { showLogoutConfirmationDialog = true },
-                            ),
-                        ),
-                    )
                 },
             )
         },
@@ -246,6 +224,8 @@ fun VaultUnlockScreen(
                 onAddAccountClick = { viewModel.trySendAction(VaultUnlockAction.AddAccountClick) },
                 onDismissRequest = { accountMenuVisible = false },
                 topAppBarScrollBehavior = scrollBehavior,
+                isAddAccountAvailable = false,
+                isLogoutAvailable = false,
                 modifier = Modifier.fillMaxSize(),
             )
         },
