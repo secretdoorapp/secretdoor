@@ -58,7 +58,6 @@ import com.x8bit.bitwarden.data.platform.manager.model.CoachMarkTourType
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
 import com.x8bit.bitwarden.data.platform.manager.model.OrganizationEvent
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
-import com.x8bit.bitwarden.data.platform.manager.network.NetworkConnectionManager
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.platform.repository.util.FakeEnvironmentRepository
 import com.x8bit.bitwarden.data.tools.generator.repository.GeneratorRepository
@@ -207,9 +206,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
     private val generatorRepository: GeneratorRepository = FakeGeneratorRepository()
     private val organizationEventManager = mockk<OrganizationEventManager> {
         every { trackEvent(event = any()) } just runs
-    }
-    private val networkConnectionManager = mockk<NetworkConnectionManager> {
-        every { isNetworkConnected } returns true
     }
 
     private val mutableShouldShowAddLoginCoachMarkFlow = MutableStateFlow(false)
@@ -1894,41 +1890,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
                     relay = SnackbarRelay.CIPHER_UPDATED,
                 )
             }
-        }
-
-    @Test
-    fun `in add mode, SaveClick with no network connection error should show error dialog`() =
-        runTest {
-            val stateWithName = createVaultAddItemState(
-                commonContentViewState = createCommonContentViewState(
-                    name = "mockName-1",
-                ),
-            )
-            mutableVaultDataFlow.value = DataState.Loaded(createVaultData())
-            every { networkConnectionManager.isNetworkConnected } returns false
-
-            val viewModel = createAddVaultItemViewModel(
-                createSavedStateHandleWithState(
-                    state = stateWithName,
-                    vaultAddEditType = VaultAddEditType.AddItem(),
-                    vaultItemCipherType = VaultItemCipherType.LOGIN,
-                ),
-            )
-
-            coEvery {
-                vaultRepository.createCipherInOrganization(any(), any())
-            } returns CreateCipherResult.Error(errorMessage = null, error = Throwable("Oh dang"))
-            viewModel.trySendAction(VaultAddEditAction.Common.SaveClick)
-
-            assertEquals(
-                stateWithName.copy(
-                    dialog = VaultAddEditState.DialogState.Generic(
-                        title = BitwardenString.internet_connection_required_title.asText(),
-                        message = BitwardenString.internet_connection_required_message.asText(),
-                    ),
-                ),
-                viewModel.stateFlow.value,
-            )
         }
 
     @Test
@@ -6473,7 +6434,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
             resourceManager = bitwardenResourceManager,
             clock = clock,
             organizationEventManager = organizationEventManager,
-            networkConnectionManager = networkConnectionManager,
             firstTimeActionManager = firstTimeActionManager,
             environmentRepository = environmentRepository,
             premiumStateManager = premiumStateManager,

@@ -24,9 +24,7 @@ import com.x8bit.bitwarden.data.platform.util.isActive
 import com.x8bit.bitwarden.data.vault.repository.model.VaultData
 import com.x8bit.bitwarden.data.vault.repository.util.toFailureCipherListView
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.VaultItemListingState
-import com.x8bit.bitwarden.ui.vault.feature.util.getCollections
 import com.x8bit.bitwarden.ui.vault.feature.util.getFolders
-import com.x8bit.bitwarden.ui.vault.feature.util.toCollectionDisplayName
 import com.x8bit.bitwarden.ui.vault.feature.util.toFolderDisplayName
 import com.x8bit.bitwarden.ui.vault.feature.util.toLabelIcons
 import com.x8bit.bitwarden.ui.vault.feature.util.toOverflowActions
@@ -50,9 +48,6 @@ fun CipherListView.determineListingPredicate(
             type is CipherListViewType.Card && isActive
         }
 
-        is VaultItemListingState.ItemListingType.Vault.Collection -> {
-            itemListingType.collectionId in this.collectionIds && isActive
-        }
 
         is VaultItemListingState.ItemListingType.Vault.Folder -> {
             folderId == itemListingType.folderId && isActive
@@ -142,27 +137,8 @@ fun VaultData.toViewState(
             ?.let { folderViewList.getFolders(it) }
             .orEmpty()
 
-    val collectionList =
-        (itemListingType as? VaultItemListingState.ItemListingType.Vault.Collection)
-            ?.let { collectionViewList.getCollections(it.collectionId) }
-            .orEmpty()
 
-    // Nested collection counts cannot use the parent-scoped list, since ciphers in a nested
-    // collection are not necessarily in the parent collection.
-    val nestedCollectionCipherViewList = if (collectionList.isEmpty()) {
-        emptyList()
-    } else {
-        decryptCipherListResult
-            .successes
-            .plus(failuresCipherViewList)
-            .filter { it.isActive }
-            .applyRestrictItemTypesPolicy(restrictItemTypesPolicyOrgIds)
-            .toFilteredList(vaultFilterType)
-    }
-
-    return if (folderList.isNotEmpty() || allFilteredCipherViewList.isNotEmpty() ||
-        collectionList.isNotEmpty()
-    ) {
+    return if (folderList.isNotEmpty() || allFilteredCipherViewList.isNotEmpty()) {
         VaultItemListingState.ViewState.Content(
             displayItemList = filteredFailuresCipherViewList
                 .toDisplayItemListDecryptionError(isVfo1FoundationEnabled = isVfo1FoundationEnabled)
@@ -190,14 +166,6 @@ fun VaultData.toViewState(
                         },
                 )
             },
-            displayCollectionList = collectionList.map { collectionView ->
-                VaultItemListingState.CollectionDisplayItem(
-                    id = requireNotNull(collectionView.id),
-                    name = collectionView.name,
-                    count = nestedCollectionCipherViewList
-                        .count { collectionView.id in it.collectionIds },
-                )
-            },
         )
     } else {
         // Use the autofill empty message if necessary, otherwise use normal type-specific message
@@ -216,13 +184,6 @@ fun VaultData.toViewState(
                         BitwardenString.no_items_folder
                     }
 
-                    is VaultItemListingState.ItemListingType.Vault.Collection -> {
-                        if (isVfo1FoundationEnabled) {
-                            BitwardenString.there_are_no_items_in_this_shared_folder
-                        } else {
-                            BitwardenString.no_items_collection
-                        }
-                    }
 
                     VaultItemListingState.ItemListingType.Vault.Trash -> {
                         BitwardenString.no_items_trash
@@ -281,7 +242,6 @@ fun VaultData.toViewState(
                 ?: run {
                     when (itemListingType) {
                         is VaultItemListingState.ItemListingType.Vault.Folder,
-                        is VaultItemListingState.ItemListingType.Vault.Collection,
                         VaultItemListingState.ItemListingType.Vault.Trash,
                         VaultItemListingState.ItemListingType.Vault.Card,
                         VaultItemListingState.ItemListingType.Vault.Identity,
@@ -345,7 +305,6 @@ fun VaultData.toViewState(
                 ?: run {
                     when (itemListingType) {
                         is VaultItemListingState.ItemListingType.Vault.Folder,
-                        is VaultItemListingState.ItemListingType.Vault.Collection,
                         VaultItemListingState.ItemListingType.Vault.Trash,
                         VaultItemListingState.ItemListingType.Vault.Card,
                         VaultItemListingState.ItemListingType.Vault.Identity,
@@ -375,13 +334,6 @@ fun VaultItemListingState.ItemListingType.updateWithAdditionalDataIfNecessary(
 ): VaultItemListingState.ItemListingType =
     when (this) {
         is VaultItemListingState.ItemListingType.Vault.Card -> this
-        is VaultItemListingState.ItemListingType.Vault.Collection -> copy(
-            collectionName = collectionList
-                .find { it.id == collectionId }
-                ?.name
-                ?.toCollectionDisplayName(collectionList)
-                .orEmpty(),
-        )
 
         is VaultItemListingState.ItemListingType.Vault.Folder -> {
             val fullyQualifiedName = folderList

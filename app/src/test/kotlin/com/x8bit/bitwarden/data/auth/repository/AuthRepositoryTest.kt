@@ -47,7 +47,6 @@ import com.bitwarden.network.model.MasterPasswordPolicyOptionsJson
 import com.bitwarden.network.model.MasterPasswordUnlockDataJson
 import com.bitwarden.network.model.OrganizationAutoEnrollStatusResponseJson
 import com.bitwarden.network.model.OrganizationKeysResponseJson
-import com.bitwarden.network.model.OrganizationType
 import com.bitwarden.network.model.PasswordHintResponseJson
 import com.bitwarden.network.model.PreLoginResponseJson
 import com.bitwarden.network.model.PrevalidateSsoResponseJson
@@ -83,18 +82,15 @@ import com.x8bit.bitwarden.data.auth.datasource.disk.model.PendingAuthRequestJso
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.UserStateJson
 import com.x8bit.bitwarden.data.auth.datasource.disk.util.FakeAuthDiskSource
 import com.x8bit.bitwarden.data.auth.datasource.sdk.AuthSdkSource
-import com.x8bit.bitwarden.data.auth.datasource.sdk.util.toKdf
 import com.x8bit.bitwarden.data.auth.datasource.sdk.util.toKdfRequestModel
 import com.x8bit.bitwarden.data.auth.manager.AuthRequestManager
 import com.x8bit.bitwarden.data.auth.manager.AuthStateManager
 import com.x8bit.bitwarden.data.auth.manager.KdfManager
 import com.x8bit.bitwarden.data.auth.manager.KeyConnectorManager
-import com.x8bit.bitwarden.data.auth.manager.OrganizationManager
 import com.x8bit.bitwarden.data.auth.manager.TrustedDeviceManager
 import com.x8bit.bitwarden.data.auth.manager.UserLogoutManager
 import com.x8bit.bitwarden.data.auth.manager.UserStateManager
 import com.x8bit.bitwarden.data.auth.manager.model.AuthRequest
-import com.x8bit.bitwarden.data.auth.manager.model.MigrateExistingUserToKeyConnectorResult
 import com.x8bit.bitwarden.data.auth.manager.model.MigrateNewUserToKeyConnectorResult
 import com.x8bit.bitwarden.data.auth.repository.model.BreachCountResult
 import com.x8bit.bitwarden.data.auth.repository.model.DeleteAccountResult
@@ -109,7 +105,6 @@ import com.x8bit.bitwarden.data.auth.repository.model.PasswordHintResult
 import com.x8bit.bitwarden.data.auth.repository.model.PolicyInformation
 import com.x8bit.bitwarden.data.auth.repository.model.PrevalidateSsoResult
 import com.x8bit.bitwarden.data.auth.repository.model.RegisterResult
-import com.x8bit.bitwarden.data.auth.repository.model.RemovePasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.RequestOtpResult
 import com.x8bit.bitwarden.data.auth.repository.model.ResendEmailResult
 import com.x8bit.bitwarden.data.auth.repository.model.ResetPasswordResult
@@ -121,7 +116,6 @@ import com.x8bit.bitwarden.data.auth.repository.model.ValidatePasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePinResult
 import com.x8bit.bitwarden.data.auth.repository.model.VerifiedOrganizationDomainSsoDetailsResult
 import com.x8bit.bitwarden.data.auth.repository.model.VerifyOtpResult
-import com.x8bit.bitwarden.data.auth.repository.model.createMockOrganization
 import com.x8bit.bitwarden.data.auth.repository.model.createMockWrappedAccountCryptographicState
 import com.x8bit.bitwarden.data.auth.repository.util.CookieCallbackResult
 import com.x8bit.bitwarden.data.auth.repository.util.DuoCallbackTokenResult
@@ -289,7 +283,6 @@ class AuthRepositoryTest {
         every { getFeatureFlag(FlagKey.SdkPreLogin) } returns true
     }
     private val authStateManager: AuthStateManager = mockk()
-    private val organizationManager: OrganizationManager = mockk()
 
     private val repository: AuthRepository = AuthRepositoryImpl(
         clock = FIXED_CLOCK,
@@ -319,7 +312,6 @@ class AuthRepositoryTest {
         kdfManager = kdfManager,
         toastManager = toastManager,
         featureFlagManager = featureFlagManager,
-        organizationManager = organizationManager,
         authStateManager = authStateManager,
     )
 
@@ -5029,206 +5021,6 @@ class AuthRepositoryTest {
         )
         assertEquals(RegisterResult.Success, result)
     }
-
-    @Test
-    fun `removePassword with no active account should return error`() = runTest {
-        fakeAuthDiskSource.userState = null
-
-        val result = repository.removePassword(masterPassword = PASSWORD)
-
-        assertEquals(RemovePasswordResult.Error(error = NoActiveUserException()), result)
-    }
-
-    @Test
-    fun `removePassword with no userDecryptionOptions should return error`() = runTest {
-        fakeAuthDiskSource.userState = SINGLE_USER_STATE_1.copy(
-            accounts = mapOf(
-                USER_ID_1 to ACCOUNT_1.copy(
-                    profile = PROFILE_1.copy(userDecryptionOptions = null),
-                ),
-            ),
-        )
-
-        val result = repository.removePassword(masterPassword = PASSWORD)
-
-        assertEquals(
-            RemovePasswordResult.Error(error = MissingPropertyException("Master Password Unlock")),
-            result,
-        )
-    }
-
-    @Test
-    fun `removePassword with no keyConnectorUrl should return error`() = runTest {
-        fakeAuthDiskSource.userState = SINGLE_USER_STATE_1
-        val organizations = listOf(
-            createMockOrganization(
-                number = 1,
-                shouldUseKeyConnector = true,
-                role = OrganizationType.USER,
-                keyConnectorUrl = null,
-            ),
-        )
-        every { organizationManager.organizations } returns organizations
-
-        val result = repository.removePassword(masterPassword = PASSWORD)
-
-        assertEquals(
-            RemovePasswordResult.Error(error = MissingPropertyException("Key Connector URL")),
-            result,
-        )
-    }
-
-    @Test
-    fun `removePassword with migrateExistingUserToKeyConnector exception should return error`() =
-        runTest {
-            fakeAuthDiskSource.userState = SINGLE_USER_STATE_1
-            val url = "www.example.com"
-            val error = Throwable("Fail!")
-            val organizations = listOf(
-                createMockOrganization(
-                    number = 1,
-                    shouldUseKeyConnector = true,
-                    role = OrganizationType.USER,
-                    keyConnectorUrl = url,
-                ),
-            )
-            val masterPasswordUnlock = PROFILE_1.userDecryptionOptions?.masterPasswordUnlock!!
-            every { organizationManager.organizations } returns organizations
-            coEvery {
-                keyConnectorManager.migrateExistingUserToKeyConnector(
-                    userId = USER_ID_1,
-                    url = url,
-                    userKeyEncrypted = masterPasswordUnlock.masterKeyWrappedUserKey,
-                    salt = masterPasswordUnlock.salt,
-                    masterPassword = PASSWORD,
-                    kdf = masterPasswordUnlock.kdf.toKdf(),
-                )
-            } returns error.asFailure()
-
-            val result = repository.removePassword(masterPassword = PASSWORD)
-
-            assertEquals(RemovePasswordResult.Error(error = error), result)
-        }
-
-    @Test
-    fun `removePassword with migrateExistingUserToKeyConnector error should return error`() =
-        runTest {
-            fakeAuthDiskSource.userState = SINGLE_USER_STATE_1
-            val url = "www.example.com"
-            val error = Throwable("Fail!")
-            val expectedResult = MigrateExistingUserToKeyConnectorResult.Error(error)
-            val organizations = listOf(
-                createMockOrganization(
-                    number = 1,
-                    shouldUseKeyConnector = true,
-                    role = OrganizationType.USER,
-                    keyConnectorUrl = url,
-                ),
-            )
-            val masterPasswordUnlock = PROFILE_1.userDecryptionOptions?.masterPasswordUnlock!!
-            every { organizationManager.organizations } returns organizations
-            coEvery {
-                keyConnectorManager.migrateExistingUserToKeyConnector(
-                    userId = USER_ID_1,
-                    url = url,
-                    userKeyEncrypted = masterPasswordUnlock.masterKeyWrappedUserKey,
-                    salt = masterPasswordUnlock.salt,
-                    masterPassword = PASSWORD,
-                    kdf = masterPasswordUnlock.kdf.toKdf(),
-                )
-            } returns expectedResult.asSuccess()
-
-            val result = repository.removePassword(masterPassword = PASSWORD)
-
-            assertEquals(
-                RemovePasswordResult.Error(error = error),
-                result,
-            )
-        }
-
-    @Test
-    @Suppress("MaxLineLength")
-    fun `removePassword with migrateExistingUserToKeyConnector wrong password error should return WrongPasswordError error`() =
-        runTest {
-            fakeAuthDiskSource.userState = SINGLE_USER_STATE_1
-            val url = "www.example.com"
-            val expectedResult = MigrateExistingUserToKeyConnectorResult.WrongPasswordError
-            val organizations = listOf(
-                createMockOrganization(
-                    number = 1,
-                    shouldUseKeyConnector = true,
-                    role = OrganizationType.USER,
-                    keyConnectorUrl = url,
-                ),
-            )
-            val masterPasswordUnlock = PROFILE_1.userDecryptionOptions?.masterPasswordUnlock!!
-            every { organizationManager.organizations } returns organizations
-            coEvery {
-                keyConnectorManager.migrateExistingUserToKeyConnector(
-                    userId = USER_ID_1,
-                    url = url,
-                    userKeyEncrypted = masterPasswordUnlock.masterKeyWrappedUserKey,
-                    salt = masterPasswordUnlock.salt,
-                    masterPassword = PASSWORD,
-                    kdf = masterPasswordUnlock.kdf.toKdf(),
-                )
-            } returns expectedResult.asSuccess()
-
-            val result = repository.removePassword(masterPassword = PASSWORD)
-
-            assertEquals(
-                RemovePasswordResult.WrongPasswordError,
-                result,
-            )
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `removePassword with migrateExistingUserToKeyConnector success should sync and return success`() =
-        runTest {
-            fakeAuthDiskSource.userState = SINGLE_USER_STATE_1
-            val masterPasswordUnlock = PROFILE_1.userDecryptionOptions?.masterPasswordUnlock!!
-            val url = "www.example.com"
-            val organizations = listOf(
-                createMockOrganization(
-                    number = 1,
-                    shouldUseKeyConnector = true,
-                    role = OrganizationType.USER,
-                    keyConnectorUrl = url,
-                ),
-            )
-            every { organizationManager.organizations } returns organizations
-            coEvery {
-                keyConnectorManager.migrateExistingUserToKeyConnector(
-                    userId = USER_ID_1,
-                    url = url,
-                    userKeyEncrypted = masterPasswordUnlock.masterKeyWrappedUserKey,
-                    salt = masterPasswordUnlock.salt,
-                    masterPassword = PASSWORD,
-                    kdf = masterPasswordUnlock.kdf.toKdf(),
-                )
-            } returns MigrateExistingUserToKeyConnectorResult.Success.asSuccess()
-            every {
-                SINGLE_USER_STATE_1.updateMasterPasswordUnlock(
-                    userId = USER_ID_1,
-                    masterPasswordUnlock = null,
-                )
-            } returns SINGLE_USER_STATE_1
-            every { vaultRepository.sync() } just runs
-            every { settingsRepository.setDefaultsIfNecessary(userId = USER_ID_1) } just runs
-
-            val result = repository.removePassword(masterPassword = PASSWORD)
-
-            assertEquals(RemovePasswordResult.Success, result)
-            verify(exactly = 1) {
-                SINGLE_USER_STATE_1.updateMasterPasswordUnlock(
-                    userId = USER_ID_1,
-                    masterPasswordUnlock = null,
-                )
-                vaultRepository.sync()
-                settingsRepository.setDefaultsIfNecessary(userId = USER_ID_1)
-            }
-        }
 
     @Suppress("MaxLineLength")
     @Test

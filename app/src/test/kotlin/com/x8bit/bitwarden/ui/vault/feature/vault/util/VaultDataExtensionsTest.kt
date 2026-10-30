@@ -125,20 +125,20 @@ class VaultDataExtensionsTest {
                         name = "Folder".asText(),
                         itemCount = 0,
                     ),
-                    VaultState.ViewState.FolderItem(
-                        id = null,
-                        name = BitwardenString.folder_none.asText(),
-                        itemCount = 1,
+                ),
+                noFolderItems = listOf(
+                    VaultState.ViewState.VaultItem.Login(
+                        id = "mockId-2",
+                        name = BitwardenString.error_cannot_decrypt.asText(),
+                        startIcon = IconData.Local(iconRes = BitwardenDrawable.ic_globe),
+                        startIconTestTag = "LoginCipherIcon",
+                        extraIconList = mockCipher.toFailureCipherListView().toLabelIcons(),
+                        overflowOptions = persistentListOf(),
+                        shouldShowMasterPasswordReprompt = false,
+                        username = null,
+                        hasDecryptionError = true,
                     ),
                 ),
-                collectionItems = listOf(
-                    VaultState.ViewState.CollectionItem(
-                        id = "mockId-1",
-                        name = "mockName-1",
-                        itemCount = 1,
-                    ),
-                ),
-                noFolderItems = listOf(),
                 trashItemsCount = 0,
                 totpItemsCount = 1,
                 itemTypesCount = CipherType.entries.size,
@@ -195,88 +195,6 @@ class VaultDataExtensionsTest {
                     VaultState.ViewState.FolderItem(
                         id = "mockId-1",
                         name = "mockName-1".asText(),
-                        itemCount = 1,
-                    ),
-                ),
-                collectionItems = listOf(),
-                noFolderItems = listOf(),
-                trashItemsCount = 0,
-                totpItemsCount = 1,
-                itemTypesCount = CipherType.entries.size,
-                sshKeyItemsCount = 0,
-                bankAccountItemsCount = 0,
-                licenseItemsCount = 0,
-                passportItemsCount = 0,
-                archivedItemsCount = 0,
-                archiveSubText = null,
-                archiveEndIcon = null,
-                showCardGroup = true,
-                showBankAccountGroup = false,
-                showLicenseGroup = false,
-                showPassportGroup = false,
-            ),
-            actual,
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `toViewState for OrganizationVault should transform full VaultData into ViewState Content with filtering of non-organization data`() {
-        val vaultData = VaultData(
-            decryptCipherListResult = createMockDecryptCipherListResult(
-                number = 1,
-                successes = listOf(
-                    createMockCipherListView(number = 1),
-                    createMockCipherListView(number = 2),
-                ),
-            ),
-            collectionViewList = listOf(
-                createMockCollectionView(number = 1),
-                createMockCollectionView(number = 2),
-            ),
-            folderViewList = listOf(
-                createMockFolderView(number = 1),
-                createMockFolderView(number = 3),
-            ),
-        )
-
-        val actual = vaultData.toViewState(
-            isPremium = true,
-            isIconLoadingDisabled = false,
-            baseIconUrl = Environment.Prod.Us.baseIconUrl,
-            vaultFilterType = VaultFilterType.OrganizationVault(
-                organizationId = "mockOrganizationId-1",
-                organizationName = "Mock Organization 1",
-            ),
-            hasMasterPassword = true,
-            restrictItemTypesPolicyOrgIds = emptyList(),
-            validTotpIds = setOf("mockId-1", "mockId-2"),
-            isNewItemTypesEnabled = false,
-        )
-
-        assertEquals(
-            VaultState.ViewState.Content(
-                loginItemsCount = 1,
-                cardItemsCount = 0,
-                identityItemsCount = 0,
-                secureNoteItemsCount = 0,
-                favoriteItems = listOf(),
-                folderItems = listOf(
-                    VaultState.ViewState.FolderItem(
-                        id = "mockId-1",
-                        name = "mockName-1".asText(),
-                        itemCount = 1,
-                    ),
-                    VaultState.ViewState.FolderItem(
-                        id = null,
-                        name = BitwardenString.folder_none.asText(),
-                        itemCount = 0,
-                    ),
-                ),
-                collectionItems = listOf(
-                    VaultState.ViewState.CollectionItem(
-                        id = "mockId-1",
-                        name = "mockName-1",
                         itemCount = 1,
                     ),
                 ),
@@ -387,7 +305,6 @@ class VaultDataExtensionsTest {
                 secureNoteItemsCount = 0,
                 favoriteItems = listOf(),
                 folderItems = listOf(),
-                collectionItems = listOf(),
                 noFolderItems = listOf(),
                 trashItemsCount = 0,
                 totpItemsCount = 1,
@@ -439,7 +356,6 @@ class VaultDataExtensionsTest {
                 secureNoteItemsCount = 0,
                 favoriteItems = listOf(),
                 folderItems = listOf(),
-                collectionItems = listOf(),
                 noFolderItems = listOf(),
                 trashItemsCount = 0,
                 totpItemsCount = 0,
@@ -493,7 +409,6 @@ class VaultDataExtensionsTest {
                 secureNoteItemsCount = 0,
                 favoriteItems = listOf(),
                 folderItems = listOf(),
-                collectionItems = listOf(),
                 noFolderItems = listOf(),
                 trashItemsCount = 0,
                 totpItemsCount = 1,
@@ -547,7 +462,6 @@ class VaultDataExtensionsTest {
                 secureNoteItemsCount = 0,
                 favoriteItems = listOf(),
                 folderItems = listOf(),
-                collectionItems = listOf(),
                 noFolderItems = listOf(),
                 trashItemsCount = 0,
                 totpItemsCount = 1,
@@ -785,7 +699,6 @@ class VaultDataExtensionsTest {
                 secureNoteItemsCount = 0,
                 favoriteItems = listOf(),
                 folderItems = listOf(),
-                collectionItems = listOf(),
                 noFolderItems = listOf(),
                 trashItemsCount = 2,
                 totpItemsCount = 1,
@@ -839,7 +752,6 @@ class VaultDataExtensionsTest {
                 secureNoteItemsCount = 0,
                 favoriteItems = listOf(),
                 folderItems = listOf(),
-                collectionItems = listOf(),
                 noFolderItems = listOf(),
                 trashItemsCount = 2,
                 totpItemsCount = 0,
@@ -902,7 +814,6 @@ class VaultDataExtensionsTest {
                         itemCount = 100,
                     ),
                 ),
-                collectionItems = listOf(),
                 noFolderItems = listOf(),
                 trashItemsCount = 0,
                 totpItemsCount = 100,
@@ -960,7 +871,6 @@ class VaultDataExtensionsTest {
                 secureNoteItemsCount = 0,
                 favoriteItems = listOf(),
                 folderItems = listOf(),
-                collectionItems = listOf(),
                 noFolderItems = listOf(
                     VaultState.ViewState.VaultItem.Login(
                         id = "mockId-1",
@@ -1041,18 +951,6 @@ class VaultDataExtensionsTest {
                 identityItemsCount = 0,
                 secureNoteItemsCount = 0,
                 favoriteItems = listOf(),
-                collectionItems = listOf(
-                    VaultState.ViewState.CollectionItem(
-                        id = "mockId-1",
-                        name = "test",
-                        itemCount = 1,
-                    ),
-                    VaultState.ViewState.CollectionItem(
-                        id = "mockId-5",
-                        name = "Collection",
-                        itemCount = 0,
-                    ),
-                ),
                 folderItems = listOf(
                     VaultState.ViewState.FolderItem(
                         id = "1",
@@ -1067,11 +965,6 @@ class VaultDataExtensionsTest {
                     VaultState.ViewState.FolderItem(
                         id = "5",
                         name = "Folder".asText(),
-                        itemCount = 0,
-                    ),
-                    VaultState.ViewState.FolderItem(
-                        id = null,
-                        name = BitwardenString.folder_none.asText(),
                         itemCount = 0,
                     ),
                 ),
@@ -1149,7 +1042,6 @@ class VaultDataExtensionsTest {
                 licenseItemsCount = 0,
                 passportItemsCount = 0,
                 favoriteItems = listOf(),
-                collectionItems = listOf(),
                 folderItems = listOf(),
                 noFolderItems = listOf(),
                 trashItemsCount = 0,
@@ -1217,7 +1109,6 @@ class VaultDataExtensionsTest {
                 licenseItemsCount = 0,
                 passportItemsCount = 0,
                 favoriteItems = listOf(),
-                collectionItems = listOf(),
                 folderItems = listOf(),
                 noFolderItems = listOf(),
                 trashItemsCount = 0,
@@ -1272,7 +1163,6 @@ class VaultDataExtensionsTest {
                 licenseItemsCount = 0,
                 passportItemsCount = 0,
                 favoriteItems = listOf(),
-                collectionItems = listOf(),
                 folderItems = listOf(),
                 noFolderItems = listOf(),
                 trashItemsCount = 0,
@@ -1342,7 +1232,6 @@ class VaultDataExtensionsTest {
                 licenseItemsCount = 0,
                 passportItemsCount = 0,
                 favoriteItems = listOf(createMockSshKeyVaultItem(number = 1)),
-                collectionItems = listOf(),
                 folderItems = listOf(),
                 noFolderItems = listOf(
                     createMockSshKeyVaultItem(number = 1),
@@ -1431,7 +1320,6 @@ class VaultDataExtensionsTest {
                 licenseItemsCount = 0,
                 passportItemsCount = 0,
                 favoriteItems = listOf(createMockBankAccountVaultItem(number = 1)),
-                collectionItems = listOf(),
                 folderItems = listOf(),
                 noFolderItems = listOf(
                     createMockBankAccountVaultItem(number = 1),
@@ -1505,7 +1393,6 @@ class VaultDataExtensionsTest {
                 licenseItemsCount = 3,
                 passportItemsCount = 0,
                 favoriteItems = listOf(createMockLicenseVaultItem(number = 1)),
-                collectionItems = listOf(),
                 folderItems = listOf(),
                 noFolderItems = listOf(
                     createMockLicenseVaultItem(number = 1),
@@ -1579,7 +1466,6 @@ class VaultDataExtensionsTest {
                 licenseItemsCount = 0,
                 passportItemsCount = 3,
                 favoriteItems = listOf(createMockPassportVaultItem(number = 1)),
-                collectionItems = listOf(),
                 folderItems = listOf(),
                 noFolderItems = listOf(
                     createMockPassportVaultItem(number = 1),

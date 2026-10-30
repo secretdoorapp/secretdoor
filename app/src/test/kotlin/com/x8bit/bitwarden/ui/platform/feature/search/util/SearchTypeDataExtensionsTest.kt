@@ -1,7 +1,6 @@
 package com.x8bit.bitwarden.ui.platform.feature.search.util
 
 import android.net.Uri
-import com.bitwarden.collections.CollectionView
 import com.bitwarden.core.data.util.toFormattedDateTimeStyle
 import com.bitwarden.ui.platform.resource.BitwardenDrawable
 import com.bitwarden.ui.platform.resource.BitwardenString
@@ -45,31 +44,6 @@ class SearchTypeDataExtensionsTest {
     @Test
     fun tearDown() {
         unmockkStatic(Uri::parse)
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `updateWithAdditionalDataIfNecessary should update the collection name when searchTypeData is a vault collection`() {
-        val collectionId = "collectionId"
-        val collectionName = "collectionName"
-        val searchTypeData = SearchTypeData.Vault.Collection(
-            collectionId = collectionId,
-            collectionName = "",
-        )
-        val collectionView = mockk<CollectionView> {
-            every { id } returns collectionId
-            every { name } returns collectionName
-        }
-        assertEquals(
-            SearchTypeData.Vault.Collection(
-                collectionId = collectionId,
-                collectionName = collectionName,
-            ),
-            searchTypeData.updateWithAdditionalDataIfNecessary(
-                folderList = emptyList(),
-                collectionList = listOf(collectionView),
-            ),
-        )
     }
 
     @Suppress("MaxLineLength")

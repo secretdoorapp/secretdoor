@@ -35,7 +35,6 @@ import com.bitwarden.ui.util.assertLockOrLogoutDialogIsDisplayed
 import com.bitwarden.ui.util.assertLogoutConfirmationDialogIsDisplayed
 import com.bitwarden.ui.util.assertNoDialogExists
 import com.bitwarden.ui.util.assertRemovalConfirmationDialogIsDisplayed
-import com.bitwarden.ui.util.assertScrollableNodeDoesNotExist
 import com.bitwarden.ui.util.assertSwitcherIsDisplayed
 import com.bitwarden.ui.util.assertSwitcherIsNotDisplayed
 import com.bitwarden.ui.util.onNodeWithTextAfterScroll
@@ -151,7 +150,6 @@ class VaultScreenTest : BitwardenComposeTest() {
     fun `vault filter should update according to state`() {
         composeTestRule.onNodeWithText("Vault: All").assertDoesNotExist()
         composeTestRule.onNodeWithText("Vault: My vault").assertDoesNotExist()
-        composeTestRule.onNodeWithText("Vault: Test Organization").assertDoesNotExist()
 
         mutableStateFlow.update {
             it.copy(
@@ -162,22 +160,6 @@ class VaultScreenTest : BitwardenComposeTest() {
 
         composeTestRule.onNodeWithText("Vault: All").assertIsDisplayed()
         composeTestRule.onNodeWithText("Vault: My vault").assertDoesNotExist()
-        composeTestRule.onNodeWithText("Vault: Test Organization").assertDoesNotExist()
-
-        mutableStateFlow.update {
-            it.copy(
-                vaultFilterData = VAULT_FILTER_DATA.copy(
-                    vaultFilterTypes = listOf(
-                        VaultFilterType.AllVaults,
-                        ORGANIZATION_VAULT_FILTER,
-                    ),
-                ),
-            )
-        }
-
-        composeTestRule.onNodeWithText("Vault: All").assertDoesNotExist()
-        composeTestRule.onNodeWithText("Vault: My vault").assertDoesNotExist()
-        composeTestRule.onNodeWithText("Vault: Test Organization").assertDoesNotExist()
 
         mutableStateFlow.update {
             it.copy(
@@ -189,19 +171,6 @@ class VaultScreenTest : BitwardenComposeTest() {
 
         composeTestRule.onNodeWithText("Vault: All").assertDoesNotExist()
         composeTestRule.onNodeWithText("Vault: My vault").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Vault: Test Organization").assertDoesNotExist()
-
-        mutableStateFlow.update {
-            it.copy(
-                vaultFilterData = VAULT_FILTER_DATA.copy(
-                    selectedVaultFilterType = ORGANIZATION_VAULT_FILTER,
-                ),
-            )
-        }
-
-        composeTestRule.onNodeWithText("Vault: All").assertDoesNotExist()
-        composeTestRule.onNodeWithText("Vault: My vault").assertDoesNotExist()
-        composeTestRule.onNodeWithText("Vault: Test Organization").assertIsDisplayed()
     }
 
     @Test
@@ -224,10 +193,6 @@ class VaultScreenTest : BitwardenComposeTest() {
             .assertIsDisplayed()
         composeTestRule
             .onAllNodesWithText("My vault")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .assertIsDisplayed()
-        composeTestRule
-            .onAllNodesWithText("Test Organization")
             .filterToOne(hasAnyAncestor(isDialog()))
             .assertIsDisplayed()
         composeTestRule
@@ -1075,7 +1040,6 @@ class VaultScreenTest : BitwardenComposeTest() {
                     favoriteItems = emptyList(),
                     folderItems = emptyList(),
                     noFolderItems = emptyList(),
-                    collectionItems = emptyList(),
                     trashItemsCount = 0,
                     archivedItemsCount = 0,
                     archiveSubText = null,
@@ -1313,13 +1277,6 @@ class VaultScreenTest : BitwardenComposeTest() {
                     noFolderItems = listOf(
                         vaultItem.copy(id = "67890", name = "No Folder Item".asText()),
                     ),
-                    collectionItems = listOf(
-                        VaultState.ViewState.CollectionItem(
-                            id = "12345",
-                            name = "Test Collection",
-                            itemCount = 1,
-                        ),
-                    ),
                 ),
             )
         }
@@ -1329,7 +1286,6 @@ class VaultScreenTest : BitwardenComposeTest() {
             "Login",
             "Test Folder",
             "No Folder Item",
-            "Test Collection",
             "Archive",
             "Trash",
         )
@@ -1347,7 +1303,6 @@ class VaultScreenTest : BitwardenComposeTest() {
             "TYPES",
             "MY FOLDERS",
             "NO FOLDER",
-            "SHARED FOLDERS",
             "HIDDEN ITEMS",
         ).forEach { header ->
             composeTestRule.onNodeWithTextAfterScroll(text = header).assertIsDisplayed()
@@ -1935,65 +1890,6 @@ class VaultScreenTest : BitwardenComposeTest() {
             viewModel.trySendAction(
                 VaultAction.DismissActionCardClick(VaultState.ActionCardState.UpgradedToPremium),
             )
-        }
-    }
-
-    @Test
-    fun `collection data should update according to the state`() {
-        val collectionsHeader = "SHARED FOLDERS"
-        val collectionName = "Test Collection"
-        val collectionCount = 3
-        val collectionItem = VaultState.ViewState.CollectionItem(
-            id = "12345",
-            name = collectionName,
-            itemCount = collectionCount,
-        )
-
-        composeTestRule.assertScrollableNodeDoesNotExist(collectionsHeader, substring = true)
-        composeTestRule.assertScrollableNodeDoesNotExist(collectionName, substring = true)
-
-        mutableStateFlow.update {
-            it.copy(
-                viewState = DEFAULT_CONTENT_VIEW_STATE.copy(
-                    collectionItems = listOf(collectionItem),
-                ),
-            )
-        }
-
-        composeTestRule
-            .onNodeWithTextAfterScroll(collectionsHeader, substring = true)
-            .assertTextEquals(collectionsHeader, "1")
-            .assertIsDisplayed()
-        composeTestRule
-            .onNodeWithTextAfterScroll(collectionName)
-            .assertTextEquals(collectionName, collectionCount.toString())
-    }
-
-    @Test
-    fun `clicking a collection item should send CollectionClick with the correct item`() {
-        val collectionName = "Test Collection"
-        val collectionCount = 3
-        val collectionItem = VaultState.ViewState.CollectionItem(
-            id = "12345",
-            name = collectionName,
-            itemCount = collectionCount,
-        )
-
-        mutableStateFlow.update {
-            it.copy(
-                viewState = DEFAULT_CONTENT_VIEW_STATE.copy(
-                    collectionItems = listOf(collectionItem),
-                ),
-            )
-        }
-
-        composeTestRule.onNode(hasScrollToNodeAction()).performScrollToNode(hasText(collectionName))
-        composeTestRule
-            .onNodeWithText(collectionName)
-            .assertTextEquals(collectionName, collectionCount.toString())
-            .performClick()
-        verify {
-            viewModel.trySendAction(VaultAction.CollectionClick(collectionItem))
         }
     }
 
@@ -3043,17 +2939,11 @@ private val LOCKED_ACCOUNT_SUMMARY = AccountSummary(
     isVaultUnlocked = false,
 )
 
-private val ORGANIZATION_VAULT_FILTER = VaultFilterType.OrganizationVault(
-    organizationId = "testOrganizationId",
-    organizationName = "Test Organization",
-)
-
 private val VAULT_FILTER_DATA = VaultFilterData(
     selectedVaultFilterType = VaultFilterType.AllVaults,
     vaultFilterTypes = listOf(
         VaultFilterType.AllVaults,
         VaultFilterType.MyVault,
-        ORGANIZATION_VAULT_FILTER,
     ),
 )
 
@@ -3090,7 +2980,6 @@ private val DEFAULT_CONTENT_VIEW_STATE: VaultState.ViewState.Content = VaultStat
     favoriteItems = emptyList(),
     folderItems = emptyList(),
     noFolderItems = emptyList(),
-    collectionItems = emptyList(),
     trashItemsCount = 0,
     totpItemsCount = 0,
     itemTypesCount = 4,

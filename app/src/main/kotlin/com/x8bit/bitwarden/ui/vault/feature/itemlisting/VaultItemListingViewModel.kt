@@ -301,7 +301,6 @@ class VaultItemListingViewModel @Inject constructor(
 
             is VaultItemListingsAction.BackClick -> handleBackClick()
             is VaultItemListingsAction.FolderClick -> handleFolderClick(action)
-            is VaultItemListingsAction.CollectionClick -> handleCollectionClick(action)
             is VaultItemListingsAction.LockClick -> handleLockClick()
             is VaultItemListingsAction.SyncClick -> handleSyncClick()
             is VaultItemListingsAction.SearchIconClick -> handleSearchIconClick()
@@ -372,9 +371,6 @@ class VaultItemListingViewModel @Inject constructor(
         authRepository.switchAccount(userId = action.accountSummary.userId)
     }
 
-    private fun handleCollectionClick(action: VaultItemListingsAction.CollectionClick) {
-        sendEvent(VaultItemListingEvent.NavigateToCollectionItem(action.id))
-    }
 
     private fun handleFolderClick(action: VaultItemListingsAction.FolderClick) {
         sendEvent(VaultItemListingEvent.NavigateToFolderItem(action.id))
@@ -641,8 +637,6 @@ class VaultItemListingViewModel @Inject constructor(
         action: VaultItemListingsAction.ItemTypeToAddSelected,
     ) {
         val listingType = state.itemListingType
-        val collectionId = (listingType as? VaultItemListingState.ItemListingType.Vault.Collection)
-            ?.collectionId
         val folderId = (listingType as? VaultItemListingState.ItemListingType.Vault.Folder)
             ?.folderId
         when (val vaultItemType = action.itemType) {
@@ -661,7 +655,6 @@ class VaultItemListingViewModel @Inject constructor(
                         sendEvent(
                             VaultItemListingEvent.NavigateToAddVaultItem(
                                 vaultItemCipherType = it,
-                                selectedCollectionId = collectionId,
                                 selectedFolderId = folderId,
                             ),
                         )
@@ -804,15 +797,6 @@ class VaultItemListingViewModel @Inject constructor(
 
     private fun handleAddVaultItemClick() {
         when (val itemListingType = state.itemListingType) {
-            is VaultItemListingState.ItemListingType.Vault.Collection -> {
-                mutableStateFlow.update {
-                    it.copy(
-                        dialogState = VaultItemListingState.DialogState.VaultItemTypeSelection(
-                            excludedOptions = createVaultItemTypeSelectionExcludedOptions(),
-                        ),
-                    )
-                }
-            }
 
             is VaultItemListingState.ItemListingType.Vault.Folder -> {
                 mutableStateFlow.update {
@@ -2778,7 +2762,6 @@ data class VaultItemListingState(
             }
 
             ItemListingType.Vault.Card,
-            is ItemListingType.Vault.Collection,
             is ItemListingType.Vault.Folder,
             ItemListingType.Vault.Identity,
             ItemListingType.Vault.Login,
@@ -3067,12 +3050,10 @@ data class VaultItemListingState(
          *
          * @property displayItemList List of items to display.
          * @property displayFolderList list of folders to display.
-         * @property displayCollectionList list of collections to display.
          */
         data class Content(
             val displayItemList: List<DisplayItem>,
             val displayFolderList: List<FolderDisplayItem>,
-            val displayCollectionList: List<CollectionDisplayItem>,
         ) : ViewState() {
             override val isPullToRefreshEnabled: Boolean get() = true
         }
@@ -3158,18 +3139,6 @@ data class VaultItemListingState(
         val count: Int,
     )
 
-    /**
-     * The collection that is displayed to the user on the ItemListingScreen.
-     *
-     * @property id the id of the collection.
-     * @property name the name of the collection.
-     * @property count the amount of ciphers in the collection.
-     */
-    data class CollectionDisplayItem(
-        val id: String,
-        val name: String,
-        val count: Int,
-    )
 
     /**
      * Represents different types of item listing.
@@ -3290,20 +3259,6 @@ data class VaultItemListingState(
                 override val hasFab: Boolean get() = true
             }
 
-            /**
-             * A Collection item listing.
-             *
-             * @property collectionId the ID of the collection.
-             * @property collectionName the name of the collection.
-             */
-            data class Collection(
-                val collectionId: String,
-                // The collectionName will always initially be an empty string
-                val collectionName: String = "",
-            ) : Vault() {
-                override val titleText: Text get() = collectionName.asText()
-                override val hasFab: Boolean get() = true
-            }
         }
 
     }
@@ -3339,10 +3294,6 @@ sealed class VaultItemListingEvent {
         val parentFolderName: String,
     ) : VaultItemListingEvent()
 
-    /**
-     * Navigates to the collection.
-     */
-    data class NavigateToCollectionItem(val collectionId: String) : VaultItemListingEvent()
 
     /**
      * Navigates to the folder.
@@ -3607,12 +3558,6 @@ sealed class VaultItemListingsAction {
         val type: VaultItemListingState.DisplayItem.ItemType,
     ) : VaultItemListingsAction()
 
-    /**
-     * Click on the collection.
-     *
-     * @property id the id of the collection that has been clicked
-     */
-    data class CollectionClick(val id: String) : VaultItemListingsAction()
 
     /**
      * Click on the folder.

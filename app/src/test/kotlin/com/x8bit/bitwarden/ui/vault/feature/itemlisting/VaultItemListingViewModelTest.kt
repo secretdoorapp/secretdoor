@@ -1303,7 +1303,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
             } returns ValidatePasswordResult.Error(error = error)
             val initialState = createVaultItemListingState(
                 viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
                     displayItemList = listOf(
                         createMockDisplayItemForCipher(
                             number = 1,
@@ -1360,7 +1359,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
             )
             val initialState = createVaultItemListingState(
                 viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
                     displayItemList = listOf(
                         createMockDisplayItemForCipher(
                             number = 1,
@@ -1603,33 +1601,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
         )
     }
 
-    @Test
-    fun `AddVaultItemClick inside a collection should show item selection dialog state`() {
-        val viewModel = createVaultItemListingViewModel(
-            savedStateHandle = createSavedStateHandleWithVaultItemListingType(
-                vaultItemListingType = VaultItemListingType.Collection(collectionId = "id"),
-            ),
-        )
-        viewModel.trySendAction(VaultItemListingsAction.AddVaultItemClick)
-        assertEquals(
-            createVaultItemListingState(
-                itemListingType = VaultItemListingState.ItemListingType.Vault.Collection(
-                    collectionId = "id",
-                ),
-                dialogState = VaultItemListingState.DialogState.VaultItemTypeSelection(
-                    excludedOptions = persistentListOf(
-                        CreateVaultItemType.FOLDER,
-                        CreateVaultItemType.SSH_KEY,
-                        CreateVaultItemType.BANK_ACCOUNT,
-                        CreateVaultItemType.LICENSE,
-                        CreateVaultItemType.PASSPORT,
-                    ),
-                ),
-            ),
-            viewModel.stateFlow.value,
-        )
-    }
-
     @Suppress("MaxLineLength")
     @Test
     fun `AddVaultItemClick inside a folder should hide card item selection dialog state when RESTRICT_ITEM_TYPES policy is enabled`() =
@@ -1654,46 +1625,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 createVaultItemListingState(
                     itemListingType = VaultItemListingState.ItemListingType.Vault.Folder(
                         folderId = "id",
-                    ),
-                    dialogState = VaultItemListingState.DialogState.VaultItemTypeSelection(
-                        excludedOptions = persistentListOf(
-                            CreateVaultItemType.CARD,
-                            CreateVaultItemType.FOLDER,
-                            CreateVaultItemType.SSH_KEY,
-                            CreateVaultItemType.BANK_ACCOUNT,
-                            CreateVaultItemType.LICENSE,
-                            CreateVaultItemType.PASSPORT,
-                        ),
-                    ),
-                ).copy(restrictItemTypesPolicyOrgIds = persistentListOf("Test Organization")),
-                viewModel.stateFlow.value,
-            )
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `AddVaultItemClick inside a collection should hide card item selection dialog state when RESTRICT_ITEM_TYPES policy is enabled`() =
-        runTest {
-            val viewModel = createVaultItemListingViewModel(
-                savedStateHandle = createSavedStateHandleWithVaultItemListingType(
-                    vaultItemListingType = VaultItemListingType.Collection(collectionId = "id"),
-                ),
-            )
-            mutableActivePoliciesFlow.emit(
-                listOf(
-                    createMockSdkPolicy(
-                        organizationId = "Test Organization",
-                        id = "testId",
-                        type = PolicyType.RESTRICTED_ITEM_TYPES,
-                        enabled = true,
-                    ),
-                ),
-            )
-            viewModel.trySendAction(VaultItemListingsAction.AddVaultItemClick)
-            assertEquals(
-                createVaultItemListingState(
-                    itemListingType = VaultItemListingState.ItemListingType.Vault.Collection(
-                        collectionId = "id",
                     ),
                     dialogState = VaultItemListingState.DialogState.VaultItemTypeSelection(
                         excludedOptions = persistentListOf(
@@ -1795,33 +1726,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
         }
     }
 
-    @Suppress("MaxLineLength")
-    @Test
-    fun `ItemTypeToAddSelected sends NavigateToAddVaultItem with the collection ID when viewing a collection`() =
-        runTest {
-            val viewModel = createVaultItemListingViewModel(
-                savedStateHandle = createSavedStateHandleWithVaultItemListingType(
-                    vaultItemListingType = VaultItemListingType.Collection(
-                        collectionId = "mockId-1",
-                    ),
-                ),
-            )
-            viewModel.eventFlow.test {
-                viewModel.trySendAction(
-                    VaultItemListingsAction.ItemTypeToAddSelected(
-                        itemType = CreateVaultItemType.LOGIN,
-                    ),
-                )
-                assertEquals(
-                    VaultItemListingEvent.NavigateToAddVaultItem(
-                        vaultItemCipherType = VaultItemCipherType.LOGIN,
-                        selectedCollectionId = "mockId-1",
-                    ),
-                    awaitItem(),
-                )
-            }
-        }
-
     @Test
     fun `FolderClick for vault item should emit NavigateToFolderItem`() = runTest {
         val viewModel = createVaultItemListingViewModel()
@@ -1830,17 +1734,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
         viewModel.eventFlow.test {
             viewModel.trySendAction(VaultItemListingsAction.FolderClick(testId))
             assertEquals(VaultItemListingEvent.NavigateToFolderItem(testId), awaitItem())
-        }
-    }
-
-    @Test
-    fun `CollectionClick for vault item should emit NavigateToCollectionItem`() = runTest {
-        val viewModel = createVaultItemListingViewModel()
-        val testId = "1"
-
-        viewModel.eventFlow.test {
-            viewModel.trySendAction(VaultItemListingsAction.CollectionClick(testId))
-            assertEquals(VaultItemListingEvent.NavigateToCollectionItem(testId), awaitItem())
         }
     }
 
@@ -2419,7 +2312,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
         assertEquals(
             createVaultItemListingState(
                 viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
                     displayItemList = listOf(
                         createMockDisplayItemForCipher(
                             number = 1,
@@ -2461,7 +2353,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 createVaultItemListingState(
                     isVfo1FoundationEnabled = false,
                     viewState = VaultItemListingState.ViewState.Content(
-                        displayCollectionList = emptyList(),
                         displayItemList = listOf(
                             createMockDisplayItemForCipher(
                                 number = 1,
@@ -2558,7 +2449,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
             assertEquals(
                 createVaultItemListingState(
                     viewState = VaultItemListingState.ViewState.Content(
-                        displayCollectionList = emptyList(),
                         displayItemList = listOf(
                             createMockDisplayItemForCipher(
                                 number = 1,
@@ -2632,7 +2522,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 createVaultItemListingState(
                     itemListingType = VaultItemListingState.ItemListingType.Vault.Identity,
                     viewState = VaultItemListingState.ViewState.Content(
-                        displayCollectionList = emptyList(),
                         displayItemList = listOf(
                             createMockDisplayItemForCipher(
                                 number = 1,
@@ -2693,7 +2582,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
             assertEquals(
                 createVaultItemListingState(
                     viewState = VaultItemListingState.ViewState.Content(
-                        displayCollectionList = emptyList(),
                         displayItemList = listOf(
                             createMockDisplayItemForCipher(
                                 number = 1,
@@ -2768,7 +2656,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
             assertEquals(
                 createVaultItemListingState(
                     viewState = VaultItemListingState.ViewState.Content(
-                        displayCollectionList = emptyList(),
                         displayItemList = listOf(
                             createMockDisplayItemForCipher(
                                 number = 1,
@@ -3108,7 +2995,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
         assertEquals(
             createVaultItemListingState(
                 viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
                     displayItemList = listOf(
                         createMockDisplayItemForCipher(
                             number = 1,
@@ -3227,7 +3113,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
         assertEquals(
             createVaultItemListingState(
                 viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
                     displayItemList = listOf(
                         createMockDisplayItemForCipher(
                             number = 1,
@@ -3351,7 +3236,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
         assertEquals(
             createVaultItemListingState(
                 viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
                     displayItemList = listOf(
                         createMockDisplayItemForCipher(
                             number = 1,

@@ -23,15 +23,6 @@ class SearchTypeExtensionsTest {
     }
 
     @Test
-    fun `toSearchTypeData should return Vault Collection when SearchType is Vault Collection`() {
-        val collectionId = "collectionId"
-        assertEquals(
-            SearchTypeData.Vault.Collection(collectionId),
-            SearchType.Vault.Collection(collectionId).toSearchTypeData(),
-        )
-    }
-
-    @Test
     fun `toSearchTypeData should return Vault Folder when SearchType is Vault Folder`() {
         val folderId = "folderId"
         assertEquals(

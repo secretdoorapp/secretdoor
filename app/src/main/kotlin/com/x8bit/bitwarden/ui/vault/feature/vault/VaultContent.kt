@@ -122,10 +122,6 @@ fun VaultContent(
         new = BitwardenString.my_folders,
         old = BitwardenString.folders,
     )
-    val collectionsLabelRes = vfo1Foundation(
-        new = BitwardenString.shared_folders,
-        old = BitwardenString.collections,
-    )
     LazyColumn(
         modifier = modifier,
     ) {
@@ -178,12 +174,6 @@ fun VaultContent(
             onVaultItemOverflowOptionClick = onVaultItemOverflowOptionClick,
         )
 
-        collectionsSection(
-            state = state,
-            collapsedSections = collapsedSections,
-            vaultHandlers = vaultHandlers,
-            labelRes = collectionsLabelRes,
-        )
 
         hiddenItemsSection(
             state = state,
@@ -533,50 +523,6 @@ private fun LazyListScope.noFolderSection(
                 .animateItem()
                 .fillMaxWidth()
                 .testTag("CipherCell")
-                .standardHorizontalMargin(),
-        )
-    }
-}
-
-/**
- * Adds the collections section to the list.
- */
-private fun LazyListScope.collectionsSection(
-    state: VaultState.ViewState.Content,
-    collapsedSections: ImmutableSet<VaultSection>,
-    vaultHandlers: VaultHandlers,
-    @StringRes labelRes: Int,
-) {
-    if (state.collectionItems.isEmpty()) return
-    expandingSectionHeader(
-        section = VaultSection.COLLECTIONS,
-        labelRes = labelRes,
-        supportingLabel = state.collectionItems.count().toString(),
-        collapsedSections = collapsedSections,
-        onClick = vaultHandlers.sectionHeaderClick,
-    )
-    if (VaultSection.COLLECTIONS in collapsedSections) return
-    itemsIndexed(
-        items = state.collectionItems,
-        key = { _, collection -> "collection_${collection.id}" },
-    ) { index, collection ->
-        BitwardenGroupItem(
-            startIcon = IconData.Local(
-                iconRes = vfo1Foundation(
-                    new = BitwardenDrawable.ic_shared_folder,
-                    old = BitwardenDrawable.ic_collections,
-                ),
-            ),
-            label = collection.name,
-            supportingLabel = collection.itemCount.toString(),
-            onClick = { vaultHandlers.collectionClick(collection) },
-            cardStyle = state
-                .collectionItems
-                .toListItemCardStyle(index = index, dividerPadding = 56.dp),
-            modifier = Modifier
-                .animateItem()
-                .fillMaxWidth()
-                .testTag("CollectionFilter")
                 .standardHorizontalMargin(),
         )
     }

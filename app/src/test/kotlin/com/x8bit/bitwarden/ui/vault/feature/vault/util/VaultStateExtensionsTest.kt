@@ -52,10 +52,6 @@ class VaultStateExtensionsTest {
                 } else {
                     null
                 },
-                VaultFilterType.OrganizationVault(
-                    organizationId = "organizationId-A",
-                    organizationName = "Organization A",
-                ),
             ),
         )
 
@@ -70,13 +66,6 @@ class VaultStateExtensionsTest {
                 VaultState.ViewState.FolderItem(
                     id = "mockId-1",
                     name = "mockName-1".asText(),
-                    itemCount = 1,
-                ),
-            ),
-            collectionItems = listOf(
-                VaultState.ViewState.CollectionItem(
-                    id = "mockId-1",
-                    name = "mockName-1",
                     itemCount = 1,
                 ),
             ),

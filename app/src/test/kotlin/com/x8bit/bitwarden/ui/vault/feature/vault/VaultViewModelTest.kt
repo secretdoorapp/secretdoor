@@ -861,10 +861,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                     vaultFilterTypes = listOf(
                         VaultFilterType.AllVaults,
                         VaultFilterType.MyVault,
-                        VaultFilterType.OrganizationVault(
-                            organizationId = "organiationId",
-                            organizationName = "Test Organization",
-                        ),
                     ),
                 ),
             ),
@@ -947,10 +943,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                     selectedVaultFilterType = VaultFilterType.AllVaults,
                     vaultFilterTypes = listOf(
                         VaultFilterType.AllVaults,
-                        VaultFilterType.OrganizationVault(
-                            organizationId = "organizationId",
-                            organizationName = "Test Organization",
-                        ),
                     ),
                 ),
             ),
@@ -1674,38 +1666,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                             name = "mockName-5".asText(),
                             itemCount = 1,
                         ),
-                        VaultState.ViewState.FolderItem(
-                            id = null,
-                            name = BitwardenString.folder_none.asText(),
-                            itemCount = 0,
-                        ),
-                    ),
-                    collectionItems = listOf(
-                        VaultState.ViewState.CollectionItem(
-                            id = "mockId-1",
-                            name = "mockName-1",
-                            itemCount = 1,
-                        ),
-                        VaultState.ViewState.CollectionItem(
-                            id = "mockId-2",
-                            name = "mockName-2",
-                            itemCount = 1,
-                        ),
-                        VaultState.ViewState.CollectionItem(
-                            id = "mockId-3",
-                            name = "mockName-3",
-                            itemCount = 1,
-                        ),
-                        VaultState.ViewState.CollectionItem(
-                            id = "mockId-4",
-                            name = "mockName-4",
-                            itemCount = 1,
-                        ),
-                        VaultState.ViewState.CollectionItem(
-                            id = "mockId-5",
-                            name = "mockName-5",
-                            itemCount = 1,
-                        ),
                     ),
                     noFolderItems = listOf(),
                     trashItemsCount = 0,
@@ -1741,7 +1701,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                     secureNoteItemsCount = 0,
                     favoriteItems = listOf(),
                     folderItems = listOf(),
-                    collectionItems = listOf(),
                     noFolderItems = listOf(),
                     trashItemsCount = 0,
                     totpItemsCount = 0,
@@ -1869,18 +1828,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                         VaultState.ViewState.FolderItem(
                             id = "mockId-1",
                             name = "mockName-1".asText(),
-                            itemCount = 1,
-                        ),
-                        VaultState.ViewState.FolderItem(
-                            id = null,
-                            name = BitwardenString.folder_none.asText(),
-                            itemCount = 0,
-                        ),
-                    ),
-                    collectionItems = listOf(
-                        VaultState.ViewState.CollectionItem(
-                            id = "mockId-1",
-                            name = "mockName-1",
                             itemCount = 1,
                         ),
                     ),
@@ -2014,18 +1961,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                                 name = "mockName-1".asText(),
                                 itemCount = 1,
                             ),
-                            VaultState.ViewState.FolderItem(
-                                id = null,
-                                name = BitwardenString.folder_none.asText(),
-                                itemCount = 0,
-                            ),
-                        ),
-                        collectionItems = listOf(
-                            VaultState.ViewState.CollectionItem(
-                                id = "mockId-1",
-                                name = "mockName-1",
-                                itemCount = 1,
-                            ),
                         ),
                         noFolderItems = listOf(),
                         trashItemsCount = 0,
@@ -2086,18 +2021,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                             VaultState.ViewState.FolderItem(
                                 id = "mockId-1",
                                 name = "mockName-1".asText(),
-                                itemCount = 1,
-                            ),
-                            VaultState.ViewState.FolderItem(
-                                id = null,
-                                name = BitwardenString.folder_none.asText(),
-                                itemCount = 0,
-                            ),
-                        ),
-                        collectionItems = listOf(
-                            VaultState.ViewState.CollectionItem(
-                                id = "mockId-1",
-                                name = "mockName-1",
                                 itemCount = 1,
                             ),
                         ),
@@ -2205,18 +2128,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                             VaultState.ViewState.FolderItem(
                                 id = "mockId-1",
                                 name = "mockName-1".asText(),
-                                itemCount = 1,
-                            ),
-                            VaultState.ViewState.FolderItem(
-                                id = null,
-                                name = BitwardenString.folder_none.asText(),
-                                itemCount = 0,
-                            ),
-                        ),
-                        collectionItems = listOf(
-                            VaultState.ViewState.CollectionItem(
-                                id = "mockId-1",
-                                name = "mockName-1",
                                 itemCount = 1,
                             ),
                         ),
@@ -2348,7 +2259,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                         secureNoteItemsCount = 0,
                         favoriteItems = listOf(),
                         folderItems = listOf(),
-                        collectionItems = listOf(),
                         noFolderItems = listOf(),
                         trashItemsCount = 0,
                         totpItemsCount = 0,
@@ -2414,24 +2324,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                 viewModel.trySendAction(VaultAction.FolderClick(folder))
                 assertEquals(
                     VaultEvent.NavigateToItemListing(VaultItemListingType.Folder(folderId)),
-                    awaitItem(),
-                )
-            }
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `CollectionClick should emit NavigateToItemListing event with Collection type with the correct collection ID`() =
-        runTest {
-            val viewModel = createViewModel()
-            val collectionId = "12345"
-            val collection = mockk<VaultState.ViewState.CollectionItem> {
-                every { id } returns collectionId
-            }
-            viewModel.eventFlow.test {
-                viewModel.trySendAction(VaultAction.CollectionClick(collection))
-                assertEquals(
-                    VaultEvent.NavigateToItemListing(VaultItemListingType.Collection(collectionId)),
                     awaitItem(),
                 )
             }
@@ -2626,7 +2518,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                         secureNoteItemsCount = 0,
                         favoriteItems = listOf(),
                         folderItems = listOf(),
-                        collectionItems = listOf(),
                         noFolderItems = listOf(),
                         trashItemsCount = 0,
                         totpItemsCount = 0,
@@ -2684,7 +2575,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                     secureNoteItemsCount = 0,
                     favoriteItems = listOf(),
                     folderItems = listOf(),
-                    collectionItems = listOf(),
                     noFolderItems = listOf(),
                     trashItemsCount = 0,
                     totpItemsCount = 0,
@@ -2721,7 +2611,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                     secureNoteItemsCount = 0,
                     favoriteItems = listOf(),
                     folderItems = listOf(),
-                    collectionItems = listOf(),
                     noFolderItems = listOf(),
                     trashItemsCount = 0,
                     totpItemsCount = 0,
@@ -2831,7 +2720,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                         secureNoteItemsCount = 0,
                         favoriteItems = listOf(),
                         folderItems = listOf(),
-                        collectionItems = listOf(),
                         noFolderItems = listOf(),
                         trashItemsCount = 0,
                         totpItemsCount = 0,
@@ -2908,7 +2796,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                         secureNoteItemsCount = 0,
                         favoriteItems = listOf(),
                         folderItems = listOf(),
-                        collectionItems = listOf(),
                         noFolderItems = listOf(),
                         trashItemsCount = 0,
                         totpItemsCount = 0,
@@ -4625,7 +4512,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                         secureNoteItemsCount = 0,
                         favoriteItems = listOf(),
                         folderItems = listOf(),
-                        collectionItems = listOf(),
                         noFolderItems = listOf(),
                         trashItemsCount = 0,
                         totpItemsCount = 0,
@@ -4693,7 +4579,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                         secureNoteItemsCount = 0,
                         favoriteItems = listOf(),
                         folderItems = listOf(),
-                        collectionItems = listOf(),
                         noFolderItems = listOf(),
                         trashItemsCount = 0,
                         totpItemsCount = 0,
@@ -4880,17 +4765,11 @@ class VaultViewModelTest : BaseViewModelTest() {
         )
 }
 
-private val ORGANIZATION_VAULT_FILTER = VaultFilterType.OrganizationVault(
-    organizationId = "testOrganizationId",
-    organizationName = "Test Organization",
-)
-
 private val VAULT_FILTER_DATA = VaultFilterData(
     selectedVaultFilterType = VaultFilterType.AllVaults,
     vaultFilterTypes = listOf(
         VaultFilterType.AllVaults,
         VaultFilterType.MyVault,
-        ORGANIZATION_VAULT_FILTER,
     ),
 )
 
@@ -5043,7 +4922,6 @@ private val DEFAULT_CONTENT_VIEW_STATE = VaultState.ViewState.Content(
     favoriteItems = emptyList(),
     folderItems = emptyList(),
     noFolderItems = emptyList(),
-    collectionItems = emptyList(),
     trashItemsCount = 0,
     archivedItemsCount = null,
     archiveSubText = null,

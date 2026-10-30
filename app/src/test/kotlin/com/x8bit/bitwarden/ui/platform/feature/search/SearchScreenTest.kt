@@ -541,15 +541,6 @@ class SearchScreenTest : BitwardenComposeTest() {
         }
         composeTestRule.onNodeWithText(text = "Search No Folder").assertIsDisplayed()
 
-        mutableStateFlow.update {
-            it.copy(
-                searchType = SearchTypeData.Vault.Collection(
-                    collectionId = "mockId",
-                    collectionName = "mockName",
-                ),
-            )
-        }
-        composeTestRule.onNodeWithText(text = "Search mockName").assertIsDisplayed()
 
         mutableStateFlow.update {
             it.copy(

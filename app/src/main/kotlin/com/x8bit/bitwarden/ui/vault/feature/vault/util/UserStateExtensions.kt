@@ -53,21 +53,12 @@ fun UserState.Account.toVaultFilterData(
     this
         .organizations
         .takeIf { it.isNotEmpty() }
-        ?.let { organizations ->
+        ?.let {
             VaultFilterData(
                 selectedVaultFilterType = VaultFilterType.AllVaults,
                 vaultFilterTypes = listOfNotNull(
                     VaultFilterType.AllVaults,
                     VaultFilterType.MyVault.takeUnless { isIndividualVaultDisabled },
-                    *organizations
-                        .sortedBy { it.name }
-                        .map { organization ->
-                            VaultFilterType.OrganizationVault(
-                                organizationId = organization.id,
-                                organizationName = organization.name,
-                            )
-                        }
-                        .toTypedArray(),
                 ),
             )
         }

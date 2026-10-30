@@ -17,19 +17,15 @@ import com.bitwarden.data.manager.NativeLibraryManager
 import com.bitwarden.data.repository.ServerConfigRepository
 import com.bitwarden.network.BitwardenServiceClient
 import com.bitwarden.network.model.BitwardenServiceClientConfig
-import com.bitwarden.network.service.EventService
 import com.bitwarden.network.service.PushService
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
 import com.x8bit.bitwarden.data.auth.datasource.sdk.AuthSdkSource
 import com.x8bit.bitwarden.data.auth.manager.AddTotpItemFromAuthenticatorManager
-import com.x8bit.bitwarden.data.auth.manager.AuthStateManager
-import com.x8bit.bitwarden.data.auth.manager.OrganizationManager
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilityEnabledManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillEnabledManager
 import com.x8bit.bitwarden.data.autofill.manager.browser.BrowserThirdPartyAutofillEnabledManager
 import com.x8bit.bitwarden.data.platform.datasource.disk.CookieDiskSource
-import com.x8bit.bitwarden.data.platform.datasource.disk.EventDiskSource
 import com.x8bit.bitwarden.data.platform.datasource.disk.PushDiskSource
 import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.data.platform.datasource.disk.legacy.LegacyAppCenterMigrator
@@ -139,25 +135,8 @@ object PlatformManagerModule {
 
     @Provides
     @Singleton
-    fun provideOrganizationEventManager(
-        authStateManager: AuthStateManager,
-        organizationManager: OrganizationManager,
-        vaultRepository: VaultRepository,
-        authDiskSource: AuthDiskSource,
-        clock: Clock,
-        dispatcherManager: DispatcherManager,
-        eventDiskSource: EventDiskSource,
-        eventService: EventService,
-    ): OrganizationEventManager = OrganizationEventManagerImpl(
-        authStateManager = authStateManager,
-        authDiskSource = authDiskSource,
-        organizationManager = organizationManager,
-        vaultRepository = vaultRepository,
-        clock = clock,
-        dispatcherManager = dispatcherManager,
-        eventDiskSource = eventDiskSource,
-        eventService = eventService,
-    )
+    fun provideOrganizationEventManager(): OrganizationEventManager =
+        OrganizationEventManagerImpl()
 
     @Provides
     @Singleton

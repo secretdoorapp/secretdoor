@@ -62,11 +62,4 @@ sealed class VaultItemListingType {
      */
     data class Folder(val folderId: String?) : VaultItemListingType()
 
-    /**
-     * A Collection listing.
-     *
-     * @param collectionId the ID of the collection.
-     */
-    data class Collection(val collectionId: String) : VaultItemListingType()
-
 }

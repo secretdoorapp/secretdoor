@@ -28,7 +28,6 @@ import com.bitwarden.network.model.KeysJson
 import com.bitwarden.network.model.MasterPasswordUnlockDataJson
 import com.bitwarden.network.model.OrganizationAutoEnrollStatusResponseJson
 import com.bitwarden.network.model.OrganizationKeysResponseJson
-import com.bitwarden.network.model.OrganizationType
 import com.bitwarden.network.model.PasswordHintResponseJson
 import com.bitwarden.network.model.PrevalidateSsoResponseJson
 import com.bitwarden.network.model.RefreshTokenResponseJson
@@ -69,11 +68,9 @@ import com.x8bit.bitwarden.data.auth.manager.AuthRequestManager
 import com.x8bit.bitwarden.data.auth.manager.AuthStateManager
 import com.x8bit.bitwarden.data.auth.manager.KdfManager
 import com.x8bit.bitwarden.data.auth.manager.KeyConnectorManager
-import com.x8bit.bitwarden.data.auth.manager.OrganizationManager
 import com.x8bit.bitwarden.data.auth.manager.TrustedDeviceManager
 import com.x8bit.bitwarden.data.auth.manager.UserLogoutManager
 import com.x8bit.bitwarden.data.auth.manager.UserStateManager
-import com.x8bit.bitwarden.data.auth.manager.model.MigrateExistingUserToKeyConnectorResult
 import com.x8bit.bitwarden.data.auth.repository.model.BreachCountResult
 import com.x8bit.bitwarden.data.auth.repository.model.DeleteAccountResult
 import com.x8bit.bitwarden.data.auth.repository.model.EmailTokenResult
@@ -86,7 +83,6 @@ import com.x8bit.bitwarden.data.auth.repository.model.PasswordHintResult
 import com.x8bit.bitwarden.data.auth.repository.model.PasswordStrengthResult
 import com.x8bit.bitwarden.data.auth.repository.model.PrevalidateSsoResult
 import com.x8bit.bitwarden.data.auth.repository.model.RegisterResult
-import com.x8bit.bitwarden.data.auth.repository.model.RemovePasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.RequestOtpResult
 import com.x8bit.bitwarden.data.auth.repository.model.ResendEmailResult
 import com.x8bit.bitwarden.data.auth.repository.model.ResetPasswordResult
@@ -185,7 +181,6 @@ internal class AuthRepositoryImpl(
     private val toastManager: ToastManager,
     private val featureFlagManager: FeatureFlagManager,
     authStateManager: AuthStateManager,
-    organizationManager: OrganizationManager,
     passwordPolicyManager: PasswordPolicyManager,
     logsManager: LogsManager,
     pushManager: PushManager,
@@ -195,7 +190,6 @@ internal class AuthRepositoryImpl(
     AuthStateManager by authStateManager,
     BiometricsEncryptionManager by biometricsEncryptionManager,
     KdfManager by kdfManager,
-    OrganizationManager by organizationManager,
     PasswordPolicyManager by passwordPolicyManager,
     UserStateManager by userStateManager {
     /**
@@ -1049,66 +1043,6 @@ internal class AuthRepositoryImpl(
             },
             onFailure = { PasswordHintResult.Error(message = null, error = it) },
         )
-    }
-
-    override suspend fun removePassword(masterPassword: String): RemovePasswordResult {
-        val profile = authDiskSource
-            .userState
-            ?.activeAccount
-            ?.profile
-            ?: return RemovePasswordResult.Error(error = NoActiveUserException())
-        val userId = profile.userId
-        val masterPasswordUnlock = profile
-            .userDecryptionOptions
-            ?.masterPasswordUnlock
-            ?: return RemovePasswordResult.Error(
-                error = MissingPropertyException("Master Password Unlock"),
-            )
-        val keyConnectorUrl = organizations
-            .find {
-                it.isKeyConnectorEnabled &&
-                    it.role != OrganizationType.OWNER &&
-                    it.role != OrganizationType.ADMIN
-            }
-            ?.keyConnectorUrl
-            ?: return RemovePasswordResult.Error(
-                error = MissingPropertyException("Key Connector URL"),
-            )
-        return keyConnectorManager
-            .migrateExistingUserToKeyConnector(
-                userId = userId,
-                url = keyConnectorUrl,
-                userKeyEncrypted = masterPasswordUnlock.masterKeyWrappedUserKey,
-                salt = masterPasswordUnlock.salt,
-                masterPassword = masterPassword,
-                kdf = masterPasswordUnlock.kdf.toKdf(),
-            )
-            .map { migrateResult: MigrateExistingUserToKeyConnectorResult ->
-                when (migrateResult) {
-                    is MigrateExistingUserToKeyConnectorResult.Error -> {
-                        RemovePasswordResult.Error(error = migrateResult.error)
-                    }
-
-                    MigrateExistingUserToKeyConnectorResult.Success -> {
-                        authDiskSource.userState = authDiskSource
-                            .userState
-                            ?.updateMasterPasswordUnlock(
-                                userId = userId,
-                                masterPasswordUnlock = null,
-                            )
-                        vaultRepository.sync()
-                        settingsRepository.setDefaultsIfNecessary(userId = userId)
-                        RemovePasswordResult.Success
-                    }
-
-                    MigrateExistingUserToKeyConnectorResult.WrongPasswordError -> {
-                        RemovePasswordResult.WrongPasswordError
-                    }
-                }
-            }
-            .getOrElse {
-                RemovePasswordResult.Error(error = it)
-            }
     }
 
     override suspend fun resetPassword(

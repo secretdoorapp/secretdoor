@@ -11,7 +11,6 @@ fun SearchType.toSearchTypeData(): SearchTypeData =
         SearchType.Vault.All -> SearchTypeData.Vault.All
         SearchType.Vault.Archive -> SearchTypeData.Vault.Archive
         SearchType.Vault.Cards -> SearchTypeData.Vault.Cards
-        is SearchType.Vault.Collection -> SearchTypeData.Vault.Collection(collectionId)
         is SearchType.Vault.Folder -> SearchTypeData.Vault.Folder(folderId)
         SearchType.Vault.Identities -> SearchTypeData.Vault.Identities
         SearchType.Vault.Logins -> SearchTypeData.Vault.Logins

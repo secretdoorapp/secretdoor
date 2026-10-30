@@ -88,7 +88,6 @@ enum class ItemListingType {
     PASSPORT,
     TRASH,
     FOLDER,
-    COLLECTION,
     ARCHIVE,
 }
 
@@ -118,9 +117,6 @@ fun SavedStateHandle.toVaultItemListingArgs(): VaultItemListingArgs {
             ItemListingType.PASSPORT -> VaultItemListingType.Passport
             ItemListingType.TRASH -> VaultItemListingType.Trash
             ItemListingType.FOLDER -> VaultItemListingType.Folder(folderId = route.itemId)
-            ItemListingType.COLLECTION -> VaultItemListingType.Collection(
-                collectionId = requireNotNull(route.itemId),
-            )
         },
     )
 }
@@ -242,7 +238,6 @@ private fun VaultItemListingType.toItemListingType(): ItemListingType {
     return when (this) {
         is VaultItemListingType.Archive -> ItemListingType.ARCHIVE
         is VaultItemListingType.Card -> ItemListingType.CARD
-        is VaultItemListingType.Collection -> ItemListingType.COLLECTION
         is VaultItemListingType.Folder -> ItemListingType.FOLDER
         is VaultItemListingType.Identity -> ItemListingType.IDENTITY
         is VaultItemListingType.Login -> ItemListingType.LOGIN
@@ -257,7 +252,6 @@ private fun VaultItemListingType.toItemListingType(): ItemListingType {
 
 private fun VaultItemListingType.toIdOrNull(): String? =
     when (this) {
-        is VaultItemListingType.Collection -> collectionId
         is VaultItemListingType.Folder -> folderId
         is VaultItemListingType.Archive -> null
         is VaultItemListingType.Card -> null

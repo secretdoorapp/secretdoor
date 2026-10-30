@@ -374,14 +374,6 @@ class UserStateExtensionsTest {
                 vaultFilterTypes = listOf(
                     VaultFilterType.AllVaults,
                     VaultFilterType.MyVault,
-                    VaultFilterType.OrganizationVault(
-                        organizationId = "organizationId-A",
-                        organizationName = "Organization A",
-                    ),
-                    VaultFilterType.OrganizationVault(
-                        organizationId = "organizationId-B",
-                        organizationName = "Organization B",
-                    ),
                 ),
             ),
             UserState.Account(
@@ -433,14 +425,6 @@ class UserStateExtensionsTest {
                 selectedVaultFilterType = VaultFilterType.AllVaults,
                 vaultFilterTypes = listOf(
                     VaultFilterType.AllVaults,
-                    VaultFilterType.OrganizationVault(
-                        organizationId = "organizationId-A",
-                        organizationName = "Organization A",
-                    ),
-                    VaultFilterType.OrganizationVault(
-                        organizationId = "organizationId-B",
-                        organizationName = "Organization B",
-                    ),
                 ),
             ),
             UserState.Account(

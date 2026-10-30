@@ -31,8 +31,5 @@ fun VaultItemListingType.toItemListingType(): VaultItemListingState.ItemListingT
 
         is VaultItemListingType.Archive -> VaultItemListingState.ItemListingType.Vault.Archive
         is VaultItemListingType.Trash -> VaultItemListingState.ItemListingType.Vault.Trash
-        is VaultItemListingType.Collection -> {
-            VaultItemListingState.ItemListingType.Vault.Collection(collectionId = collectionId)
-        }
 
     }

@@ -2120,9 +2120,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                     SearchTypeData.Vault.All -> SearchType.Vault.All
                     SearchTypeData.Vault.Archive -> SearchType.Vault.Archive
                     SearchTypeData.Vault.Cards -> SearchType.Vault.Cards
-                    is SearchTypeData.Vault.Collection -> SearchType.Vault.Collection(
-                        collectionId = searchType.collectionId,
-                    )
 
                     is SearchTypeData.Vault.Folder -> SearchType.Vault.Folder(
                         folderId = searchType.folderId,

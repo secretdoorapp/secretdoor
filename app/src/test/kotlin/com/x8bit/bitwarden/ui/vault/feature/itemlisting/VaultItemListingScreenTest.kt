@@ -206,7 +206,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
             viewState = VaultItemListingState.ViewState.Content(
                 displayItemList = listOf(createCipherDisplayItem(number = 1)),
                 displayFolderList = emptyList(),
-                displayCollectionList = emptyList(),
             ),
         )
 
@@ -227,7 +226,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
             viewState = VaultItemListingState.ViewState.Content(
                 displayItemList = listOf(createCipherDisplayItem(number = 1)),
                 displayFolderList = emptyList(),
-                displayCollectionList = emptyList(),
             ),
         )
 
@@ -449,7 +447,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
                 viewState = VaultItemListingState.ViewState.Content(
                     displayItemList = emptyList(),
                     displayFolderList = emptyList(),
-                    displayCollectionList = emptyList(),
                 ),
             )
         }
@@ -735,7 +732,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
                             count = 0,
                         ),
                     ),
-                    displayCollectionList = emptyList(),
                 ),
             )
         }
@@ -758,7 +754,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
                     displayFolderList = listOf(
                         VaultItemListingState.FolderDisplayItem(name = "test", id = "1", count = 0),
                     ),
-                    displayCollectionList = emptyList(),
                 ),
             )
         }
@@ -787,7 +782,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
                             count = 0,
                         ),
                     ),
-                    displayCollectionList = emptyList(),
                 ),
             )
         }
@@ -808,7 +802,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
         mutableStateFlow.update {
             it.copy(
                 viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
                     displayItemList = emptyList(),
                     displayFolderList = listOf(
                         VaultItemListingState.FolderDisplayItem(
@@ -827,120 +820,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `Collections text should be displayed according to state`() {
-        val collectionName = "Shared folders"
-        mutableStateFlow.update { DEFAULT_STATE }
-        composeTestRule
-            .onNodeWithText(text = collectionName)
-            .assertDoesNotExist()
-
-        mutableStateFlow.update {
-            it.copy(
-                viewState = VaultItemListingState.ViewState.Content(
-                    displayItemList = emptyList(),
-                    displayFolderList = emptyList(),
-                    displayCollectionList = listOf(
-                        VaultItemListingState.CollectionDisplayItem(
-                            name = collectionName,
-                            id = "1",
-                            count = 0,
-                        ),
-                    ),
-                ),
-            )
-        }
-        composeTestRule
-            .onNodeWithTextAfterScroll(collectionName)
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun `Collection text count should be displayed according to state`() {
-        mutableStateFlow.update { DEFAULT_STATE }
-        composeTestRule
-            .onNodeWithText(text = "SHARED FOLDERS (3)")
-            .assertDoesNotExist()
-
-        mutableStateFlow.update {
-            it.copy(
-                viewState = VaultItemListingState.ViewState.Content(
-                    displayItemList = emptyList(),
-                    displayFolderList = emptyList(),
-                    displayCollectionList = listOf(
-                        VaultItemListingState.CollectionDisplayItem(
-                            name = "Collection",
-                            id = "1",
-                            count = 0,
-                        ),
-                        VaultItemListingState.CollectionDisplayItem(
-                            name = "Collection2",
-                            id = "2",
-                            count = 0,
-                        ),
-                        VaultItemListingState.CollectionDisplayItem(
-                            name = "Collection3",
-                            id = "3",
-                            count = 0,
-                        ),
-                    ),
-                ),
-            )
-        }
-        composeTestRule
-            .onNodeWithTextAfterScroll(text = "SHARED FOLDERS (3)")
-            .assertIsDisplayed()
-
-        mutableStateFlow.update {
-            it.copy(
-                viewState = VaultItemListingState.ViewState.Content(
-                    displayItemList = emptyList(),
-                    displayFolderList = emptyList(),
-                    displayCollectionList = listOf(
-                        VaultItemListingState.CollectionDisplayItem(
-                            name = "Collection",
-                            id = "1",
-                            count = 0,
-                        ),
-                    ),
-                ),
-            )
-        }
-
-        composeTestRule
-            .onNodeWithTextAfterScroll(text = "SHARED FOLDERS (1)")
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun `collectionDisplayItems should be displayed according to state`() {
-        val collectionName = "TestCollection"
-        mutableStateFlow.update { DEFAULT_STATE }
-        composeTestRule
-            .onNodeWithText(text = collectionName)
-            .assertDoesNotExist()
-
-        mutableStateFlow.update {
-            it.copy(
-                viewState = VaultItemListingState.ViewState.Content(
-                    displayItemList = emptyList(),
-                    displayFolderList = emptyList(),
-                    displayCollectionList = listOf(
-                        VaultItemListingState.CollectionDisplayItem(
-                            name = collectionName,
-                            id = "1",
-                            count = 0,
-                        ),
-                    ),
-                ),
-            )
-        }
-
-        composeTestRule
-            .onNodeWithText(text = collectionName)
-            .assertIsDisplayed()
-    }
-
-    @Test
     fun `Items text should be displayed according to state`() {
         val items = "ITEMS (1)"
         mutableStateFlow.update { DEFAULT_STATE }
@@ -951,7 +830,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
         mutableStateFlow.update {
             it.copy(
                 viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
                     displayItemList = listOf(
                         createCipherDisplayItem(number = 1),
                     ),
@@ -974,7 +852,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
         mutableStateFlow.update {
             it.copy(
                 viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
                     displayItemList = listOf(
                         createCipherDisplayItem(number = 1),
                     ),
@@ -989,7 +866,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
         mutableStateFlow.update {
             it.copy(
                 viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
                     displayItemList = listOf(
                         createCipherDisplayItem(number = 1),
                         createCipherDisplayItem(number = 2),
@@ -1011,7 +887,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
         mutableStateFlow.update {
             it.copy(
                 viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
                     displayItemList = listOf(
                         createCipherDisplayItem(number = 1),
                     ),
@@ -1034,7 +909,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
         mutableStateFlow.update {
             it.copy(
                 viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
                     displayItemList = listOf(
                         createCipherDisplayItem(number = 1)
                             .copy(
@@ -1087,7 +961,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
         mutableStateFlow.update {
             it.copy(
                 viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
                     displayItemList = listOf(
                         createCipherDisplayItem(number = 1).copy(
                             shouldShowMasterPasswordReprompt = true,
@@ -1137,7 +1010,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
         mutableStateFlow.update {
             it.copy(
                 viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
                     displayItemList = listOf(
                         createCipherDisplayItem(number = 1)
                             .copy(
@@ -1168,7 +1040,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
         mutableStateFlow.update {
             it.copy(
                 viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
                     displayItemList = listOf(
                         createCipherDisplayItem(number = 1)
                             .copy(
@@ -1343,7 +1214,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
             it.copy(
                 itemListingType = VaultItemListingState.ItemListingType.Vault.Login,
                 viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
                     displayItemList = listOf(createCipherDisplayItem(number = 1)),
                     displayFolderList = emptyList(),
                 ),
@@ -1387,7 +1257,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
             it.copy(
                 itemListingType = VaultItemListingState.ItemListingType.Vault.Login,
                 viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
                     displayItemList = listOf(
                         createCipherDisplayItem(number = 1).copy(
                             overflowOptions = listOf(archiveAction),
@@ -1434,7 +1303,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
             it.copy(
                 itemListingType = VaultItemListingState.ItemListingType.Vault.Login,
                 viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
                     displayItemList = listOf(
                         createCipherDisplayItem(number = 1)
                             .copy(shouldShowMasterPasswordReprompt = true),

@@ -1237,16 +1237,6 @@ sealed class SearchTypeData : Parcelable {
                     .asText(BitwardenString.passports.asText())
         }
 
-        /**
-         * Indicates that we should be searching only ciphers in the given collection.
-         */
-        data class Collection(
-            val collectionId: String,
-            val collectionName: String = "",
-        ) : Vault() {
-            override val title: Text
-                get() = BitwardenString.search_x.asText(collectionName.asText())
-        }
 
         /**
          * Indicates that we should be searching only ciphers not in a folder.

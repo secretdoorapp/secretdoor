@@ -17,7 +17,6 @@ import com.x8bit.bitwarden.data.autofill.util.login
 import com.x8bit.bitwarden.data.platform.util.isActive
 import com.x8bit.bitwarden.data.vault.repository.model.VaultData
 import com.x8bit.bitwarden.data.vault.repository.util.toFailureCipherListView
-import com.x8bit.bitwarden.ui.vault.feature.util.getFilteredCollections
 import com.x8bit.bitwarden.ui.vault.feature.util.getFilteredFolders
 import com.x8bit.bitwarden.ui.vault.feature.util.toLabelIcons
 import com.x8bit.bitwarden.ui.vault.feature.util.toOverflowActions
@@ -96,9 +95,6 @@ fun VaultData.toViewState(
         )
         .getFilteredFolders()
 
-    val filteredCollectionViewList = collectionViewList
-        .toFilteredList(vaultFilterType)
-        .getFilteredCollections()
 
     return if (allCipherViews.isEmpty()) {
         VaultState.ViewState.NoItems
@@ -130,8 +126,7 @@ fun VaultData.toViewState(
                         )
                     },
             )
-        val shouldShowUnGroupedItems = filteredCollectionViewList.isEmpty() &&
-            noFolderItems.size < NO_FOLDER_ITEM_THRESHOLD
+        val shouldShowUnGroupedItems = noFolderItems.size < NO_FOLDER_ITEM_THRESHOLD
         val cardCount = activeCipherViews.count { it.type is CipherListViewType.Card }
         val archiveCount = allCipherViews.count {
             it.archivedDate != null && it.deletedDate == null
@@ -208,19 +203,6 @@ fun VaultData.toViewState(
             noFolderItems = noFolderItems
                 .takeIf { shouldShowUnGroupedItems }
                 .orEmpty(),
-            collectionItems = filteredCollectionViewList
-                .filter { it.id != null }
-                .map { collectionView ->
-                    VaultState.ViewState.CollectionItem(
-                        id = requireNotNull(collectionView.id),
-                        name = collectionView.name,
-                        itemCount = activeCipherViews
-                            .count {
-                                !it.id.isNullOrBlank() &&
-                                    collectionView.id in it.collectionIds
-                            },
-                    )
-                },
             trashItemsCount = allCipherViews.count { it.deletedDate != null },
             archivedItemsCount = archiveCount.takeIf { isPremium || archiveCount > 0 },
             archiveEndIcon = BitwardenDrawable.ic_locked.takeIf { !isPremium && archiveCount == 0 },
@@ -433,9 +415,6 @@ fun List<CipherListView>.toFilteredList(
             when (vaultFilterType) {
                 VaultFilterType.AllVaults -> true
                 VaultFilterType.MyVault -> it.organizationId == null
-                is VaultFilterType.OrganizationVault -> {
-                    it.organizationId == vaultFilterType.organizationId
-                }
             }
         }
 
@@ -453,11 +432,6 @@ fun List<FolderView>.toFilteredList(
                 VaultFilterType.AllVaults,
                 VaultFilterType.MyVault,
                     -> true
-
-                // Only include folders containing an item associated with this organization.
-                is VaultFilterType.OrganizationVault -> {
-                    cipherList.any { it.folderId == folder.id }
-                }
             }
         }
 
@@ -473,9 +447,6 @@ fun List<CollectionView>.toFilteredList(
             when (vaultFilterType) {
                 VaultFilterType.AllVaults -> true
                 VaultFilterType.MyVault -> false
-                is VaultFilterType.OrganizationVault -> {
-                    it.organizationId == vaultFilterType.organizationId
-                }
             }
         }
 

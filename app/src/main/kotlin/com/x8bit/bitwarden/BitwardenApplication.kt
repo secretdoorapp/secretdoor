@@ -10,7 +10,6 @@ import com.x8bit.bitwarden.data.auth.manager.AuthRequestNotificationManager
 import com.x8bit.bitwarden.data.autofill.manager.FillAssistManager
 import com.x8bit.bitwarden.data.platform.datasource.disk.legacy.DiskSourceMigrationLogger
 import com.x8bit.bitwarden.data.platform.manager.LogsManager
-import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
 import com.x8bit.bitwarden.data.platform.manager.network.NetworkConfigManager
 import com.x8bit.bitwarden.data.platform.manager.restriction.RestrictionManager
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
@@ -45,8 +44,6 @@ class BitwardenApplication : Application(), SingletonImageLoader.Factory {
     @Inject
     lateinit var authRequestNotificationManager: AuthRequestNotificationManager
 
-    @Inject
-    lateinit var organizationEventManager: OrganizationEventManager
 
     @Inject
     lateinit var restrictionManager: RestrictionManager

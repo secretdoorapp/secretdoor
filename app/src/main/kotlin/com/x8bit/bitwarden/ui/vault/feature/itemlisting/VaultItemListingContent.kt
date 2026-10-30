@@ -119,51 +119,6 @@ fun VaultItemListingContent(
             }
         }
 
-        if (state.displayCollectionList.isNotEmpty()) {
-            item(key = "collections_header") {
-                Spacer(modifier = Modifier.height(height = 12.dp))
-                BitwardenListHeaderText(
-                    label = stringResource(
-                        id = vfo1Foundation(
-                            new = BitwardenString.shared_folders,
-                            old = BitwardenString.collections,
-                        ),
-                    ),
-                    supportingLabel = state.displayCollectionList.count().toString(),
-                    modifier = Modifier
-                        .animateItem()
-                        .fillMaxWidth()
-                        .standardHorizontalMargin()
-                        .padding(horizontal = 16.dp),
-                )
-                Spacer(modifier = Modifier.height(height = 8.dp))
-            }
-
-            itemsIndexed(
-                items = state.displayCollectionList,
-                key = { _, collection -> "collection_${collection.id}" },
-            ) { index, collection ->
-                BitwardenGroupItem(
-                    startIcon = IconData.Local(
-                        iconRes = vfo1Foundation(
-                            new = BitwardenDrawable.ic_shared_folder,
-                            old = BitwardenDrawable.ic_collections,
-                        ),
-                    ),
-                    label = collection.name,
-                    supportingLabel = collection.count.toString(),
-                    onClick = { vaultItemListingHandlers.collectionClick(collection.id) },
-                    cardStyle = state
-                        .displayCollectionList
-                        .toListItemCardStyle(index = index, dividerPadding = 56.dp),
-                    modifier = Modifier
-                        .animateItem()
-                        .fillMaxWidth()
-                        .standardHorizontalMargin(),
-                )
-            }
-        }
-
         if (state.displayFolderList.isNotEmpty()) {
             item(key = "folders_header") {
                 Spacer(modifier = Modifier.height(height = 12.dp))

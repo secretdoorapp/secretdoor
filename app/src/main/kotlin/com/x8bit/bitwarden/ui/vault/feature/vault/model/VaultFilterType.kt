@@ -38,16 +38,4 @@ sealed class VaultFilterType : Parcelable {
         override val name: Text get() = BitwardenString.my_vault.asText()
         override val description: Text get() = BitwardenString.my_vault.asText()
     }
-
-    /**
-     * Only data from the organization with the given [organizationId] should be present.
-     */
-    @Parcelize
-    data class OrganizationVault(
-        val organizationId: String,
-        val organizationName: String,
-    ) : VaultFilterType() {
-        override val name: Text get() = organizationName.asText()
-        override val description: Text get() = organizationName.asText()
-    }
 }

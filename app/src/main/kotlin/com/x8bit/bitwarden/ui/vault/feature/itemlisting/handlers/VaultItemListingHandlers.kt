@@ -22,7 +22,6 @@ data class VaultItemListingHandlers(
     val addVaultItemClick: () -> Unit,
     val itemClick: (id: String, type: VaultItemListingState.DisplayItem.ItemType) -> Unit,
     val folderClick: (id: String) -> Unit,
-    val collectionClick: (id: String) -> Unit,
     val masterPasswordRepromptSubmit: (password: String, MasterPasswordRepromptData) -> Unit,
     val refreshClick: () -> Unit,
     val syncClick: () -> Unit,
@@ -69,9 +68,6 @@ data class VaultItemListingHandlers(
                 },
                 addVaultItemClick = {
                     viewModel.trySendAction(VaultItemListingsAction.AddVaultItemClick)
-                },
-                collectionClick = {
-                    viewModel.trySendAction(VaultItemListingsAction.CollectionClick(it))
                 },
                 itemClick = { id, type ->
                     viewModel.trySendAction(

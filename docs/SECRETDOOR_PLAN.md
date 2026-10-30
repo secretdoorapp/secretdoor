@@ -87,13 +87,20 @@ stored key material.
     Collections screen and menu options, Leave organization, Migrate to My Items (and
     `VaultMigrationManager`), the owner picker, owner bottom sheet and collection selector in
     add/edit.
-  - [ ] Organizations/collections data layer: vault screen collection section and organization
-    vault filter, `VaultItemListingType.Collection`, collection/organization search types,
-    `OrganizationManager`, `CollectionsDao`, org/collection SDK extensions, policies
-    (`PolicyManager`), organization events. Do this with compiler feedback.
-  - [ ] Bug: `VaultAddEditViewModel.hasValidationErrors` blocks saving an item when the phone is
-    offline ("Internet connection required"). Remove the network check. Also review the other
-    `isNetworkConnected` checks (vault and item listing pull-to-refresh, Settings > Other sync).
+  - [x] Organizations/collections data layer, part 1 (not yet compiled or tested): vault screen
+    collections section, collection item listing (`VaultItemListingType.Collection`), collection
+    search types, `VaultFilterType.OrganizationVault`, `OrganizationManager`, and the unused
+    `AuthRepository.removePassword` (Key Connector). `OrganizationEventManagerImpl` is now a
+    no-op, so organization events are never stored or uploaded.
+  - [ ] Organizations/collections data layer, part 2: policies (`PolicyManager`, used in ~60
+    files), `selectedCollectionId` / owner state in add/edit, collection permission helpers,
+    org/collection SDK extensions. Do this with compiler feedback.
+  - [ ] Room tables `CollectionEntity` and `OrganizationEventEntity`: kept (always empty). Dropping
+    them needs a database migration and a regenerated schema, so do it with a build.
+  - [x] Bug fixed: saving an item no longer requires an internet connection
+    (`VaultAddEditViewModel` no longer depends on `NetworkConnectionManager`).
+  - [ ] Sync UI (vault and item listing pull-to-refresh, "Sync" menu, Settings > Other "Sync
+    now") still shows "Internet connection required" when offline. Remove the sync UI.
 
 ### Phase 4: Backup and restore
 - Free: "Export encrypted backup" saves the password-protected file wherever the user picks

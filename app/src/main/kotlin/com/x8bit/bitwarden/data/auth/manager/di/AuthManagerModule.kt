@@ -7,7 +7,6 @@ import com.bitwarden.network.service.AccountsService
 import com.bitwarden.network.service.AuthRequestsService
 import com.bitwarden.network.service.DevicesService
 import com.bitwarden.network.service.NewAuthRequestService
-import com.bitwarden.network.service.OrganizationService
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
 import com.x8bit.bitwarden.data.auth.datasource.sdk.AuthSdkSource
 import com.x8bit.bitwarden.data.auth.manager.AddTotpItemFromAuthenticatorManager
@@ -24,8 +23,6 @@ import com.x8bit.bitwarden.data.auth.manager.KdfManager
 import com.x8bit.bitwarden.data.auth.manager.KdfManagerImpl
 import com.x8bit.bitwarden.data.auth.manager.KeyConnectorManager
 import com.x8bit.bitwarden.data.auth.manager.KeyConnectorManagerImpl
-import com.x8bit.bitwarden.data.auth.manager.OrganizationManager
-import com.x8bit.bitwarden.data.auth.manager.OrganizationManagerImpl
 import com.x8bit.bitwarden.data.auth.manager.TrustedDeviceManager
 import com.x8bit.bitwarden.data.auth.manager.TrustedDeviceManagerImpl
 import com.x8bit.bitwarden.data.auth.manager.UserLogoutManager
@@ -186,16 +183,6 @@ object AuthManagerModule {
         vaultSdkSource = vaultSdkSource,
         accountsService = accountsService,
         featureFlagManager = featureFlagManager,
-    )
-
-    @Provides
-    @Singleton
-    fun providesOrganizationManager(
-        authDiskSource: AuthDiskSource,
-        organizationService: OrganizationService,
-    ): OrganizationManager = OrganizationManagerImpl(
-        authDiskSource = authDiskSource,
-        organizationService = organizationService,
     )
 
     @Provides

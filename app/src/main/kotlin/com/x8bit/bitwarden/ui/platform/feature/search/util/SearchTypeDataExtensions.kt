@@ -40,12 +40,6 @@ fun SearchTypeData.updateWithAdditionalDataIfNecessary(
     collectionList: List<CollectionView>,
 ): SearchTypeData =
     when (this) {
-        is SearchTypeData.Vault.Collection -> copy(
-            collectionName = collectionList
-                .find { it.id == collectionId }
-                ?.name
-                .orEmpty(),
-        )
 
         is SearchTypeData.Vault.Folder -> copy(
             folderName = folderList
@@ -108,9 +102,6 @@ private fun CipherListView.filterBySearchType(
         SearchTypeData.Vault.All -> isActive
         SearchTypeData.Vault.Archive -> archivedDate != null && deletedDate == null
         is SearchTypeData.Vault.Cards -> type is CipherListViewType.Card && isActive
-        is SearchTypeData.Vault.Collection -> {
-            searchTypeData.collectionId in this.collectionIds && isActive
-        }
 
         is SearchTypeData.Vault.Folder -> folderId == searchTypeData.folderId && isActive
         SearchTypeData.Vault.NoFolder -> folderId == null && isActive

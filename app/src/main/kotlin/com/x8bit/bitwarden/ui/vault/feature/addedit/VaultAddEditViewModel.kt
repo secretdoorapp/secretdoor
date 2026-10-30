@@ -47,7 +47,6 @@ import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardMan
 import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
 import com.x8bit.bitwarden.data.platform.manager.model.CoachMarkTourType
 import com.x8bit.bitwarden.data.platform.manager.model.OrganizationEvent
-import com.x8bit.bitwarden.data.platform.manager.network.NetworkConnectionManager
 import com.x8bit.bitwarden.data.platform.manager.util.toAutofillSaveItemOrNull
 import com.x8bit.bitwarden.data.platform.manager.util.toAutofillSelectionDataOrNull
 import com.x8bit.bitwarden.data.platform.manager.util.toCreateCredentialRequestOrNull
@@ -144,7 +143,6 @@ class VaultAddEditViewModel @Inject constructor(
     private val resourceManager: ResourceManager,
     private val clock: Clock,
     private val organizationEventManager: OrganizationEventManager,
-    private val networkConnectionManager: NetworkConnectionManager,
     private val firstTimeActionManager: FirstTimeActionManager,
     private val environmentRepository: EnvironmentRepository,
     private val premiumStateManager: PremiumStateManager,
@@ -522,16 +520,6 @@ class VaultAddEditViewModel @Inject constructor(
                 } else {
                     BitwardenString.select_one_collection.asText()
                 },
-            )
-            true
-        } else if (
-            !networkConnectionManager.isNetworkConnected
-        ) {
-            showDialog(
-                dialogState = VaultAddEditState.DialogState.Generic(
-                    title = BitwardenString.internet_connection_required_title.asText(),
-                    message = BitwardenString.internet_connection_required_message.asText(),
-                ),
             )
             true
         } else {

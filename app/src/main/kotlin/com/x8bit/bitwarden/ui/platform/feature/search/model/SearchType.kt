@@ -63,12 +63,6 @@ sealed class SearchType : Parcelable {
          */
         data object Passports : Vault()
 
-        /**
-         * Indicates that we should be searching only ciphers in the given collection.
-         */
-        data class Collection(
-            val collectionId: String,
-        ) : Vault()
 
         /**
          * Indicates that we should be searching only ciphers not in a folder.

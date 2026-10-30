@@ -144,9 +144,6 @@ fun VaultItemListingScreen(
                 onNavigateToVaultItemListing(VaultItemListingType.Folder(event.folderId))
             }
 
-            is VaultItemListingEvent.NavigateToCollectionItem -> {
-                onNavigateToVaultItemListing(VaultItemListingType.Collection(event.collectionId))
-            }
 
             is VaultItemListingEvent.CompleteCredentialRegistration -> {
                 credentialProviderCompletionManager.completeCredentialRegistration(event.result)
