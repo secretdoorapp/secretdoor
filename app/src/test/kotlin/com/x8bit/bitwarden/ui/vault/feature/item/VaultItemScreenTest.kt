@@ -72,7 +72,6 @@ class VaultItemScreenTest : BitwardenComposeTest() {
 
     private var onNavigateBackCalled = false
     private var onNavigateToVaultEditItemArgs: VaultAddEditArgs? = null
-    private var onNavigateToMoveToOrganizationItemId: String? = null
     private var onNavigateToAttachmentsId: String? = null
     private var onNavigateToPasswordHistoryId: String? = null
     private var onNavigateToPreviewAttachment: PreviewAttachmentRoute? = null
@@ -97,9 +96,6 @@ class VaultItemScreenTest : BitwardenComposeTest() {
                 viewModel = viewModel,
                 onNavigateBack = { onNavigateBackCalled = true },
                 onNavigateToVaultAddEditItem = { onNavigateToVaultEditItemArgs = it },
-                onNavigateToMoveToOrganization = { id, _ ->
-                    onNavigateToMoveToOrganizationItemId = id
-                },
                 onNavigateToAttachments = { onNavigateToAttachmentsId = it },
                 onNavigateToPasswordHistory = { onNavigateToPasswordHistoryId = it },
                 onNavigateToPreviewAttachment = { onNavigateToPreviewAttachment = it },
@@ -129,14 +125,7 @@ class VaultItemScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `NavigateToMoveToOrganization event should invoke onNavigateToMoveToOrganization`() {
-        val id = "id1234"
-        mutableEventFlow.tryEmit(VaultItemEvent.NavigateToMoveToOrganization(itemId = id))
-        assertEquals(id, onNavigateToMoveToOrganizationItemId)
-    }
-
-    @Test
-    fun `NavigateToMoveToOrganization event should invoke onNavigateToAttachments`() {
+    fun `NavigateToAttachments event should invoke onNavigateToAttachments`() {
         val id = "id1234"
         mutableEventFlow.tryEmit(VaultItemEvent.NavigateToAttachments(itemId = id))
         assertEquals(id, onNavigateToAttachmentsId)
@@ -1544,134 +1533,6 @@ class VaultItemScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `Move to organization option menu click should send MoveToOrganizationClick action`() {
-        mutableStateFlow.update {
-            DEFAULT_STATE.copy(
-                viewState = DEFAULT_LOGIN_VIEW_STATE,
-            )
-        }
-
-        // Confirm dropdown version of item is absent
-        composeTestRule
-            .onAllNodesWithText("Move")
-            .filter(hasAnyAncestor(isPopup()))
-            .assertCountEquals(0)
-        // Open the overflow menu
-        composeTestRule.onNodeWithContentDescription("More options").performClick()
-        // Click on the move to organization hint item in the dropdown
-        composeTestRule
-            .onAllNodesWithText("Move")
-            .filterToOne(hasAnyAncestor(isPopup()))
-            .performClick()
-        verify {
-            viewModel.trySendAction(VaultItemAction.Common.MoveToOrganizationClick)
-        }
-    }
-
-    @Test
-    fun `Move to organization option menu should not be visible if user has no organizations`() {
-        mutableStateFlow.update {
-            DEFAULT_STATE.copy(
-                viewState = DEFAULT_LOGIN_VIEW_STATE.copy(
-                    common = DEFAULT_COMMON.copy(hasOrganizations = false),
-                ),
-            )
-        }
-
-        // Confirm dropdown version of item is absent
-        composeTestRule
-            .onAllNodesWithText("Move")
-            .filter(hasAnyAncestor(isPopup()))
-            .assertCountEquals(0)
-        // Open the overflow menu
-        composeTestRule.onNodeWithContentDescription("More options").performClick()
-        // Confirm it does not exist
-        composeTestRule
-            .onAllNodesWithText("Move")
-            .filterToOne(hasAnyAncestor(isPopup()))
-            .assertDoesNotExist()
-    }
-
-    @Test
-    fun `menu Collection option should be displayed based on state`() {
-        mutableStateFlow.update {
-            it.copy(
-                viewState = DEFAULT_IDENTITY_VIEW_STATE
-                    .copy(
-                        common = DEFAULT_COMMON
-                            .copy(currentCipher = createMockCipherView(1)),
-                    ),
-            )
-        }
-        // Confirm overflow is closed on initial load
-        composeTestRule
-            .onAllNodesWithText("Shared folders")
-            .filter(hasAnyAncestor(isPopup()))
-            .assertCountEquals(0)
-
-        // Open the overflow menu
-        composeTestRule
-            .onNodeWithContentDescription("More options")
-            .performClick()
-
-        // Confirm Collections option is present
-        composeTestRule
-            .onAllNodesWithText("Shared folders")
-            .filterToOne(hasAnyAncestor(isPopup()))
-            .assertIsDisplayed()
-
-        // Confirm Collections option is not present when canDelete is false
-        mutableStateFlow.update {
-            it.copy(
-                viewState = DEFAULT_IDENTITY_VIEW_STATE
-                    .copy(
-                        common = DEFAULT_COMMON
-                            .copy(canAssignToCollections = false),
-                    ),
-            )
-        }
-        composeTestRule
-            .onAllNodesWithText("Shared folders")
-            .filter(hasAnyAncestor(isPopup()))
-            .assertCountEquals(0)
-    }
-
-    @Test
-    fun `Collections menu click should send CollectionsClick action`() {
-        mutableStateFlow.update {
-            it.copy(
-                viewState = DEFAULT_IDENTITY_VIEW_STATE
-                    .copy(
-                        common = DEFAULT_COMMON
-                            .copy(currentCipher = createMockCipherView(1)),
-                    ),
-            )
-        }
-        // Confirm dropdown version of item is absent
-        composeTestRule
-            .onAllNodesWithText("Shared folders")
-            .filter(hasAnyAncestor(isPopup()))
-            .assertCountEquals(0)
-        // Open the overflow menu
-        composeTestRule
-            .onNodeWithContentDescription("More options")
-            .performClick()
-        // Click on the move to organization hint item in the dropdown
-        composeTestRule
-            .onAllNodesWithText("Shared folders")
-            .filterToOne(hasAnyAncestor(isPopup()))
-            .performClick()
-
-        composeTestRule
-            .onNode(isPopup())
-            .assertDoesNotExist()
-
-        verify {
-            viewModel.trySendAction(VaultItemAction.Common.CollectionsClick)
-        }
-    }
-
-    @Test
     fun `Menu should display correct items when cipher is in a collection`() {
         mutableStateFlow.update {
             it.copy(
@@ -1694,7 +1555,7 @@ class VaultItemScreenTest : BitwardenComposeTest() {
         composeTestRule
             .onAllNodesWithText("Shared folders")
             .filterToOne(hasAnyAncestor(isPopup()))
-            .assertIsDisplayed()
+            .assertDoesNotExist()
 
         composeTestRule
             .onAllNodesWithText("Delete")
@@ -1732,7 +1593,7 @@ class VaultItemScreenTest : BitwardenComposeTest() {
         composeTestRule
             .onAllNodesWithText("Move")
             .filterToOne(hasAnyAncestor(isPopup()))
-            .assertIsDisplayed()
+            .assertDoesNotExist()
 
         composeTestRule
             .onAllNodesWithText("Delete")

@@ -102,7 +102,6 @@ fun NavGraphBuilder.vaultAddEditDestination(
     onNavigateToCardScanScreen: () -> Unit,
     onNavigateToGeneratorModal: (GeneratorMode.Modal) -> Unit,
     onNavigateToAttachments: (cipherId: String) -> Unit,
-    onNavigateToMoveToOrganization: (cipherId: String, showOnlyCollections: Boolean) -> Unit,
     onNavigateToPlan: () -> Unit,
     onCloseAndNavigateToVaultItem: (cipherId: String, cipherType: VaultItemCipherType) -> Unit,
 ) {
@@ -114,7 +113,6 @@ fun NavGraphBuilder.vaultAddEditDestination(
             onNavigateToCardScanScreen = onNavigateToCardScanScreen,
             onNavigateToGeneratorModal = onNavigateToGeneratorModal,
             onNavigateToAttachments = onNavigateToAttachments,
-            onNavigateToMoveToOrganization = onNavigateToMoveToOrganization,
             onNavigateToPlan = onNavigateToPlan,
             onCloseAndNavigateToVaultItem = onCloseAndNavigateToVaultItem,
         )

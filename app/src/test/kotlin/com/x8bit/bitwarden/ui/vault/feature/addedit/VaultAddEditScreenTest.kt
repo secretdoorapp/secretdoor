@@ -107,7 +107,6 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
     private var onCloseAndNavigateToVaultItemId: String? = null
     private var onCloseAndNavigateToVaultItemType: VaultItemCipherType? = null
     private var onNavigateToCardScanScreenCalled = false
-    private var onNavigateToMoveToOrganizationId: String? = null
     private var onNavigateToPlanCalled = false
 
     private val mutableEventFlow = bufferedMutableSharedFlow<VaultAddEditEvent>()
@@ -150,7 +149,6 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
                 },
                 onNavigateToGeneratorModal = { onNavigateToGeneratorModalType = it },
                 onNavigateToAttachments = { onNavigateToAttachmentsId = it },
-                onNavigateToMoveToOrganization = { id, _ -> onNavigateToMoveToOrganizationId = id },
                 onNavigateToCardScanScreen = { onNavigateToCardScanScreenCalled = true },
                 onNavigateToPlan = { onNavigateToPlanCalled = true },
                 onCloseAndNavigateToVaultItem = { id, type ->
@@ -281,14 +279,6 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
         )
         assertEquals(cipherId, onCloseAndNavigateToVaultItemId)
         assertEquals(cipherType, onCloseAndNavigateToVaultItemType)
-    }
-
-    @Test
-    @Suppress("MaxLineLength")
-    fun `on NavigateToMoveToOrganization event should invoke onNavigateToMoveToOrganization with the correct ID`() {
-        val cipherId = "cipherId-1234"
-        mutableEventFlow.tryEmit(VaultAddEditEvent.NavigateToMoveToOrganization(cipherId))
-        assertEquals(cipherId, onNavigateToMoveToOrganizationId)
     }
 
     @Suppress("MaxLineLength")
@@ -3425,24 +3415,6 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `clicking a Ownership option should send SelectOwnerForItem action`() {
-        updateStateWithOwners()
-
-        // Opens the menu
-        composeTestRule
-            .onNodeWithContentDescriptionAfterScroll(
-                label = "My vault. Vault",
-            )
-            .performClick()
-
-        verify {
-            viewModel.trySendAction(
-                VaultAddEditAction.Common.SelectOwnerForItem,
-            )
-        }
-    }
-
-    @Test
     fun `clicking a Ownership option should clear focus from the focused text field`() {
         mutableStateFlow.value = DEFAULT_STATE_CARD
         updateStateWithOwners()
@@ -3467,75 +3439,6 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `should show owner selection bottom sheet when state updates to OwnerSelection`() {
-        mutableStateFlow.update {
-            it.copy(bottomSheetState = VaultAddEditState.BottomSheetState.OwnerSelection)
-        }
-
-        composeTestRule
-            .onNodeWithText("Select vault")
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun `DismissOwnerSelectionBottomSheet action sent when bottom sheet close button click`() {
-        mutableStateFlow.update {
-            it.copy(bottomSheetState = VaultAddEditState.BottomSheetState.OwnerSelection)
-        }
-
-        composeTestRule
-            .onNodeWithText("Select vault")
-            .assertIsDisplayed()
-
-        composeTestRule
-            .onAllNodesWithContentDescription("Close")
-            .filterToOne(hasAnyAncestor(isBottomSheet))
-            .assertIsDisplayed()
-            .performClick()
-
-        dispatcher.advanceTimeByAndRunCurrent(1000L)
-
-        verify {
-            viewModel.trySendAction(VaultAddEditAction.Common.DismissBottomSheet)
-        }
-    }
-
-    @Test
-    fun `Selecting option and clicking save on owner sheet sends OwnershipChange action`() {
-        val ownerId = "1234"
-        val ownerName = "name"
-        mutableStateFlow.update { currentState ->
-            updateCommonContent(currentState) {
-                copy(
-                    availableOwners = listOf(
-                        VaultAddEditState.Owner(
-                            id = ownerId,
-                            name = ownerName.asText(),
-                            collections = DEFAULT_COLLECTIONS,
-                        ),
-                    )
-                        .toImmutableList(),
-                )
-            }
-                .copy(bottomSheetState = VaultAddEditState.BottomSheetState.OwnerSelection)
-        }
-
-        composeTestRule
-            .onNodeWithText(ownerName)
-            .performSemanticsAction(SemanticsActions.OnClick)
-
-        composeTestRule
-            .onAllNodesWithText("Save")
-            .filterToOne(hasAnyAncestor(isBottomSheet))
-            .assertIsDisplayed()
-            .performClick()
-
-        verify {
-            viewModel.trySendAction(VaultAddEditAction.Common.OwnershipChange(ownerId = ownerId))
-        }
-    }
-
-    @Test
     fun `the Ownership control should display the text provided by the state`() {
         updateStateWithOwners()
         composeTestRule
@@ -3551,28 +3454,6 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
         composeTestRule
             .onNodeWithContentDescriptionAfterScroll(label = "mockOwnerName-2. Vault")
             .assertIsDisplayed()
-    }
-
-    @Test
-    fun `clicking a Collection should send CollectionSelect action`() {
-        updateStateWithOwners(selectedOwnerId = "mockOwnerId-2")
-
-        composeTestRule
-            .onNodeWithTextAfterScroll("mockCollectionName-2")
-            .performClick()
-
-        verify {
-            viewModel.trySendAction(
-                VaultAddEditAction.Common.CollectionSelect(
-                    VaultCollection(
-                        id = "mockCollectionId-2",
-                        name = "mockCollectionName-2",
-                        isSelected = false,
-                        isDefaultUserCollection = false,
-                    ),
-                ),
-            )
-        }
     }
 
     @Test
@@ -4624,7 +4505,7 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
         composeTestRule
             .onAllNodesWithText("Shared folders")
             .filterToOne(hasAnyAncestor(isPopup()))
-            .assertIsDisplayed()
+            .assertDoesNotExist()
 
         composeTestRule
             .onAllNodesWithText("Move")
@@ -4635,57 +4516,6 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
             .onAllNodesWithText("Delete")
             .filterToOne(hasAnyAncestor(isPopup()))
             .assertIsDisplayed()
-    }
-
-    @Test
-    fun `Menu Collections should display correctly according to state`() {
-        mutableStateFlow.update {
-            it.copy(
-                vaultAddEditType = VaultAddEditType.EditItem(vaultItemId = "mockId-1"),
-                viewState = VaultAddEditState.ViewState.Content(
-                    common = VaultAddEditState.ViewState.Content.Common(
-                        originalCipher = createMockCipherView(1),
-                    ),
-                    type = VaultAddEditState.ViewState.Content.ItemType.SecureNotes,
-                    isIndividualVaultDisabled = false,
-                ),
-            )
-        }
-        // Confirm overflow is closed on initial load
-        composeTestRule
-            .onAllNodesWithText("Shared folders")
-            .filter(hasAnyAncestor(isPopup()))
-            .assertCountEquals(0)
-
-        // Open the overflow menu
-        composeTestRule
-            .onNodeWithContentDescription("More options")
-            .performClick()
-
-        // Confirm Collections option is present
-        composeTestRule
-            .onAllNodesWithText("Shared folders")
-            .filterToOne(hasAnyAncestor(isPopup()))
-            .assertIsDisplayed()
-
-        // Confirm Collections option is not present when canAssignToCollections is false
-        mutableStateFlow.update {
-            it.copy(
-                vaultAddEditType = VaultAddEditType.EditItem(vaultItemId = "mockId-1"),
-                viewState = VaultAddEditState.ViewState.Content(
-                    common = VaultAddEditState.ViewState.Content.Common(
-                        originalCipher = createMockCipherView(1),
-                        canAssignToCollections = false,
-                    ),
-                    type = VaultAddEditState.ViewState.Content.ItemType.SecureNotes,
-                    isIndividualVaultDisabled = false,
-                ),
-            )
-        }
-        composeTestRule
-            .onAllNodesWithText("Shared folders")
-            .filter(hasAnyAncestor(isPopup()))
-            .assertCountEquals(0)
     }
 
     @Test
@@ -4717,7 +4547,7 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
         composeTestRule
             .onAllNodesWithText("Move")
             .filterToOne(hasAnyAncestor(isPopup()))
-            .assertIsDisplayed()
+            .assertDoesNotExist()
 
         composeTestRule
             .onAllNodesWithText("Shared folders")
@@ -5399,40 +5229,6 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
             .onAllNodesWithText("Move")
             .filterToOne(hasAnyAncestor(isPopup()))
             .assertIsNotDisplayed()
-    }
-
-    @Test
-    fun `Move to organization option menu should be visible if user has organizations`() {
-        mutableStateFlow.update {
-            it.copy(
-                vaultAddEditType = VaultAddEditType.EditItem(vaultItemId = "mockId-1"),
-                viewState = VaultAddEditState.ViewState.Content(
-                    common = VaultAddEditState.ViewState.Content.Common(
-                        originalCipher = createMockCipherView(1).copy(
-                            collectionIds = emptyList(),
-                        ),
-                        hasOrganizations = true,
-                    ),
-                    type = VaultAddEditState.ViewState.Content.ItemType.SecureNotes,
-                    isIndividualVaultDisabled = false,
-                ),
-            )
-        }
-
-        // Confirm dropdown version of item is absent
-        composeTestRule
-            .onAllNodesWithText("Move")
-            .filter(hasAnyAncestor(isPopup()))
-            .assertCountEquals(0)
-
-        composeTestRule
-            .onNodeWithContentDescription("More options")
-            .performClick()
-
-        composeTestRule
-            .onAllNodesWithText("Move")
-            .filterToOne(hasAnyAncestor(isPopup()))
-            .assertIsDisplayed()
     }
 
     @Test

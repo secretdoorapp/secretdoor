@@ -6,7 +6,6 @@ import com.bitwarden.core.data.manager.realtime.RealtimeManager
 import com.bitwarden.cxf.parser.CredentialExchangePayloadParser
 import com.bitwarden.data.manager.appstate.AppStateManager
 import com.bitwarden.data.manager.file.FileManager
-import com.bitwarden.network.service.CiphersService
 import com.bitwarden.network.service.SyncService
 import com.bitwarden.ui.platform.feature.cardscanner.manager.CardScanManager
 import com.bitwarden.ui.platform.feature.cardscanner.manager.CardScanManagerImpl
@@ -19,12 +18,10 @@ import com.x8bit.bitwarden.data.auth.manager.UserStateManager
 import com.x8bit.bitwarden.data.autofill.manager.FillAssistManager
 import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.data.platform.manager.DatabaseSchemeManager
-import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.PushManager
 import com.x8bit.bitwarden.data.platform.manager.ReviewPromptManager
 import com.x8bit.bitwarden.data.platform.manager.keyrotation.KeyRotationManager
-import com.x8bit.bitwarden.data.platform.manager.network.NetworkConnectionManager
 import com.x8bit.bitwarden.data.platform.manager.policy.PasswordPolicyManager
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.vault.datasource.disk.VaultDiskSource
@@ -41,11 +38,8 @@ import com.x8bit.bitwarden.data.vault.manager.TotpCodeManager
 import com.x8bit.bitwarden.data.vault.manager.TotpCodeManagerImpl
 import com.x8bit.bitwarden.data.vault.manager.VaultLockManager
 import com.x8bit.bitwarden.data.vault.manager.VaultLockManagerImpl
-import com.x8bit.bitwarden.data.vault.manager.VaultMigrationManager
-import com.x8bit.bitwarden.data.vault.manager.VaultMigrationManagerImpl
 import com.x8bit.bitwarden.data.vault.manager.VaultSyncManager
 import com.x8bit.bitwarden.data.vault.manager.VaultSyncManagerImpl
-import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -64,34 +58,6 @@ object VaultManagerModule {
     @Provides
     @Singleton
     fun provideCardScanManager(): CardScanManager = CardScanManagerImpl()
-
-    @Provides
-    @Singleton
-    fun provideVaultMigrationManager(
-        authDiskSource: AuthDiskSource,
-        vaultDiskSource: VaultDiskSource,
-        vaultRepository: VaultRepository,
-        vaultSdkSource: VaultSdkSource,
-        ciphersService: CiphersService,
-        settingsDiskSource: SettingsDiskSource,
-        vaultLockManager: VaultLockManager,
-        policyManager: PolicyManager,
-        featureFlagManager: FeatureFlagManager,
-        connectionManager: NetworkConnectionManager,
-        dispatcherManager: DispatcherManager,
-    ): VaultMigrationManager = VaultMigrationManagerImpl(
-        authDiskSource = authDiskSource,
-        vaultDiskSource = vaultDiskSource,
-        vaultRepository = vaultRepository,
-        vaultSdkSource = vaultSdkSource,
-        ciphersService = ciphersService,
-        settingsDiskSource = settingsDiskSource,
-        vaultLockManager = vaultLockManager,
-        policyManager = policyManager,
-        featureFlagManager = featureFlagManager,
-        connectionManager = connectionManager,
-        dispatcherManager = dispatcherManager,
-    )
 
     @Provides
     @Singleton

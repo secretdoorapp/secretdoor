@@ -98,7 +98,6 @@ import com.x8bit.bitwarden.ui.vault.util.savedSnackbarMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -352,15 +351,12 @@ class VaultAddEditViewModel @Inject constructor(
 
             is VaultAddEditAction.Common.NameTextChange -> handleNameTextInputChange(action)
             is VaultAddEditAction.Common.NotesTextChange -> handleNotesTextInputChange(action)
-            is VaultAddEditAction.Common.OwnershipChange -> handleOwnershipTextInputChange(action)
             is VaultAddEditAction.Common.ToggleFavorite -> handleToggleFavorite(action)
             is VaultAddEditAction.Common.ToggleMasterPasswordReprompt -> {
                 handleToggleMasterPasswordReprompt(action)
             }
 
             is VaultAddEditAction.Common.AttachmentsClick -> handleAttachmentsClick()
-            is VaultAddEditAction.Common.MoveToOrganizationClick -> handleMoveToOrganizationClick()
-            is VaultAddEditAction.Common.CollectionsClick -> handleCollectionsClick()
             is VaultAddEditAction.Common.ArchiveClick -> handleArchiveClick()
             is VaultAddEditAction.Common.UnarchiveClick -> handleUnarchiveClick()
             VaultAddEditAction.Common.UpgradeToPremiumClick -> handleUpgradeToPremiumClick()
@@ -381,7 +377,6 @@ class VaultAddEditViewModel @Inject constructor(
                 handleCustomFieldActionSelected(action)
             }
 
-            is VaultAddEditAction.Common.CollectionSelect -> handleCollectionSelect(action)
             is VaultAddEditAction.Common.InitialAutofillDialogDismissed -> {
                 handleInitialAutofillDialogDismissed()
             }
@@ -449,10 +444,6 @@ class VaultAddEditViewModel @Inject constructor(
 
             is VaultAddEditAction.Common.AddNewFolder -> {
                 handleAddNewFolder(action)
-            }
-
-            VaultAddEditAction.Common.SelectOwnerForItem -> {
-                handleSelectOwnerForItem()
             }
 
             VaultAddEditAction.Common.DismissBottomSheet -> {
@@ -613,13 +604,6 @@ class VaultAddEditViewModel @Inject constructor(
         onEdit { sendEvent(VaultAddEditEvent.NavigateToAttachments(it.vaultItemId)) }
     }
 
-    private fun handleMoveToOrganizationClick() {
-        onEdit { sendEvent(VaultAddEditEvent.NavigateToMoveToOrganization(it.vaultItemId)) }
-    }
-
-    private fun handleCollectionsClick() {
-        onEdit { sendEvent(VaultAddEditEvent.NavigateToCollections(it.vaultItemId)) }
-    }
 
     private fun handleArchiveClick() {
         if (!state.hasPremium) {
@@ -946,14 +930,6 @@ class VaultAddEditViewModel @Inject constructor(
         }
     }
 
-    private fun handleSelectOwnerForItem() {
-        mutableStateFlow.update {
-            it.copy(
-                bottomSheetState = VaultAddEditState.BottomSheetState.OwnerSelection,
-            )
-        }
-    }
-
     private fun handleDismissBottomSheet() {
         mutableStateFlow.update {
             it.copy(
@@ -1106,14 +1082,6 @@ class VaultAddEditViewModel @Inject constructor(
         }
     }
 
-    private fun handleOwnershipTextInputChange(
-        action: VaultAddEditAction.Common.OwnershipChange,
-    ) {
-        updateCommonContent { commonContent ->
-            commonContent.copy(selectedOwnerId = action.ownerId)
-        }
-    }
-
     private fun handleNameTextInputChange(
         action: VaultAddEditAction.Common.NameTextChange,
     ) {
@@ -1124,22 +1092,6 @@ class VaultAddEditViewModel @Inject constructor(
 
     private fun handleTooltipClick() {
         sendEvent(VaultAddEditEvent.NavigateToTooltipUri)
-    }
-
-    private fun handleCollectionSelect(
-        action: VaultAddEditAction.Common.CollectionSelect,
-    ) {
-        updateCommonContent { currentCommonContentState ->
-            currentCommonContentState.copy(
-                selectedOwnerId = currentCommonContentState.selectedOwner?.id,
-                availableOwners = currentCommonContentState
-                    .availableOwners
-                    .toUpdatedOwners(
-                        selectedCollectionId = action.collection.id,
-                        selectedOwnerId = currentCommonContentState.selectedOwner?.id,
-                    ),
-            )
-        }
     }
 
     //endregion Common Handlers
@@ -2716,33 +2668,6 @@ class VaultAddEditViewModel @Inject constructor(
             )
     }
 
-    private fun List<VaultAddEditState.Owner>.toUpdatedOwners(
-        selectedOwnerId: String?,
-        selectedCollectionId: String,
-    ): ImmutableList<VaultAddEditState.Owner> =
-        map { owner ->
-            if (owner.id != selectedOwnerId) return@map owner
-            owner.copy(
-                collections = owner
-                    .collections
-                    .toUpdatedCollections(selectedCollectionId = selectedCollectionId),
-            )
-        }
-            .toImmutableList()
-
-    private fun List<VaultCollection>.toUpdatedCollections(
-        selectedCollectionId: String,
-    ): List<VaultCollection> =
-        map { collection ->
-            collection.copy(
-                isSelected = if (selectedCollectionId == collection.id) {
-                    !collection.isSelected
-                } else {
-                    collection.isSelected
-                },
-            )
-        }
-
     //endregion Utility Functions
 }
 
@@ -2899,10 +2824,6 @@ data class VaultAddEditState(
             ?.hasOrganizations
             ?: false
 
-    val shouldShowMoveToOrganization: Boolean
-        get() = !isAddItemMode &&
-            !isCipherInCollection &&
-            hasOrganizations
 
     /**
      * Enum representing the main type options for the vault, such as LOGIN, CARD, etc.
@@ -3386,12 +3307,6 @@ data class VaultAddEditState(
          */
         @Parcelize
         data object FolderSelection : BottomSheetState()
-
-        /**
-         * Displays a owner selection bottom sheet.
-         */
-        @Parcelize
-        data object OwnerSelection : BottomSheetState()
     }
 
     /**
@@ -3540,12 +3455,6 @@ sealed class VaultAddEditEvent {
         val cipherType: VaultItemCipherType,
     ) : VaultAddEditEvent()
 
-    /**
-     * Navigates to the move to organization screen.
-     */
-    data class NavigateToMoveToOrganization(
-        val cipherId: String,
-    ) : VaultAddEditEvent()
 
     /**
      * Navigates to the upgrade-to-Premium url.
@@ -3559,12 +3468,6 @@ sealed class VaultAddEditEvent {
      */
     data object NavigateToPlanModal : VaultAddEditEvent()
 
-    /**
-     * Navigates to the collections screen.
-     */
-    data class NavigateToCollections(
-        val cipherId: String,
-    ) : VaultAddEditEvent()
 
     /**
      * Navigate the user to the tooltip URI.
@@ -3677,15 +3580,6 @@ sealed class VaultAddEditAction {
          */
         data object InitialAutofillDialogDismissed : Common()
 
-        /**
-         * The user has clicked the move to organization overflow option.
-         */
-        data object MoveToOrganizationClick : Common()
-
-        /**
-         * The user has clicked the collections overflow option.
-         */
-        data object CollectionsClick : Common()
 
         /**
          * The user has clicked the archive overflow option.
@@ -3749,13 +3643,6 @@ sealed class VaultAddEditAction {
         data class NotesTextChange(val notes: String) : Common()
 
         /**
-         * Fired when the owner text input is changed.
-         *
-         * @property ownerId The new owner id.
-         */
-        data class OwnershipChange(val ownerId: String?) : Common()
-
-        /**
          * Represents the action to add a new custom field.
          */
         data class AddNewCustomFieldClick(
@@ -3780,15 +3667,6 @@ sealed class VaultAddEditAction {
          * Represents the action to open tooltip
          */
         data object TooltipClick : Common()
-
-        /**
-         * The user has selected a collection.
-         *
-         * @property collection the collection selected.
-         */
-        data class CollectionSelect(
-            val collection: VaultCollection,
-        ) : Common()
 
         /**
          * The user has changed the visibility state of a hidden field.
@@ -3873,11 +3751,6 @@ sealed class VaultAddEditAction {
          * The user has clicked on folder selection card for the item.
          */
         data object SelectOrAddFolderForItem : Common()
-
-        /**
-         * The user has clicked on owner selection card for the item.
-         */
-        data object SelectOwnerForItem : Common()
 
         /**
          * The user has dismissed the current bottom sheet.

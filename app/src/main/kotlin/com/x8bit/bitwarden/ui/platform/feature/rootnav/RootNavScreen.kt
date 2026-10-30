@@ -52,9 +52,6 @@ import com.x8bit.bitwarden.ui.vault.feature.exportitems.exportItemsGraph
 import com.x8bit.bitwarden.ui.vault.feature.exportitems.navigateToExportItemsGraph
 import com.x8bit.bitwarden.ui.vault.feature.exportitems.verifypassword.navigateToVerifyPassword
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.navigateToVaultItemListingAsRoot
-import com.x8bit.bitwarden.ui.vault.feature.migratetomyitems.MigrateToMyItemsGraphRoute
-import com.x8bit.bitwarden.ui.vault.feature.migratetomyitems.migrateToMyItemsGraph
-import com.x8bit.bitwarden.ui.vault.feature.migratetomyitems.navigateToMigrateToMyItemsGraph
 import com.x8bit.bitwarden.ui.vault.model.VaultAddEditType
 import com.x8bit.bitwarden.ui.vault.model.VaultItemCipherType
 import com.x8bit.bitwarden.ui.vault.model.VaultItemListingType
@@ -95,7 +92,6 @@ fun RootNavScreen(
         setupAutoFillDestinationAsRoot()
         setupCompleteDestination()
         exportItemsGraph(navController)
-        migrateToMyItemsGraph(navController)
     }
 
     val targetRoute = when (state) {
@@ -122,7 +118,6 @@ fun RootNavScreen(
         RootNavState.OnboardingAutoFillSetup -> SetupAutofillRoute.AsRoot
         RootNavState.OnboardingBrowserAutofillSetup -> SetupBrowserAutofillRoute.AsRoot
         RootNavState.OnboardingStepsComplete -> SetupCompleteRoute
-        is RootNavState.MigrateToMyItems -> MigrateToMyItemsGraphRoute
     }
     val currentRoute = navController.currentDestination?.rootLevelRoute()
 
@@ -159,10 +154,6 @@ fun RootNavScreen(
     LaunchedEffect(state) {
         when (val currentState = state) {
             RootNavState.Auth -> navController.navigateToAuthGraph(rootNavOptions)
-            is RootNavState.MigrateToMyItems -> {
-                navController.navigateToMigrateToMyItemsGraph(rootNavOptions)
-            }
-
             RootNavState.Splash -> navController.navigateToSplash(rootNavOptions)
             RootNavState.VaultLocked -> navController.navigateToVaultUnlock(rootNavOptions)
             is RootNavState.VaultUnlocked -> navController.navigateToVaultUnlockedGraph(
@@ -284,20 +275,10 @@ private fun AnimatedContentTransitionScope<NavBackStackEntry>.toEnterTransition(
     return if (initialRoute == targetRoute) {
         RootTransitionProviders.Enter.none
     } else {
-        when (targetState.destination.rootLevelRoute()) {
-            MigrateToMyItemsGraphRoute.toObjectNavigationRoute(),
-                -> RootTransitionProviders.Enter.slideUp
-
-            else -> when (initialState.destination.rootLevelRoute()) {
-                // Disable transitions when coming from the splash screen
-                SplashRoute.toObjectNavigationRoute() -> RootTransitionProviders.Enter.none
-                // The MigrateToMyItemsGraphRoute animation should stay but due to an issue
-                // when combining certain animations, we are just using a fadeIn instead.
-                MigrateToMyItemsGraphRoute.toObjectNavigationRoute(),
-                    -> RootTransitionProviders.Enter.fadeIn
-
-                else -> RootTransitionProviders.Enter.fadeIn
-            }
+        when (initialRoute) {
+            // Disable transitions when coming from the splash screen
+            SplashRoute.toObjectNavigationRoute() -> RootTransitionProviders.Enter.none
+            else -> RootTransitionProviders.Enter.fadeIn
         }
     }
 }
@@ -315,15 +296,7 @@ private fun AnimatedContentTransitionScope<NavBackStackEntry>.toExitTransition()
         when (initialRoute) {
             // Disable transitions when coming from the splash screen
             SplashRoute.toObjectNavigationRoute() -> RootTransitionProviders.Exit.none
-            MigrateToMyItemsGraphRoute.toObjectNavigationRoute(),
-                -> RootTransitionProviders.Exit.slideDown
-
-            else -> when (targetRoute) {
-                MigrateToMyItemsGraphRoute.toObjectNavigationRoute(),
-                    -> RootTransitionProviders.Exit.stay
-
-                else -> RootTransitionProviders.Exit.fadeOut
-            }
+            else -> RootTransitionProviders.Exit.fadeOut
         }
     }
 }

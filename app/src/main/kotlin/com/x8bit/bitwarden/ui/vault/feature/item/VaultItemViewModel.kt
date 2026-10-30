@@ -353,8 +353,6 @@ class VaultItemViewModel @Inject constructor(
 
             is VaultItemAction.Common.AttachmentsClick -> handleAttachmentsClick()
             is VaultItemAction.Common.CloneClick -> handleCloneClick()
-            is VaultItemAction.Common.MoveToOrganizationClick -> handleMoveToOrganizationClick()
-            is VaultItemAction.Common.CollectionsClick -> handleCollectionsClick()
             is VaultItemAction.Common.ConfirmDeleteClick -> handleConfirmDeleteClick()
             is VaultItemAction.Common.ConfirmRestoreClick -> handleConfirmRestoreClick()
             is VaultItemAction.Common.DeleteClick -> handleDeleteClick()
@@ -569,13 +567,6 @@ class VaultItemViewModel @Inject constructor(
         }
     }
 
-    private fun handleMoveToOrganizationClick() {
-        sendEvent(VaultItemEvent.NavigateToMoveToOrganization(itemId = state.vaultItemId))
-    }
-
-    private fun handleCollectionsClick() {
-        sendEvent(VaultItemEvent.NavigateToCollections(itemId = state.vaultItemId))
-    }
 
     private fun handleConfirmDeleteClick() {
         onContent { content ->
@@ -2504,19 +2495,6 @@ sealed class VaultItemEvent {
         val itemId: String,
     ) : VaultItemEvent()
 
-    /**
-     * Navigates to the move to organization screen.
-     */
-    data class NavigateToMoveToOrganization(
-        val itemId: String,
-    ) : VaultItemEvent()
-
-    /**
-     * Navigates to the collections screen.
-     */
-    data class NavigateToCollections(
-        val itemId: String,
-    ) : VaultItemEvent()
 
     /**
      * Navigates to select a location where to save an attachment with the name [fileName].
@@ -2662,15 +2640,6 @@ sealed class VaultItemAction {
          */
         data object CloneClick : Common()
 
-        /**
-         * The user has clicked the move to organization button.
-         */
-        data object MoveToOrganizationClick : Common()
-
-        /**
-         * The user has clicked the collections button.
-         */
-        data object CollectionsClick : Common()
 
         /**
          * The user has clicked the download button.

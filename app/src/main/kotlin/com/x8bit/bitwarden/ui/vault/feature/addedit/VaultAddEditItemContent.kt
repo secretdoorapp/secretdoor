@@ -35,7 +35,6 @@ import com.bitwarden.ui.util.asText
 import com.x8bit.bitwarden.data.platform.repository.model.UriMatchType
 import com.x8bit.bitwarden.ui.platform.composition.util.vfo1Foundation
 import com.x8bit.bitwarden.ui.platform.manager.permissions.PermissionsManager
-import com.x8bit.bitwarden.ui.vault.components.collectionItemsSelector
 import com.x8bit.bitwarden.ui.vault.feature.addedit.handlers.VaultAddEditBankAccountTypeHandlers
 import com.x8bit.bitwarden.ui.vault.feature.addedit.handlers.VaultAddEditCardTypeHandlers
 import com.x8bit.bitwarden.ui.vault.feature.addedit.handlers.VaultAddEditCommonHandlers
@@ -201,50 +200,12 @@ fun CoachMarkScope<AddEditItemCoachMark>.VaultAddEditContent(
                     focusManager.clearFocus()
                     commonTypeHandlers.onSelectOrAddFolderForItem()
                 },
-                cardStyle = if (isAddItemMode && state.common.hasOrganizations) {
-                    CardStyle.Top(dividerPadding = 0.dp)
-                } else {
-                    CardStyle.Full
-                },
+                cardStyle = CardStyle.Full,
                 modifier = Modifier
                     .testTag(tag = "FolderPicker")
                     .fillMaxWidth()
                     .standardHorizontalMargin(),
             )
-        }
-
-        if (isAddItemMode && state.common.hasOrganizations) {
-            val collections = state.common.selectedOwner?.collections.orEmpty()
-            item {
-                BitwardenTextSelectionButton(
-                    label = stringResource(
-                        id = vfo1Foundation(BitwardenString.vault, BitwardenString.owner),
-                    ),
-                    selectedOption = state.common.selectedOwner?.name?.invoke(),
-                    onClick = {
-                        // Clear any current focused item, such as an unrelated text field, so the
-                        // soft keyboard is not animating away while the bottom sheet animates in.
-                        focusManager.clearFocus()
-                        commonTypeHandlers.onPresentOwnerOptions()
-                    },
-                    cardStyle = if (collections.isNotEmpty()) {
-                        CardStyle.Middle()
-                    } else {
-                        CardStyle.Bottom
-                    },
-                    modifier = Modifier
-                        .testTag(tag = "ItemOwnershipPicker")
-                        .fillMaxWidth()
-                        .standardHorizontalMargin(),
-                )
-            }
-
-            if (collections.isNotEmpty()) {
-                collectionItemsSelector(
-                    collectionList = collections,
-                    onCollectionSelect = commonTypeHandlers.onCollectionSelect,
-                )
-            }
         }
 
         when (state.type) {

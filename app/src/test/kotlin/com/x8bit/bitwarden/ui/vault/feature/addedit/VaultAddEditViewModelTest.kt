@@ -691,46 +691,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `MoveToOrganizationClick should emit NavigateToMoveToOrganization`() = runTest {
-        val vaultAddEditType = VaultAddEditType.EditItem(DEFAULT_ITEM_ID)
-        val initState = createVaultAddItemState(vaultAddEditType = vaultAddEditType)
-        val viewModel = createAddVaultItemViewModel(
-            savedStateHandle = createSavedStateHandleWithState(
-                state = initState,
-                vaultAddEditType = vaultAddEditType,
-                vaultItemCipherType = VaultItemCipherType.LOGIN,
-            ),
-        )
-        viewModel.eventFlow.test {
-            viewModel.trySendAction(VaultAddEditAction.Common.MoveToOrganizationClick)
-            assertEquals(
-                VaultAddEditEvent.NavigateToMoveToOrganization(DEFAULT_ITEM_ID),
-                awaitItem(),
-            )
-        }
-    }
-
-    @Test
-    fun `CollectionsClick should emit NavigateToCollections`() = runTest {
-        val vaultAddEditType = VaultAddEditType.EditItem(DEFAULT_ITEM_ID)
-        val initState = createVaultAddItemState(vaultAddEditType = vaultAddEditType)
-        val viewModel = createAddVaultItemViewModel(
-            savedStateHandle = createSavedStateHandleWithState(
-                state = initState,
-                vaultAddEditType = vaultAddEditType,
-                vaultItemCipherType = VaultItemCipherType.LOGIN,
-            ),
-        )
-        viewModel.eventFlow.test {
-            viewModel.trySendAction(VaultAddEditAction.Common.CollectionsClick)
-            assertEquals(
-                VaultAddEditEvent.NavigateToCollections(DEFAULT_ITEM_ID),
-                awaitItem(),
-            )
-        }
-    }
-
-    @Test
     @Suppress("MaxLineLength")
     fun `ConfirmDeleteClick with DeleteCipherResult Success should emit send snackbar event and NavigateBack`() =
         runTest {
@@ -5017,60 +4977,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
             assertEquals(expectedState, viewModel.stateFlow.value)
         }
 
-        @Test
-        fun `OwnershipChange should update ownership`() = runTest {
-            val action = VaultAddEditAction.Common.OwnershipChange("mockId-1")
-
-            viewModel.trySendAction(action)
-
-            val expectedState = vaultAddItemInitialState.copy(
-                viewState = VaultAddEditState.ViewState.Content(
-                    common = createCommonContentViewState()
-                        .copy(selectedOwnerId = "mockId-1"),
-                    isIndividualVaultDisabled = false,
-                    type = createLoginTypeContentViewState(),
-                ),
-            )
-
-            assertEquals(expectedState, viewModel.stateFlow.value)
-        }
-
-        @Test
-        fun `SelectOwnerForItem should update state to show bottom sheet`() = runTest {
-            val action = VaultAddEditAction.Common.SelectOwnerForItem
-
-            viewModel.trySendAction(action)
-
-            val expectedState = vaultAddItemInitialState.copy(
-                bottomSheetState = VaultAddEditState.BottomSheetState.OwnerSelection,
-            )
-
-            assertEquals(expectedState, viewModel.stateFlow.value)
-        }
-
-        @Test
-        fun `DismissOwnerSelectionBottomSheet should update state to hide bottom sheet`() =
-            runTest {
-                val action = VaultAddEditAction.Common.DismissBottomSheet
-
-                viewModel.trySendAction(VaultAddEditAction.Common.SelectOwnerForItem)
-
-                assertEquals(
-                    vaultAddItemInitialState.copy(
-                        bottomSheetState = VaultAddEditState.BottomSheetState.OwnerSelection,
-                    ),
-                    viewModel.stateFlow.value,
-                )
-                val expectedState = vaultAddItemInitialState.copy(
-                    bottomSheetState = null,
-                )
-                viewModel.trySendAction(action)
-                assertEquals(
-                    expectedState,
-                    viewModel.stateFlow.value,
-                )
-            }
-
         @Suppress("MaxLineLength")
         @Test
         fun `AddNewCustomFieldClick should allow a user to add a custom boolean field in Secure notes item`() =
@@ -5408,78 +5314,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
                 settingsRepository.initialAutofillDialogShown = true
             }
         }
-
-        @Test
-        fun `CollectionSelect should update availableOwners collections`() = runTest {
-            viewModel.trySendAction(ownershipChangeAction())
-
-            val action = collectionSelectAction()
-            viewModel.trySendAction(action)
-
-            val expectedState = vaultAddItemInitialState.copy(
-                viewState = VaultAddEditState.ViewState.Content(
-                    common = createCommonContentViewState(
-                        availableOwners = createOwnerList(isCollectionSelected = true),
-                        selectedOwnerId = "organizationId",
-                    ),
-                    isIndividualVaultDisabled = false,
-                    type = createLoginTypeContentViewState(),
-                ),
-            )
-            assertEquals(expectedState, viewModel.stateFlow.value)
-        }
-
-        @Suppress("MaxLineLength")
-        @Test
-        fun `CollectionSelect should update selectedOwnerId when isIndividualVaultDisabled is true`() =
-            runTest {
-                every {
-                    policyManager.getActivePolicies(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-                } returns listOf(
-                    createMockSdkPolicy(
-                        organizationId = "Test Org",
-                        id = "testId",
-                        type = PolicyType.ORGANIZATION_DATA_OWNERSHIP,
-                        enabled = true,
-                    ),
-                )
-
-                val vaultAddEditType = VaultAddEditType.AddItem()
-                val vaultItemCipherType = VaultItemCipherType.LOGIN
-                mutableVaultDataFlow.value = DataState.Loaded(
-                    data = createVaultData(),
-                )
-
-                val viewModel = createAddVaultItemViewModel(
-                    savedStateHandle = createSavedStateHandleWithState(
-                        state = null,
-                        vaultAddEditType = vaultAddEditType,
-                        vaultItemCipherType = vaultItemCipherType,
-                    ),
-                )
-
-                val action = collectionSelectAction()
-                viewModel.trySendAction(action)
-
-                val expectedState = vaultAddItemInitialState.copy(
-                    viewState = VaultAddEditState.ViewState.Content(
-                        common = createCommonContentViewState(
-                            availableOwners = listOf(
-                                VaultAddEditState.Owner(
-                                    id = "organizationId",
-                                    name = "organizationName".asText(),
-                                    collections = emptyList(),
-                                ),
-                            ),
-                            selectedOwnerId = "organizationId",
-                        ),
-                        isIndividualVaultDisabled = true,
-                        type = createLoginTypeContentViewState(),
-                    ),
-                    hasPremium = true,
-                )
-                assertEquals(expectedState, viewModel.stateFlow.value)
-            }
 
         @Suppress("MaxLineLength")
         @Test
@@ -6722,19 +6556,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
                 } else {
                     emptyList()
                 },
-            ),
-        )
-
-    private fun ownershipChangeAction(): VaultAddEditAction.Common.OwnershipChange =
-        VaultAddEditAction.Common.OwnershipChange("organizationId")
-
-    private fun collectionSelectAction(): VaultAddEditAction.Common.CollectionSelect =
-        VaultAddEditAction.Common.CollectionSelect(
-            VaultCollection(
-                id = "mockId-1",
-                name = "mockName-1",
-                isSelected = false,
-                isDefaultUserCollection = false,
             ),
         )
 

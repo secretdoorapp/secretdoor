@@ -83,6 +83,17 @@ stored key material.
     and listing types, the `ShareNewSend` special circumstance and the `ACTION_SEND` intent filter.
   - [ ] Send data layer: `VaultDiskSource` Send storage, `VaultSdkSource` Send encrypt/decrypt,
     `VaultSdkSendExtensions` (goes with the `:network` cleanup).
+  - [x] Organizations/collections UI (not yet compiled or tested): delete Move to organization /
+    Collections screen and menu options, Leave organization, Migrate to My Items (and
+    `VaultMigrationManager`), the owner picker, owner bottom sheet and collection selector in
+    add/edit.
+  - [ ] Organizations/collections data layer: vault screen collection section and organization
+    vault filter, `VaultItemListingType.Collection`, collection/organization search types,
+    `OrganizationManager`, `CollectionsDao`, org/collection SDK extensions, policies
+    (`PolicyManager`), organization events. Do this with compiler feedback.
+  - [ ] Bug: `VaultAddEditViewModel.hasValidationErrors` blocks saving an item when the phone is
+    offline ("Internet connection required"). Remove the network check. Also review the other
+    `isNetworkConnected` checks (vault and item listing pull-to-refresh, Settings > Other sync).
 
 ### Phase 4: Backup and restore
 - Free: "Export encrypted backup" saves the password-protected file wherever the user picks

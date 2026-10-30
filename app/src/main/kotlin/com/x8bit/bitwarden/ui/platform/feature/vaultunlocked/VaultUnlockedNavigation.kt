@@ -69,8 +69,6 @@ import com.x8bit.bitwarden.ui.vault.feature.item.vaultItemDestination
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.vaultItemListingDestinationAsRoot
 import com.x8bit.bitwarden.ui.vault.feature.manualcodeentry.navigateToManualCodeEntryScreen
 import com.x8bit.bitwarden.ui.vault.feature.manualcodeentry.vaultManualCodeEntryDestination
-import com.x8bit.bitwarden.ui.vault.feature.movetoorganization.navigateToVaultMoveToOrganization
-import com.x8bit.bitwarden.ui.vault.feature.movetoorganization.vaultMoveToOrganizationDestination
 import com.x8bit.bitwarden.ui.vault.feature.qrcodescan.navigateToQrCodeScanScreen
 import com.x8bit.bitwarden.ui.vault.feature.qrcodescan.vaultQrCodeScanDestination
 import kotlinx.serialization.Serializable
@@ -193,12 +191,6 @@ fun NavGraphBuilder.vaultUnlockedGraph(
             onNavigateBack = { navController.popBackStack() },
             onNavigateToGeneratorModal = { navController.navigateToGeneratorModal(mode = it) },
             onNavigateToAttachments = { navController.navigateToAttachment(it) },
-            onNavigateToMoveToOrganization = { vaultItemId, showOnlyCollections ->
-                navController.navigateToVaultMoveToOrganization(
-                    vaultItemId = vaultItemId,
-                    showOnlyCollections = showOnlyCollections,
-                )
-            },
             onNavigateToPlan = { navController.navigateToPlanModal() },
             onCloseAndNavigateToVaultItem = { cipherId, cipherType ->
                 navController.navigateToVaultItem(
@@ -211,18 +203,9 @@ fun NavGraphBuilder.vaultUnlockedGraph(
                 )
             },
         )
-        vaultMoveToOrganizationDestination(
-            onNavigateBack = { navController.popBackStack() },
-        )
         vaultItemDestination(
             onNavigateBack = { navController.popBackStack() },
             onNavigateToVaultEditItem = { navController.navigateToVaultAddEdit(it) },
-            onNavigateToMoveToOrganization = { vaultItemId, showOnlyCollections ->
-                navController.navigateToVaultMoveToOrganization(
-                    vaultItemId = vaultItemId,
-                    showOnlyCollections = showOnlyCollections,
-                )
-            },
             onNavigateToAttachments = { navController.navigateToAttachment(it) },
             onNavigateToPasswordHistory = {
                 navController.navigateToPasswordHistory(

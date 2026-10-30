@@ -16,8 +16,6 @@ import com.x8bit.bitwarden.data.credentials.model.GetCredentialsRequest
 import com.x8bit.bitwarden.data.credentials.model.ProviderGetPasswordCredentialRequest
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
-import com.x8bit.bitwarden.data.vault.manager.VaultMigrationManager
-import com.x8bit.bitwarden.data.vault.manager.model.VaultMigrationData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
@@ -33,7 +31,6 @@ import javax.inject.Inject
 class RootNavViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     specialCircumstanceManager: SpecialCircumstanceManager,
-    vaultMigrationManager: VaultMigrationManager,
 ) : BaseViewModel<RootNavState, Unit, RootNavAction>(
     initialState = RootNavState.Splash,
 ) {
@@ -42,13 +39,11 @@ class RootNavViewModel @Inject constructor(
             authRepository.authStateFlow,
             authRepository.userStateFlow,
             specialCircumstanceManager.specialCircumstanceStateFlow,
-            vaultMigrationManager.vaultMigrationDataStateFlow,
-        ) { authState, userState, specialCircumstance, vaultMigrationData ->
+        ) { authState, userState, specialCircumstance ->
             RootNavAction.Internal.UserStateUpdateReceive(
                 authState = authState,
                 userState = userState,
                 specialCircumstance = specialCircumstance,
-                vaultMigrationData = vaultMigrationData,
             )
         }
             .onEach(::sendAction)
@@ -88,10 +83,6 @@ class RootNavViewModel @Inject constructor(
                 userState.activeAccount.onboardingStatus != OnboardingStatus.COMPLETE -> {
                 getOnboardingNavState(onboardingStatus = userState.activeAccount.onboardingStatus)
             }
-
-            userState.activeAccount.isVaultUnlocked &&
-                action.vaultMigrationData is VaultMigrationData.MigrationRequired &&
-                shouldShowVaultMigration(specialCircumstance) -> RootNavState.MigrateToMyItems
 
             userState.activeAccount.isVaultUnlocked -> {
                 when (specialCircumstance) {
@@ -208,36 +199,6 @@ class RootNavViewModel @Inject constructor(
         OnboardingStatus.FINAL_STEP -> RootNavState.OnboardingStepsComplete
         OnboardingStatus.COMPLETE -> throw IllegalStateException("Should not have entered here.")
     }
-
-    /**
-     * Determines whether the vault migration screen should be shown based on the special
-     * circumstance. Returns true for circumstances that are shortcuts not blocking user from
-     * essential operations like autofill, passkeys or Credential Manager
-     */
-    private fun shouldShowVaultMigration(specialCircumstance: SpecialCircumstance?): Boolean =
-        when (specialCircumstance) {
-            is SpecialCircumstance.AccountSecurityShortcut,
-            is SpecialCircumstance.GeneratorShortcut,
-            is SpecialCircumstance.PremiumCheckout,
-            is SpecialCircumstance.StripePortal,
-            is SpecialCircumstance.SearchShortcut,
-            is SpecialCircumstance.VerificationCodeShortcut,
-            is SpecialCircumstance.VaultShortcut,
-            null,
-                -> true
-
-            is SpecialCircumstance.AddTotpLoginItem,
-            is SpecialCircumstance.AutofillSave,
-            is SpecialCircumstance.AutofillSelection,
-            is SpecialCircumstance.CredentialExchangeExport,
-            is SpecialCircumstance.Fido2Assertion,
-            is SpecialCircumstance.PasswordlessRequest,
-            is SpecialCircumstance.ProviderGetCredentials,
-            is SpecialCircumstance.ProviderGetPasswordRequest,
-            is SpecialCircumstance.ProviderCreateCredential,
-            is SpecialCircumstance.RegistrationEvent,
-                -> false
-        }
 }
 
 /**
@@ -261,12 +222,6 @@ sealed class RootNavState : Parcelable {
      */
     @Parcelize
     data object VaultLocked : RootNavState()
-
-    /**
-     * App should show MigrateToMyItems graph.
-     */
-    @Parcelize
-    data object MigrateToMyItems : RootNavState()
 
     /**
      * App should show vault unlocked nav graph for the given [activeUserId].
@@ -420,7 +375,6 @@ sealed class RootNavAction {
             val authState: AuthState,
             val userState: UserState?,
             val specialCircumstance: SpecialCircumstance?,
-            val vaultMigrationData: VaultMigrationData,
         ) : RootNavAction()
     }
 }

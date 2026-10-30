@@ -41,7 +41,6 @@ import com.bitwarden.ui.platform.manager.IntentManager
 import com.bitwarden.ui.platform.resource.BitwardenDrawable
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.asText
-import com.x8bit.bitwarden.ui.platform.composition.util.vfo1Foundation
 import com.x8bit.bitwarden.ui.vault.feature.addedit.VaultAddEditArgs
 import com.x8bit.bitwarden.ui.vault.feature.attachments.preview.PreviewAttachmentRoute
 import com.x8bit.bitwarden.ui.vault.feature.item.handlers.VaultBankAccountItemTypeHandlers
@@ -66,7 +65,6 @@ fun VaultItemScreen(
     intentManager: IntentManager = LocalIntentManager.current,
     onNavigateBack: () -> Unit,
     onNavigateToVaultAddEditItem: (args: VaultAddEditArgs) -> Unit,
-    onNavigateToMoveToOrganization: (vaultItemId: String, showOnlyCollections: Boolean) -> Unit,
     onNavigateToAttachments: (vaultItemId: String) -> Unit,
     onNavigateToPasswordHistory: (vaultItemId: String) -> Unit,
     onNavigateToPreviewAttachment: (route: PreviewAttachmentRoute) -> Unit,
@@ -110,13 +108,6 @@ fun VaultItemScreen(
 
             is VaultItemEvent.NavigateToAttachments -> onNavigateToAttachments(event.itemId)
 
-            is VaultItemEvent.NavigateToMoveToOrganization -> {
-                onNavigateToMoveToOrganization(event.itemId, false)
-            }
-
-            is VaultItemEvent.NavigateToCollections -> {
-                onNavigateToMoveToOrganization(event.itemId, true)
-            }
 
             is VaultItemEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.data)
 
@@ -202,38 +193,6 @@ fun VaultItemScreen(
                                 },
                             )
                                 .takeUnless { state.isCipherInCollection },
-                            OverflowMenuItemData(
-                                text = stringResource(
-                                    id = vfo1Foundation(
-                                        new = BitwardenString.move,
-                                        old = BitwardenString.move_to_organization,
-                                    ),
-                                ),
-                                onClick = {
-                                    viewModel.trySendAction(
-                                        VaultItemAction.Common.MoveToOrganizationClick,
-                                    )
-                                },
-                            )
-                                .takeUnless {
-                                    state.isCipherInCollection ||
-                                        !state.hasOrganizations
-                                },
-                            OverflowMenuItemData(
-                                text = stringResource(
-                                    id = vfo1Foundation(
-                                        new = BitwardenString.shared_folders,
-                                        old = BitwardenString.collections,
-                                    ),
-                                ),
-                                onClick = {
-                                    viewModel.trySendAction(VaultItemAction.Common.CollectionsClick)
-                                },
-                            )
-                                .takeIf {
-                                    state.isCipherInCollection &&
-                                        state.canAssignToCollections
-                                },
                             OverflowMenuItemData(
                                 text = stringResource(id = BitwardenString.archive_verb),
                                 onClick = {

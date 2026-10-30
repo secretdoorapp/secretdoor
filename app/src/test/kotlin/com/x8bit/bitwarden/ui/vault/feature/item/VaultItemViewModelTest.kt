@@ -1492,52 +1492,6 @@ class VaultItemViewModelTest : BaseViewModelTest() {
             }
         }
 
-        @Test
-        fun `on MoveToOrganizationClick should emit NavigateToMoveToOrganization`() = runTest {
-            val loginState = DEFAULT_STATE.copy(viewState = DEFAULT_VIEW_STATE)
-            every {
-                mockCipherView.toViewState(
-                    previousState = null,
-                    isPremiumUser = true,
-                    canDelete = true,
-                    canRestore = false,
-                    canAssignToCollections = true,
-                    canEdit = true,
-                    totpCodeItemData = null,
-                    baseIconUrl = Environment.Prod.Us.baseIconUrl,
-                    isIconLoadingDisabled = false,
-                    relatedLocations = persistentListOf(),
-                    hasOrganizations = true,
-                )
-            } returns DEFAULT_VIEW_STATE
-            mutableVaultItemFlow.value = DataState.Loaded(data = mockCipherView)
-            mutableAuthCodeItemFlow.value = DataState.Loaded(data = null)
-            mutableCollectionsStateFlow.value = DataState.Loaded(emptyList())
-            mutableFoldersStateFlow.value = DataState.Loaded(emptyList())
-
-            assertEquals(loginState, viewModel.stateFlow.value)
-
-            viewModel.eventFlow.test {
-                viewModel.trySendAction(VaultItemAction.Common.MoveToOrganizationClick)
-                assertEquals(
-                    VaultItemEvent.NavigateToMoveToOrganization(itemId = VAULT_ITEM_ID),
-                    awaitItem(),
-                )
-            }
-        }
-
-        @Test
-        fun `on CollectionsClick should emit NavigateToCollections`() = runTest {
-            val viewModel = createViewModel(state = DEFAULT_STATE)
-            viewModel.eventFlow.test {
-                viewModel.trySendAction(VaultItemAction.Common.CollectionsClick)
-                assertEquals(
-                    VaultItemEvent.NavigateToCollections(itemId = VAULT_ITEM_ID),
-                    awaitItem(),
-                )
-            }
-        }
-
         @Suppress("MaxLineLength")
         @Test
         fun `on AttachmentDownloadClick should show loading dialog, attempt to download an attachment, and display an error dialog on failure`() =

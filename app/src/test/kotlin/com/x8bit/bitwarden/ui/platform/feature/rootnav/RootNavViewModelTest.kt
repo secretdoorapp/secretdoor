@@ -7,16 +7,12 @@ import androidx.credentials.provider.ProviderCreateCredentialRequest
 import com.bitwarden.core.data.manager.dispatcher.FakeDispatcherManager
 import com.bitwarden.cxf.model.ImportCredentialsRequestData
 import com.bitwarden.data.repository.model.Environment
-import com.bitwarden.network.model.JwtTokenDataJson
-import com.bitwarden.network.model.OrganizationType
 import com.bitwarden.network.util.parseJwtTokenDataOrNull
 import com.bitwarden.ui.platform.base.BaseViewModelTest
-import com.bitwarden.ui.platform.manager.share.model.ShareData
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.OnboardingStatus
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.AuthState
 import com.x8bit.bitwarden.data.auth.repository.model.UserState
-import com.x8bit.bitwarden.data.auth.repository.model.createMockOrganization
 import com.x8bit.bitwarden.data.autofill.model.AutofillSaveItem
 import com.x8bit.bitwarden.data.autofill.model.AutofillSelectionData
 import com.x8bit.bitwarden.data.credentials.model.CreateCredentialRequest
@@ -28,8 +24,6 @@ import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.model.CompleteRegistrationData
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
-import com.x8bit.bitwarden.data.vault.manager.VaultMigrationManager
-import com.x8bit.bitwarden.data.vault.manager.model.VaultMigrationData
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -61,12 +55,6 @@ class RootNavViewModelTest : BaseViewModelTest() {
             authRepository = mockAuthRepository,
             dispatcherManager = FakeDispatcherManager(),
         )
-
-    private val mutableVaultMigrationDataStateFlow =
-        MutableStateFlow<VaultMigrationData>(VaultMigrationData.NoMigrationRequired)
-    private val vaultMigrationManager = mockk<VaultMigrationManager> {
-        every { vaultMigrationDataStateFlow } returns mutableVaultMigrationDataStateFlow
-    }
 
     @BeforeEach
     fun setup() {
@@ -1340,110 +1328,10 @@ class RootNavViewModelTest : BaseViewModelTest() {
         )
     }
 
-    @Test
-    fun `when vaultMigrationDataStateFlow emits true the nav state should be MigrateToMyItems`() {
-        mutableVaultMigrationDataStateFlow.value = MOCK_VAULT_MIGRATION_DATA
-        mutableUserStateFlow.tryEmit(MOCK_VAULT_UNLOCKED_USER_STATE)
-        val viewModel = createViewModel()
-
-        assertEquals(
-            RootNavState.MigrateToMyItems,
-            viewModel.stateFlow.value,
-        )
-    }
-
-    @Test
-    fun `when vault is locked MigrateToMyItems should not show even if flow emits true`() {
-        mutableVaultMigrationDataStateFlow.value = MOCK_VAULT_MIGRATION_DATA
-
-        // Vault is locked
-        mutableUserStateFlow.tryEmit(
-            MOCK_VAULT_UNLOCKED_USER_STATE.copy(
-                accounts = listOf(
-                    MOCK_VAULT_UNLOCKED_USER_STATE.activeAccount.copy(isVaultUnlocked = false),
-                ),
-            ),
-        )
-        val viewModel = createViewModel()
-
-        assertEquals(
-            RootNavState.VaultLocked,
-            viewModel.stateFlow.value,
-        )
-    }
-
-    @Test
-    fun `when vaultMigrationDataStateFlow emits false MigrateToMyItems should not show`() {
-        mutableVaultMigrationDataStateFlow.value = VaultMigrationData.NoMigrationRequired
-        mutableUserStateFlow.tryEmit(MOCK_VAULT_UNLOCKED_USER_STATE)
-        val viewModel = createViewModel()
-
-        assertEquals(
-            RootNavState.VaultUnlocked("activeUserId"),
-            viewModel.stateFlow.value,
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `when migration required with AutofillSave circumstance should prioritize AutofillSave over migration`() {
-        val autofillSaveItem: AutofillSaveItem = mockk()
-        specialCircumstanceManager.specialCircumstance =
-            SpecialCircumstance.AutofillSave(autofillSaveItem = autofillSaveItem)
-        mutableVaultMigrationDataStateFlow.value = MOCK_VAULT_MIGRATION_DATA
-        mutableUserStateFlow.tryEmit(MOCK_VAULT_UNLOCKED_USER_STATE)
-        val viewModel = createViewModel()
-
-        assertEquals(
-            RootNavState.VaultUnlockedForAutofillSave(autofillSaveItem = autofillSaveItem),
-            viewModel.stateFlow.value,
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `when migration required with AutofillSelection circumstance should prioritize AutofillSelection over migration`() {
-        val autofillSelectionData = AutofillSelectionData(
-            type = AutofillSelectionData.Type.LOGIN,
-            framework = AutofillSelectionData.Framework.AUTOFILL,
-            uri = "uri",
-        )
-        specialCircumstanceManager.specialCircumstance =
-            SpecialCircumstance.AutofillSelection(
-                autofillSelectionData = autofillSelectionData,
-                shouldFinishWhenComplete = true,
-            )
-        mutableVaultMigrationDataStateFlow.value = MOCK_VAULT_MIGRATION_DATA
-        mutableUserStateFlow.tryEmit(MOCK_VAULT_UNLOCKED_USER_STATE)
-        val viewModel = createViewModel()
-
-        assertEquals(
-            RootNavState.VaultUnlockedForAutofillSelection(
-                activeUserId = "activeUserId",
-                type = AutofillSelectionData.Type.LOGIN,
-            ),
-            viewModel.stateFlow.value,
-        )
-    }
-
-    @Test
-    fun `when migration required with VaultShortcut should show migration screen`() {
-        specialCircumstanceManager.specialCircumstance = SpecialCircumstance.VaultShortcut
-        mutableVaultMigrationDataStateFlow.value = MOCK_VAULT_MIGRATION_DATA
-        mutableUserStateFlow.tryEmit(MOCK_VAULT_UNLOCKED_USER_STATE)
-        val viewModel = createViewModel()
-
-        assertEquals(
-            RootNavState.MigrateToMyItems,
-            viewModel.stateFlow.value,
-        )
-    }
-
     private fun createViewModel(): RootNavViewModel =
         RootNavViewModel(
             authRepository = authRepository,
             specialCircumstanceManager = specialCircumstanceManager,
-            vaultMigrationManager = vaultMigrationManager,
         )
 }
 
@@ -1531,9 +1419,4 @@ private val MOCK_VAULT_UNLOCKED_USER_MULTIPLE_ACCOUNTS_STATE = UserState(
             creationDate = null,
         ),
     ),
-)
-
-private val MOCK_VAULT_MIGRATION_DATA = VaultMigrationData.MigrationRequired(
-    organizationName = "organizationName",
-    organizationId = "mockOrganizationId-1",
 )

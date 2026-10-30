@@ -49,7 +49,6 @@ fun SavedStateHandle.toVaultItemArgs(): VaultItemArgs {
 fun NavGraphBuilder.vaultItemDestination(
     onNavigateBack: () -> Unit,
     onNavigateToVaultEditItem: (args: VaultAddEditArgs) -> Unit,
-    onNavigateToMoveToOrganization: (vaultItemId: String, showOnlyCollections: Boolean) -> Unit,
     onNavigateToAttachments: (vaultItemId: String) -> Unit,
     onNavigateToPasswordHistory: (vaultItemId: String) -> Unit,
     onNavigateToPreviewAttachment: (route: PreviewAttachmentRoute) -> Unit,
@@ -59,7 +58,6 @@ fun NavGraphBuilder.vaultItemDestination(
         VaultItemScreen(
             onNavigateBack = onNavigateBack,
             onNavigateToVaultAddEditItem = onNavigateToVaultEditItem,
-            onNavigateToMoveToOrganization = onNavigateToMoveToOrganization,
             onNavigateToAttachments = onNavigateToAttachments,
             onNavigateToPasswordHistory = onNavigateToPasswordHistory,
             onNavigateToPreviewAttachment = onNavigateToPreviewAttachment,

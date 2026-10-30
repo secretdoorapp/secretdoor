@@ -45,7 +45,6 @@ import com.bitwarden.core.util.persistentListOfNotNull
 import com.bitwarden.ui.platform.base.util.EventsEffect
 import com.bitwarden.ui.platform.base.util.cardStyle
 import com.bitwarden.ui.platform.base.util.standardHorizontalMargin
-import com.bitwarden.ui.platform.base.util.toListItemCardStyle
 import com.bitwarden.ui.platform.components.appbar.BitwardenTopAppBar
 import com.bitwarden.ui.platform.components.appbar.NavigationIcon
 import com.bitwarden.ui.platform.components.appbar.action.BitwardenOverflowActionItem
@@ -122,7 +121,6 @@ fun VaultAddEditScreen(
     onNavigateToManualCodeEntryScreen: () -> Unit,
     onNavigateToGeneratorModal: (GeneratorMode.Modal) -> Unit,
     onNavigateToAttachments: (cipherId: String) -> Unit,
-    onNavigateToMoveToOrganization: (cipherId: String, showOnlyCollections: Boolean) -> Unit,
     onNavigateToPlan: () -> Unit,
     onCloseAndNavigateToVaultItem: (cipherId: String, cipherType: VaultItemCipherType) -> Unit,
 ) {
@@ -162,13 +160,6 @@ fun VaultAddEditScreen(
                 onCloseAndNavigateToVaultItem(event.cipherId, event.cipherType)
             }
 
-            is VaultAddEditEvent.NavigateToMoveToOrganization -> {
-                onNavigateToMoveToOrganization(event.cipherId, false)
-            }
-
-            is VaultAddEditEvent.NavigateToCollections -> {
-                onNavigateToMoveToOrganization(event.cipherId, true)
-            }
 
             VaultAddEditEvent.ExitApp -> exitManager.exitApplication()
             VaultAddEditEvent.NavigateBack -> onNavigateBack.invoke()
@@ -382,38 +373,6 @@ fun VaultAddEditScreen(
                                     },
                                 )
                                     .takeUnless { state.isAddItemMode },
-                                OverflowMenuItemData(
-                                    text = stringResource(
-                                        id = vfo1Foundation(
-                                            new = BitwardenString.move,
-                                            old = BitwardenString.move_to_organization,
-                                        ),
-                                    ),
-                                    onClick = {
-                                        viewModel.trySendAction(
-                                            VaultAddEditAction.Common.MoveToOrganizationClick,
-                                        )
-                                    },
-                                )
-                                    .takeUnless { !state.shouldShowMoveToOrganization },
-                                OverflowMenuItemData(
-                                    text = stringResource(
-                                        id = vfo1Foundation(
-                                            new = BitwardenString.shared_folders,
-                                            old = BitwardenString.collections,
-                                        ),
-                                    ),
-                                    onClick = {
-                                        viewModel.trySendAction(
-                                            VaultAddEditAction.Common.CollectionsClick,
-                                        )
-                                    },
-                                )
-                                    .takeUnless {
-                                        state.isAddItemMode ||
-                                            !state.isCipherInCollection ||
-                                            !state.canAssociateToCollections
-                                    },
                                 OverflowMenuItemData(
                                     text = stringResource(id = BitwardenString.archive_verb),
                                     onClick = archiveClickAction,
@@ -655,14 +614,6 @@ private fun BottomSheetViews(
             )
         }
 
-        is VaultAddEditState.BottomSheetState.OwnerSelection -> {
-            OwnerSelectionBottomSheet(
-                state = viewState,
-                handlers = handlers,
-                modifier = modifier,
-            )
-        }
-
         null -> Unit
     }
 }
@@ -809,99 +760,6 @@ private fun FolderSelectionBottomSheetContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .cardStyle(cardStyle = cardStyle, paddingVertical = 0.dp),
-                )
-            }
-        }
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-        item {
-            Spacer(modifier = Modifier.navigationBarsPadding())
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun OwnerSelectionBottomSheet(
-    state: VaultAddEditState.ViewState.Content.Common,
-    handlers: VaultAddEditCommonHandlers,
-    modifier: Modifier = Modifier,
-) {
-
-    var selectedOwner by rememberSaveable {
-        mutableStateOf(state.selectedOwner)
-    }
-    BitwardenModalBottomSheet(
-        sheetTitle = stringResource(
-            vfo1Foundation(BitwardenString.select_vault, BitwardenString.owner),
-        ),
-        onDismiss = handlers.onDismissBottomSheet,
-        topBarActions = { animatedOnDismiss ->
-            BitwardenTextButton(
-                label = stringResource(BitwardenString.save),
-                onClick = {
-                    handlers.onDismissBottomSheet()
-                    selectedOwner?.let { handlers.onOwnerSelected(it.id) }
-                    animatedOnDismiss()
-                },
-                isEnabled = selectedOwner != null,
-            )
-        },
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        modifier = modifier.statusBarsPadding(),
-    ) {
-        OwnerSelectionBottomSheetContent(
-            options = state.availableOwners,
-            selectedOwner = selectedOwner,
-            onOptionSelected = {
-                selectedOwner = it
-            },
-        )
-    }
-}
-
-@Composable
-private fun OwnerSelectionBottomSheetContent(
-    options: ImmutableList<VaultAddEditState.Owner>,
-    selectedOwner: VaultAddEditState.Owner?,
-    onOptionSelected: (VaultAddEditState.Owner) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    LazyColumn(
-        modifier = modifier
-            .standardHorizontalMargin(),
-    ) {
-        item {
-            Spacer(modifier = Modifier.height(12.dp))
-        }
-        itemsIndexed(options) { index, option ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .defaultMinSize(minHeight = 60.dp)
-                    .cardStyle(
-                        cardStyle = options.toListItemCardStyle(index = index),
-                        paddingHorizontal = 16.dp,
-                        onClick = { onOptionSelected(option) },
-                    )
-                    .semantics(mergeDescendants = true) {
-                        this.selected = selectedOwner == option
-                        this.role = Role.RadioButton
-                    },
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = option.name(),
-                    color = BitwardenTheme.colorScheme.text.primary,
-                    style = BitwardenTheme.typography.bodyLarge,
-                    modifier = Modifier.weight(weight = 1f),
-                )
-                Spacer(modifier = Modifier.width(width = 16.dp))
-                BitwardenRadioButton(
-                    isSelected = selectedOwner == option,
-                    onClick = null,
                 )
             }
         }
