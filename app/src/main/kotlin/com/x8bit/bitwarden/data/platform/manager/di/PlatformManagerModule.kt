@@ -14,7 +14,6 @@ import com.bitwarden.cxf.registry.CredentialExchangeRegistry
 import com.bitwarden.cxf.registry.dsl.credentialExchangeRegistry
 import com.bitwarden.data.datasource.disk.ConfigDiskSource
 import com.bitwarden.data.manager.NativeLibraryManager
-import com.bitwarden.data.repository.ServerConfigRepository
 import com.bitwarden.network.BitwardenServiceClient
 import com.bitwarden.network.model.BitwardenServiceClientConfig
 import com.bitwarden.network.service.PushService
@@ -201,18 +200,13 @@ object PlatformManagerModule {
     @Singleton
     fun providesFeatureFlagManager(
         debugMenuRepository: DebugMenuRepository,
-        serverConfigRepository: ServerConfigRepository,
     ): FeatureFlagManager = if (debugMenuRepository.isDebugMenuEnabled) {
         DebugMenuFeatureFlagManagerImpl(
             debugMenuRepository = debugMenuRepository,
-            defaultFeatureFlagManager = FeatureFlagManagerImpl(
-                serverConfigRepository = serverConfigRepository,
-            ),
+            defaultFeatureFlagManager = FeatureFlagManagerImpl(),
         )
     } else {
-        FeatureFlagManagerImpl(
-            serverConfigRepository = serverConfigRepository,
-        )
+        FeatureFlagManagerImpl()
     }
 
     @Provides
@@ -237,17 +231,11 @@ object PlatformManagerModule {
     @Singleton
     fun provideNetworkConfigManager(
         authRepository: AuthRepository,
-        environmentRepository: EnvironmentRepository,
-        serverConfigRepository: ServerConfigRepository,
         bitwardenServiceClient: BitwardenServiceClient,
-        dispatcherManager: DispatcherManager,
     ): NetworkConfigManager =
         NetworkConfigManagerImpl(
             authRepository = authRepository,
-            environmentRepository = environmentRepository,
-            serverConfigRepository = serverConfigRepository,
             bitwardenServiceClient = bitwardenServiceClient,
-            dispatcherManager = dispatcherManager,
         )
 
     @Provides

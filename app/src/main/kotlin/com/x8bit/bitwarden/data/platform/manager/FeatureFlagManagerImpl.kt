@@ -2,53 +2,30 @@ package com.x8bit.bitwarden.data.platform.manager
 
 import com.bitwarden.core.data.manager.model.FlagKey
 import com.bitwarden.data.datasource.disk.model.ServerConfig
-import com.bitwarden.data.repository.ServerConfigRepository
-import com.x8bit.bitwarden.data.platform.util.isServerVersionAtLeast
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flowOf
 
 private const val CIPHER_KEY_ENCRYPTION_KEY = "enableCipherKeyEncryption"
-private const val CIPHER_KEY_ENC_MIN_SERVER_VERSION = "2024.2.0"
 
 /**
  * Primary implementation of [FeatureFlagManager].
+ *
+ * SecretDoor has no server to provide feature flags, so every flag uses its built-in default
+ * value and cipher key encryption stays off.
  */
-class FeatureFlagManagerImpl(
-    private val serverConfigRepository: ServerConfigRepository,
-) : FeatureFlagManager {
+class FeatureFlagManagerImpl : FeatureFlagManager {
 
-    override val sdkFeatureFlags: Map<String, Boolean>
-        get() = mapOf(
-            CIPHER_KEY_ENCRYPTION_KEY to serverConfigRepository.isCipherKeyEncryptionEnabled,
-        )
+    override val sdkFeatureFlags: Map<String, Boolean> = mapOf(CIPHER_KEY_ENCRYPTION_KEY to false)
 
-    override fun <T : Any> getFeatureFlagFlow(key: FlagKey<T>): Flow<T> =
-        serverConfigRepository
-            .serverConfigStateFlow
-            .map { serverConfig ->
-                serverConfig.getFlagValueOrDefault(key = key)
-            }
+    override fun <T : Any> getFeatureFlagFlow(key: FlagKey<T>): Flow<T> = flowOf(key.defaultValue)
 
     override suspend fun <T : Any> getFeatureFlag(
         key: FlagKey<T>,
         forceRefresh: Boolean,
-    ): T =
-        serverConfigRepository
-            .getServerConfig(forceRefresh = forceRefresh)
-            .getFlagValueOrDefault(key = key)
+    ): T = key.defaultValue
 
-    override fun <T : Any> getFeatureFlag(key: FlagKey<T>): T =
-        serverConfigRepository
-            .serverConfigStateFlow
-            .value
-            .getFlagValueOrDefault(key = key)
+    override fun <T : Any> getFeatureFlag(key: FlagKey<T>): T = key.defaultValue
 }
-
-/**
- * Get the computed value of the cipher key encryption flag based on server version.
- */
-private val ServerConfigRepository.isCipherKeyEncryptionEnabled: Boolean
-    get() = isServerVersionAtLeast(serverConfigStateFlow.value, CIPHER_KEY_ENC_MIN_SERVER_VERSION)
 
 /**
  * Extract the value of a [FlagKey] from the [ServerConfig]. If there is an issue with retrieving
