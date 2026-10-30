@@ -22,6 +22,15 @@ class AllowedHostsInterceptorTest {
     }
 
     @Test
+    fun `requests to Digital Asset Links should proceed`() {
+        val chain = createChain(
+            url = "https://digitalassetlinks.googleapis.com/v1/assetlinks:check",
+        )
+
+        assertEquals(response, interceptor.intercept(chain))
+    }
+
+    @Test
     fun `requests to any other host should be blocked without proceeding`() {
         val chain = createChain(url = "https://api.bitwarden.com/config")
 

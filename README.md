@@ -35,9 +35,14 @@ Bitwarden SDK for all encryption. It is not affiliated with or endorsed by Bitwa
   websites you have logins for.
 - **No crash reporting or analytics.** SecretDoor contains no Firebase, Crashlytics or advertising
   libraries.
-- **Network use.** The only optional network request is the "check known data breaches" option for
-  the master password, which is off by default. It sends only the first five characters of the
-  password's SHA-1 hash to [Have I Been Pwned](https://haveibeenpwned.com/Passwords).
+- **Network use.** SecretDoor blocks every connection except two:
+  - The optional "check known data breaches" option for the master password (off by default). It
+    sends only the first five characters of the password's SHA-1 hash to
+    [Have I Been Pwned](https://haveibeenpwned.com/Passwords).
+  - When an app (not a browser) asks for a passkey, SecretDoor asks Google's
+    [Digital Asset Links](https://developers.google.com/digital-asset-links) service whether the
+    app belongs to that website, to protect against phishing apps. Only the website, the app's
+    package name and its signing certificate fingerprint are sent; no vault data.
 
 ## Backups
 
