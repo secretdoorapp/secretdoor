@@ -13,8 +13,6 @@ import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.Text
 import com.bitwarden.ui.util.asPluralsText
 import com.bitwarden.ui.util.asText
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
-import com.x8bit.bitwarden.data.platform.manager.util.hasRestrictItemTypes
 import com.x8bit.bitwarden.data.vault.manager.model.SyncVaultDataResult
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.ImportCredentialsResult
@@ -34,7 +32,6 @@ private const val KEY_STATE = "state"
 class ImportItemsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val vaultRepository: VaultRepository,
-    private val policyManager: PolicyManager,
 ) : BaseViewModel<ImportItemsState, ImportItemsEvent, ImportItemsAction>(
     initialState = savedStateHandle[KEY_STATE] ?: ImportItemsState(),
 ) {
@@ -125,10 +122,7 @@ class ImportItemsViewModel @Inject constructor(
             add(CredentialTypes.CREDENTIAL_TYPE_PUBLIC_KEY)
             add(CredentialTypes.CREDENTIAL_TYPE_ADDRESS)
             add(CredentialTypes.CREDENTIAL_TYPE_API_KEY)
-            // Only include credit card type if policy doesn't restrict it
-            if (!policyManager.hasRestrictItemTypes()) {
-                add(CredentialTypes.CREDENTIAL_TYPE_CREDIT_CARD)
-            }
+            add(CredentialTypes.CREDENTIAL_TYPE_CREDIT_CARD)
             add(CredentialTypes.CREDENTIAL_TYPE_CUSTOM_FIELDS)
             add(CredentialTypes.CREDENTIAL_TYPE_DRIVERS_LICENSE)
             add(CredentialTypes.CREDENTIAL_TYPE_IDENTITY_DOCUMENT)

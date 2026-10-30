@@ -11,7 +11,6 @@ import kotlinx.serialization.Serializable
 @Parcelize
 data class AccountSelectionListItem(
     val userId: String,
-    val isItemRestricted: Boolean,
     val avatarColorHex: String,
     val initials: String,
     val email: String,

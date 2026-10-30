@@ -69,10 +69,9 @@ class RootNavViewModel @Inject constructor(
                 userState.hasPendingAccountAddition -> RootNavState.Auth
 
             specialCircumstance is SpecialCircumstance.CredentialExchangeExport -> {
-                val exportableAccounts = userState.accounts.filter { it.isExportable }
-                if (exportableAccounts.size == 1) {
+                if (userState.accounts.size == 1) {
                     RootNavState.CredentialExchangeExportSkipAccountSelection(
-                        userId = exportableAccounts.first().userId,
+                        userId = userState.accounts.first().userId,
                     )
                 } else {
                     RootNavState.CredentialExchangeExport

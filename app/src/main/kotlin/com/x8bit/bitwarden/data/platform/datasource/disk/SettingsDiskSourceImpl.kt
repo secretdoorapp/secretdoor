@@ -56,7 +56,6 @@ private const val INTRODUCING_ARCHIVE_ACTION_CARD_DISMISSED =
     "introducingArchiveActionCardDismissed"
 private const val PREMIUM_UPGRADE_BANNER_DISMISSED = "premiumUpgradeBannerDismissed"
 private const val COLLAPSED_VAULT_SECTIONS = "collapsedVaultSections"
-private const val VAULT_POLICY_BANNER_DISMISSED_DATE = "vaultPolicyBannerDismissedDate"
 private const val UPGRADED_TO_PREMIUM_CARD_CONSUMED = "upgradedToPremiumCardConsumed"
 private const val UPGRADED_TO_PREMIUM_CARD_PENDING = "upgradedToPremiumCardPending"
 private const val PREMIUM_UPGRADE_PENDING = "premiumUpgradePending"
@@ -109,9 +108,6 @@ class SettingsDiskSourceImpl(
 
     private val mutableCollapsedVaultSectionsFlowMap =
         mutableMapOf<String, MutableSharedFlow<Set<VaultSection>?>>()
-
-    private val mutableVaultPolicyBannerDismissedDateFlowMap =
-        mutableMapOf<String, MutableSharedFlow<Instant?>>()
 
     private val mutableUpgradedToPremiumCardConsumedFlowMap =
         mutableMapOf<String, MutableSharedFlow<Boolean?>>()
@@ -281,7 +277,6 @@ class SettingsDiskSourceImpl(
         storeClearClipboardFrequencySeconds(userId = userId, frequency = null)
         removeWithPrefix(prefix = ACCOUNT_BIOMETRIC_INTEGRITY_VALID_KEY.appendIdentifier(userId))
         storeAppResumeScreen(userId = userId, screenData = null)
-        storeVaultPolicyBannerDismissedDate(userId = userId, dismissalRevisionDate = null)
         storeCollapsedVaultSections(userId = userId, collapsedVaultSections = null)
 
         // The following are intentionally not cleared so they can be
@@ -364,28 +359,6 @@ class SettingsDiskSourceImpl(
     override fun getPremiumUpgradeBannerDismissedFlow(userId: String): Flow<Boolean?> =
         getMutablePremiumUpgradeBannerDismissedFlow(userId = userId)
             .onSubscription { emit(getPremiumUpgradeBannerDismissed(userId = userId)) }
-
-    override fun getVaultPolicyBannerDismissedDate(
-        userId: String,
-    ): Instant? =
-        getLong(key = VAULT_POLICY_BANNER_DISMISSED_DATE.appendIdentifier(identifier = userId))
-            ?.let { Instant.ofEpochMilli(it) }
-
-    override fun storeVaultPolicyBannerDismissedDate(
-        userId: String,
-        dismissalRevisionDate: Instant?,
-    ) {
-        putLong(
-            key = VAULT_POLICY_BANNER_DISMISSED_DATE.appendIdentifier(identifier = userId),
-            value = dismissalRevisionDate?.toEpochMilli(),
-        )
-        getMutableVaultPolicyBannerDismissedDateFlow(userId = userId).tryEmit(dismissalRevisionDate)
-    }
-
-    override fun getVaultPolicyBannerDismissedDateFlow(
-        userId: String,
-    ): Flow<Instant?> = getMutableVaultPolicyBannerDismissedDateFlow(userId = userId)
-        .onSubscription { emit(getVaultPolicyBannerDismissedDate(userId = userId)) }
 
     override fun getUpgradedToPremiumCardConsumed(userId: String): Boolean? =
         getBoolean(
@@ -817,13 +790,6 @@ class SettingsDiskSourceImpl(
         userId: String,
     ): MutableSharedFlow<Boolean?> =
         mutablePremiumUpgradeBannerDismissedFlowMap.getOrPut(userId) {
-            bufferedMutableSharedFlow(replay = 1)
-        }
-
-    private fun getMutableVaultPolicyBannerDismissedDateFlow(
-        userId: String,
-    ): MutableSharedFlow<Instant?> =
-        mutableVaultPolicyBannerDismissedDateFlowMap.getOrPut(userId) {
             bufferedMutableSharedFlow(replay = 1)
         }
 

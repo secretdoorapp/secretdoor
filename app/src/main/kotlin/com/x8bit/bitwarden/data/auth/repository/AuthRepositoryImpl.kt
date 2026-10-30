@@ -102,7 +102,6 @@ import com.x8bit.bitwarden.data.auth.repository.util.WebAuthResult
 import com.x8bit.bitwarden.data.auth.repository.util.toAccountCryptographicState
 import com.x8bit.bitwarden.data.auth.repository.util.toDeviceInfo
 import com.x8bit.bitwarden.data.auth.repository.util.toKdfRequestModel
-import com.x8bit.bitwarden.data.auth.repository.util.toPolicyInformation
 import com.x8bit.bitwarden.data.auth.repository.util.toSdkParams
 import com.x8bit.bitwarden.data.auth.repository.util.toUserState
 import com.x8bit.bitwarden.data.auth.repository.util.updateForcePasswordReset
@@ -1694,15 +1693,10 @@ internal class AuthRepositoryImpl(
         orgIdentifier: String?,
         userConfirmedKeyConnector: Boolean,
     ): LoginResult = userStateManager.userStateTransaction {
-        val passwordPolicyInfo = loginResponse.masterPasswordPolicyOptions?.toPolicyInformation()
         val userStateJson = loginResponse.toUserState(
             previousUserState = authDiskSource.userState,
             environmentUrlData = environmentRepository.environment.environmentUrlData,
-            passwordPassesPolicy = if (password != null && passwordPolicyInfo != null) {
-                passwordPassesPolicy(password = password, policyInfo = passwordPolicyInfo)
-            } else {
-                true
-            },
+            passwordPassesPolicy = true,
         )
         val profile = userStateJson.activeAccount.profile
         val userId = profile.userId

@@ -8,8 +8,6 @@ import com.bitwarden.network.model.MasterPasswordUnlockDataJson
 import com.bitwarden.network.model.OrganizationType
 import com.bitwarden.network.model.SyncResponseJson
 import com.bitwarden.network.model.UserDecryptionOptionsJson
-import com.bitwarden.policies.Policy
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.util.toHexColorRepresentation
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.ForcePasswordResetReason
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.OnboardingStatus
@@ -216,7 +214,6 @@ fun UserStateJson.toUserState(
     isBiometricsEnabledProvider: (userId: String) -> Boolean,
     vaultUnlockTypeProvider: (userId: String) -> VaultUnlockType,
     isDeviceTrustedProvider: (userId: String) -> Boolean,
-    getUserPolicies: (userId: String, policy: PolicyType) -> List<Policy>,
 ): UserState =
     UserState(
         activeUserId = this.activeUserId,
@@ -258,17 +255,6 @@ fun UserStateJson.toUserState(
                 val needsMasterPassword = decryptionOptions?.hasMasterPassword == false &&
                     userNeedsMasterPassword
 
-                val hasPersonalOwnershipRestrictedOrg = getUserPolicies(
-                    userId,
-                    PolicyType.ORGANIZATION_DATA_OWNERSHIP,
-                )
-                    .any { it.enabled }
-
-                val hasPersonalVaultExportRestrictedOrg = getUserPolicies(
-                    userId,
-                    PolicyType.DISABLE_PERSONAL_VAULT_EXPORT,
-                )
-                    .any { it.enabled }
 
                 UserState.Account(
                     userId = userId,
@@ -300,8 +286,6 @@ fun UserStateJson.toUserState(
                     // using the app prior to the release of the onboarding flow.
                     onboardingStatus = onboardingStatus ?: OnboardingStatus.COMPLETE,
                     firstTimeState = firstTimeState,
-                    isExportable = !hasPersonalOwnershipRestrictedOrg &&
-                        !hasPersonalVaultExportRestrictedOrg,
                     creationDate = profile.creationDate,
                 )
             },

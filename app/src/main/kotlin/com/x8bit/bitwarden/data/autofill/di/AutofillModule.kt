@@ -30,7 +30,6 @@ import com.x8bit.bitwarden.data.autofill.provider.AutofillCipherProviderImpl
 import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.ciphermatching.CipherMatchingManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
 import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
@@ -134,13 +133,11 @@ object AutofillModule {
         authRepository: AuthRepository,
         cipherMatchingManager: CipherMatchingManager,
         vaultRepository: VaultRepository,
-        policyManager: PolicyManager,
     ): AutofillCipherProvider =
         AutofillCipherProviderImpl(
             authRepository = authRepository,
             cipherMatchingManager = cipherMatchingManager,
             vaultRepository = vaultRepository,
-            policyManager = policyManager,
         )
 
     @Singleton
@@ -150,7 +147,6 @@ object AutofillModule {
         filledDataBuilder: FilledDataBuilder,
         fillResponseBuilder: FillResponseBuilder,
         parser: AutofillParser,
-        policyManager: PolicyManager,
         saveInfoBuilder: SaveInfoBuilder,
         settingsRepository: SettingsRepository,
     ): AutofillProcessor =
@@ -159,7 +155,6 @@ object AutofillModule {
             filledDataBuilder = filledDataBuilder,
             fillResponseBuilder = fillResponseBuilder,
             parser = parser,
-            policyManager = policyManager,
             saveInfoBuilder = saveInfoBuilder,
             settingsRepository = settingsRepository,
         )

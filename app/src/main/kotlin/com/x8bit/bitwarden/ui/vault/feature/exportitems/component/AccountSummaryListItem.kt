@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -30,7 +29,6 @@ import com.bitwarden.ui.platform.base.util.toUnscaledTextUnit
 import com.bitwarden.ui.platform.components.model.CardStyle
 import com.bitwarden.ui.platform.components.util.rememberVectorPainter
 import com.bitwarden.ui.platform.resource.BitwardenDrawable
-import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.platform.theme.BitwardenTheme
 import com.x8bit.bitwarden.ui.vault.feature.exportitems.model.AccountSelectionListItem
 
@@ -101,17 +99,6 @@ fun AccountSummaryListItem(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.testTag("AccountEmailLabel"),
             )
-
-            if (item.isItemRestricted) {
-                Text(
-                    text = stringResource(
-                        BitwardenString.import_restricted_unable_to_import_credit_cards,
-                    ),
-                    style = BitwardenTheme.typography.bodyMedium,
-                    color = BitwardenTheme.colorScheme.text.secondary,
-                    modifier = Modifier.testTag("AccountRestrictedLabel"),
-                )
-            }
         }
 
         Spacer(modifier = Modifier.width(8.dp))

@@ -84,7 +84,6 @@ data class UserState(
         val isUsingKeyConnector: Boolean,
         val onboardingStatus: OnboardingStatus,
         val firstTimeState: FirstTimeState,
-        val isExportable: Boolean,
         val creationDate: Instant?,
     ) {
         /**
@@ -132,7 +131,6 @@ data class UserState(
             isUsingKeyConnector = false,
             onboardingStatus = OnboardingStatus.COMPLETE,
             firstTimeState = FirstTimeState(),
-            isExportable = false,
             creationDate = null,
         )
     }

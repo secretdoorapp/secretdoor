@@ -322,7 +322,6 @@ private fun VerifyPasswordContent_MasterPassword_preview() {
             ),
             accountSummaryListItem = AccountSelectionListItem(
                 userId = "userId",
-                isItemRestricted = false,
                 avatarColorHex = "#FF0000",
                 initials = "JD",
                 email = "john.doe@example.com",
@@ -354,7 +353,6 @@ private fun VerifyPasswordContent_Otp_preview() {
             ),
             accountSummaryListItem = AccountSelectionListItem(
                 userId = "userId",
-                isItemRestricted = false,
                 avatarColorHex = "#FF0000",
                 initials = "JD",
                 email = "john.doe@example.com",

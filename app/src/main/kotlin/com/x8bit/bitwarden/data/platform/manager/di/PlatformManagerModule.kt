@@ -49,8 +49,6 @@ import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.LogsManager
 import com.x8bit.bitwarden.data.platform.manager.LogsManagerImpl
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.PushManager
 import com.x8bit.bitwarden.data.platform.manager.PushManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.ResourceCacheManager
@@ -81,8 +79,6 @@ import com.x8bit.bitwarden.data.platform.manager.network.NetworkPermissionManage
 import com.x8bit.bitwarden.data.platform.manager.network.NetworkPermissionManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.policy.PasswordPolicyManager
 import com.x8bit.bitwarden.data.platform.manager.policy.PasswordPolicyManagerImpl
-import com.x8bit.bitwarden.data.platform.manager.policy.UserNotificationPolicyManager
-import com.x8bit.bitwarden.data.platform.manager.policy.UserNotificationPolicyManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.restriction.RestrictionManager
 import com.x8bit.bitwarden.data.platform.manager.restriction.RestrictionManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.sdk.SdkPlatformApiFactory
@@ -250,40 +246,12 @@ object PlatformManagerModule {
 
     @Provides
     @Singleton
-    fun providePolicyManager(
-        authDiskSource: AuthDiskSource,
-        authSdkSource: AuthSdkSource,
-        featureFlagManager: FeatureFlagManager,
-    ): PolicyManager = PolicyManagerImpl(
-        authDiskSource = authDiskSource,
-        authSdkSource = authSdkSource,
-        featureFlagManager = featureFlagManager,
-    )
-
-    @Provides
-    @Singleton
     fun providePasswordPolicyManager(
         authDiskSource: AuthDiskSource,
         authSdkSource: AuthSdkSource,
-        policyManager: PolicyManager,
     ): PasswordPolicyManager = PasswordPolicyManagerImpl(
         authDiskSource = authDiskSource,
         authSdkSource = authSdkSource,
-        policyManager = policyManager,
-    )
-
-    @Provides
-    @Singleton
-    fun provideUserNotificationPolicyManager(
-        authDiskSource: AuthDiskSource,
-        settingsDiskSource: SettingsDiskSource,
-        policyManager: PolicyManager,
-        dispatcherManager: DispatcherManager,
-    ): UserNotificationPolicyManager = UserNotificationPolicyManagerImpl(
-        authDiskSource = authDiskSource,
-        settingsDiskSource = settingsDiskSource,
-        policyManager = policyManager,
-        dispatcherManager = dispatcherManager,
     )
 
     @Provides
