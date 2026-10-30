@@ -114,6 +114,13 @@ stored key material.
 
 ### Phase 5: Branding cleanup
 - Replace remaining user-visible "Bitwarden" strings, icons, About screen, links, and README.
+- Progress:
+  - [x] Icons (option A, "door ajar with light and keyhole"): launcher foreground and
+    monochrome (main/beta/release), navy launcher/splash background (beta purple, debug red),
+    splash icon, autofill/suggestion logo, notification icon, Import logins shield glyph.
+    Illustrations recolored to navy/tan/gold. Unused `logo_bitwarden` deleted.
+    Review page and generators: `design/icon-review/`, `design/icon-tools/`.
+  - [ ] `logo_authenticator` stays until the `:authenticator` module is removed.
 
 ## Build Prerequisites
 - `user.properties` with `gitHubToken=<classic PAT with read:packages>` to download

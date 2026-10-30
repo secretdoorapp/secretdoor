@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Beta builds use a purple icon background to tell them apart from release. -->
+    <color name="ic_launcher_background">#FF4B2A6B</color>
+</resources>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- This is the apps Primary Blue color an exists here for launcher and splash theme only -->
-    <color name="ic_launcher_background">#FF175DDC</color>
+    <!-- SecretDoor navy; used for the launcher icon and splash screen background only. -->
+    <color name="ic_launcher_background">#FF14233B</color>
     <color name="ic_shortcut_background">@android:color/white</color>
 </resources>
