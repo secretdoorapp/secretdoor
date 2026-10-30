@@ -25,7 +25,6 @@ import com.x8bit.bitwarden.data.vault.datasource.disk.VaultDiskSource
 import com.x8bit.bitwarden.data.vault.datasource.sdk.VaultSdkSource
 import com.x8bit.bitwarden.data.vault.manager.model.SyncVaultDataResult
 import com.x8bit.bitwarden.data.vault.repository.model.DomainsData
-import com.x8bit.bitwarden.data.vault.repository.model.SendData
 import com.x8bit.bitwarden.data.vault.repository.model.VaultData
 import com.x8bit.bitwarden.data.vault.repository.util.sortAlphabetically
 import com.x8bit.bitwarden.data.vault.repository.util.sortAlphabeticallyByTypeAndOrganization
@@ -33,7 +32,6 @@ import com.x8bit.bitwarden.data.vault.repository.util.toDomainsData
 import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkCipherList
 import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkCollectionList
 import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkFolderList
-import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkSendList
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -90,8 +88,6 @@ internal class VaultSyncManagerImpl(
 
     private val activeUserId: String? get() = authDiskSource.userState?.activeUserId
 
-    private val mutableSendDataStateFlow = MutableStateFlow<DataState<SendData>>(DataState.Loading)
-
     private val mutableDecryptCipherListResultFlow =
         MutableStateFlow<DataState<DecryptCipherListResult>>(DataState.Loading)
 
@@ -116,27 +112,21 @@ internal class VaultSyncManagerImpl(
     override val collectionsStateFlow: StateFlow<DataState<List<CollectionView>>>
         get() = mutableCollectionsStateFlow.asStateFlow()
 
-    override val sendDataStateFlow: StateFlow<DataState<SendData>>
-        get() = mutableSendDataStateFlow.asStateFlow()
-
     override val vaultDataStateFlow: StateFlow<DataState<VaultData>> =
         combine(
             decryptCipherListResultStateFlow,
             foldersStateFlow,
             collectionsStateFlow,
-            sendDataStateFlow,
-        ) { ciphersDataState, foldersDataState, collectionsDataState, sendsDataState ->
+        ) { ciphersDataState, foldersDataState, collectionsDataState ->
             combineDataStates(
                 ciphersDataState,
                 foldersDataState,
                 collectionsDataState,
-                sendsDataState,
-            ) { ciphersData, foldersData, collectionsData, sendsData ->
+            ) { ciphersData, foldersData, collectionsData ->
                 VaultData(
                     decryptCipherListResult = ciphersData,
                     collectionViewList = collectionsData,
                     folderViewList = foldersData,
-                    sendViewList = sendsData.sendViewList,
                 )
             }
         }
@@ -198,13 +188,6 @@ internal class VaultSyncManagerImpl(
                 vaultUnlockFlow = vaultLockManager.vaultUnlockDataStateFlow,
             ) { activeUserId -> observeVaultDiskCollections(userId = activeUserId) }
             .launchIn(unconfinedScope)
-        // Setup sends MutableStateFlow
-        mutableSendDataStateFlow
-            .observeWhenSubscribedAndUnlocked(
-                userStateFlow = authDiskSource.userStateFlow,
-                vaultUnlockFlow = vaultLockManager.vaultUnlockDataStateFlow,
-            ) { activeUserId -> observeVaultDiskSends(userId = activeUserId) }
-            .launchIn(unconfinedScope)
 
         pushManager
             .fullSyncFlow
@@ -230,7 +213,6 @@ internal class VaultSyncManagerImpl(
         mutableDomainsStateFlow.updateToPendingOrLoading()
         mutableFoldersStateFlow.updateToPendingOrLoading()
         mutableCollectionsStateFlow.updateToPendingOrLoading()
-        mutableSendDataStateFlow.updateToPendingOrLoading()
         syncJob = ioScope.launch { syncInternal(userId = userId, forced = forced) }
     }
 
@@ -367,30 +349,10 @@ internal class VaultSyncManagerImpl(
             .map { it.orLoadingIfNotSynced(userId = userId) }
             .onEach { mutableCollectionsStateFlow.value = it }
 
-    private fun observeVaultDiskSends(
-        userId: String,
-    ): Flow<DataState<SendData>> =
-        vaultDiskSource
-            .getSendsFlow(userId = userId)
-            .onStart { mutableSendDataStateFlow.updateToPendingOrLoading() }
-            .map {
-                vaultLockManager.waitUntilUnlocked(userId = userId)
-                vaultSdkSource
-                    .decryptSendList(userId = userId, sendList = it.toEncryptedSdkSendList())
-                    .fold(
-                        onSuccess = { sends -> DataState.Loaded(sends.sortAlphabetically()) },
-                        onFailure = { throwable -> DataState.Error(throwable) },
-                    )
-            }
-            .map { it.orLoadingIfNotSynced(userId = userId) }
-            .map { dataState -> dataState.map { SendData(sendViewList = it) } }
-            .onEach { mutableSendDataStateFlow.value = it }
-
     private fun clearUnlockedData() {
         mutableDecryptCipherListResultFlow.update { DataState.Loading }
         mutableFoldersStateFlow.update { DataState.Loading }
         mutableCollectionsStateFlow.update { DataState.Loading }
-        mutableSendDataStateFlow.update { DataState.Loading }
     }
 
     /**

@@ -2279,7 +2279,6 @@ class VaultAddEditViewModel @Inject constructor(
                 ),
                 collectionViewList = emptyList(),
                 folderViewList = emptyList(),
-                sendViewList = emptyList(),
             )
         val isIndividualVaultDisabled = policyManager
             .getActivePolicies(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)

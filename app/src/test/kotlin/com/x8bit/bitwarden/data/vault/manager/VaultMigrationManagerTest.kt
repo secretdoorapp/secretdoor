@@ -9,7 +9,6 @@ import com.bitwarden.network.model.createMockCipher
 import com.bitwarden.network.model.createMockCipherMiniResponseJson
 import com.bitwarden.network.model.createMockSyncResponse
 import com.bitwarden.policies.PolicyType
-import com.bitwarden.send.SendView
 import com.bitwarden.vault.CipherListView
 import com.bitwarden.vault.FolderView
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.AccountJson
@@ -1113,7 +1112,6 @@ class VaultMigrationManagerTest {
                     ),
                 ),
                 folderViewList = emptyList(),
-                sendViewList = emptyList(),
             ),
         )
 
@@ -1189,7 +1187,6 @@ private fun createVaultData(
     cipherListView: CipherListView? = null,
     collectionViewList: List<CollectionView> = emptyList(),
     folderViewList: List<FolderView> = emptyList(),
-    sendViewList: List<SendView> = emptyList(),
 ): VaultData =
     VaultData(
         decryptCipherListResult = createMockDecryptCipherListResult(
@@ -1198,7 +1195,6 @@ private fun createVaultData(
         ),
         collectionViewList = collectionViewList,
         folderViewList = folderViewList,
-        sendViewList = sendViewList,
     )
 
 private val MOCK_USER_STATE = UserStateJson(

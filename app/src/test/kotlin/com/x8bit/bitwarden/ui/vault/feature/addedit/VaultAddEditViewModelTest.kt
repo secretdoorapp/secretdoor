@@ -15,7 +15,6 @@ import com.bitwarden.core.data.repository.model.DataState
 import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
 import com.bitwarden.data.repository.model.Environment
 import com.bitwarden.policies.PolicyType
-import com.bitwarden.send.SendView
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarData
 import com.bitwarden.ui.platform.feature.cardscanner.manager.CardScanManager
@@ -6650,7 +6649,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
         cipherListView: CipherListView? = null,
         collectionViewList: List<CollectionView> = emptyList(),
         folderViewList: List<FolderView> = emptyList(),
-        sendViewList: List<SendView> = emptyList(),
     ): VaultData =
         VaultData(
             decryptCipherListResult = createMockDecryptCipherListResult(
@@ -6659,7 +6657,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
             ),
             collectionViewList = collectionViewList,
             folderViewList = folderViewList,
-            sendViewList = sendViewList,
         )
 
     private fun createUserState(): UserState =

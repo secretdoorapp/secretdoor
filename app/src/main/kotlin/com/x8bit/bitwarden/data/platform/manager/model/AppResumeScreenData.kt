@@ -15,12 +15,6 @@ sealed class AppResumeScreenData {
     data object GeneratorScreen : AppResumeScreenData()
 
     /**
-     * Data object representing the Send screen for app resume.
-     */
-    @Serializable
-    data object SendScreen : AppResumeScreenData()
-
-    /**
      * Data class representing the Search screen for app resume.
      */
     @Serializable

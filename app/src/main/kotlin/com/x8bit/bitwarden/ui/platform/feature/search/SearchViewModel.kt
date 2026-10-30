@@ -7,10 +7,8 @@ import com.bitwarden.annotation.OmitFromCoverage
 import com.bitwarden.core.data.manager.model.FlagKey
 import com.bitwarden.core.data.repository.model.DataState
 import com.bitwarden.data.repository.util.baseIconUrl
-import com.bitwarden.data.repository.util.baseWebSendUrl
 import com.bitwarden.data.repository.util.baseWebVaultUrlOrDefault
 import com.bitwarden.policies.PolicyType
-import com.bitwarden.send.SendType
 import com.bitwarden.ui.platform.base.BackgroundEvent
 import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.components.icon.model.IconData
@@ -45,9 +43,7 @@ import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.vault.manager.model.GetCipherResult
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.ArchiveCipherResult
-import com.x8bit.bitwarden.data.vault.repository.model.DeleteSendResult
 import com.x8bit.bitwarden.data.vault.repository.model.GenerateTotpResult
-import com.x8bit.bitwarden.data.vault.repository.model.RemovePasswordSendResult
 import com.x8bit.bitwarden.data.vault.repository.model.UnarchiveCipherResult
 import com.x8bit.bitwarden.data.vault.repository.model.UpdateCipherResult
 import com.x8bit.bitwarden.data.vault.repository.model.VaultData
@@ -58,8 +54,6 @@ import com.x8bit.bitwarden.ui.platform.feature.search.util.toSearchTypeData
 import com.x8bit.bitwarden.ui.platform.feature.search.util.toViewState
 import com.x8bit.bitwarden.ui.platform.feature.search.util.updateWithAdditionalDataIfNecessary
 import com.x8bit.bitwarden.ui.platform.model.SnackbarRelay
-import com.x8bit.bitwarden.ui.tools.feature.send.model.SendItemType
-import com.x8bit.bitwarden.ui.tools.feature.send.util.toSendItemType
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.model.ListingItemOverflowAction
 import com.x8bit.bitwarden.ui.vault.feature.vault.model.VaultFilterData
 import com.x8bit.bitwarden.ui.vault.feature.vault.model.VaultFilterType
@@ -126,15 +120,11 @@ class SearchViewModel @Inject constructor(
                 searchType = searchType.toSearchTypeData(),
                 viewState = SearchState.ViewState.Loading,
                 dialogState = null,
-                vaultFilterData = when (searchType) {
-                    is SearchType.Sends -> null
-                    is SearchType.Vault -> userState.activeAccount.toVaultFilterData(
-                        isIndividualVaultDisabled = policyManager
-                            .getActivePolicies(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-                            .any(),
-                    )
-                },
-                baseWebSendUrl = environmentRepo.environment.baseWebSendUrl,
+                vaultFilterData = userState.activeAccount.toVaultFilterData(
+                    isIndividualVaultDisabled = policyManager
+                        .getActivePolicies(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)
+                        .any(),
+                ),
                 baseIconUrl = environmentRepo.environment.baseIconUrl,
                 isIconLoadingDisabled = settingsRepo.isIconLoadingDisabled,
                 autofillSelectionData = specialCircumstance?.toAutofillSelectionDataOrNull(),
@@ -181,8 +171,6 @@ class SearchViewModel @Inject constructor(
                 SnackbarRelay.CIPHER_DELETED_SOFT,
                 SnackbarRelay.CIPHER_RESTORED,
                 SnackbarRelay.CIPHER_UPDATED,
-                SnackbarRelay.SEND_DELETED,
-                SnackbarRelay.SEND_UPDATED,
             )
             .map { SearchAction.Internal.SnackbarDataReceived(it) }
             .onEach(::sendAction)
@@ -232,12 +220,6 @@ class SearchViewModel @Inject constructor(
                 }
             }
 
-            is SearchState.DisplayItem.ItemType.Sends -> {
-                SearchEvent.NavigateToViewSend(
-                    sendId = action.itemId,
-                    sendType = itemType.type.toSendItemType(),
-                )
-            }
         }
         sendEvent(event)
     }
@@ -331,23 +313,6 @@ class SearchViewModel @Inject constructor(
     @Suppress("LongMethod")
     private fun handleOverflowItemClick(action: SearchAction.OverflowOptionClick) {
         when (val overflowAction = action.overflowAction) {
-            is ListingItemOverflowAction.SendAction.CopyUrlClick -> {
-                handleCopyUrlClick(overflowAction)
-            }
-
-            is ListingItemOverflowAction.SendAction.DeleteClick -> {
-                handleDeleteClick(overflowAction)
-            }
-
-            is ListingItemOverflowAction.SendAction.ViewClick -> handleViewClick(overflowAction)
-            is ListingItemOverflowAction.SendAction.EditClick -> handleEditClick(overflowAction)
-            is ListingItemOverflowAction.SendAction.RemovePasswordClick -> {
-                handleRemovePasswordClick(overflowAction)
-            }
-
-            is ListingItemOverflowAction.SendAction.ShareUrlClick -> {
-                handleShareUrlClick(overflowAction)
-            }
 
             is ListingItemOverflowAction.VaultAction.CopyNoteClick -> {
                 handleCopyNoteClick(overflowAction)
@@ -411,43 +376,6 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private fun handleCopyUrlClick(action: ListingItemOverflowAction.SendAction.CopyUrlClick) {
-        clipboardManager.setText(
-            text = action.sendUrl,
-            toastDescriptorOverride = BitwardenString.link.asText(),
-        )
-    }
-
-    private fun handleDeleteClick(action: ListingItemOverflowAction.SendAction.DeleteClick) {
-        mutableStateFlow.update {
-            it.copy(
-                dialogState = SearchState.DialogState.Loading(BitwardenString.deleting.asText()),
-            )
-        }
-        viewModelScope.launch {
-            val result = vaultRepo.deleteSend(action.sendId)
-            sendAction(SearchAction.Internal.DeleteSendResultReceive(result))
-        }
-    }
-
-    private fun handleViewClick(action: ListingItemOverflowAction.SendAction.ViewClick) {
-        sendEvent(
-            SearchEvent.NavigateToViewSend(
-                sendId = action.sendId,
-                sendType = action.sendType.toSendItemType(),
-            ),
-        )
-    }
-
-    private fun handleEditClick(action: ListingItemOverflowAction.SendAction.EditClick) {
-        sendEvent(
-            event = SearchEvent.NavigateToEditSend(
-                sendId = action.sendId,
-                sendType = action.sendType.toSendItemType(),
-            ),
-        )
-    }
-
     private fun handleCopyTotpClick(
         action: ListingItemOverflowAction.VaultAction.CopyTotpClick,
     ) {
@@ -505,26 +433,6 @@ class SearchViewModel @Inject constructor(
                 )
             }
         }
-    }
-
-    private fun handleRemovePasswordClick(
-        action: ListingItemOverflowAction.SendAction.RemovePasswordClick,
-    ) {
-        mutableStateFlow.update {
-            it.copy(
-                dialogState = SearchState.DialogState.Loading(
-                    message = BitwardenString.removing_send_password.asText(),
-                ),
-            )
-        }
-        viewModelScope.launch {
-            val result = vaultRepo.removePasswordSend(action.sendId)
-            sendAction(SearchAction.Internal.RemovePasswordSendResultReceive(result))
-        }
-    }
-
-    private fun handleShareUrlClick(action: ListingItemOverflowAction.SendAction.ShareUrlClick) {
-        sendEvent(SearchEvent.ShowShareSheet(action.sendUrl))
     }
 
     private fun handleCopyNoteClick(action: ListingItemOverflowAction.VaultAction.CopyNoteClick) {
@@ -698,16 +606,8 @@ class SearchViewModel @Inject constructor(
                 handleIconLoadingSettingReceive(action)
             }
 
-            is SearchAction.Internal.DeleteSendResultReceive -> {
-                handleDeleteSendResultReceive(action)
-            }
-
             is SearchAction.Internal.GenerateTotpResultReceive -> {
                 handleGenerateTotpResultReceive(action)
-            }
-
-            is SearchAction.Internal.RemovePasswordSendResultReceive -> {
-                handleRemovePasswordSendResultReceive(action)
             }
 
             is SearchAction.Internal.SnackbarDataReceived -> handleSnackbarDataReceived(action)
@@ -804,29 +704,6 @@ class SearchViewModel @Inject constructor(
         recalculateViewState()
     }
 
-    private fun handleDeleteSendResultReceive(
-        action: SearchAction.Internal.DeleteSendResultReceive,
-    ) {
-        when (val result = action.result) {
-            is DeleteSendResult.Error -> {
-                mutableStateFlow.update {
-                    it.copy(
-                        dialogState = SearchState.DialogState.Error(
-                            title = BitwardenString.an_error_has_occurred.asText(),
-                            message = BitwardenString.generic_error_message.asText(),
-                            throwable = result.error,
-                        ),
-                    )
-                }
-            }
-
-            DeleteSendResult.Success -> {
-                mutableStateFlow.update { it.copy(dialogState = null) }
-                sendEvent(SearchEvent.ShowSnackbar(BitwardenString.send_deleted.asText()))
-            }
-        }
-    }
-
     private fun handleGenerateTotpResultReceive(
         action: SearchAction.Internal.GenerateTotpResultReceive,
     ) {
@@ -837,31 +714,6 @@ class SearchViewModel @Inject constructor(
                     text = result.code,
                     toastDescriptorOverride = BitwardenString.totp.asText(),
                 )
-            }
-        }
-    }
-
-    private fun handleRemovePasswordSendResultReceive(
-        action: SearchAction.Internal.RemovePasswordSendResultReceive,
-    ) {
-        when (val result = action.result) {
-            is RemovePasswordSendResult.Error -> {
-                mutableStateFlow.update {
-                    it.copy(
-                        dialogState = SearchState.DialogState.Error(
-                            title = BitwardenString.an_error_has_occurred.asText(),
-                            message = result
-                                .errorMessage
-                                ?.asText()
-                                ?: BitwardenString.generic_error_message.asText(),
-                        ),
-                    )
-                }
-            }
-
-            is RemovePasswordSendResult.Success -> {
-                mutableStateFlow.update { it.copy(dialogState = null) }
-                sendEvent(SearchEvent.ShowSnackbar(BitwardenString.password_removed.asText()))
             }
         }
     }
@@ -1112,16 +964,6 @@ class SearchViewModel @Inject constructor(
                             )
                     }
 
-                    is SearchTypeData.Sends -> {
-                        vaultData
-                            .sendViewList
-                            .filterAndOrganize(searchType, state.searchTerm)
-                            .toViewState(
-                                searchTerm = state.searchTerm,
-                                baseWebSendUrl = state.baseWebSendUrl,
-                                clock = clock,
-                            )
-                    }
                 },
                 dialogState = currentState.dialogState.takeUnless { clearDialogState },
             )
@@ -1166,7 +1008,6 @@ data class SearchState(
     val viewState: ViewState,
     val dialogState: DialogState?,
     val vaultFilterData: VaultFilterData?,
-    val baseWebSendUrl: String,
     val baseIconUrl: String,
     val isIconLoadingDisabled: Boolean,
     // Internal
@@ -1286,14 +1127,9 @@ data class SearchState(
         val itemType: ItemType,
     ) : Parcelable {
         /**
-         * Indicates the item type as a send or vault item.
+         * Indicates the type of the vault item.
          */
         sealed class ItemType : Parcelable {
-            /**
-             * Indicates the item type is a send.
-             */
-            @Parcelize
-            data class Sends(val type: SendType) : ItemType()
 
             /**
              * Indicates the item type is a vault item.
@@ -1305,40 +1141,13 @@ data class SearchState(
 }
 
 /**
- * Represents the difference between searching sends and searching vault items.
+ * Represents the kind of vault items being searched.
  */
 sealed class SearchTypeData : Parcelable {
     /**
      * The hint to display in the search toolbar at the top of the screen.
      */
     abstract val title: Text
-
-    /**
-     * Indicates that we should be searching sends.
-     */
-    @Parcelize
-    sealed class Sends : SearchTypeData() {
-        /**
-         * Indicates that we should be searching all sends.
-         */
-        data object All : Sends() {
-            override val title: Text get() = BitwardenString.search_sends.asText()
-        }
-
-        /**
-         * Indicates that we should be searching only text sends.
-         */
-        data object Texts : Sends() {
-            override val title: Text get() = BitwardenString.search_text_sends.asText()
-        }
-
-        /**
-         * Indicates that we should be searching only file sends.
-         */
-        data object Files : Sends() {
-            override val title: Text get() = BitwardenString.search_file_sends.asText()
-        }
-    }
 
     /**
      * Indicates that we should be searching vault items.
@@ -1558,13 +1367,6 @@ sealed class SearchAction {
         ) : Internal()
 
         /**
-         * Indicates a result for deleting the send has been received.
-         */
-        data class DeleteSendResultReceive(
-            val result: DeleteSendResult,
-        ) : Internal()
-
-        /**
          * Indicates a result for generating a verification code has been received.
          */
         data class GenerateTotpResultReceive(
@@ -1583,13 +1385,6 @@ sealed class SearchAction {
          */
         data class UnarchiveCipherReceive(
             val result: UnarchiveCipherResult,
-        ) : Internal()
-
-        /**
-         * Indicates a result for removing the password protection from a send has been received.
-         */
-        data class RemovePasswordSendResultReceive(
-            val result: RemovePasswordSendResult,
         ) : Internal()
 
         /**
@@ -1654,22 +1449,6 @@ sealed class SearchEvent {
      * Navigates back to the previous screen.
      */
     data object NavigateBack : SearchEvent()
-
-    /**
-     * Navigates to edit a send.
-     */
-    data class NavigateToEditSend(
-        val sendId: String,
-        val sendType: SendItemType,
-    ) : SearchEvent()
-
-    /**
-     * Navigates to view a send.
-     */
-    data class NavigateToViewSend(
-        val sendId: String,
-        val sendType: SendItemType,
-    ) : SearchEvent()
 
     /**
      * Navigates to view a cipher.

@@ -10,7 +10,6 @@ import com.x8bit.bitwarden.data.vault.manager.CipherManager
 import com.x8bit.bitwarden.data.vault.manager.CredentialExchangeImportManager
 import com.x8bit.bitwarden.data.vault.manager.FolderManager
 import com.x8bit.bitwarden.data.vault.manager.PinProtectedUserKeyManager
-import com.x8bit.bitwarden.data.vault.manager.SendManager
 import com.x8bit.bitwarden.data.vault.manager.TotpCodeManager
 import com.x8bit.bitwarden.data.vault.manager.VaultLockManager
 import com.x8bit.bitwarden.data.vault.manager.VaultSyncManager
@@ -37,7 +36,6 @@ object VaultRepositoryModule {
         authDiskSource: AuthDiskSource,
         cipherManager: CipherManager,
         folderManager: FolderManager,
-        sendManager: SendManager,
         vaultLockManager: VaultLockManager,
         dispatcherManager: DispatcherManager,
         totpCodeManager: TotpCodeManager,
@@ -52,7 +50,6 @@ object VaultRepositoryModule {
         authDiskSource = authDiskSource,
         cipherManager = cipherManager,
         folderManager = folderManager,
-        sendManager = sendManager,
         vaultLockManager = vaultLockManager,
         dispatcherManager = dispatcherManager,
         totpCodeManager = totpCodeManager,

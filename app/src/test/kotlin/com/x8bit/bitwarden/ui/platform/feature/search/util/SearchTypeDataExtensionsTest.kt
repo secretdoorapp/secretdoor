@@ -3,7 +3,6 @@ package com.x8bit.bitwarden.ui.platform.feature.search.util
 import android.net.Uri
 import com.bitwarden.collections.CollectionView
 import com.bitwarden.core.data.util.toFormattedDateTimeStyle
-import com.bitwarden.send.SendView
 import com.bitwarden.ui.platform.resource.BitwardenDrawable
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.asText
@@ -17,7 +16,6 @@ import com.bitwarden.vault.FolderView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockCardListView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockCipherListView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockLoginListView
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSendView
 import com.x8bit.bitwarden.ui.platform.feature.search.SearchState
 import com.x8bit.bitwarden.ui.platform.feature.search.SearchTypeData
 import com.x8bit.bitwarden.ui.platform.feature.search.model.AutofillSelectionOption
@@ -94,45 +92,6 @@ class SearchTypeDataExtensionsTest {
             ),
             searchTypeData.updateWithAdditionalDataIfNecessary(
                 folderList = listOf(folderView),
-                collectionList = emptyList(),
-            ),
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `updateWithAdditionalDataIfNecessary should return the searchTypeData unchanged for Sends All`() {
-        val searchTypeData = SearchTypeData.Sends.All
-        assertEquals(
-            searchTypeData,
-            searchTypeData.updateWithAdditionalDataIfNecessary(
-                folderList = listOf(),
-                collectionList = emptyList(),
-            ),
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `updateWithAdditionalDataIfNecessary should return the searchTypeData unchanged for Sends Files`() {
-        val searchTypeData = SearchTypeData.Sends.Files
-        assertEquals(
-            searchTypeData,
-            searchTypeData.updateWithAdditionalDataIfNecessary(
-                folderList = listOf(),
-                collectionList = emptyList(),
-            ),
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `updateWithAdditionalDataIfNecessary should return the searchTypeData unchanged for Sends Texts`() {
-        val searchTypeData = SearchTypeData.Sends.Texts
-        assertEquals(
-            searchTypeData,
-            searchTypeData.updateWithAdditionalDataIfNecessary(
-                folderList = listOf(),
                 collectionList = emptyList(),
             ),
         )
@@ -661,117 +620,4 @@ class SearchTypeDataExtensionsTest {
         )
     }
 
-    @Test
-    fun `SendViews filterAndOrganize should return empty list when search term is blank`() {
-        val sends = listOf(createMockSendView(number = 1))
-        val result = sends.filterAndOrganize(
-            searchTypeData = SearchTypeData.Sends.Files,
-            searchTerm = "",
-        )
-        assertEquals(emptyList<SendView>(), result)
-    }
-
-    @Test
-    fun `SendViews filterAndOrganize should return filtered list when search term is not blank`() {
-        val sends = listOf(
-            createMockSendView(number = 1),
-            createMockSendView(number = 2),
-        )
-        val result = sends.filterAndOrganize(
-            searchTypeData = SearchTypeData.Sends.Files,
-            searchTerm = "2",
-        )
-        assertEquals(
-            listOf(createMockSendView(number = 2)),
-            result,
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `SendViews filterAndOrganize should return list organized by priority when search term is not blank`() {
-        val match1 = createMockSendView(number = 1, name = "match1")
-        val match2 = createMockSendView(number = 2, name = "match2")
-        val ciphers = listOf(
-            createMockSendView(number = 0),
-            match2,
-            match1,
-        )
-        val result = ciphers.filterAndOrganize(
-            searchTypeData = SearchTypeData.Sends.Files,
-            searchTerm = "match",
-        )
-        assertEquals(listOf(match1, match2), result)
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `SendViews toViewState should return empty state with no message when search term is blank`() {
-        val sends = listOf(
-            createMockSendView(number = 0),
-            createMockSendView(number = 1),
-            createMockSendView(number = 2),
-        )
-
-        val result = sends.toViewState(
-            searchTerm = "",
-            baseWebSendUrl = "www,test.com",
-            clock = clock,
-        )
-
-        assertEquals(SearchState.ViewState.Empty(message = null), result)
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `SendViews toViewState should return content state when search term is not blank and sends is not empty`() {
-        mockkStatic(TemporalAccessor::toFormattedDateTimeStyle) {
-            every {
-                any<TemporalAccessor>().toFormattedDateTimeStyle(
-                    dateStyle = FormatStyle.MEDIUM,
-                    timeStyle = FormatStyle.SHORT,
-                    clock = clock,
-                )
-            } returns DEFAULT_FORMATTED_DATE_TIME
-            val sends = listOf(
-                createMockSendView(number = 0),
-                createMockSendView(number = 1),
-                createMockSendView(number = 2),
-            )
-
-            val result = sends.toViewState(
-                searchTerm = "mock",
-                baseWebSendUrl = "https://vault.bitwarden.com/#/send/",
-                clock = clock,
-            )
-
-            assertEquals(
-                SearchState.ViewState.Content(
-                    displayItems = persistentListOf(
-                        createMockDisplayItemForSend(number = 0),
-                        createMockDisplayItemForSend(number = 1),
-                        createMockDisplayItemForSend(number = 2),
-                    ),
-                ),
-                result,
-            )
-        }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `SendViews toViewState should return empty state with message when search term is not blank and sends is empty`() {
-        val result = emptyList<SendView>().toViewState(
-            searchTerm = "a",
-            baseWebSendUrl = "www,test.com",
-            clock = clock,
-        )
-
-        assertEquals(
-            SearchState.ViewState.Empty(
-                message = BitwardenString.there_are_no_items_that_match_the_search.asText(),
-            ),
-            result,
-        )
-    }
 }

@@ -30,9 +30,6 @@ import com.x8bit.bitwarden.ui.platform.feature.settings.navigateToSettingsGraphR
 import com.x8bit.bitwarden.ui.platform.feature.settings.settingsGraph
 import com.x8bit.bitwarden.ui.platform.feature.vaultunlockednavbar.model.VaultUnlockedNavBarTab
 import com.x8bit.bitwarden.ui.tools.feature.generator.generatorGraph
-import com.x8bit.bitwarden.ui.tools.feature.send.addedit.AddEditSendRoute
-import com.x8bit.bitwarden.ui.tools.feature.send.sendGraph
-import com.x8bit.bitwarden.ui.tools.feature.send.viewsend.ViewSendRoute
 import com.x8bit.bitwarden.ui.vault.feature.addedit.VaultAddEditArgs
 import com.x8bit.bitwarden.ui.vault.feature.importitems.navigateToImportItemsScreen
 import com.x8bit.bitwarden.ui.vault.feature.item.VaultItemArgs
@@ -52,10 +49,7 @@ fun VaultUnlockedNavBarScreen(
     onNavigateToVaultAddItem: (args: VaultAddEditArgs) -> Unit,
     onNavigateToVaultItem: (args: VaultItemArgs) -> Unit,
     onNavigateToVaultEditItem: (args: VaultAddEditArgs) -> Unit,
-    onNavigateToSearchSend: (searchType: SearchType.Sends) -> Unit,
     onNavigateToSearchVault: (searchType: SearchType.Vault) -> Unit,
-    onNavigateToAddEditSend: (route: AddEditSendRoute) -> Unit,
-    onNavigateToViewSend: (ViewSendRoute) -> Unit,
     onNavigateToDeleteAccount: () -> Unit,
     onNavigateToExportVault: () -> Unit,
     onNavigateToFolders: () -> Unit,
@@ -85,10 +79,7 @@ fun VaultUnlockedNavBarScreen(
         onNavigateToVaultItem = onNavigateToVaultItem,
         onNavigateToVaultEditItem = onNavigateToVaultEditItem,
         navigateToVaultAddItem = onNavigateToVaultAddItem,
-        onNavigateToSearchSend = onNavigateToSearchSend,
         onNavigateToSearchVault = onNavigateToSearchVault,
-        onNavigateToAddEditSend = onNavigateToAddEditSend,
-        onNavigateToViewSend = onNavigateToViewSend,
         navigateToDeleteAccount = onNavigateToDeleteAccount,
         navigateToExportVault = onNavigateToExportVault,
         navigateToFolders = onNavigateToFolders,
@@ -97,7 +88,6 @@ fun VaultUnlockedNavBarScreen(
         generatorTabClickedAction = {
             viewModel.trySendAction(VaultUnlockedNavBarAction.GeneratorTabClick)
         },
-        sendTabClickedAction = { viewModel.trySendAction(VaultUnlockedNavBarAction.SendTabClick) },
         vaultTabClickedAction = {
             viewModel.trySendAction(VaultUnlockedNavBarAction.VaultTabClick)
         },
@@ -127,16 +117,12 @@ private fun VaultUnlockedNavBarScaffold(
     state: VaultUnlockedNavBarState,
     navController: NavHostController,
     vaultTabClickedAction: () -> Unit,
-    sendTabClickedAction: () -> Unit,
     generatorTabClickedAction: () -> Unit,
     settingsTabClickedAction: () -> Unit,
     navigateToVaultAddItem: (args: VaultAddEditArgs) -> Unit,
     onNavigateToVaultItem: (args: VaultItemArgs) -> Unit,
     onNavigateToVaultEditItem: (args: VaultAddEditArgs) -> Unit,
-    onNavigateToSearchSend: (searchType: SearchType.Sends) -> Unit,
     onNavigateToSearchVault: (searchType: SearchType.Vault) -> Unit,
-    onNavigateToAddEditSend: (route: AddEditSendRoute) -> Unit,
-    onNavigateToViewSend: (ViewSendRoute) -> Unit,
     navigateToDeleteAccount: () -> Unit,
     navigateToExportVault: () -> Unit,
     navigateToFolders: () -> Unit,
@@ -161,7 +147,6 @@ private fun VaultUnlockedNavBarScaffold(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val navigationItems = persistentListOfNotNull<NavigationItem>(
         VaultUnlockedNavBarTab.Vault(labelRes = state.vaultNavBarLabelRes),
-        VaultUnlockedNavBarTab.Send.takeUnless { state.areSendsDisabled },
         VaultUnlockedNavBarTab.Generator,
         VaultUnlockedNavBarTab.Settings(state.notificationState.settingsTabNotificationCount),
     )
@@ -175,7 +160,6 @@ private fun VaultUnlockedNavBarScaffold(
             onNavigationClick = { navigationItem ->
                 when (navigationItem) {
                     VaultUnlockedNavBarTab.Generator -> generatorTabClickedAction()
-                    VaultUnlockedNavBarTab.Send -> sendTabClickedAction()
                     is VaultUnlockedNavBarTab.Settings -> settingsTabClickedAction()
                     is VaultUnlockedNavBarTab.Vault -> vaultTabClickedAction()
                 }
@@ -211,13 +195,6 @@ private fun VaultUnlockedNavBarScaffold(
                     navController.navigateToSettingsGraphRoot()
                     navController.navigateToAutoFill()
                 },
-                onNavigateToPlan = onNavigateToPlan,
-            )
-            sendGraph(
-                navController = navController,
-                onNavigateToAddEditSend = onNavigateToAddEditSend,
-                onNavigateToViewSend = onNavigateToViewSend,
-                onNavigateToSearchSend = onNavigateToSearchSend,
                 onNavigateToPlan = onNavigateToPlan,
             )
             generatorGraph(

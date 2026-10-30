@@ -4,7 +4,6 @@ import com.bitwarden.core.data.repository.model.DataState
 import com.bitwarden.exporters.ExportFormat
 import com.bitwarden.fido.Fido2CredentialAutofillView
 import com.bitwarden.sdk.Fido2CredentialStore
-import com.bitwarden.send.SendView
 import com.bitwarden.vault.CipherListView
 import com.bitwarden.vault.CipherType
 import com.bitwarden.vault.CipherView
@@ -12,7 +11,6 @@ import com.bitwarden.vault.FolderView
 import com.x8bit.bitwarden.data.platform.manager.keyrotation.KeyRotationManager
 import com.x8bit.bitwarden.data.vault.manager.CipherManager
 import com.x8bit.bitwarden.data.vault.manager.FolderManager
-import com.x8bit.bitwarden.data.vault.manager.SendManager
 import com.x8bit.bitwarden.data.vault.manager.VaultLockManager
 import com.x8bit.bitwarden.data.vault.manager.VaultSyncManager
 import com.x8bit.bitwarden.data.vault.manager.model.VerificationCodeItem
@@ -35,7 +33,6 @@ interface VaultRepository :
     CipherManager,
     FolderManager,
     KeyRotationManager,
-    SendManager,
     VaultLockManager,
     VaultSyncManager {
 
@@ -68,12 +65,6 @@ interface VaultRepository :
      * `null` if the folder cannot be found.
      */
     fun getVaultFolderStateFlow(folderId: String): StateFlow<DataState<FolderView?>>
-
-    /**
-     * Flow that represents the data for a specific send as found by ID. This may emit `null` if
-     * the send cannot be found.
-     */
-    fun getSendStateFlow(sendId: String): StateFlow<DataState<SendView?>>
 
     /**
      * Flow that represents the data for a single verification code item.

@@ -8,8 +8,6 @@ import androidx.navigation.NavOptions
 import com.bitwarden.annotation.OmitFromCoverage
 import com.bitwarden.ui.platform.base.util.composableWithStayTransitions
 import com.x8bit.bitwarden.ui.platform.feature.search.model.SearchType
-import com.x8bit.bitwarden.ui.tools.feature.send.addedit.AddEditSendRoute
-import com.x8bit.bitwarden.ui.tools.feature.send.viewsend.ViewSendRoute
 import com.x8bit.bitwarden.ui.vault.feature.addedit.VaultAddEditArgs
 import com.x8bit.bitwarden.ui.vault.feature.item.VaultItemArgs
 import kotlinx.serialization.Serializable
@@ -35,10 +33,7 @@ fun NavGraphBuilder.vaultUnlockedNavBarDestination(
     onNavigateToVaultAddItem: (args: VaultAddEditArgs) -> Unit,
     onNavigateToVaultItem: (args: VaultItemArgs) -> Unit,
     onNavigateToVaultEditItem: (args: VaultAddEditArgs) -> Unit,
-    onNavigateToSearchSend: (searchType: SearchType.Sends) -> Unit,
     onNavigateToSearchVault: (searchType: SearchType.Vault) -> Unit,
-    onNavigateToAddEditSend: (route: AddEditSendRoute) -> Unit,
-    onNavigateToViewSend: (ViewSendRoute) -> Unit,
     onNavigateToDeleteAccount: () -> Unit,
     onNavigateToExportVault: () -> Unit,
     onNavigateToFolders: () -> Unit,
@@ -61,10 +56,7 @@ fun NavGraphBuilder.vaultUnlockedNavBarDestination(
             onNavigateToVaultAddItem = onNavigateToVaultAddItem,
             onNavigateToVaultItem = onNavigateToVaultItem,
             onNavigateToVaultEditItem = onNavigateToVaultEditItem,
-            onNavigateToViewSend = onNavigateToViewSend,
-            onNavigateToSearchSend = onNavigateToSearchSend,
             onNavigateToSearchVault = onNavigateToSearchVault,
-            onNavigateToAddEditSend = onNavigateToAddEditSend,
             onNavigateToDeleteAccount = onNavigateToDeleteAccount,
             onNavigateToExportVault = onNavigateToExportVault,
             onNavigateToFolders = onNavigateToFolders,

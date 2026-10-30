@@ -24,10 +24,8 @@ import com.bitwarden.core.data.util.asFailure
 import com.bitwarden.core.data.util.asSuccess
 import com.bitwarden.data.repository.model.Environment
 import com.bitwarden.data.repository.util.baseIconUrl
-import com.bitwarden.data.repository.util.baseWebSendUrl
 import com.bitwarden.policies.Policy
 import com.bitwarden.policies.PolicyType
-import com.bitwarden.send.SendType
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.components.account.model.AccountSummary
 import com.bitwarden.ui.platform.components.icon.model.IconData
@@ -78,7 +76,6 @@ import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.ciphermatching.CipherMatchingManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
 import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
-import com.x8bit.bitwarden.data.platform.manager.model.EffectiveSendPolicy
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
 import com.x8bit.bitwarden.data.platform.manager.model.OrganizationEvent
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
@@ -98,13 +95,10 @@ import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockLoginListVi
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockPassportView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkFido2CredentialList
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkPolicy
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSendView
 import com.x8bit.bitwarden.data.vault.manager.model.GetCipherResult
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.ArchiveCipherResult
-import com.x8bit.bitwarden.data.vault.repository.model.DeleteSendResult
 import com.x8bit.bitwarden.data.vault.repository.model.GenerateTotpResult
-import com.x8bit.bitwarden.data.vault.repository.model.RemovePasswordSendResult
 import com.x8bit.bitwarden.data.vault.repository.model.UnarchiveCipherResult
 import com.x8bit.bitwarden.data.vault.repository.model.VaultData
 import com.x8bit.bitwarden.ui.credentials.manager.model.AssertFido2CredentialResult
@@ -113,7 +107,6 @@ import com.x8bit.bitwarden.ui.credentials.manager.model.GetCredentialsResult
 import com.x8bit.bitwarden.ui.credentials.manager.model.GetPasswordCredentialResult
 import com.x8bit.bitwarden.ui.platform.feature.search.model.SearchType
 import com.x8bit.bitwarden.ui.platform.model.SnackbarRelay
-import com.x8bit.bitwarden.ui.tools.feature.send.model.SendItemType
 import com.x8bit.bitwarden.ui.vault.components.model.CreateVaultItemType
 import com.x8bit.bitwarden.ui.vault.feature.addedit.util.createMockPasskeyAttestationOptions
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.model.ListingItemOverflowAction
@@ -222,8 +215,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
     private val mutableActivePoliciesFlow: MutableStateFlow<List<Policy>> =
         MutableStateFlow(emptyList())
     private val policyManager: PolicyManager = mockk {
-        every { getEffectiveSendPolicy() } returns DEFAULT_EFFECTIVE_SEND_POLICY
-        every { getEffectiveSendPolicyFlow() } returns emptyFlow()
         every {
             getActivePoliciesFlow(type = PolicyType.RESTRICTED_ITEM_TYPES)
         } returns mutableActivePoliciesFlow
@@ -624,7 +615,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             val viewModel = createVaultItemListingViewModel()
@@ -677,7 +667,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             val viewModel = createVaultItemListingViewModel()
@@ -714,7 +703,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = emptyList(),
                 collectionViewList = emptyList(),
-                sendViewList = emptyList(),
             ),
         )
         coEvery {
@@ -763,7 +751,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             coEvery {
@@ -817,7 +804,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             every {
@@ -880,7 +866,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             every {
@@ -947,7 +932,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             every { bitwardenCredentialManager.isUserVerified } returns true
@@ -998,28 +982,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 VaultItemListingEvent.NavigateToVaultItem(
                     id = "mock",
                     type = VaultItemCipherType.LOGIN,
-                ),
-                awaitItem(),
-            )
-        }
-    }
-
-    @Test
-    fun `ItemClick for send item should emit NavigateToViewSendItem`() = runTest {
-        val viewModel = createVaultItemListingViewModel(
-            createSavedStateHandleWithVaultItemListingType(VaultItemListingType.SendFile),
-        )
-        viewModel.eventFlow.test {
-            viewModel.trySendAction(
-                VaultItemListingsAction.ItemClick(
-                    id = "mock",
-                    type = VaultItemListingState.DisplayItem.ItemType.Sends(type = SendType.FILE),
-                ),
-            )
-            assertEquals(
-                VaultItemListingEvent.NavigateToViewSendItem(
-                    id = "mock",
-                    sendType = SendItemType.FILE,
                 ),
                 awaitItem(),
             )
@@ -1333,7 +1295,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             val viewModel = createVaultItemListingViewModel()
@@ -1395,7 +1356,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             val initialState = createVaultItemListingState(
@@ -1458,7 +1418,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             specialCircumstanceManager.specialCircumstance =
@@ -1508,7 +1467,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             specialCircumstanceManager.specialCircumstance =
@@ -1793,87 +1751,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `AddVaultItemClick for text send item should emit NavigateToAddVaultItem`() = runTest {
-        val viewModel = createVaultItemListingViewModel(
-            createSavedStateHandleWithVaultItemListingType(VaultItemListingType.SendText),
-        )
-        viewModel.eventFlow.test {
-            viewModel.trySendAction(VaultItemListingsAction.AddVaultItemClick)
-            assertEquals(
-                VaultItemListingEvent.NavigateToAddSendItem(sendType = SendItemType.TEXT),
-                awaitItem(),
-            )
-        }
-    }
-
-    @Test
-    fun `AddVaultItemClick for file send item with Premium should emit NavigateToAddVaultItem`() =
-        runTest {
-            val viewModel = createVaultItemListingViewModel(
-                createSavedStateHandleWithVaultItemListingType(VaultItemListingType.SendFile),
-            )
-            viewModel.eventFlow.test {
-                viewModel.trySendAction(VaultItemListingsAction.AddVaultItemClick)
-                assertEquals(
-                    VaultItemListingEvent.NavigateToAddSendItem(sendType = SendItemType.FILE),
-                    awaitItem(),
-                )
-            }
-        }
-
-    @Test
-    fun `AddVaultItemClick for file send without Premium and upgrade unavailable shows Error`() =
-        runTest {
-            every { premiumStateManager.isInAppUpgradeAvailable() } returns false
-            mutableUserStateFlow.value = DEFAULT_USER_STATE.copy(
-                accounts = listOf(DEFAULT_ACCOUNT.copy(isPremium = false)),
-            )
-            val viewModel = createVaultItemListingViewModel(
-                createSavedStateHandleWithVaultItemListingType(VaultItemListingType.SendFile),
-            )
-            viewModel.eventFlow.test {
-                viewModel.trySendAction(VaultItemListingsAction.AddVaultItemClick)
-                expectNoEvents()
-            }
-            assertEquals(
-                createVaultItemListingState(
-                    itemListingType = VaultItemListingState.ItemListingType.Send.SendFile,
-                    dialogState = VaultItemListingState.DialogState.Error(
-                        title = BitwardenString.send.asText(),
-                        message = BitwardenString.send_file_premium_required.asText(),
-                    ),
-                    isPremium = false,
-                ),
-                viewModel.stateFlow.value,
-            )
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `AddVaultItemClick for file send without Premium and upgrade available shows Upgrade to Premium dialog`() =
-        runTest {
-            every { premiumStateManager.isInAppUpgradeAvailable() } returns true
-            mutableUserStateFlow.value = DEFAULT_USER_STATE.copy(
-                accounts = listOf(DEFAULT_ACCOUNT.copy(isPremium = false)),
-            )
-            val viewModel = createVaultItemListingViewModel(
-                createSavedStateHandleWithVaultItemListingType(VaultItemListingType.SendFile),
-            )
-            viewModel.eventFlow.test {
-                viewModel.trySendAction(VaultItemListingsAction.AddVaultItemClick)
-                expectNoEvents()
-            }
-            assertEquals(
-                createVaultItemListingState(
-                    itemListingType = VaultItemListingState.ItemListingType.Send.SendFile,
-                    dialogState = VaultItemListingState.DialogState.FileTypeRequiresPremium,
-                    isPremium = false,
-                ),
-                viewModel.stateFlow.value,
-            )
-        }
-
-    @Test
     fun `ItemTypeToAddSelected sends NavigateToAddFolder for folder selection`() = runTest {
         val viewModel = createVaultItemListingViewModel(
             savedStateHandle = createSavedStateHandleWithVaultItemListingType(
@@ -1973,204 +1850,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
         viewModel.trySendAction(VaultItemListingsAction.RefreshClick)
         verify { vaultRepository.sync(forced = true) }
     }
-
-    @Test
-    fun `OverflowOptionClick Send ViewClick should emit NavigateToViewSendItem`() = runTest {
-        val sendId = "sendId"
-        val viewModel = createVaultItemListingViewModel()
-        viewModel.eventFlow.test {
-            viewModel.trySendAction(
-                VaultItemListingsAction.OverflowOptionClick(
-                    ListingItemOverflowAction.SendAction.ViewClick(
-                        sendId = sendId,
-                        sendType = SendType.TEXT,
-                    ),
-                ),
-            )
-            assertEquals(
-                VaultItemListingEvent.NavigateToViewSendItem(
-                    id = sendId,
-                    sendType = SendItemType.TEXT,
-                ),
-                awaitItem(),
-            )
-        }
-    }
-
-    @Test
-    fun `OverflowOptionClick Send EditClick should emit NavigateToEditSendItem`() = runTest {
-        val sendId = "sendId"
-        val viewModel = createVaultItemListingViewModel()
-        viewModel.eventFlow.test {
-            viewModel.trySendAction(
-                VaultItemListingsAction.OverflowOptionClick(
-                    ListingItemOverflowAction.SendAction.EditClick(
-                        sendId = sendId,
-                        sendType = SendType.FILE,
-                    ),
-                ),
-            )
-            assertEquals(
-                VaultItemListingEvent.NavigateToEditSendItem(
-                    id = sendId,
-                    sendType = SendItemType.FILE,
-                ),
-                awaitItem(),
-            )
-        }
-    }
-
-    @Test
-    fun `OverflowOptionClick Send CopyUrlClick should call setText on clipboardManager`() =
-        runTest {
-            val sendUrl = "www.test.com"
-            val viewModel = createVaultItemListingViewModel()
-            viewModel.trySendAction(
-                VaultItemListingsAction.OverflowOptionClick(
-                    ListingItemOverflowAction.SendAction.CopyUrlClick(sendUrl = sendUrl),
-                ),
-            )
-            verify(exactly = 1) {
-                clipboardManager.setText(
-                    text = sendUrl,
-                    toastDescriptorOverride = BitwardenString.send_link.asText(),
-                )
-            }
-        }
-
-    @Test
-    fun `OverflowOptionClick Send DeleteClick with deleteSend error should display error dialog`() =
-        runTest {
-            val sendId = "sendId1234"
-            val error = Throwable("Oops")
-            coEvery { vaultRepository.deleteSend(sendId) } returns DeleteSendResult.Error(
-                error = error,
-            )
-
-            val viewModel = createVaultItemListingViewModel()
-            viewModel.stateFlow.test {
-                assertEquals(initialState, awaitItem())
-                viewModel.trySendAction(
-                    VaultItemListingsAction.OverflowOptionClick(
-                        ListingItemOverflowAction.SendAction.DeleteClick(sendId = sendId),
-                    ),
-                )
-                assertEquals(
-                    initialState.copy(
-                        dialogState = VaultItemListingState.DialogState.Loading(
-                            message = BitwardenString.deleting.asText(),
-                        ),
-                    ),
-                    awaitItem(),
-                )
-                assertEquals(
-                    initialState.copy(
-                        dialogState = VaultItemListingState.DialogState.Error(
-                            title = BitwardenString.an_error_has_occurred.asText(),
-                            message = BitwardenString.generic_error_message.asText(),
-                            throwable = error,
-                        ),
-                    ),
-                    awaitItem(),
-                )
-            }
-        }
-
-    @Test
-    fun `OverflowOptionClick Send DeleteClick with deleteSend success should emit ShowSnackbar`() =
-        runTest {
-            val sendId = "sendId1234"
-            coEvery { vaultRepository.deleteSend(sendId) } returns DeleteSendResult.Success
-
-            val viewModel = createVaultItemListingViewModel()
-            viewModel.eventFlow.test {
-                viewModel.trySendAction(
-                    VaultItemListingsAction.OverflowOptionClick(
-                        ListingItemOverflowAction.SendAction.DeleteClick(sendId = sendId),
-                    ),
-                )
-                assertEquals(
-                    VaultItemListingEvent.ShowSnackbar(BitwardenString.send_deleted.asText()),
-                    awaitItem(),
-                )
-            }
-        }
-
-    @Test
-    fun `OverflowOptionClick Send ShareUrlClick should emit ShowShareSheet`() = runTest {
-        val sendUrl = "www.test.com"
-        val viewModel = createVaultItemListingViewModel()
-        viewModel.eventFlow.test {
-            viewModel.trySendAction(
-                VaultItemListingsAction.OverflowOptionClick(
-                    ListingItemOverflowAction.SendAction.ShareUrlClick(sendUrl = sendUrl),
-                ),
-            )
-            assertEquals(VaultItemListingEvent.ShowShareSheet(sendUrl), awaitItem())
-        }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `OverflowOptionClick Send RemovePasswordClick with removePasswordSend error should display error dialog`() =
-        runTest {
-            val sendId = "sendId1234"
-            val error = Throwable("Oops")
-            coEvery {
-                vaultRepository.removePasswordSend(sendId)
-            } returns RemovePasswordSendResult.Error(errorMessage = null, error = error)
-
-            val viewModel = createVaultItemListingViewModel()
-            viewModel.stateFlow.test {
-                assertEquals(initialState, awaitItem())
-                viewModel.trySendAction(
-                    VaultItemListingsAction.OverflowOptionClick(
-                        ListingItemOverflowAction.SendAction.RemovePasswordClick(sendId = sendId),
-                    ),
-                )
-                assertEquals(
-                    initialState.copy(
-                        dialogState = VaultItemListingState.DialogState.Loading(
-                            message = BitwardenString.removing_send_password.asText(),
-                        ),
-                    ),
-                    awaitItem(),
-                )
-                assertEquals(
-                    initialState.copy(
-                        dialogState = VaultItemListingState.DialogState.Error(
-                            title = BitwardenString.an_error_has_occurred.asText(),
-                            message = BitwardenString.generic_error_message.asText(),
-                            throwable = error,
-                        ),
-                    ),
-                    awaitItem(),
-                )
-            }
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `OverflowOptionClick Send RemovePasswordClick with removePasswordSend success should emit ShowSnackbar`() =
-        runTest {
-            val sendId = "sendId1234"
-            coEvery {
-                vaultRepository.removePasswordSend(sendId)
-            } returns RemovePasswordSendResult.Success(mockk())
-
-            val viewModel = createVaultItemListingViewModel()
-            viewModel.eventFlow.test {
-                viewModel.trySendAction(
-                    VaultItemListingsAction.OverflowOptionClick(
-                        ListingItemOverflowAction.SendAction.RemovePasswordClick(sendId = sendId),
-                    ),
-                )
-                assertEquals(
-                    VaultItemListingEvent.ShowSnackbar(BitwardenString.password_removed.asText()),
-                    awaitItem(),
-                )
-            }
-        }
 
     @Test
     fun `OverflowOptionClick Vault CopyNoteClick should call setText on the ClipboardManager`() =
@@ -2730,7 +2409,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = listOf(createMockFolderView(number = 1)),
                 collectionViewList = listOf(createMockCollectionView(number = 1)),
-                sendViewList = listOf(createMockSendView(number = 1)),
             ),
         )
 
@@ -2770,7 +2448,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             )
 
@@ -2871,7 +2548,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             )
 
@@ -2941,7 +2617,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             )
 
@@ -3008,7 +2683,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             )
 
@@ -3083,7 +2757,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             )
 
@@ -3134,7 +2807,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             val viewModel = createVaultItemListingViewModel()
@@ -3166,7 +2838,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             val viewModel = createVaultItemListingViewModel(
@@ -3203,7 +2874,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             val viewModel = createVaultItemListingViewModel(
@@ -3240,7 +2910,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             val viewModel = createVaultItemListingViewModel(
@@ -3277,7 +2946,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             val viewModel = createVaultItemListingViewModel(
@@ -3314,7 +2982,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             val viewModel = createVaultItemListingViewModel(
@@ -3352,7 +3019,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             val viewModel = createVaultItemListingViewModel(
@@ -3378,80 +3044,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
             )
         }
 
-    @Suppress("MaxLineLength")
-    @Test
-    fun `vaultDataStateFlow Loaded with empty items should update ViewState to NoItems content for SendFile ItemListingType`() =
-        runTest {
-            val dataState = DataState.Loaded(
-                data = VaultData(
-                    decryptCipherListResult = createMockDecryptCipherListResult(
-                        number = 1,
-                        successes = emptyList(),
-                    ),
-                    folderViewList = emptyList(),
-                    collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
-                ),
-            )
-            val viewModel = createVaultItemListingViewModel(
-                savedStateHandle = createSavedStateHandleWithVaultItemListingType(
-                    vaultItemListingType = VaultItemListingType.SendFile,
-                ),
-            )
-
-            mutableVaultDataStateFlow.tryEmit(value = dataState)
-
-            assertEquals(
-                createVaultItemListingState(
-                    itemListingType = VaultItemListingState.ItemListingType.Send.SendFile,
-                    viewState = VaultItemListingState.ViewState.NoItems(
-                        header = null,
-                        message = BitwardenString.no_file_sends.asText(),
-                        shouldShowAddButton = true,
-                        buttonText = BitwardenString.new_file_send.asText(),
-                    ),
-                ),
-                viewModel.stateFlow.value,
-            )
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `vaultDataStateFlow Loaded with empty items should update ViewState to NoItems content for SendText ItemListingType`() =
-        runTest {
-            val dataState = DataState.Loaded(
-                data = VaultData(
-                    decryptCipherListResult = createMockDecryptCipherListResult(
-                        number = 1,
-                        successes = emptyList(),
-                    ),
-                    folderViewList = emptyList(),
-                    collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
-                ),
-            )
-            val viewModel = createVaultItemListingViewModel(
-                savedStateHandle = createSavedStateHandleWithVaultItemListingType(
-                    vaultItemListingType = VaultItemListingType.SendText,
-                ),
-            )
-
-            mutableVaultDataStateFlow.tryEmit(value = dataState)
-
-            assertEquals(
-                createVaultItemListingState(
-                    itemListingType = VaultItemListingState.ItemListingType.Send.SendText,
-                    viewState = VaultItemListingState.ViewState.NoItems(
-                        header = null,
-                        message = BitwardenString.no_text_sends.asText(),
-                        shouldShowAddButton = true,
-                        buttonText = BitwardenString.new_text_send.asText(),
-                    ),
-                ),
-                viewModel.stateFlow.value,
-            )
-        }
-
     @Test
     fun `vaultDataStateFlow Loaded with trash items should update ViewState to NoItems`() =
         runTest {
@@ -3463,7 +3055,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             )
             val viewModel = createVaultItemListingViewModel()
@@ -3508,7 +3099,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             ),
         )
@@ -3544,7 +3134,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             ),
         )
@@ -3576,7 +3165,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             ),
         )
@@ -3628,7 +3216,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = listOf(createMockFolderView(number = 1)),
                 collectionViewList = listOf(createMockCollectionView(number = 1)),
-                sendViewList = listOf(createMockSendView(number = 1)),
             ),
             error = IllegalStateException(),
         )
@@ -3667,7 +3254,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = emptyList(),
                 collectionViewList = emptyList(),
-                sendViewList = emptyList(),
             ),
             error = IllegalStateException(),
         )
@@ -3699,7 +3285,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = listOf(createMockFolderView(number = 1)),
                 collectionViewList = listOf(createMockCollectionView(number = 1)),
-                sendViewList = listOf(createMockSendView(number = 1)),
             ),
             error = IllegalStateException(),
         )
@@ -3756,7 +3341,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = listOf(createMockFolderView(number = 1)),
                 collectionViewList = listOf(createMockCollectionView(number = 1)),
-                sendViewList = listOf(createMockSendView(number = 1)),
             ),
         )
 
@@ -3794,7 +3378,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = emptyList(),
                 collectionViewList = emptyList(),
-                sendViewList = emptyList(),
             ),
         )
 
@@ -3825,7 +3408,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = listOf(createMockFolderView(number = 1)),
                 collectionViewList = listOf(createMockCollectionView(number = 1)),
-                sendViewList = listOf(createMockSendView(number = 1)),
             ),
         )
 
@@ -3866,7 +3448,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = listOf(createMockFolderView(number = 1)),
                 collectionViewList = listOf(createMockCollectionView(number = 1)),
-                sendViewList = listOf(createMockSendView(number = 1)),
             ),
         )
 
@@ -4302,7 +3883,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             )
 
@@ -4356,7 +3936,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             )
 
@@ -4403,7 +3982,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             )
 
@@ -4443,7 +4021,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             )
 
@@ -4494,7 +4071,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             )
             val viewModel = createVaultItemListingViewModel()
@@ -4556,7 +4132,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             )
 
@@ -4630,7 +4205,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             )
             createVaultItemListingViewModel()
@@ -4679,7 +4253,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             )
             val viewModel = createVaultItemListingViewModel()
@@ -4731,7 +4304,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             )
             val viewModel = createVaultItemListingViewModel()
@@ -4798,7 +4370,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = listOf(createMockFolderView(number = 1)),
                 collectionViewList = listOf(createMockCollectionView(number = 1)),
-                sendViewList = listOf(createMockSendView(number = 1)),
             ),
         )
         createVaultItemListingViewModel()
@@ -4843,7 +4414,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = listOf(createMockFolderView(number = 1)),
                 collectionViewList = listOf(createMockCollectionView(number = 1)),
-                sendViewList = listOf(createMockSendView(number = 1)),
             ),
         )
         val viewModel = createVaultItemListingViewModel()
@@ -4915,7 +4485,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = listOf(createMockFolderView(number = 1)),
                 collectionViewList = listOf(createMockCollectionView(number = 1)),
-                sendViewList = listOf(createMockSendView(number = 1)),
             ),
         )
         val viewModel = createVaultItemListingViewModel()
@@ -4993,7 +4562,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             )
             createVaultItemListingViewModel()
@@ -5569,7 +5137,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     collectionViewList = emptyList(),
                     folderViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             coEvery {
@@ -5750,7 +5317,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 ),
                 collectionViewList = emptyList(),
                 folderViewList = emptyList(),
-                sendViewList = emptyList(),
             ),
         )
         coEvery {
@@ -5827,7 +5393,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 ),
                 collectionViewList = emptyList(),
                 folderViewList = emptyList(),
-                sendViewList = emptyList(),
             ),
         )
         every {
@@ -5907,7 +5472,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             coEvery {
@@ -5945,7 +5509,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             coEvery {
@@ -6028,7 +5591,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             )
             val viewModel = createVaultItemListingViewModel()
@@ -6080,7 +5642,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             )
             mutableVaultDataStateFlow.value = dataState
@@ -6138,7 +5699,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = listOf(createMockFolderView(number = 1)),
                 collectionViewList = listOf(createMockCollectionView(number = 1)),
-                sendViewList = listOf(createMockSendView(number = 1)),
             ),
         )
         val viewModel = createVaultItemListingViewModel()
@@ -6562,7 +6122,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
 
@@ -6629,7 +6188,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
 
@@ -6706,7 +6264,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = emptyList(),
                     collectionViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
 
@@ -6844,14 +6401,12 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
             accountSummaries = DEFAULT_USER_STATE.toAccountSummaries(),
             viewState = viewState,
             vaultFilterType = vaultRepository.vaultFilterType,
-            baseWebSendUrl = Environment.Prod.Us.baseWebSendUrl,
             baseIconUrl = environmentRepository.environment.baseIconUrl,
             isIconLoadingDisabled = settingsRepository.isIconLoadingDisabled,
             isPullToRefreshSettingEnabled = false,
             dialogState = dialogState,
             totpData = null,
             autofillSelectionData = null,
-            policyDisablesSend = false,
             hasMasterPassword = true,
             createCredentialRequest = null,
             isPremium = isPremium,
@@ -6887,15 +6442,6 @@ private val DEFAULT_ACCOUNT = UserState.Account(
 private val DEFAULT_USER_STATE = UserState(
     activeUserId = "activeUserId",
     accounts = listOf(DEFAULT_ACCOUNT),
-)
-
-private val DEFAULT_EFFECTIVE_SEND_POLICY = EffectiveSendPolicy(
-    allowedDomains = null,
-    allowedSendTypes = null,
-    deletionHours = null,
-    disableHideEmail = false,
-    disableSend = false,
-    whoCanAccess = null,
 )
 
 private const val DEFAULT_RELYING_PARTY_ID = "www.bitwarden.com"

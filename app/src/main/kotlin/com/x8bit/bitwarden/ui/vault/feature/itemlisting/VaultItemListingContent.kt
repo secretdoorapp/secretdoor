@@ -45,7 +45,6 @@ import kotlinx.collections.immutable.toImmutableList
 fun VaultItemListingContent(
     state: VaultItemListingState.ViewState.Content,
     actionCard: VaultItemListingState.ActionCardState?,
-    policyDisablesSend: Boolean,
     showAddTotpBanner: Boolean,
     vaultItemListingHandlers: VaultItemListingHandlers,
     modifier: Modifier = Modifier,
@@ -112,19 +111,6 @@ fun VaultItemListingContent(
                     text = stringResource(
                         id = BitwardenString.add_this_authenticator_key_to_a_login,
                     ),
-                    modifier = Modifier
-                        .animateItem()
-                        .standardHorizontalMargin()
-                        .fillMaxWidth(),
-                )
-            }
-        }
-
-        if (policyDisablesSend) {
-            item(key = "sends_disabled_callout") {
-                Spacer(modifier = Modifier.height(height = 12.dp))
-                BitwardenInfoCalloutCard(
-                    text = stringResource(id = BitwardenString.send_disabled_warning),
                     modifier = Modifier
                         .animateItem()
                         .standardHorizontalMargin()
@@ -266,13 +252,6 @@ fun VaultItemListingContent(
                                 contentDescription = option.contentDescription(),
                                 onClick = {
                                     when (option) {
-                                        is ListingItemOverflowAction.SendAction -> {
-                                            if (option.speedBump != null) {
-                                                overflowSpeedBumpAction = option
-                                            } else {
-                                                vaultItemListingHandlers.overflowItemClick(option)
-                                            }
-                                        }
 
                                         is ListingItemOverflowAction.VaultAction -> {
                                             if (option.requiresPasswordReprompt &&
@@ -292,8 +271,6 @@ fun VaultItemListingContent(
                                 },
                             )
                         }
-                        // Only show options if allowed
-                        .filter { !policyDisablesSend }
                         .toImmutableList(),
                     cardStyle = state
                         .displayItemList

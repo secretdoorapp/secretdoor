@@ -11,7 +11,6 @@ import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
 import com.bitwarden.data.repository.model.Environment
 import com.bitwarden.policies.Policy
 import com.bitwarden.policies.PolicyType
-import com.bitwarden.send.SendType
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarData
 import com.bitwarden.ui.platform.manager.snackbar.SnackbarRelayManager
@@ -56,14 +55,11 @@ import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockLoginView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockPassportView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkFido2CredentialList
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkPolicy
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSendView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockUriView
 import com.x8bit.bitwarden.data.vault.manager.model.GetCipherResult
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.ArchiveCipherResult
-import com.x8bit.bitwarden.data.vault.repository.model.DeleteSendResult
 import com.x8bit.bitwarden.data.vault.repository.model.GenerateTotpResult
-import com.x8bit.bitwarden.data.vault.repository.model.RemovePasswordSendResult
 import com.x8bit.bitwarden.data.vault.repository.model.UnarchiveCipherResult
 import com.x8bit.bitwarden.data.vault.repository.model.UpdateCipherResult
 import com.x8bit.bitwarden.data.vault.repository.model.VaultData
@@ -72,7 +68,6 @@ import com.x8bit.bitwarden.ui.platform.feature.search.util.createMockDisplayItem
 import com.x8bit.bitwarden.ui.platform.feature.search.util.filterAndOrganize
 import com.x8bit.bitwarden.ui.platform.feature.search.util.toViewState
 import com.x8bit.bitwarden.ui.platform.model.SnackbarRelay
-import com.x8bit.bitwarden.ui.tools.feature.send.model.SendItemType
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.model.ListingItemOverflowAction
 import com.x8bit.bitwarden.ui.vault.feature.vault.model.VaultFilterType
 import com.x8bit.bitwarden.ui.vault.feature.vault.util.toFilteredList
@@ -196,7 +191,7 @@ class SearchViewModelTest : BaseViewModelTest() {
 
     @Test
     fun `initial state should be correct when set`() {
-        val state = DEFAULT_STATE.copy(searchType = SearchTypeData.Sends.All)
+        val state = DEFAULT_STATE
         val viewModel = createViewModel(initialState = state)
         assertEquals(state, viewModel.stateFlow.value)
     }
@@ -283,23 +278,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                     cipherId = "mock",
                     cipherType = VaultItemCipherType.LOGIN,
                 ),
-                awaitItem(),
-            )
-        }
-    }
-
-    @Test
-    fun `ItemClick for send item should emit NavigateToViewSend`() = runTest {
-        val viewModel = createViewModel(DEFAULT_STATE.copy(searchType = SearchTypeData.Sends.All))
-        viewModel.eventFlow.test {
-            viewModel.trySendAction(
-                SearchAction.ItemClick(
-                    itemId = "mock",
-                    itemType = SearchState.DisplayItem.ItemType.Sends(type = SendType.TEXT),
-                ),
-            )
-            assertEquals(
-                SearchEvent.NavigateToViewSend(sendId = "mock", sendType = SendItemType.TEXT),
                 awaitItem(),
             )
         }
@@ -1002,196 +980,6 @@ class SearchViewModelTest : BaseViewModelTest() {
         }
 
     @Test
-    fun `OverflowOptionClick Send ViewClick should emit NavigateToViewSend`() = runTest {
-        val sendId = "sendId"
-        val viewModel = createViewModel()
-        viewModel.eventFlow.test {
-            viewModel.trySendAction(
-                SearchAction.OverflowOptionClick(
-                    ListingItemOverflowAction.SendAction.ViewClick(
-                        sendId = sendId,
-                        sendType = SendType.TEXT,
-                    ),
-                ),
-            )
-            assertEquals(
-                SearchEvent.NavigateToViewSend(sendId = sendId, sendType = SendItemType.TEXT),
-                awaitItem(),
-            )
-        }
-    }
-
-    @Test
-    fun `OverflowOptionClick Send EditClick should emit NavigateToEditSend`() = runTest {
-        val sendId = "sendId"
-        val viewModel = createViewModel()
-        viewModel.eventFlow.test {
-            viewModel.trySendAction(
-                SearchAction.OverflowOptionClick(
-                    ListingItemOverflowAction.SendAction.EditClick(
-                        sendId = sendId,
-                        sendType = SendType.FILE,
-                    ),
-                ),
-            )
-            assertEquals(
-                SearchEvent.NavigateToEditSend(sendId = sendId, sendType = SendItemType.FILE),
-                awaitItem(),
-            )
-        }
-    }
-
-    @Test
-    fun `OverflowOptionClick Send CopyUrlClick should call setText on clipboardManager`() =
-        runTest {
-            val sendUrl = "www.test.com"
-            val viewModel = createViewModel()
-            viewModel.trySendAction(
-                SearchAction.OverflowOptionClick(
-                    ListingItemOverflowAction.SendAction.CopyUrlClick(sendUrl = sendUrl),
-                ),
-            )
-            verify(exactly = 1) {
-                clipboardManager.setText(
-                    text = sendUrl,
-                    toastDescriptorOverride = BitwardenString.link.asText(),
-                )
-            }
-        }
-
-    @Test
-    fun `OverflowOptionClick Send DeleteClick with deleteSend error should display error dialog`() =
-        runTest {
-            val error = Throwable("Ahhh")
-            val sendId = "sendId1234"
-            coEvery {
-                vaultRepository.deleteSend(sendId)
-            } returns DeleteSendResult.Error(error = error)
-            val viewModel = createViewModel()
-
-            viewModel.stateFlow.test {
-                assertEquals(DEFAULT_STATE, awaitItem())
-                viewModel.trySendAction(
-                    SearchAction.OverflowOptionClick(
-                        ListingItemOverflowAction.SendAction.DeleteClick(sendId = sendId),
-                    ),
-                )
-                assertEquals(
-                    DEFAULT_STATE.copy(
-                        dialogState = SearchState.DialogState.Loading(
-                            message = BitwardenString.deleting.asText(),
-                        ),
-                    ),
-                    awaitItem(),
-                )
-                assertEquals(
-                    DEFAULT_STATE.copy(
-                        dialogState = SearchState.DialogState.Error(
-                            title = BitwardenString.an_error_has_occurred.asText(),
-                            message = BitwardenString.generic_error_message.asText(),
-                            throwable = error,
-                        ),
-                    ),
-                    awaitItem(),
-                )
-            }
-        }
-
-    @Test
-    fun `OverflowOptionClick Send DeleteClick with deleteSend success should emit ShowSnackbar`() =
-        runTest {
-            val sendId = "sendId1234"
-            coEvery { vaultRepository.deleteSend(sendId) } returns DeleteSendResult.Success
-
-            val viewModel = createViewModel()
-            viewModel.eventFlow.test {
-                viewModel.trySendAction(
-                    SearchAction.OverflowOptionClick(
-                        ListingItemOverflowAction.SendAction.DeleteClick(sendId = sendId),
-                    ),
-                )
-                assertEquals(
-                    SearchEvent.ShowSnackbar(BitwardenString.send_deleted.asText()),
-                    awaitItem(),
-                )
-            }
-        }
-
-    @Test
-    fun `OverflowOptionClick Send ShareUrlClick should emit ShowShareSheet`() = runTest {
-        val sendUrl = "www.test.com"
-        val viewModel = createViewModel()
-        viewModel.eventFlow.test {
-            viewModel.trySendAction(
-                SearchAction.OverflowOptionClick(
-                    ListingItemOverflowAction.SendAction.ShareUrlClick(sendUrl = sendUrl),
-                ),
-            )
-            assertEquals(SearchEvent.ShowShareSheet(sendUrl), awaitItem())
-        }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `OverflowOptionClick Send RemovePasswordClick with removePasswordSend error should display error dialog`() =
-        runTest {
-            val sendId = "sendId1234"
-            coEvery {
-                vaultRepository.removePasswordSend(sendId)
-            } returns RemovePasswordSendResult.Error(errorMessage = null, error = null)
-
-            val viewModel = createViewModel()
-            viewModel.stateFlow.test {
-                assertEquals(DEFAULT_STATE, awaitItem())
-                viewModel.trySendAction(
-                    SearchAction.OverflowOptionClick(
-                        ListingItemOverflowAction.SendAction.RemovePasswordClick(sendId = sendId),
-                    ),
-                )
-                assertEquals(
-                    DEFAULT_STATE.copy(
-                        dialogState = SearchState.DialogState.Loading(
-                            message = BitwardenString.removing_send_password.asText(),
-                        ),
-                    ),
-                    awaitItem(),
-                )
-                assertEquals(
-                    DEFAULT_STATE.copy(
-                        dialogState = SearchState.DialogState.Error(
-                            title = BitwardenString.an_error_has_occurred.asText(),
-                            message = BitwardenString.generic_error_message.asText(),
-                        ),
-                    ),
-                    awaitItem(),
-                )
-            }
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `OverflowOptionClick Send RemovePasswordClick with removePasswordSend success should emit ShowSnackbar`() =
-        runTest {
-            val sendId = "sendId1234"
-            coEvery {
-                vaultRepository.removePasswordSend(sendId)
-            } returns RemovePasswordSendResult.Success(mockk())
-
-            val viewModel = createViewModel()
-            viewModel.eventFlow.test {
-                viewModel.trySendAction(
-                    SearchAction.OverflowOptionClick(
-                        ListingItemOverflowAction.SendAction.RemovePasswordClick(sendId = sendId),
-                    ),
-                )
-                assertEquals(
-                    SearchEvent.ShowSnackbar(BitwardenString.password_removed.asText()),
-                    awaitItem(),
-                )
-            }
-        }
-
-    @Test
     fun `OverflowOptionClick Vault CopyNoteClick should call setText on the ClipboardManager`() =
         runTest {
             val notes = "notes"
@@ -1770,7 +1558,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = listOf(createMockFolderView(number = 1)),
                 collectionViewList = listOf(createMockCollectionView(number = 1)),
-                sendViewList = listOf(createMockSendView(number = 1)),
             ),
         )
 
@@ -1840,7 +1627,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             )
 
@@ -1869,7 +1655,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = emptyList(),
                 collectionViewList = emptyList(),
-                sendViewList = emptyList(),
             ),
         )
         val viewModel = createViewModel()
@@ -1891,7 +1676,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = listOf(createMockFolderView(number = 1)),
                 collectionViewList = listOf(createMockCollectionView(number = 1)),
-                sendViewList = listOf(createMockSendView(number = 1)),
             ),
         )
         val viewModel = createViewModel()
@@ -1953,7 +1737,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             ),
         )
@@ -1980,7 +1763,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                     decryptCipherListResult = createMockDecryptCipherListResult(number = 1),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             ),
         )
@@ -2004,7 +1786,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                     ),
                     folderViewList = listOf(createMockFolderView(number = 1)),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             ),
         )
@@ -2068,7 +1849,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                 decryptCipherListResult = createMockDecryptCipherListResult(number = 1),
                 folderViewList = listOf(createMockFolderView(number = 1)),
                 collectionViewList = listOf(createMockCollectionView(number = 1)),
-                sendViewList = listOf(createMockSendView(number = 1)),
             ),
             error = IllegalStateException(),
         )
@@ -2094,7 +1874,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = emptyList(),
                 collectionViewList = emptyList(),
-                sendViewList = emptyList(),
             ),
             error = IllegalStateException(),
         )
@@ -2120,7 +1899,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = listOf(createMockFolderView(number = 1)),
                 collectionViewList = listOf(createMockCollectionView(number = 1)),
-                sendViewList = listOf(createMockSendView(number = 1)),
             ),
             error = IllegalStateException(),
         )
@@ -2193,7 +1971,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = listOf(createMockFolderView(number = 1)),
                 collectionViewList = listOf(createMockCollectionView(number = 1)),
-                sendViewList = listOf(createMockSendView(number = 1)),
             ),
         )
 
@@ -2224,7 +2001,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = emptyList(),
                 collectionViewList = emptyList(),
-                sendViewList = emptyList(),
             ),
         )
 
@@ -2249,7 +2025,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = listOf(createMockFolderView(number = 1)),
                 collectionViewList = listOf(createMockCollectionView(number = 1)),
-                sendViewList = listOf(createMockSendView(number = 1)),
             ),
         )
 
@@ -2342,9 +2117,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                 toSearchArgs()
             } returns SearchArgs(
                 type = when (val searchType = initialState?.searchType) {
-                    SearchTypeData.Sends.All -> SearchType.Sends.All
-                    SearchTypeData.Sends.Files -> SearchType.Sends.Files
-                    SearchTypeData.Sends.Texts -> SearchType.Sends.Texts
                     SearchTypeData.Vault.All -> SearchType.Vault.All
                     SearchTypeData.Vault.Archive -> SearchType.Vault.Archive
                     SearchTypeData.Vault.Cards -> SearchType.Vault.Cards
@@ -2430,7 +2202,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                 ),
                 folderViewList = listOf(createMockFolderView(number = 1)),
                 collectionViewList = listOf(createMockCollectionView(number = 1)),
-                sendViewList = listOf(createMockSendView(number = 1)),
             ),
         )
         mutableVaultDataStateFlow.value = dataState
@@ -2456,7 +2227,6 @@ private val DEFAULT_STATE: SearchState = SearchState(
     viewState = SearchState.ViewState.Loading,
     dialogState = null,
     vaultFilterData = null,
-    baseWebSendUrl = "https://send.bitwarden.com/#",
     baseIconUrl = "https://icons.bitwarden.net",
     isIconLoadingDisabled = false,
     hasMasterPassword = true,

@@ -14,9 +14,7 @@ import com.bitwarden.network.model.createMockCipher
 import com.bitwarden.network.model.createMockCollection
 import com.bitwarden.network.model.createMockDomains
 import com.bitwarden.network.model.createMockFolder
-import com.bitwarden.network.model.createMockSend
 import com.bitwarden.network.service.SyncService
-import com.bitwarden.send.SendView
 import com.bitwarden.vault.DecryptCipherListResult
 import com.bitwarden.vault.FolderView
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.AccountJson
@@ -39,18 +37,14 @@ import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockFolderView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkCipher
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkCollection
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkFolder
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkSend
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSendView
 import com.x8bit.bitwarden.data.vault.manager.model.SyncVaultDataResult
 import com.x8bit.bitwarden.data.vault.repository.model.DomainsData
-import com.x8bit.bitwarden.data.vault.repository.model.SendData
 import com.x8bit.bitwarden.data.vault.repository.model.VaultData
 import com.x8bit.bitwarden.data.vault.repository.model.VaultUnlockData
 import com.x8bit.bitwarden.data.vault.repository.model.createMockDomainsData
 import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkCipherList
 import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkCollectionList
 import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkFolderList
-import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkSendList
 import io.mockk.awaits
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -217,22 +211,14 @@ class VaultSyncManagerTest {
                 collectionList = listOf(createMockSdkCollection(number = 1)),
             )
         } returns listOf(createMockCollectionView(number = 1)).asSuccess()
-        coEvery {
-            vaultSdkSource.decryptSendList(
-                userId = userId,
-                sendList = listOf(createMockSdkSend(number = 1)),
-            )
-        } returns listOf(createMockSendView(number = 1)).asSuccess()
         val ciphersFlow = bufferedMutableSharedFlow<List<SyncResponseJson.Cipher>>()
         val collectionsFlow = bufferedMutableSharedFlow<List<SyncResponseJson.Collection>>()
         val foldersFlow = bufferedMutableSharedFlow<List<SyncResponseJson.Folder>>()
-        val sendsFlow = bufferedMutableSharedFlow<List<SyncResponseJson.Send>>()
         val domainsFlow = bufferedMutableSharedFlow<SyncResponseJson.Domains>()
         setupVaultDiskSourceFlows(
             ciphersFlow = ciphersFlow,
             collectionsFlow = collectionsFlow,
             foldersFlow = foldersFlow,
-            sendsFlow = sendsFlow,
             domainsFlow = domainsFlow,
         )
 
@@ -242,26 +228,22 @@ class VaultSyncManagerTest {
                 .testIn(backgroundScope)
             val collectionsStateFlow = vaultSyncManager.collectionsStateFlow.testIn(backgroundScope)
             val foldersStateFlow = vaultSyncManager.foldersStateFlow.testIn(backgroundScope)
-            val sendsStateFlow = vaultSyncManager.sendDataStateFlow.testIn(backgroundScope)
             val domainsStateFlow = vaultSyncManager.domainsStateFlow.testIn(backgroundScope)
 
             assertEquals(DataState.Loading, ciphersStateFlow.awaitItem())
             assertEquals(DataState.Loading, collectionsStateFlow.awaitItem())
             assertEquals(DataState.Loading, foldersStateFlow.awaitItem())
-            assertEquals(DataState.Loading, sendsStateFlow.awaitItem())
             assertEquals(DataState.Loading, domainsStateFlow.awaitItem())
 
             ciphersFlow.tryEmit(listOf(createMockCipher(number = 1)))
             collectionsFlow.tryEmit(listOf(createMockCollection(number = 1)))
             foldersFlow.tryEmit(listOf(createMockFolder(number = 1)))
-            sendsFlow.tryEmit(listOf(createMockSend(number = 1)))
             domainsFlow.tryEmit(createMockDomains(number = 1))
 
             // No events received until unlocked
             ciphersStateFlow.expectNoEvents()
             collectionsStateFlow.expectNoEvents()
             foldersStateFlow.expectNoEvents()
-            sendsStateFlow.expectNoEvents()
             // Domains does not care about being unlocked
             assertEquals(
                 DataState.Loaded(createMockDomainsData(number = 1)),
@@ -273,7 +255,6 @@ class VaultSyncManagerTest {
             ciphersFlow.tryEmit(listOf(createMockCipher(number = 1)))
             collectionsFlow.tryEmit(listOf(createMockCollection(number = 1)))
             foldersFlow.tryEmit(listOf(createMockFolder(number = 1)))
-            sendsFlow.tryEmit(listOf(createMockSend(number = 1)))
             domainsFlow.tryEmit(createMockDomains(number = 1))
 
             assertEquals(
@@ -288,10 +269,6 @@ class VaultSyncManagerTest {
                 DataState.Loaded(listOf(createMockFolderView(number = 1))),
                 foldersStateFlow.awaitItem(),
             )
-            assertEquals(
-                DataState.Loaded(SendData(listOf(createMockSendView(number = 1)))),
-                sendsStateFlow.awaitItem(),
-            )
             // Domain data has not changed
             domainsStateFlow.expectNoEvents()
 
@@ -300,7 +277,6 @@ class VaultSyncManagerTest {
             assertEquals(DataState.Loading, ciphersStateFlow.awaitItem())
             assertEquals(DataState.Loading, collectionsStateFlow.awaitItem())
             assertEquals(DataState.Loading, foldersStateFlow.awaitItem())
-            assertEquals(DataState.Loading, sendsStateFlow.awaitItem())
             assertEquals(DataState.Loading, domainsStateFlow.awaitItem())
         }
     }
@@ -339,22 +315,14 @@ class VaultSyncManagerTest {
                     collectionList = listOf(createMockSdkCollection(1)),
                 )
             } returns listOf(createMockCollectionView(number = 1)).asSuccess()
-            coEvery {
-                vaultSdkSource.decryptSendList(
-                    userId = userId,
-                    sendList = listOf(createMockSdkSend(number = 1)),
-                )
-            } returns listOf(createMockSendView(number = 1)).asSuccess()
             val ciphersFlow = bufferedMutableSharedFlow<List<SyncResponseJson.Cipher>>()
             val collectionsFlow = bufferedMutableSharedFlow<List<SyncResponseJson.Collection>>()
             val foldersFlow = bufferedMutableSharedFlow<List<SyncResponseJson.Folder>>()
-            val sendsFlow = bufferedMutableSharedFlow<List<SyncResponseJson.Send>>()
             val domainsFlow = bufferedMutableSharedFlow<SyncResponseJson.Domains>()
             setupVaultDiskSourceFlows(
                 ciphersFlow = ciphersFlow,
                 collectionsFlow = collectionsFlow,
                 foldersFlow = foldersFlow,
-                sendsFlow = sendsFlow,
                 domainsFlow = domainsFlow,
             )
 
@@ -366,26 +334,22 @@ class VaultSyncManagerTest {
                     .collectionsStateFlow
                     .testIn(backgroundScope)
                 val foldersStateFlow = vaultSyncManager.foldersStateFlow.testIn(backgroundScope)
-                val sendsStateFlow = vaultSyncManager.sendDataStateFlow.testIn(backgroundScope)
                 val domainsStateFlow = vaultSyncManager.domainsStateFlow.testIn(backgroundScope)
 
                 assertEquals(DataState.Loading, ciphersStateFlow.awaitItem())
                 assertEquals(DataState.Loading, collectionsStateFlow.awaitItem())
                 assertEquals(DataState.Loading, foldersStateFlow.awaitItem())
-                assertEquals(DataState.Loading, sendsStateFlow.awaitItem())
                 assertEquals(DataState.Loading, domainsStateFlow.awaitItem())
 
                 ciphersFlow.tryEmit(listOf(createMockCipher(number = 1)))
                 collectionsFlow.tryEmit(listOf(createMockCollection(number = 1)))
                 foldersFlow.tryEmit(listOf(createMockFolder(number = 1)))
-                sendsFlow.tryEmit(listOf(createMockSend(number = 1)))
                 domainsFlow.tryEmit(createMockDomains(number = 1))
 
                 // No events received until unlocked
                 ciphersStateFlow.expectNoEvents()
                 collectionsStateFlow.expectNoEvents()
                 foldersStateFlow.expectNoEvents()
-                sendsStateFlow.expectNoEvents()
                 // Domains does not care about being unlocked
                 assertEquals(
                     DataState.Loaded(createMockDomainsData(number = 1)),
@@ -405,10 +369,6 @@ class VaultSyncManagerTest {
                     DataState.Loaded(listOf(createMockFolderView(number = 1))),
                     foldersStateFlow.awaitItem(),
                 )
-                assertEquals(
-                    DataState.Loaded(SendData(listOf(createMockSendView(number = 1)))),
-                    sendsStateFlow.awaitItem(),
-                )
                 // Domain data has not changed
                 domainsStateFlow.expectNoEvents()
 
@@ -419,7 +379,6 @@ class VaultSyncManagerTest {
                 assertEquals(DataState.Loading, ciphersStateFlow.awaitItem())
                 assertEquals(DataState.Loading, collectionsStateFlow.awaitItem())
                 assertEquals(DataState.Loading, foldersStateFlow.awaitItem())
-                assertEquals(DataState.Loading, sendsStateFlow.awaitItem())
                 domainsStateFlow.expectNoEvents()
             }
         }
@@ -613,63 +572,6 @@ class VaultSyncManagerTest {
     }
 
     @Test
-    fun `sendDataStateFlow should emit decrypted list of sends when decryptSendsList succeeds`() =
-        runTest {
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-            val userId = "mockId-1"
-            val mockSendList = listOf(createMockSend(number = 1))
-            val mockEncryptedSendList = mockSendList.toEncryptedSdkSendList()
-            val mockSendViewList = listOf(createMockSendView(number = 1))
-            val mutableSendsStateFlow =
-                bufferedMutableSharedFlow<List<SyncResponseJson.Send>>(replay = 1)
-            setupVaultDiskSourceFlows(sendsFlow = mutableSendsStateFlow)
-            coEvery {
-                vaultSdkSource.decryptSendList(userId = userId, sendList = mockEncryptedSendList)
-            } returns mockSendViewList.asSuccess()
-
-            vaultSyncManager
-                .sendDataStateFlow
-                .test {
-                    assertEquals(DataState.Loading, awaitItem())
-                    mutableSendsStateFlow.tryEmit(mockSendList)
-
-                    // No additional emissions until vault is unlocked
-                    expectNoEvents()
-                    setVaultToUnlocked(userId = userId)
-
-                    assertEquals(DataState.Loaded(SendData(mockSendViewList)), awaitItem())
-                }
-        }
-
-    @Test
-    fun `sendDataStateFlow should emit an error when decryptSendsList fails`() = runTest {
-        fakeAuthDiskSource.userState = MOCK_USER_STATE
-        val userId = "mockId-1"
-        val throwable = Throwable("Fail")
-        val mockSendList = listOf(createMockSend(number = 1))
-        val mockEncryptedSendList = mockSendList.toEncryptedSdkSendList()
-        val mutableSendsStateFlow =
-            bufferedMutableSharedFlow<List<SyncResponseJson.Send>>(replay = 1)
-        setupVaultDiskSourceFlows(sendsFlow = mutableSendsStateFlow)
-        coEvery {
-            vaultSdkSource.decryptSendList(userId = userId, sendList = mockEncryptedSendList)
-        } returns throwable.asFailure()
-
-        vaultSyncManager
-            .sendDataStateFlow
-            .test {
-                assertEquals(DataState.Loading, awaitItem())
-                mutableSendsStateFlow.tryEmit(mockSendList)
-
-                // No additional emissions until vault is unlocked
-                expectNoEvents()
-                setVaultToUnlocked(userId = userId)
-
-                assertEquals(DataState.Error<SendData>(throwable), awaitItem())
-            }
-    }
-
-    @Test
     fun `databaseSchemeChangeFlow should trigger sync on emission`() = runTest {
         fakeAuthDiskSource.userState = MOCK_USER_STATE
 
@@ -785,7 +687,6 @@ class VaultSyncManagerTest {
                     ),
                 ),
                 foldersFlow = flowOf(emptyList()),
-                sendsFlow = flowOf(emptyList()),
             )
 
             turbineScope {
@@ -796,7 +697,6 @@ class VaultSyncManagerTest {
                     .collectionsStateFlow
                     .testIn(backgroundScope)
                 val foldersStateFlow = vaultSyncManager.foldersStateFlow.testIn(backgroundScope)
-                val sendsStateFlow = vaultSyncManager.sendDataStateFlow.testIn(backgroundScope)
                 val domainsStateFlow = vaultSyncManager.domainsStateFlow.testIn(backgroundScope)
 
                 assertEquals(
@@ -815,10 +715,6 @@ class VaultSyncManagerTest {
                 assertEquals(
                     DataState.Loaded(emptyList<FolderView>()),
                     foldersStateFlow.awaitItem(),
-                )
-                assertEquals(
-                    DataState.Loaded(SendData(sendViewList = emptyList())),
-                    sendsStateFlow.awaitItem(),
                 )
                 assertEquals(
                     DataState.Loaded(
@@ -845,7 +741,6 @@ class VaultSyncManagerTest {
                 collectionsFlow = flowOf(emptyList()),
                 domainsFlow = flowOf(),
                 foldersFlow = flowOf(emptyList()),
-                sendsFlow = flowOf(emptyList()),
             )
             turbineScope {
                 val ciphersStateFlow = vaultSyncManager
@@ -855,13 +750,11 @@ class VaultSyncManagerTest {
                     .collectionsStateFlow
                     .testIn(backgroundScope)
                 val foldersStateFlow = vaultSyncManager.foldersStateFlow.testIn(backgroundScope)
-                val sendsStateFlow = vaultSyncManager.sendDataStateFlow.testIn(backgroundScope)
                 val domainsStateFlow = vaultSyncManager.domainsStateFlow.testIn(backgroundScope)
 
                 assertEquals(DataState.Loading, ciphersStateFlow.awaitItem())
                 assertEquals(DataState.Loading, collectionsStateFlow.awaitItem())
                 assertEquals(DataState.Loading, foldersStateFlow.awaitItem())
-                assertEquals(DataState.Loading, sendsStateFlow.awaitItem())
                 assertEquals(DataState.Loading, domainsStateFlow.awaitItem())
             }
         }
@@ -947,13 +840,11 @@ class VaultSyncManagerTest {
         collectionsFlow: Flow<List<SyncResponseJson.Collection>> = bufferedMutableSharedFlow(),
         domainsFlow: Flow<SyncResponseJson.Domains> = bufferedMutableSharedFlow(),
         foldersFlow: Flow<List<SyncResponseJson.Folder>> = bufferedMutableSharedFlow(),
-        sendsFlow: Flow<List<SyncResponseJson.Send>> = bufferedMutableSharedFlow(),
     ) {
         coEvery { vaultDiskSource.getCiphersFlow(userId = userId) } returns ciphersFlow
         coEvery { vaultDiskSource.getCollectionsFlow(userId = userId) } returns collectionsFlow
         coEvery { vaultDiskSource.getDomainsFlow(userId = userId) } returns domainsFlow
         coEvery { vaultDiskSource.getFoldersFlow(userId = userId) } returns foldersFlow
-        coEvery { vaultDiskSource.getSendsFlow(userId = userId) } returns sendsFlow
     }
 
     private fun setupEmptyDecryptionResults(
@@ -968,9 +859,6 @@ class VaultSyncManagerTest {
         coEvery {
             vaultSdkSource.decryptCollectionList(userId = userId, collectionList = emptyList())
         } returns emptyList<CollectionView>().asSuccess()
-        coEvery {
-            vaultSdkSource.decryptSendList(userId = userId, sendList = emptyList())
-        } returns emptyList<SendView>().asSuccess()
     }
     //endregion Helper functions
 }

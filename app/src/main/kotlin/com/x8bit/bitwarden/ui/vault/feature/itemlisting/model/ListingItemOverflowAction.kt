@@ -4,7 +4,6 @@ package com.x8bit.bitwarden.ui.vault.feature.itemlisting.model
 
 import android.os.Parcelable
 import com.bitwarden.annotation.OmitFromCoverage
-import com.bitwarden.send.SendType
 import com.bitwarden.ui.platform.components.dialog.model.BitwardenTwoButtonDialogData
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.Text
@@ -31,84 +30,6 @@ sealed class ListingItemOverflowAction : Parcelable {
      * The data to be displayed for an optional speed bump dialog.
      */
     abstract val speedBump: BitwardenTwoButtonDialogData?
-
-    /**
-     * Represents the send actions.
-     */
-    sealed class SendAction : ListingItemOverflowAction() {
-        /**
-         * Click on the view send overflow option.
-         */
-        @Parcelize
-        data class ViewClick(
-            val sendId: String,
-            val sendType: SendType,
-        ) : SendAction() {
-            override val title: Text get() = BitwardenString.view.asText()
-            override val contentDescription: Text get() = title
-            override val speedBump: BitwardenTwoButtonDialogData? get() = null
-        }
-
-        /**
-         * Click on the edit send overflow option.
-         */
-        @Parcelize
-        data class EditClick(
-            val sendId: String,
-            val sendType: SendType,
-        ) : SendAction() {
-            override val title: Text get() = BitwardenString.edit.asText()
-            override val contentDescription: Text get() = title
-            override val speedBump: BitwardenTwoButtonDialogData? get() = null
-        }
-
-        /**
-         * Click on the copy send URL overflow option.
-         */
-        @Parcelize
-        data class CopyUrlClick(val sendUrl: String) : SendAction() {
-            override val title: Text get() = BitwardenString.copy_link.asText()
-            override val contentDescription: Text get() = title
-            override val speedBump: BitwardenTwoButtonDialogData? get() = null
-        }
-
-        /**
-         * Click on the share send URL overflow option.
-         */
-        @Parcelize
-        data class ShareUrlClick(val sendUrl: String) : SendAction() {
-            override val title: Text get() = BitwardenString.share_link.asText()
-            override val contentDescription: Text
-                get() = BitwardenString.external_link_format.asText(title)
-            override val speedBump: BitwardenTwoButtonDialogData? get() = null
-        }
-
-        /**
-         * Click on the remove password send overflow option.
-         */
-        @Parcelize
-        data class RemovePasswordClick(val sendId: String) : SendAction() {
-            override val title: Text get() = BitwardenString.remove_password.asText()
-            override val contentDescription: Text get() = title
-            override val speedBump: BitwardenTwoButtonDialogData? get() = null
-        }
-
-        /**
-         * Click on the delete send overflow option.
-         */
-        @Parcelize
-        data class DeleteClick(val sendId: String) : SendAction() {
-            override val title: Text get() = BitwardenString.delete.asText()
-            override val contentDescription: Text get() = title
-            override val speedBump: BitwardenTwoButtonDialogData
-                get() = BitwardenTwoButtonDialogData(
-                    title = BitwardenString.delete.asText(),
-                    message = BitwardenString.are_you_sure_delete_send.asText(),
-                    confirmButtonText = BitwardenString.yes.asText(),
-                    dismissButtonText = BitwardenString.cancel.asText(),
-                )
-        }
-    }
 
     /**
      * Represents the vault actions.

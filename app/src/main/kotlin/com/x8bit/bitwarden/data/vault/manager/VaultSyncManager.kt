@@ -6,7 +6,6 @@ import com.bitwarden.vault.DecryptCipherListResult
 import com.bitwarden.vault.FolderView
 import com.x8bit.bitwarden.data.vault.manager.model.SyncVaultDataResult
 import com.x8bit.bitwarden.data.vault.repository.model.DomainsData
-import com.x8bit.bitwarden.data.vault.repository.model.SendData
 import com.x8bit.bitwarden.data.vault.repository.model.VaultData
 import kotlinx.coroutines.flow.StateFlow
 
@@ -56,11 +55,6 @@ interface VaultSyncManager {
      * must be collected in order to trigger state changes.
      */
     val foldersStateFlow: StateFlow<DataState<List<FolderView>>>
-
-    /**
-     * Flow that represents the current send data.
-     */
-    val sendDataStateFlow: StateFlow<DataState<SendData>>
 
     /**
      * Sync the vault data for the current user.

@@ -49,7 +49,6 @@ class AppResumeManagerImpl(
         }
         return when (val resumeScreenData = getResumeScreen()) {
             AppResumeScreenData.GeneratorScreen -> SpecialCircumstance.GeneratorShortcut
-            AppResumeScreenData.SendScreen -> SpecialCircumstance.SendShortcut
             is AppResumeScreenData.SearchScreen -> SpecialCircumstance.SearchShortcut(
                 searchTerm = resumeScreenData.searchTerm,
             )

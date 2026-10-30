@@ -17,7 +17,6 @@ import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextInput
 import androidx.core.net.toUri
 import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
-import com.bitwarden.send.SendType
 import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarData
 import com.bitwarden.ui.platform.manager.IntentManager
 import com.bitwarden.ui.util.asText
@@ -29,11 +28,6 @@ import com.x8bit.bitwarden.data.platform.manager.util.AppResumeStateManager
 import com.x8bit.bitwarden.ui.platform.base.BitwardenComposeTest
 import com.x8bit.bitwarden.ui.platform.feature.search.model.AutofillSelectionOption
 import com.x8bit.bitwarden.ui.platform.feature.search.util.createMockDisplayItemForCipher
-import com.x8bit.bitwarden.ui.platform.feature.search.util.createMockDisplayItemForSend
-import com.x8bit.bitwarden.ui.tools.feature.send.addedit.AddEditSendRoute
-import com.x8bit.bitwarden.ui.tools.feature.send.addedit.ModeType
-import com.x8bit.bitwarden.ui.tools.feature.send.model.SendItemType
-import com.x8bit.bitwarden.ui.tools.feature.send.viewsend.ViewSendRoute
 import com.x8bit.bitwarden.ui.vault.feature.addedit.VaultAddEditArgs
 import com.x8bit.bitwarden.ui.vault.feature.item.VaultItemArgs
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.model.ListingItemOverflowAction
@@ -69,8 +63,6 @@ class SearchScreenTest : BitwardenComposeTest() {
     private val appResumeStateManager: AppResumeStateManager = mockk(relaxed = true)
 
     private var onNavigateBackCalled = false
-    private var onNavigateToAddEditSendRoute: AddEditSendRoute? = null
-    private var onNavigateToViewSendRoute: ViewSendRoute? = null
     private var onNavigateToEditCipherArgs: VaultAddEditArgs? = null
     private var onNavigateToViewCipherArgs: VaultItemArgs? = null
     private var onNavigateToPlanCalled = false
@@ -84,8 +76,6 @@ class SearchScreenTest : BitwardenComposeTest() {
             SearchScreen(
                 viewModel = viewModel,
                 onNavigateBack = { onNavigateBackCalled = true },
-                onNavigateToAddEditSend = { onNavigateToAddEditSendRoute = it },
-                onNavigateToViewSend = { onNavigateToViewSendRoute = it },
                 onNavigateToEditCipher = { onNavigateToEditCipherArgs = it },
                 onNavigateToViewCipher = { onNavigateToViewCipherArgs = it },
                 onNavigateToPlan = { onNavigateToPlanCalled = true },
@@ -97,32 +87,6 @@ class SearchScreenTest : BitwardenComposeTest() {
     fun `NavigateBack should call onNavigateBack`() {
         mutableEventFlow.tryEmit(SearchEvent.NavigateBack)
         assertTrue(onNavigateBackCalled)
-    }
-
-    @Test
-    fun `NavigateToEditSend should call onNavigateToAddEditSend`() {
-        val sendId = "sendId"
-        val sendType = SendItemType.FILE
-        mutableEventFlow.tryEmit(
-            SearchEvent.NavigateToEditSend(sendId = sendId, sendType = sendType),
-        )
-        assertEquals(
-            AddEditSendRoute(sendType = sendType, modeType = ModeType.EDIT, sendId = sendId),
-            onNavigateToAddEditSendRoute,
-        )
-    }
-
-    @Test
-    fun `NavigateToViewSend should call onNavigateToViewSend`() {
-        val sendId = "sendId1234"
-        val sendType = SendItemType.TEXT
-        mutableEventFlow.tryEmit(
-            SearchEvent.NavigateToViewSend(sendId = sendId, sendType = sendType),
-        )
-        assertEquals(
-            ViewSendRoute(sendId = sendId, sendType = sendType),
-            onNavigateToViewSendRoute,
-        )
     }
 
     @Test
@@ -817,134 +781,6 @@ class SearchScreenTest : BitwardenComposeTest() {
         composeTestRule.assertNoDialogExists()
     }
 
-    @Test
-    fun `on send item overflow click should display dialog`() {
-        val number = 1
-        mutableStateFlow.update {
-            it.copy(
-                viewState = SearchState.ViewState.Content(
-                    displayItems = persistentListOf(createMockDisplayItemForSend(number = number)),
-                ),
-            )
-        }
-        composeTestRule.assertNoDialogExists()
-
-        composeTestRule
-            .onNodeWithContentDescription("More options")
-            .assertIsDisplayed()
-            .performClick()
-
-        composeTestRule
-            .onAllNodesWithText("mockName-$number")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun `on send item overflow option click should emit the appropriate action`() {
-        mutableStateFlow.update {
-            it.copy(
-                viewState = SearchState.ViewState.Content(
-                    displayItems = persistentListOf(createMockDisplayItemForSend(number = 1)),
-                ),
-            )
-        }
-
-        composeTestRule.assertNoDialogExists()
-
-        composeTestRule
-            .onNodeWithContentDescription(label = "More options")
-            .assertIsDisplayed()
-            .performClick()
-        composeTestRule
-            .onNodeWithText(text = "View")
-            .assert(hasAnyAncestor(isDialog()))
-            .performClick()
-        verify(exactly = 1) {
-            viewModel.trySendAction(
-                SearchAction.OverflowOptionClick(
-                    overflowAction = ListingItemOverflowAction.SendAction.ViewClick(
-                        sendId = "mockId-1",
-                        sendType = SendType.FILE,
-                    ),
-                ),
-            )
-        }
-
-        composeTestRule
-            .onNodeWithContentDescription("More options")
-            .assertIsDisplayed()
-            .performClick()
-        composeTestRule
-            .onNodeWithText("Edit")
-            .assert(hasAnyAncestor(isDialog()))
-            .performClick()
-        verify(exactly = 1) {
-            viewModel.trySendAction(
-                SearchAction.OverflowOptionClick(
-                    overflowAction = ListingItemOverflowAction.SendAction.EditClick(
-                        sendId = "mockId-1",
-                        sendType = SendType.FILE,
-                    ),
-                ),
-            )
-        }
-
-        composeTestRule
-            .onNodeWithContentDescription("More options")
-            .assertIsDisplayed()
-            .performClick()
-        composeTestRule
-            .onNodeWithText("Copy link")
-            .assert(hasAnyAncestor(isDialog()))
-            .performClick()
-        verify(exactly = 1) {
-            viewModel.trySendAction(
-                SearchAction.OverflowOptionClick(
-                    overflowAction = ListingItemOverflowAction.SendAction.CopyUrlClick(
-                        sendUrl = "https://vault.bitwarden.com/#/send/mockAccessId-1/mockKey-1",
-                    ),
-                ),
-            )
-        }
-
-        composeTestRule
-            .onNodeWithContentDescription("More options")
-            .assertIsDisplayed()
-            .performClick()
-        composeTestRule
-            .onNodeWithText("Share link")
-            .assert(hasAnyAncestor(isDialog()))
-            .performClick()
-        verify(exactly = 1) {
-            viewModel.trySendAction(
-                SearchAction.OverflowOptionClick(
-                    overflowAction = ListingItemOverflowAction.SendAction.ShareUrlClick(
-                        sendUrl = "https://vault.bitwarden.com/#/send/mockAccessId-1/mockKey-1",
-                    ),
-                ),
-            )
-        }
-
-        composeTestRule
-            .onNodeWithContentDescription("More options")
-            .assertIsDisplayed()
-            .performClick()
-        composeTestRule
-            .onNodeWithText("Remove password")
-            .assert(hasAnyAncestor(isDialog()))
-            .performClick()
-        verify(exactly = 1) {
-            viewModel.trySendAction(
-                SearchAction.OverflowOptionClick(
-                    overflowAction = ListingItemOverflowAction.SendAction.RemovePasswordClick(
-                        sendId = "mockId-1",
-                    ),
-                ),
-            )
-        }
-    }
-
     @Suppress("MaxLineLength")
     @Test
     fun `on vault item archive overflow option click should display archive confirmation dialog and emits ArchiveClick on confirmation`() {
@@ -984,50 +820,6 @@ class SearchScreenTest : BitwardenComposeTest() {
                 SearchAction.OverflowOptionClick(
                     overflowAction = ListingItemOverflowAction.VaultAction.ArchiveClick(
                         cipherId = itemId,
-                    ),
-                ),
-            )
-        }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `on send item delete overflow option click should display delete confirmation dialog and emits DeleteClick on confirmation`() {
-        val sendId = "mockId-1"
-        val message = "Are you sure you want to delete this Send?"
-        mutableStateFlow.update {
-            it.copy(
-                viewState = SearchState.ViewState.Content(
-                    displayItems = persistentListOf(createMockDisplayItemForSend(number = 1)),
-                ),
-            )
-        }
-        composeTestRule.onNode(isDialog()).assertDoesNotExist()
-        composeTestRule.onNodeWithText(message).assertDoesNotExist()
-
-        composeTestRule
-            .onNodeWithContentDescription("More options")
-            .assertIsDisplayed()
-            .performClick()
-        composeTestRule
-            .onNodeWithText("Delete")
-            .assert(hasAnyAncestor(isDialog()))
-            .performClick()
-
-        composeTestRule
-            .onNodeWithText(message)
-            .assertIsDisplayed()
-            .assert(hasAnyAncestor(isDialog()))
-        composeTestRule
-            .onNodeWithText("Yes")
-            .assert(hasAnyAncestor(isDialog()))
-            .performClick()
-
-        verify(exactly = 1) {
-            viewModel.trySendAction(
-                SearchAction.OverflowOptionClick(
-                    overflowAction = ListingItemOverflowAction.SendAction.DeleteClick(
-                        sendId = sendId,
                     ),
                 ),
             )
@@ -1099,7 +891,6 @@ private val DEFAULT_STATE: SearchState = SearchState(
     viewState = SearchState.ViewState.Loading,
     dialogState = null,
     vaultFilterData = null,
-    baseWebSendUrl = "www.test.com",
     baseIconUrl = "www.test.com",
     isIconLoadingDisabled = false,
     hasMasterPassword = true,

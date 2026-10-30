@@ -7,9 +7,6 @@ import com.bitwarden.collections.CollectionView
 import com.bitwarden.core.data.util.toFormattedDateTimeStyle
 import com.bitwarden.data.repository.model.Environment
 import com.bitwarden.data.repository.util.baseIconUrl
-import com.bitwarden.data.repository.util.baseWebSendUrl
-import com.bitwarden.send.SendType
-import com.bitwarden.send.SendView
 import com.bitwarden.ui.platform.components.icon.model.IconData
 import com.bitwarden.ui.platform.model.TotpData
 import com.bitwarden.ui.platform.resource.BitwardenDrawable
@@ -34,7 +31,6 @@ import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockDecryptCiph
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockFolderView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockLoginListView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkCipher
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSendView
 import com.x8bit.bitwarden.data.vault.repository.model.VaultData
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.VaultItemListingState
 import com.x8bit.bitwarden.ui.vault.feature.vault.model.VaultFilterType
@@ -571,44 +567,6 @@ class VaultItemListingDataExtensionsTest {
     }
 
     @Test
-    fun `determineListingPredicate should return the correct predicate for File sendView`() {
-        val sendView = createMockSendView(number = 1, type = SendType.FILE)
-
-        mapOf(
-            VaultItemListingState.ItemListingType.Send.SendFile to true,
-            VaultItemListingState.ItemListingType.Send.SendText to false,
-        )
-            .forEach { (type, expected) ->
-                val result = sendView.determineListingPredicate(
-                    itemListingType = type,
-                )
-                assertEquals(
-                    expected,
-                    result,
-                )
-            }
-    }
-
-    @Test
-    fun `determineListingPredicate should return the correct predicate for Text sendView`() {
-        val sendView = createMockSendView(number = 1, type = SendType.TEXT)
-
-        mapOf(
-            VaultItemListingState.ItemListingType.Send.SendFile to false,
-            VaultItemListingState.ItemListingType.Send.SendText to true,
-        )
-            .forEach { (type, expected) ->
-                val result = sendView.determineListingPredicate(
-                    itemListingType = type,
-                )
-                assertEquals(
-                    expected,
-                    result,
-                )
-            }
-    }
-
-    @Test
     fun `toViewState should transform a list of CipherViews into a ViewState when not autofill`() {
         mockkStatic(CipherView::subtitle)
         mockkStatic(Uri::class)
@@ -678,7 +636,6 @@ class VaultItemListingDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         ).toViewState(
             itemListingType = VaultItemListingState.ItemListingType.Vault.Folder("mockId-1"),
             vaultFilterType = VaultFilterType.AllVaults,
@@ -771,7 +728,6 @@ class VaultItemListingDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         ).toViewState(
             itemListingType = VaultItemListingState.ItemListingType.Vault.Folder("mockId-1"),
             vaultFilterType = VaultFilterType.AllVaults,
@@ -858,7 +814,6 @@ class VaultItemListingDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         ).toViewState(
             itemListingType = VaultItemListingState.ItemListingType.Vault.Folder("mockId-1"),
             vaultFilterType = VaultFilterType.AllVaults,
@@ -916,7 +871,6 @@ class VaultItemListingDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         )
 
         every {
@@ -1240,77 +1194,6 @@ class VaultItemListingDataExtensionsTest {
     }
 
     @Test
-    fun `toViewState should transform a list of SendViews into a ViewState`() {
-        mockkStatic(TemporalAccessor::toFormattedDateTimeStyle) {
-            every {
-                any<TemporalAccessor>().toFormattedDateTimeStyle(
-                    dateStyle = FormatStyle.MEDIUM,
-                    timeStyle = FormatStyle.SHORT,
-                    clock = clock,
-                )
-            } returns DEFAULT_FORMATTED_DATE_TIME
-            val sendViewList = listOf(
-                createMockSendView(number = 1, type = SendType.FILE),
-                createMockSendView(number = 2, type = SendType.TEXT),
-            )
-
-            val result = sendViewList.toViewState(
-                itemListingType = VaultItemListingState.ItemListingType.Send.SendFile,
-                baseWebSendUrl = Environment.Prod.Us.baseWebSendUrl,
-                clock = clock,
-            )
-
-            assertEquals(
-                VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
-                    displayItemList = listOf(
-                        createMockDisplayItemForSend(number = 1, sendType = SendType.FILE),
-                        createMockDisplayItemForSend(number = 2, sendType = SendType.TEXT),
-                    ),
-                    displayFolderList = emptyList(),
-                ),
-                result,
-            )
-        }
-    }
-
-    @Test
-    fun `toViewState should return NoLogins state for empty SendFile list`() {
-        val result = emptyList<SendView>().toViewState(
-            itemListingType = VaultItemListingState.ItemListingType.Send.SendFile,
-            baseWebSendUrl = Environment.Prod.Us.baseWebSendUrl,
-            clock = clock,
-        )
-
-        assertEquals(
-            VaultItemListingState.ViewState.NoItems(
-                message = BitwardenString.no_file_sends.asText(),
-                shouldShowAddButton = true,
-                buttonText = BitwardenString.new_file_send.asText(),
-            ),
-            result,
-        )
-    }
-
-    @Test
-    fun `toViewState should return NoLogins state for empty SendText list`() {
-        val result = emptyList<SendView>().toViewState(
-            itemListingType = VaultItemListingState.ItemListingType.Send.SendText,
-            baseWebSendUrl = Environment.Prod.Us.baseWebSendUrl,
-            clock = clock,
-        )
-
-        assertEquals(
-            VaultItemListingState.ViewState.NoItems(
-                message = BitwardenString.no_text_sends.asText(),
-                shouldShowAddButton = true,
-                buttonText = BitwardenString.new_text_send.asText(),
-            ),
-            result,
-        )
-    }
-
-    @Test
     fun `updateWithAdditionalDataIfNecessary should update a folder itemListingType`() {
         val folderViewList = listOf(
             createMockFolderView(number = 1),
@@ -1373,102 +1256,6 @@ class VaultItemListingDataExtensionsTest {
         )
     }
 
-    @Suppress("MaxLineLength")
-    @Test
-    fun `updateWithAdditionalDataIfNecessary should not change a non-folder or non-collection itemListingType`() {
-        val folderViewList = listOf(
-            createMockFolderView(number = 1),
-            createMockFolderView(number = 2),
-            createMockFolderView(number = 3),
-        )
-        val collectionViewList = listOf(
-            createMockCollectionView(number = 1),
-            createMockCollectionView(number = 2),
-            createMockCollectionView(number = 3),
-        )
-
-        assertEquals(
-            VaultItemListingState.ItemListingType.Vault.Identity,
-            VaultItemListingState.ItemListingType.Vault.Identity
-                .updateWithAdditionalDataIfNecessary(
-                    folderList = folderViewList,
-                    collectionList = collectionViewList,
-                ),
-        )
-
-        assertEquals(
-            VaultItemListingState.ItemListingType.Vault.Login,
-            VaultItemListingState.ItemListingType.Vault.Login
-                .updateWithAdditionalDataIfNecessary(
-                    folderList = folderViewList,
-                    collectionList = collectionViewList,
-                ),
-        )
-
-        assertEquals(
-            VaultItemListingState.ItemListingType.Vault.SecureNote,
-            VaultItemListingState.ItemListingType.Vault.SecureNote
-                .updateWithAdditionalDataIfNecessary(
-                    folderList = folderViewList,
-                    collectionList = collectionViewList,
-                ),
-        )
-
-        assertEquals(
-            VaultItemListingState.ItemListingType.Vault.Trash,
-            VaultItemListingState.ItemListingType.Vault.Trash
-                .updateWithAdditionalDataIfNecessary(
-                    folderList = folderViewList,
-                    collectionList = collectionViewList,
-                ),
-        )
-
-        assertEquals(
-            VaultItemListingState.ItemListingType.Vault.SshKey,
-            VaultItemListingState.ItemListingType.Vault.SshKey
-                .updateWithAdditionalDataIfNecessary(
-                    folderList = folderViewList,
-                    collectionList = collectionViewList,
-                ),
-        )
-
-        assertEquals(
-            VaultItemListingState.ItemListingType.Vault.BankAccount,
-            VaultItemListingState.ItemListingType.Vault.BankAccount
-                .updateWithAdditionalDataIfNecessary(
-                    folderList = folderViewList,
-                    collectionList = collectionViewList,
-                ),
-        )
-
-        assertEquals(
-            VaultItemListingState.ItemListingType.Vault.Card,
-            VaultItemListingState.ItemListingType.Vault.Card
-                .updateWithAdditionalDataIfNecessary(
-                    folderList = folderViewList,
-                    collectionList = collectionViewList,
-                ),
-        )
-
-        assertEquals(
-            VaultItemListingState.ItemListingType.Send.SendFile,
-            VaultItemListingState.ItemListingType.Send.SendFile
-                .updateWithAdditionalDataIfNecessary(
-                    folderList = folderViewList,
-                    collectionList = collectionViewList,
-                ),
-        )
-
-        assertEquals(
-            VaultItemListingState.ItemListingType.Send.SendText,
-            VaultItemListingState.ItemListingType.Send.SendText
-                .updateWithAdditionalDataIfNecessary(
-                    folderList = folderViewList,
-                    collectionList = collectionViewList,
-                ),
-        )
-    }
-
     @Test
     fun `toViewState should properly filter and return the correct folders`() {
         val vaultData = VaultData(
@@ -1484,7 +1271,6 @@ class VaultItemListingDataExtensionsTest {
                 FolderView("4", "test/test/test/", clock.instant()),
                 FolderView("5", "Folder", clock.instant()),
             ),
-            sendViewList = emptyList(),
         )
 
         val actual = vaultData.toViewState(
@@ -1531,7 +1317,6 @@ class VaultItemListingDataExtensionsTest {
                 createMockCollectionView(5, "Collection"),
             ),
             folderViewList = emptyList(),
-            sendViewList = emptyList(),
         )
 
         val actual = vaultData.toViewState(
@@ -1583,7 +1368,6 @@ class VaultItemListingDataExtensionsTest {
                 createMockCollectionView(2, "test/nested"),
             ),
             folderViewList = emptyList(),
-            sendViewList = emptyList(),
         )
 
         val actual = vaultData.toViewState(
@@ -1758,7 +1542,6 @@ class VaultItemListingDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         )
 
         val actual = vaultData.toViewState(
@@ -1808,7 +1591,6 @@ class VaultItemListingDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         )
 
         val actual = vaultData.toViewState(
@@ -1850,7 +1632,6 @@ class VaultItemListingDataExtensionsTest {
         ),
         collectionViewList = collectionViewList,
         folderViewList = emptyList(),
-        sendViewList = emptyList(),
     )
 
     private fun VaultData.toNestedCollectionViewState(

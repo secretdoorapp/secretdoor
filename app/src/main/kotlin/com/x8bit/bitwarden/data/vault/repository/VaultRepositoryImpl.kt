@@ -13,7 +13,6 @@ import com.bitwarden.core.data.util.asFailure
 import com.bitwarden.exporters.ExportFormat
 import com.bitwarden.fido.Fido2CredentialAutofillView
 import com.bitwarden.sdk.Fido2CredentialStore
-import com.bitwarden.send.SendView
 import com.bitwarden.vault.CipherListView
 import com.bitwarden.vault.CipherListViewType
 import com.bitwarden.vault.CipherType
@@ -32,7 +31,6 @@ import com.x8bit.bitwarden.data.vault.manager.CipherManager
 import com.x8bit.bitwarden.data.vault.manager.CredentialExchangeImportManager
 import com.x8bit.bitwarden.data.vault.manager.FolderManager
 import com.x8bit.bitwarden.data.vault.manager.PinProtectedUserKeyManager
-import com.x8bit.bitwarden.data.vault.manager.SendManager
 import com.x8bit.bitwarden.data.vault.manager.TotpCodeManager
 import com.x8bit.bitwarden.data.vault.manager.VaultLockManager
 import com.x8bit.bitwarden.data.vault.manager.VaultSyncManager
@@ -80,7 +78,6 @@ internal class VaultRepositoryImpl(
     private val authDiskSource: AuthDiskSource,
     private val cipherManager: CipherManager,
     private val folderManager: FolderManager,
-    private val sendManager: SendManager,
     private val vaultLockManager: VaultLockManager,
     private val totpCodeManager: TotpCodeManager,
     private val vaultSyncManager: VaultSyncManager,
@@ -93,7 +90,6 @@ internal class VaultRepositoryImpl(
     CipherManager by cipherManager,
     FolderManager by folderManager,
     KeyRotationManager by keyRotationManager,
-    SendManager by sendManager,
     VaultLockManager by vaultLockManager,
     VaultSyncManager by vaultSyncManager {
 
@@ -162,20 +158,6 @@ internal class VaultRepositoryImpl(
                     vaultData
                         .folderViewList
                         .find { it.id == folderId }
-                }
-            }
-            .stateIn(
-                scope = unconfinedScope,
-                started = SharingStarted.Lazily,
-                initialValue = DataState.Loading,
-            )
-
-    override fun getSendStateFlow(sendId: String): StateFlow<DataState<SendView?>> =
-        vaultSyncManager
-            .sendDataStateFlow
-            .map { dataState ->
-                dataState.map { sendData ->
-                    sendData.sendViewList.find { it.id == sendId }
                 }
             }
             .stateIn(

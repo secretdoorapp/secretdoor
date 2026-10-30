@@ -37,9 +37,6 @@ import com.x8bit.bitwarden.data.platform.manager.util.AppResumeStateManager
 import com.x8bit.bitwarden.data.platform.manager.util.RegisterScreenDataOnLifecycleEffect
 import com.x8bit.bitwarden.ui.platform.composition.LocalAppResumeStateManager
 import com.x8bit.bitwarden.ui.platform.feature.search.handlers.SearchHandlers
-import com.x8bit.bitwarden.ui.tools.feature.send.addedit.AddEditSendRoute
-import com.x8bit.bitwarden.ui.tools.feature.send.addedit.ModeType
-import com.x8bit.bitwarden.ui.tools.feature.send.viewsend.ViewSendRoute
 import com.x8bit.bitwarden.ui.vault.feature.addedit.VaultAddEditArgs
 import com.x8bit.bitwarden.ui.vault.feature.item.VaultItemArgs
 import com.x8bit.bitwarden.ui.vault.feature.vault.VaultFilter
@@ -47,15 +44,13 @@ import com.x8bit.bitwarden.ui.vault.model.VaultAddEditType
 import kotlinx.collections.immutable.toImmutableList
 
 /**
- * The search UI for vault items or send items.
+ * The search UI for vault items.
  */
 @Suppress("LongMethod", "CyclomaticComplexMethod")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
     onNavigateBack: () -> Unit,
-    onNavigateToAddEditSend: (route: AddEditSendRoute) -> Unit,
-    onNavigateToViewSend: (route: ViewSendRoute) -> Unit,
     onNavigateToEditCipher: (args: VaultAddEditArgs) -> Unit,
     onNavigateToViewCipher: (args: VaultItemArgs) -> Unit,
     onNavigateToPlan: () -> Unit,
@@ -77,21 +72,6 @@ fun SearchScreen(
     EventsEffect(viewModel = viewModel) { event ->
         when (event) {
             SearchEvent.NavigateBack -> onNavigateBack()
-            is SearchEvent.NavigateToEditSend -> {
-                onNavigateToAddEditSend(
-                    AddEditSendRoute(
-                        sendType = event.sendType,
-                        modeType = ModeType.EDIT,
-                        sendId = event.sendId,
-                    ),
-                )
-            }
-
-            is SearchEvent.NavigateToViewSend -> {
-                onNavigateToViewSend(
-                    ViewSendRoute(sendId = event.sendId, sendType = event.sendType),
-                )
-            }
 
             is SearchEvent.NavigateToEditCipher -> {
                 onNavigateToEditCipher(

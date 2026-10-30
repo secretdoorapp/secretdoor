@@ -17,10 +17,8 @@ import com.bitwarden.core.data.repository.model.DataState
 import com.bitwarden.core.data.repository.util.map
 import com.bitwarden.core.util.persistentListOfNotNull
 import com.bitwarden.data.repository.util.baseIconUrl
-import com.bitwarden.data.repository.util.baseWebSendUrl
 import com.bitwarden.data.repository.util.baseWebVaultUrlOrDefault
 import com.bitwarden.policies.PolicyType
-import com.bitwarden.send.SendType
 import com.bitwarden.ui.platform.base.BackgroundEvent
 import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.base.util.toAndroidAppUriString
@@ -80,9 +78,7 @@ import com.x8bit.bitwarden.data.platform.util.getSignatureFingerprintAsHexString
 import com.x8bit.bitwarden.data.vault.manager.model.GetCipherResult
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.ArchiveCipherResult
-import com.x8bit.bitwarden.data.vault.repository.model.DeleteSendResult
 import com.x8bit.bitwarden.data.vault.repository.model.GenerateTotpResult
-import com.x8bit.bitwarden.data.vault.repository.model.RemovePasswordSendResult
 import com.x8bit.bitwarden.data.vault.repository.model.UnarchiveCipherResult
 import com.x8bit.bitwarden.data.vault.repository.model.VaultData
 import com.x8bit.bitwarden.ui.credentials.manager.model.AssertFido2CredentialResult
@@ -93,8 +89,6 @@ import com.x8bit.bitwarden.ui.platform.feature.search.SearchTypeData
 import com.x8bit.bitwarden.ui.platform.feature.search.model.SearchType
 import com.x8bit.bitwarden.ui.platform.feature.search.util.filterAndOrganize
 import com.x8bit.bitwarden.ui.platform.model.SnackbarRelay
-import com.x8bit.bitwarden.ui.tools.feature.send.model.SendItemType
-import com.x8bit.bitwarden.ui.tools.feature.send.util.toSendItemType
 import com.x8bit.bitwarden.ui.vault.components.model.CreateVaultItemType
 import com.x8bit.bitwarden.ui.vault.components.util.toVaultItemCipherTypeOrNull
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.model.ListingItemOverflowAction
@@ -102,7 +96,6 @@ import com.x8bit.bitwarden.ui.vault.feature.itemlisting.util.determineListingPre
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.util.messageResourceId
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.util.toItemListingType
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.util.toSearchType
-import com.x8bit.bitwarden.ui.vault.feature.itemlisting.util.toSendItemType
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.util.toVaultItemCipherType
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.util.toViewState
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.util.updateWithAdditionalDataIfNecessary
@@ -176,7 +169,6 @@ class VaultItemListingViewModel @Inject constructor(
             accountSummaries = accountSummaries,
             viewState = VaultItemListingState.ViewState.Loading,
             vaultFilterType = vaultRepository.vaultFilterType,
-            baseWebSendUrl = environmentRepository.environment.baseWebSendUrl,
             baseIconUrl = environmentRepository.environment.baseIconUrl,
             isIconLoadingDisabled = settingsRepository.isIconLoadingDisabled,
             isPullToRefreshSettingEnabled = settingsRepository.getPullToRefreshEnabledFlow().value,
@@ -185,7 +177,6 @@ class VaultItemListingViewModel @Inject constructor(
                 ?.let {
                     VaultItemListingState.DialogState.Loading(BitwardenString.loading.asText())
                 },
-            policyDisablesSend = policyManager.getEffectiveSendPolicy().disableSend,
             restrictItemTypesPolicyOrgIds = persistentListOf(),
             autofillSelectionData = specialCircumstance?.toAutofillSelectionDataOrNull(),
             hasMasterPassword = userState.activeAccount.hasMasterPassword,
@@ -213,12 +204,6 @@ class VaultItemListingViewModel @Inject constructor(
             .launchIn(viewModelScope)
 
         policyManager
-            .getEffectiveSendPolicyFlow()
-            .map { VaultItemListingsAction.Internal.PolicyUpdateReceive(it.disableSend) }
-            .onEach(::sendAction)
-            .launchIn(viewModelScope)
-
-        policyManager
             .getActivePoliciesFlow(type = PolicyType.RESTRICTED_ITEM_TYPES)
             .map { policies -> policies.map { it.organizationId } }
             .map { VaultItemListingsAction.Internal.RestrictItemTypesPolicyUpdateReceive(it) }
@@ -243,8 +228,6 @@ class VaultItemListingViewModel @Inject constructor(
                 SnackbarRelay.CIPHER_RESTORED,
                 SnackbarRelay.CIPHER_UPDATED,
                 SnackbarRelay.FOLDER_CREATED,
-                SnackbarRelay.SEND_DELETED,
-                SnackbarRelay.SEND_UPDATED,
             )
             .map { VaultItemListingsAction.Internal.SnackbarDataReceived(it) }
             .onEach(::sendAction)
@@ -633,33 +616,6 @@ class VaultItemListingViewModel @Inject constructor(
         )
     }
 
-    private fun handleCopySendUrlClick(action: ListingItemOverflowAction.SendAction.CopyUrlClick) {
-        clipboardManager.setText(
-            text = action.sendUrl,
-            toastDescriptorOverride = BitwardenString.send_link.asText(),
-        )
-    }
-
-    private fun handleDeleteSendClick(action: ListingItemOverflowAction.SendAction.DeleteClick) {
-        mutableStateFlow.update {
-            it.copy(
-                dialogState = VaultItemListingState.DialogState.Loading(
-                    message = BitwardenString.deleting.asText(),
-                ),
-            )
-        }
-        viewModelScope.launch {
-            val result = vaultRepository.deleteSend(action.sendId)
-            sendAction(VaultItemListingsAction.Internal.DeleteSendResultReceive(result))
-        }
-    }
-
-    private fun handleShareSendUrlClick(
-        action: ListingItemOverflowAction.SendAction.ShareUrlClick,
-    ) {
-        sendEvent(VaultItemListingEvent.ShowShareSheet(action.sendUrl))
-    }
-
     private fun handleShareCipherDecryptionErrorClick(
         action: VaultItemListingsAction.ShareCipherDecryptionErrorClick,
     ) {
@@ -678,22 +634,6 @@ class VaultItemListingViewModel @Inject constructor(
             val baseUrl = environmentRepository.environment.baseWebVaultUrlOrDefault
             val url = "$baseUrl/#/settings/subscription/premium?callToAction=upgradeToPremium"
             sendEvent(VaultItemListingEvent.NavigateToUrl(url = url))
-        }
-    }
-
-    private fun handleRemoveSendPasswordClick(
-        action: ListingItemOverflowAction.SendAction.RemovePasswordClick,
-    ) {
-        mutableStateFlow.update {
-            it.copy(
-                dialogState = VaultItemListingState.DialogState.Loading(
-                    message = BitwardenString.removing_send_password.asText(),
-                ),
-            )
-        }
-        viewModelScope.launch {
-            val result = vaultRepository.removePasswordSend(action.sendId)
-            sendAction(VaultItemListingsAction.Internal.RemovePasswordSendResultReceive(result))
         }
     }
 
@@ -862,16 +802,6 @@ class VaultItemListingViewModel @Inject constructor(
         )
     }
 
-    private fun fileSendRequiresPremiumDialog(): VaultItemListingState.DialogState =
-        if (premiumStateManager.isInAppUpgradeAvailable()) {
-            VaultItemListingState.DialogState.FileTypeRequiresPremium
-        } else {
-            VaultItemListingState.DialogState.Error(
-                title = BitwardenString.send.asText(),
-                message = BitwardenString.send_file_premium_required.asText(),
-            )
-        }
-
     private fun handleAddVaultItemClick() {
         when (val itemListingType = state.itemListingType) {
             is VaultItemListingState.ItemListingType.Vault.Collection -> {
@@ -902,42 +832,7 @@ class VaultItemListingViewModel @Inject constructor(
                 )
             }
 
-            is VaultItemListingState.ItemListingType.Send -> {
-                when (val sendType = itemListingType.toSendItemType()) {
-                    SendItemType.FILE -> {
-                        if (state.isPremium) {
-                            sendEvent(VaultItemListingEvent.NavigateToAddSendItem(sendType))
-                        } else {
-                            mutableStateFlow.update {
-                                it.copy(dialogState = fileSendRequiresPremiumDialog())
-                            }
-                        }
-                    }
-
-                    SendItemType.TEXT -> {
-                        sendEvent(VaultItemListingEvent.NavigateToAddSendItem(sendType))
-                    }
-                }
-            }
         }
-    }
-
-    private fun handleViewSendClick(action: ListingItemOverflowAction.SendAction.ViewClick) {
-        sendEvent(
-            VaultItemListingEvent.NavigateToViewSendItem(
-                id = action.sendId,
-                sendType = action.sendType.toSendItemType(),
-            ),
-        )
-    }
-
-    private fun handleEditSendClick(action: ListingItemOverflowAction.SendAction.EditClick) {
-        sendEvent(
-            event = VaultItemListingEvent.NavigateToEditSendItem(
-                id = action.sendId,
-                sendType = action.sendType.toSendItemType(),
-            ),
-        )
     }
 
     private fun handleItemClick(action: VaultItemListingsAction.ItemClick) {
@@ -969,13 +864,6 @@ class VaultItemListingViewModel @Inject constructor(
                 VaultItemListingEvent.NavigateToVaultItem(
                     id = action.id,
                     type = itemType.type.toVaultItemCipherType(),
-                )
-            }
-
-            is VaultItemListingState.DisplayItem.ItemType.Sends -> {
-                VaultItemListingEvent.NavigateToViewSendItem(
-                    id = action.id,
-                    sendType = itemType.type.toSendItemType(),
                 )
             }
 
@@ -1609,29 +1497,6 @@ class VaultItemListingViewModel @Inject constructor(
     @Suppress("LongMethod")
     private fun handleOverflowOptionClick(action: VaultItemListingsAction.OverflowOptionClick) {
         when (val overflowAction = action.action) {
-            is ListingItemOverflowAction.SendAction.CopyUrlClick -> {
-                handleCopySendUrlClick(overflowAction)
-            }
-
-            is ListingItemOverflowAction.SendAction.DeleteClick -> {
-                handleDeleteSendClick(overflowAction)
-            }
-
-            is ListingItemOverflowAction.SendAction.ViewClick -> {
-                handleViewSendClick(overflowAction)
-            }
-
-            is ListingItemOverflowAction.SendAction.EditClick -> {
-                handleEditSendClick(overflowAction)
-            }
-
-            is ListingItemOverflowAction.SendAction.RemovePasswordClick -> {
-                handleRemoveSendPasswordClick(overflowAction)
-            }
-
-            is ListingItemOverflowAction.SendAction.ShareUrlClick -> {
-                handleShareSendUrlClick(overflowAction)
-            }
 
             is ListingItemOverflowAction.VaultAction.CopyNoteClick -> {
                 handleCopyNoteClick(overflowAction)
@@ -1702,14 +1567,6 @@ class VaultItemListingViewModel @Inject constructor(
                 handlePullToRefreshEnableReceive(action)
             }
 
-            is VaultItemListingsAction.Internal.DeleteSendResultReceive -> {
-                handleDeleteSendResultReceive(action)
-            }
-
-            is VaultItemListingsAction.Internal.RemovePasswordSendResultReceive -> {
-                handleRemovePasswordSendResultReceive(action)
-            }
-
             is VaultItemListingsAction.Internal.VaultDataReceive -> handleVaultDataReceive(action)
             is VaultItemListingsAction.Internal.IconLoadingSettingReceive -> {
                 handleIconsSettingReceived(action)
@@ -1729,10 +1586,6 @@ class VaultItemListingViewModel @Inject constructor(
 
             is VaultItemListingsAction.Internal.ValidateUserVerificationPinResultReceive -> {
                 handleValidateUserVerificationPinResultReceive(action)
-            }
-
-            is VaultItemListingsAction.Internal.PolicyUpdateReceive -> {
-                handlePolicyUpdateReceive(action)
             }
 
             is VaultItemListingsAction.Internal.CreateCredentialRequestReceive -> {
@@ -1916,59 +1769,6 @@ class VaultItemListingViewModel @Inject constructor(
     ) {
         mutableStateFlow.update {
             it.copy(isPullToRefreshSettingEnabled = action.isPullToRefreshEnabled)
-        }
-    }
-
-    private fun handleDeleteSendResultReceive(
-        action: VaultItemListingsAction.Internal.DeleteSendResultReceive,
-    ) {
-        when (val result = action.result) {
-            is DeleteSendResult.Error -> {
-                mutableStateFlow.update {
-                    it.copy(
-                        dialogState = VaultItemListingState.DialogState.Error(
-                            title = BitwardenString.an_error_has_occurred.asText(),
-                            message = BitwardenString.generic_error_message.asText(),
-                            throwable = result.error,
-                        ),
-                    )
-                }
-            }
-
-            DeleteSendResult.Success -> {
-                clearDialogState()
-                sendEvent(VaultItemListingEvent.ShowSnackbar(BitwardenString.send_deleted.asText()))
-            }
-        }
-    }
-
-    private fun handleRemovePasswordSendResultReceive(
-        action: VaultItemListingsAction.Internal.RemovePasswordSendResultReceive,
-    ) {
-        when (val result = action.result) {
-            is RemovePasswordSendResult.Error -> {
-                mutableStateFlow.update {
-                    it.copy(
-                        dialogState = VaultItemListingState.DialogState.Error(
-                            title = BitwardenString.an_error_has_occurred.asText(),
-                            message = result
-                                .errorMessage
-                                ?.asText()
-                                ?: BitwardenString.generic_error_message.asText(),
-                            throwable = result.error,
-                        ),
-                    )
-                }
-            }
-
-            is RemovePasswordSendResult.Success -> {
-                clearDialogState()
-                sendEvent(
-                    VaultItemListingEvent.ShowSnackbar(
-                        BitwardenString.password_removed.asText(),
-                    ),
-                )
-            }
         }
     }
 
@@ -2284,16 +2084,6 @@ class VaultItemListingViewModel @Inject constructor(
 
     private fun vaultPendingReceive(vaultData: DataState.Pending<VaultData>) {
         updateStateWithVaultData(vaultData = vaultData.data, clearDialogState = false)
-    }
-
-    private fun handlePolicyUpdateReceive(
-        action: VaultItemListingsAction.Internal.PolicyUpdateReceive,
-    ) {
-        mutableStateFlow.update {
-            it.copy(
-                policyDisablesSend = action.policyDisablesSend,
-            )
-        }
     }
 
     private fun handleRegisterCredentialRequestReceive(
@@ -2766,18 +2556,6 @@ class VaultItemListingViewModel @Inject constructor(
                         )
                     }
 
-                    is VaultItemListingState.ItemListingType.Send -> {
-                        vaultData
-                            .sendViewList
-                            .filter { sendView ->
-                                sendView.determineListingPredicate(listingType)
-                            }
-                            .toViewState(
-                                itemListingType = listingType,
-                                baseWebSendUrl = state.baseWebSendUrl,
-                                clock = clock,
-                            )
-                    }
                 },
                 dialogState = currentState.dialogState.takeUnless { clearDialogState },
             )
@@ -2967,11 +2745,9 @@ data class VaultItemListingState(
     val accountSummaries: ImmutableList<AccountSummary>,
     val viewState: ViewState,
     val vaultFilterType: VaultFilterType,
-    val baseWebSendUrl: String,
     val baseIconUrl: String,
     val isIconLoadingDisabled: Boolean,
     val dialogState: DialogState?,
-    val policyDisablesSend: Boolean,
     val restrictItemTypesPolicyOrgIds: ImmutableList<String>,
     // Internal
     private val isPullToRefreshSettingEnabled: Boolean,
@@ -3012,8 +2788,6 @@ data class VaultItemListingState(
             ItemListingType.Vault.License,
             ItemListingType.Vault.Passport,
             ItemListingType.Vault.Trash,
-            ItemListingType.Send.SendFile,
-            ItemListingType.Send.SendText,
                 -> null
         }
 
@@ -3246,12 +3020,6 @@ data class VaultItemListingState(
         @Parcelize
         data object ArchiveRequiresPremium : DialogState()
 
-        /**
-         * Displays a dialog to the user indicating that creating a File-type Send
-         * requires a Premium account.
-         */
-        @Parcelize
-        data object FileTypeRequiresPremium : DialogState()
     }
 
     /**
@@ -3361,13 +3129,9 @@ data class VaultItemListingState(
         val itemType: ItemType,
     ) {
         /**
-         * Indicates the item type as a send or vault item.
+         * Indicates the type of the listed item.
          */
         sealed class ItemType {
-            /**
-             * Indicates the item type is a send.
-             */
-            data class Sends(val type: SendType) : ItemType()
 
             /**
              * Indicates the item type is a vault item.
@@ -3542,26 +3306,6 @@ data class VaultItemListingState(
             }
         }
 
-        /**
-         * Represents different types of vault item listings.
-         */
-        sealed class Send : ItemListingType() {
-            /**
-             * A Send File item listing.
-             */
-            data object SendFile : Send() {
-                override val titleText: Text get() = BitwardenString.file.asText()
-                override val hasFab: Boolean get() = true
-            }
-
-            /**
-             * A Send Text item listing.
-             */
-            data object SendText : Send() {
-                override val titleText: Text get() = BitwardenString.text.asText()
-                override val hasFab: Boolean get() = true
-            }
-        }
     }
 }
 
@@ -3604,31 +3348,6 @@ sealed class VaultItemListingEvent {
      * Navigates to the folder.
      */
     data class NavigateToFolderItem(val folderId: String) : VaultItemListingEvent()
-
-    /**
-     * Navigates to the AddSendItemScreen.
-     */
-    data class NavigateToAddSendItem(
-        val sendType: SendItemType,
-    ) : VaultItemListingEvent()
-
-    /**
-     * Navigates to the AddSendScreen.
-     *
-     * @property id the id of the send to navigate to.
-     */
-    data class NavigateToEditSendItem(
-        val sendType: SendItemType,
-        val id: String,
-    ) : VaultItemListingEvent()
-
-    /**
-     * Navigates to the ViewSendScreen.
-     */
-    data class NavigateToViewSendItem(
-        val id: String,
-        val sendType: SendItemType,
-    ) : VaultItemListingEvent()
 
     /**
      * Navigates to the VaultItemScreen.
@@ -3978,11 +3697,6 @@ sealed class VaultItemListingsAction {
         data class PullToRefreshEnableReceive(val isPullToRefreshEnabled: Boolean) : Internal()
 
         /**
-         * Indicates a result for deleting the send has been received.
-         */
-        data class DeleteSendResultReceive(val result: DeleteSendResult) : Internal()
-
-        /**
          * Indicates that the archive cipher result has been received.
          */
         data class ArchiveCipherReceive(
@@ -4001,13 +3715,6 @@ sealed class VaultItemListingsAction {
          */
         data class GenerateTotpResultReceive(
             val result: GenerateTotpResult,
-        ) : Internal()
-
-        /**
-         * Indicates a result for removing the password protection from a send has been received.
-         */
-        data class RemovePasswordSendResultReceive(
-            val result: RemovePasswordSendResult,
         ) : Internal()
 
         /**
@@ -4048,13 +3755,6 @@ sealed class VaultItemListingsAction {
         data class ValidateUserVerificationPinResultReceive(
             val result: ValidatePinResult,
             val selectedCipherId: String,
-        ) : Internal()
-
-        /**
-         * Indicates that a policy update has been received.
-         */
-        data class PolicyUpdateReceive(
-            val policyDisablesSend: Boolean,
         ) : Internal()
 
         /**

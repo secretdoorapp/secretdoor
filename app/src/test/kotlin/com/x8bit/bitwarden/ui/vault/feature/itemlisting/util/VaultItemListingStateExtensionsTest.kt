@@ -1,7 +1,6 @@
 package com.x8bit.bitwarden.ui.vault.feature.itemlisting.util
 
 import com.x8bit.bitwarden.ui.platform.feature.search.model.SearchType
-import com.x8bit.bitwarden.ui.tools.feature.send.model.SendItemType
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.VaultItemListingState
 import com.x8bit.bitwarden.ui.vault.model.VaultItemCipherType
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -9,26 +8,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class VaultItemListingStateExtensionsTest {
-
-    @Test
-    fun `toSearchType should return Texts when item type is SendText`() {
-        val expected = SearchType.Sends.Texts
-        val itemType = VaultItemListingState.ItemListingType.Send.SendText
-
-        val result = itemType.toSearchType()
-
-        assertEquals(expected, result)
-    }
-
-    @Test
-    fun `toSearchType should return Files when item type is SendFile`() {
-        val expected = SearchType.Sends.Files
-        val itemType = VaultItemListingState.ItemListingType.Send.SendFile
-
-        val result = itemType.toSearchType()
-
-        assertEquals(expected, result)
-    }
 
     @Test
     fun `toSearchType should return Logins when item type is Login`() {
@@ -206,21 +185,4 @@ class VaultItemListingStateExtensionsTest {
         }
     }
 
-    @Test
-    fun `toSendItemType should return the correct response`() {
-        val itemListingTypes = listOf(
-            VaultItemListingState.ItemListingType.Send.SendFile,
-            VaultItemListingState.ItemListingType.Send.SendText,
-        )
-
-        val result = itemListingTypes.map { it.toSendItemType() }
-
-        assertEquals(
-            listOf(
-                SendItemType.FILE,
-                SendItemType.TEXT,
-            ),
-            result,
-        )
-    }
 }

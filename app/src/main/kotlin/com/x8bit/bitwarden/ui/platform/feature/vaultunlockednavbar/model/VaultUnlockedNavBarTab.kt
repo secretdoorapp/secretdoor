@@ -8,8 +8,6 @@ import com.x8bit.bitwarden.ui.platform.feature.settings.SettingsGraphRoute
 import com.x8bit.bitwarden.ui.platform.feature.settings.SettingsRoute
 import com.x8bit.bitwarden.ui.tools.feature.generator.GeneratorGraphRoute
 import com.x8bit.bitwarden.ui.tools.feature.generator.GeneratorRoute
-import com.x8bit.bitwarden.ui.tools.feature.send.SendGraphRoute
-import com.x8bit.bitwarden.ui.tools.feature.send.SendRoute
 import com.x8bit.bitwarden.ui.vault.feature.vault.VaultGraphRoute
 import com.x8bit.bitwarden.ui.vault.feature.vault.VaultRoute
 import kotlinx.parcelize.Parcelize
@@ -33,19 +31,6 @@ sealed class VaultUnlockedNavBarTab : NavigationItem, Parcelable {
         override val graphRoute get() = GeneratorGraphRoute
         override val startDestinationRoute get() = GeneratorRoute.Standard
         override val testTag get() = "GeneratorTab"
-        override val notificationCount get() = 0
-    }
-
-    /**
-     * Show the Send screen.
-     */
-    @Parcelize
-    data object Send : VaultUnlockedNavBarTab() {
-        override val iconRes get() = BitwardenDrawable.ic_send
-        override val labelRes get() = BitwardenString.send
-        override val graphRoute get() = SendGraphRoute
-        override val startDestinationRoute get() = SendRoute
-        override val testTag get() = "SendTab"
         override val notificationCount get() = 0
     }
 

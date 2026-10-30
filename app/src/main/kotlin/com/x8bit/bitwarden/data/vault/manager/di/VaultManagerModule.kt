@@ -7,7 +7,6 @@ import com.bitwarden.cxf.parser.CredentialExchangePayloadParser
 import com.bitwarden.data.manager.appstate.AppStateManager
 import com.bitwarden.data.manager.file.FileManager
 import com.bitwarden.network.service.CiphersService
-import com.bitwarden.network.service.SendsService
 import com.bitwarden.network.service.SyncService
 import com.bitwarden.ui.platform.feature.cardscanner.manager.CardScanManager
 import com.bitwarden.ui.platform.feature.cardscanner.manager.CardScanManagerImpl
@@ -38,8 +37,6 @@ import com.x8bit.bitwarden.data.vault.manager.FolderManager
 import com.x8bit.bitwarden.data.vault.manager.FolderManagerImpl
 import com.x8bit.bitwarden.data.vault.manager.PinProtectedUserKeyManager
 import com.x8bit.bitwarden.data.vault.manager.PinProtectedUserKeyManagerImpl
-import com.x8bit.bitwarden.data.vault.manager.SendManager
-import com.x8bit.bitwarden.data.vault.manager.SendManagerImpl
 import com.x8bit.bitwarden.data.vault.manager.TotpCodeManager
 import com.x8bit.bitwarden.data.vault.manager.TotpCodeManagerImpl
 import com.x8bit.bitwarden.data.vault.manager.VaultLockManager
@@ -128,30 +125,6 @@ object VaultManagerModule {
         vaultDiskSource = vaultDiskSource,
         vaultSdkSource = vaultSdkSource,
         clock = clock,
-    )
-
-    @Provides
-    @Singleton
-    fun provideSendManager(
-        sendsService: SendsService,
-        vaultDiskSource: VaultDiskSource,
-        vaultSdkSource: VaultSdkSource,
-        authDiskSource: AuthDiskSource,
-        settingsDiskSource: SettingsDiskSource,
-        fileManager: FileManager,
-        reviewPromptManager: ReviewPromptManager,
-        pushManager: PushManager,
-        dispatcherManager: DispatcherManager,
-    ): SendManager = SendManagerImpl(
-        fileManager = fileManager,
-        authDiskSource = authDiskSource,
-        settingsDiskSource = settingsDiskSource,
-        sendsService = sendsService,
-        vaultDiskSource = vaultDiskSource,
-        vaultSdkSource = vaultSdkSource,
-        reviewPromptManager = reviewPromptManager,
-        pushManager = pushManager,
-        dispatcherManager = dispatcherManager,
     )
 
     @Provides

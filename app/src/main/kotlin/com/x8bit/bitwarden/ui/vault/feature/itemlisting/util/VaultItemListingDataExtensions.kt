@@ -5,8 +5,6 @@ package com.x8bit.bitwarden.ui.vault.feature.itemlisting.util
 import androidx.annotation.DrawableRes
 import com.bitwarden.collections.CollectionView
 import com.bitwarden.core.data.util.toFormattedDateTimeStyle
-import com.bitwarden.send.SendType
-import com.bitwarden.send.SendView
 import com.bitwarden.ui.platform.base.util.toHostOrPathOrNull
 import com.bitwarden.ui.platform.components.icon.model.IconData
 import com.bitwarden.ui.platform.model.TotpData
@@ -25,8 +23,6 @@ import com.x8bit.bitwarden.data.credentials.model.CreateCredentialRequest
 import com.x8bit.bitwarden.data.platform.util.isActive
 import com.x8bit.bitwarden.data.vault.repository.model.VaultData
 import com.x8bit.bitwarden.data.vault.repository.util.toFailureCipherListView
-import com.x8bit.bitwarden.ui.tools.feature.send.util.toLabelIcons
-import com.x8bit.bitwarden.ui.tools.feature.send.util.toOverflowActions
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.VaultItemListingState
 import com.x8bit.bitwarden.ui.vault.feature.util.getCollections
 import com.x8bit.bitwarden.ui.vault.feature.util.getFolders
@@ -96,23 +92,6 @@ fun CipherListView.determineListingPredicate(
 
         is VaultItemListingState.ItemListingType.Vault.Archive -> {
             archivedDate != null && deletedDate == null
-        }
-    }
-
-/**
- * Determines a predicate to filter a list of [CipherView] based on the
- * [VaultItemListingState.ItemListingType].
- */
-fun SendView.determineListingPredicate(
-    itemListingType: VaultItemListingState.ItemListingType.Send,
-): Boolean =
-    when (itemListingType) {
-        is VaultItemListingState.ItemListingType.Send.SendFile -> {
-            type == SendType.FILE
-        }
-
-        is VaultItemListingState.ItemListingType.Send.SendText -> {
-            type == SendType.TEXT
         }
     }
 
@@ -388,39 +367,6 @@ fun VaultData.toViewState(
 }
 
 /**
- * Transforms a list of [CipherView] into [VaultItemListingState.ViewState].
- */
-fun List<SendView>.toViewState(
-    itemListingType: VaultItemListingState.ItemListingType.Send,
-    baseWebSendUrl: String,
-    clock: Clock,
-): VaultItemListingState.ViewState =
-    if (isNotEmpty()) {
-        VaultItemListingState.ViewState.Content(
-            displayItemList = toDisplayItemList(
-                baseWebSendUrl = baseWebSendUrl,
-                clock = clock,
-            ),
-            displayFolderList = emptyList(),
-            displayCollectionList = emptyList(),
-        )
-    } else {
-        VaultItemListingState.ViewState.NoItems(
-            message = when (itemListingType) {
-                VaultItemListingState.ItemListingType.Send.SendFile -> BitwardenString.no_file_sends
-                VaultItemListingState.ItemListingType.Send.SendText -> BitwardenString.no_text_sends
-            }
-                .asText(),
-            shouldShowAddButton = true,
-            buttonText = when (itemListingType) {
-                VaultItemListingState.ItemListingType.Send.SendFile -> BitwardenString.new_file_send
-                VaultItemListingState.ItemListingType.Send.SendText -> BitwardenString.new_text_send
-            }
-                .asText(),
-        )
-    }
-
-/**
  * Updates a [VaultItemListingState.ItemListingType] with the given data if necessary.
  */
 fun VaultItemListingState.ItemListingType.updateWithAdditionalDataIfNecessary(
@@ -453,8 +399,6 @@ fun VaultItemListingState.ItemListingType.updateWithAdditionalDataIfNecessary(
         is VaultItemListingState.ItemListingType.Vault.Login -> this
         is VaultItemListingState.ItemListingType.Vault.SecureNote -> this
         is VaultItemListingState.ItemListingType.Vault.Trash -> this
-        is VaultItemListingState.ItemListingType.Send.SendFile -> this
-        is VaultItemListingState.ItemListingType.Send.SendText -> this
         is VaultItemListingState.ItemListingType.Vault.SshKey -> this
         is VaultItemListingState.ItemListingType.Vault.BankAccount -> this
         is VaultItemListingState.ItemListingType.Vault.License -> this
@@ -481,17 +425,6 @@ private fun List<CipherListView>.toDisplayItemList(
             isFido2Creation = isFido2Creation,
             isPremiumUser = isPremiumUser,
             isVfo1FoundationEnabled = isVfo1FoundationEnabled,
-        )
-    }
-
-private fun List<SendView>.toDisplayItemList(
-    baseWebSendUrl: String,
-    clock: Clock,
-): List<VaultItemListingState.DisplayItem> =
-    this.map {
-        it.toDisplayItem(
-            baseWebSendUrl = baseWebSendUrl,
-            clock = clock,
         )
     }
 
@@ -618,39 +551,6 @@ private fun CipherListView.toIconData(
         }
     }
 }
-
-private fun SendView.toDisplayItem(
-    baseWebSendUrl: String,
-    clock: Clock,
-): VaultItemListingState.DisplayItem =
-    VaultItemListingState.DisplayItem(
-        id = id.orEmpty(),
-        title = name.asText(),
-        titleTestTag = "SendNameLabel",
-        secondSubtitle = null,
-        secondSubtitleTestTag = null,
-        subtitle = deletionDate.toFormattedDateTimeStyle(
-            dateStyle = FormatStyle.MEDIUM,
-            timeStyle = FormatStyle.SHORT,
-            clock = clock,
-        ),
-        subtitleTestTag = "SendDateLabel",
-        iconData = IconData.Local(
-            iconRes = when (type) {
-                SendType.TEXT -> BitwardenDrawable.ic_file_text
-                SendType.FILE -> BitwardenDrawable.ic_file
-                SendType.ITEM -> TODO("[PM-41095] Support Item SendType")
-            },
-        ),
-        iconTestTag = null,
-        extraIconList = toLabelIcons(clock = clock),
-        overflowOptions = toOverflowActions(baseWebSendUrl = baseWebSendUrl),
-        optionsTestTag = "SendOptionsButton",
-        isAutofill = false,
-        shouldShowMasterPasswordReprompt = false,
-        isCredentialCreation = false,
-        itemType = VaultItemListingState.DisplayItem.ItemType.Sends(type = this.type),
-    )
 
 @get:DrawableRes
 private val CipherListViewType.iconRes: Int

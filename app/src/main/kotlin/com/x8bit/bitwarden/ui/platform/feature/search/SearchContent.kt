@@ -128,13 +128,6 @@ fun SearchContent(
                             contentDescription = option.contentDescription(),
                             onClick = {
                                 when (option) {
-                                    is ListingItemOverflowAction.SendAction -> {
-                                        if (option.speedBump != null) {
-                                            overflowSpeedBumpAction = option
-                                        } else {
-                                            searchHandlers.onOverflowItemClick(option)
-                                        }
-                                    }
 
                                     is ListingItemOverflowAction.VaultAction -> {
                                         if (option.requiresPasswordReprompt &&

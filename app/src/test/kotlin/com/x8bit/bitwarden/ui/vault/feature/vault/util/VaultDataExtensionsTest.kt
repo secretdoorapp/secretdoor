@@ -23,7 +23,6 @@ import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockDecryptCiph
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockFolderView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockLoginListView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkCipher
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSendView
 import com.x8bit.bitwarden.data.vault.repository.model.VaultData
 import com.x8bit.bitwarden.data.vault.repository.util.toFailureCipherListView
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.model.ListingItemOverflowAction
@@ -78,7 +77,6 @@ class VaultDataExtensionsTest {
                 FolderView("4", "test/test/test/", clock.instant()),
                 FolderView("5", "Folder", clock.instant()),
             ),
-            sendViewList = listOf(createMockSendView(number = 1)),
         )
 
         val actual = vaultData.toViewState(
@@ -173,7 +171,6 @@ class VaultDataExtensionsTest {
             ),
             collectionViewList = listOf(createMockCollectionView(number = 1)),
             folderViewList = listOf(createMockFolderView(number = 1)),
-            sendViewList = listOf(createMockSendView(number = 1)),
         )
 
         val actual = vaultData.toViewState(
@@ -241,7 +238,6 @@ class VaultDataExtensionsTest {
                 createMockFolderView(number = 1),
                 createMockFolderView(number = 3),
             ),
-            sendViewList = listOf(createMockSendView(number = 1)),
         )
 
         val actual = vaultData.toViewState(
@@ -313,7 +309,6 @@ class VaultDataExtensionsTest {
             ),
             collectionViewList = emptyList(),
             folderViewList = emptyList(),
-            sendViewList = emptyList(),
         )
 
         val actual = vaultData.toViewState(
@@ -342,7 +337,6 @@ class VaultDataExtensionsTest {
             ),
             collectionViewList = listOf(createMockCollectionView(number = 1)),
             folderViewList = listOf(createMockFolderView(number = 1)),
-            sendViewList = listOf(createMockSendView(number = 1)),
         )
 
         val actual = vaultData.toViewState(
@@ -372,7 +366,6 @@ class VaultDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         )
 
         val actual = vaultData.toViewState(
@@ -425,7 +418,6 @@ class VaultDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         )
 
         val actual = vaultData.toViewState(
@@ -480,7 +472,6 @@ class VaultDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         )
 
         val actual = vaultData.toViewState(
@@ -535,7 +526,6 @@ class VaultDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         )
 
         val actual = vaultData.toViewState(
@@ -774,7 +764,6 @@ class VaultDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         )
 
         val actual = vaultData.toViewState(
@@ -829,7 +818,6 @@ class VaultDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         )
 
         val actual = vaultData.toViewState(
@@ -887,7 +875,6 @@ class VaultDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         )
 
         val actual = vaultData.toViewState(
@@ -952,7 +939,6 @@ class VaultDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         )
 
         val actual = vaultData.toViewState(
@@ -1035,7 +1021,6 @@ class VaultDataExtensionsTest {
                 FolderView("4", "test/test/test/", clock.instant()),
                 FolderView("5", "Folder", clock.instant()),
             ),
-            sendViewList = emptyList(),
         )
 
         val actual = vaultData.toViewState(
@@ -1140,7 +1125,6 @@ class VaultDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         )
 
         val actual = vaultData.toViewState(
@@ -1209,7 +1193,6 @@ class VaultDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         )
 
         val actual = vaultData.toViewState(
@@ -1264,7 +1247,6 @@ class VaultDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         )
 
         val actual = vaultData.toViewState(
@@ -1336,7 +1318,6 @@ class VaultDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         )
         val actual = vaultData.toViewState(
             isPremium = true,
@@ -1426,7 +1407,6 @@ class VaultDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         )
         val actual = vaultData.toViewState(
             isPremium = true,
@@ -1501,7 +1481,6 @@ class VaultDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         )
         val actual = vaultData.toViewState(
             isPremium = true,
@@ -1576,7 +1555,6 @@ class VaultDataExtensionsTest {
             ),
             collectionViewList = listOf(),
             folderViewList = listOf(),
-            sendViewList = listOf(),
         )
         val actual = vaultData.toViewState(
             isPremium = true,

@@ -1,7 +1,6 @@
 package com.x8bit.bitwarden.ui.vault.feature.itemlisting.util
 
 import com.x8bit.bitwarden.ui.platform.feature.search.model.SearchType
-import com.x8bit.bitwarden.ui.tools.feature.send.model.SendItemType
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.VaultItemListingState
 import com.x8bit.bitwarden.ui.vault.model.VaultItemCipherType
 
@@ -38,18 +37,6 @@ fun VaultItemListingState.ItemListingType.toSearchType(): SearchType =
         is VaultItemListingState.ItemListingType.Vault.Collection -> {
             SearchType.Vault.Collection(collectionId = collectionId)
         }
-
-        is VaultItemListingState.ItemListingType.Send.SendFile -> SearchType.Sends.Files
-        is VaultItemListingState.ItemListingType.Send.SendText -> SearchType.Sends.Texts
-    }
-
-/**
- * Transforms a [VaultItemListingState.ItemListingType.Send] into a [SendItemType].
- */
-fun VaultItemListingState.ItemListingType.Send.toSendItemType(): SendItemType =
-    when (this) {
-        is VaultItemListingState.ItemListingType.Send.SendFile -> SendItemType.FILE
-        is VaultItemListingState.ItemListingType.Send.SendText -> SendItemType.TEXT
     }
 
 /**

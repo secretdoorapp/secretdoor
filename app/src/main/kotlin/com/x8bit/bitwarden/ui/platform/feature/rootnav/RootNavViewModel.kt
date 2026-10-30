@@ -4,7 +4,6 @@ import android.os.Parcelable
 import androidx.lifecycle.viewModelScope
 import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.base.util.toAndroidAppUriString
-import com.bitwarden.ui.platform.manager.share.model.ShareData
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.OnboardingStatus
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.AuthState
@@ -19,7 +18,6 @@ import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
 import com.x8bit.bitwarden.data.vault.manager.VaultMigrationManager
 import com.x8bit.bitwarden.data.vault.manager.model.VaultMigrationData
-import com.x8bit.bitwarden.ui.tools.feature.send.model.SendItemType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
@@ -116,15 +114,6 @@ class RootNavViewModel @Inject constructor(
                         )
                     }
 
-                    is SpecialCircumstance.ShareNewSend -> {
-                        RootNavState.VaultUnlockedForNewSend(
-                            sendType = when (specialCircumstance.data) {
-                                is ShareData.FileSend -> SendItemType.FILE
-                                is ShareData.TextSend -> SendItemType.TEXT
-                            },
-                        )
-                    }
-
                     is SpecialCircumstance.PasswordlessRequest -> {
                         RootNavState.VaultUnlockedForAuthRequest
                     }
@@ -186,7 +175,6 @@ class RootNavViewModel @Inject constructor(
                     is SpecialCircumstance.PremiumCheckout,
                     SpecialCircumstance.StripePortal,
                     SpecialCircumstance.VaultShortcut,
-                    SpecialCircumstance.SendShortcut,
                     is SpecialCircumstance.SearchShortcut,
                     SpecialCircumstance.VerificationCodeShortcut,
                     // SecretDoor has no email registration, so registration links are ignored.
@@ -233,8 +221,6 @@ class RootNavViewModel @Inject constructor(
             is SpecialCircumstance.PremiumCheckout,
             is SpecialCircumstance.StripePortal,
             is SpecialCircumstance.SearchShortcut,
-            is SpecialCircumstance.SendShortcut,
-            is SpecialCircumstance.ShareNewSend,
             is SpecialCircumstance.VerificationCodeShortcut,
             is SpecialCircumstance.VaultShortcut,
             null,
@@ -370,14 +356,6 @@ sealed class RootNavState : Parcelable {
     @Parcelize
     data class VaultUnlockedForNewTotp(
         val activeUserId: String,
-    ) : RootNavState()
-
-    /**
-     * App should show the new send screen for an unlocked user.
-     */
-    @Parcelize
-    data class VaultUnlockedForNewSend(
-        val sendType: SendItemType,
     ) : RootNavState()
 
     /**

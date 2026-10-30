@@ -57,9 +57,6 @@ import com.x8bit.bitwarden.ui.platform.composition.LocalCredentialProviderComple
 import com.x8bit.bitwarden.ui.platform.feature.search.model.SearchType
 import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.PinInputDialog
 import com.x8bit.bitwarden.ui.platform.manager.biometrics.BiometricsManager
-import com.x8bit.bitwarden.ui.tools.feature.send.addedit.AddEditSendRoute
-import com.x8bit.bitwarden.ui.tools.feature.send.addedit.ModeType
-import com.x8bit.bitwarden.ui.tools.feature.send.viewsend.ViewSendRoute
 import com.x8bit.bitwarden.ui.vault.components.VaultItemSelectionDialog
 import com.x8bit.bitwarden.ui.vault.feature.addedit.VaultAddEditArgs
 import com.x8bit.bitwarden.ui.vault.feature.item.VaultItemArgs
@@ -81,8 +78,6 @@ fun VaultItemListingScreen(
     onNavigateToVaultItemListing: (vaultItemListingType: VaultItemListingType) -> Unit,
     onNavigateToVaultAddItemScreen: (args: VaultAddEditArgs) -> Unit,
     onNavigateToAddFolder: (selectedFolderId: String?) -> Unit,
-    onNavigateToAddEditSendItem: (route: AddEditSendRoute) -> Unit,
-    onNavigateToViewSendItem: (route: ViewSendRoute) -> Unit,
     onNavigateToSearch: (searchType: SearchType) -> Unit,
     onNavigateToPlan: () -> Unit,
     intentManager: IntentManager = LocalIntentManager.current,
@@ -126,12 +121,6 @@ fun VaultItemListingScreen(
                 )
             }
 
-            is VaultItemListingEvent.NavigateToViewSendItem -> {
-                onNavigateToViewSendItem(
-                    ViewSendRoute(sendId = event.id, sendType = event.sendType),
-                )
-            }
-
             is VaultItemListingEvent.NavigateToEditCipher -> {
                 onNavigateToVaultEditItemScreen(
                     VaultAddEditArgs(
@@ -146,25 +135,6 @@ fun VaultItemListingScreen(
             }
 
             VaultItemListingEvent.NavigateToPlanModal -> onNavigateToPlan()
-
-            is VaultItemListingEvent.NavigateToAddSendItem -> {
-                onNavigateToAddEditSendItem(
-                    AddEditSendRoute(
-                        sendType = event.sendType,
-                        modeType = ModeType.ADD,
-                    ),
-                )
-            }
-
-            is VaultItemListingEvent.NavigateToEditSendItem -> {
-                onNavigateToAddEditSendItem(
-                    AddEditSendRoute(
-                        sendType = event.sendType,
-                        modeType = ModeType.EDIT,
-                        sendId = event.id,
-                    ),
-                )
-            }
 
             is VaultItemListingEvent.NavigateToSearchScreen -> {
                 onNavigateToSearch(event.searchType)
@@ -417,18 +387,6 @@ private fun VaultItemListingDialogs(
             )
         }
 
-        is VaultItemListingState.DialogState.FileTypeRequiresPremium -> {
-            BitwardenTwoButtonDialog(
-                title = stringResource(id = BitwardenString.premium_subscription_required),
-                message = stringResource(id = BitwardenString.send_file_premium_required),
-                confirmButtonText = stringResource(id = BitwardenString.upgrade_to_premium),
-                dismissButtonText = stringResource(id = BitwardenString.cancel),
-                onConfirmClick = vaultItemListingHandlers.upgradeToPremiumClick,
-                onDismissClick = vaultItemListingHandlers.dismissDialogRequest,
-                onDismissRequest = vaultItemListingHandlers.dismissDialogRequest,
-            )
-        }
-
         null -> Unit
     }
 }
@@ -522,8 +480,6 @@ private fun VaultItemListingScaffold(
                     state = state.viewState,
                     actionCard = state.actionCard,
                     showAddTotpBanner = state.isTotp,
-                    policyDisablesSend = state.policyDisablesSend &&
-                        state.itemListingType is VaultItemListingState.ItemListingType.Send,
                     vaultItemListingHandlers = vaultItemListingHandlers,
                     modifier = Modifier.fillMaxSize(),
                 )
@@ -532,8 +488,6 @@ private fun VaultItemListingScaffold(
             is VaultItemListingState.ViewState.NoItems -> {
                 VaultItemListingEmpty(
                     state = state.viewState,
-                    policyDisablesSend = state.policyDisablesSend &&
-                        state.itemListingType is VaultItemListingState.ItemListingType.Send,
                     addItemClickAction = vaultItemListingHandlers.addVaultItemClick,
                     modifier = Modifier.fillMaxSize(),
                 )

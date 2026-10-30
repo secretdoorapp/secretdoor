@@ -3,7 +3,6 @@ package com.x8bit.bitwarden.data.platform.manager.model
 import android.os.Parcelable
 import androidx.credentials.CredentialManager
 import com.bitwarden.cxf.model.ImportCredentialsRequestData
-import com.bitwarden.ui.platform.manager.share.model.ShareData
 import com.bitwarden.ui.platform.model.TotpData
 import com.x8bit.bitwarden.data.autofill.model.AutofillSaveItem
 import com.x8bit.bitwarden.data.autofill.model.AutofillSelectionData
@@ -25,15 +24,6 @@ sealed class SpecialCircumstance : Parcelable {
     @Parcelize
     data class AddTotpLoginItem(
         val data: TotpData,
-    ) : SpecialCircumstance()
-
-    /**
-     * The app was launched in order to create/share a new Send using the given [data].
-     */
-    @Parcelize
-    data class ShareNewSend(
-        val data: ShareData,
-        val shouldFinishWhenComplete: Boolean,
     ) : SpecialCircumstance()
 
     /**
@@ -116,12 +106,6 @@ sealed class SpecialCircumstance : Parcelable {
      */
     @Parcelize
     data object AccountSecurityShortcut : SpecialCircumstance()
-
-    /**
-     * Deeplink to the Send.
-     */
-    @Parcelize
-    data object SendShortcut : SpecialCircumstance()
 
     /**
      * Deeplink to the Search.

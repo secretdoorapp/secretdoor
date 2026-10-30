@@ -8,21 +8,6 @@ import org.junit.jupiter.api.Test
 class SearchTypeExtensionsTest {
 
     @Test
-    fun `toSearchTypeData should return Sends All when SearchType is Sends All`() {
-        assertEquals(SearchTypeData.Sends.All, SearchType.Sends.All.toSearchTypeData())
-    }
-
-    @Test
-    fun `toSearchTypeData should return Sends Files when SearchType is Sends Files`() {
-        assertEquals(SearchTypeData.Sends.Files, SearchType.Sends.Files.toSearchTypeData())
-    }
-
-    @Test
-    fun `toSearchTypeData should return Sends Texts when SearchType is Sends Texts`() {
-        assertEquals(SearchTypeData.Sends.Texts, SearchType.Sends.Texts.toSearchTypeData())
-    }
-
-    @Test
     fun `toSearchTypeData should return Vault All when SearchType is Vault All`() {
         assertEquals(SearchTypeData.Vault.All, SearchType.Vault.All.toSearchTypeData())
     }

@@ -37,10 +37,6 @@ class SpecialCircumstanceExtensionsTest {
                 autofillSelectionData = mockk(),
                 shouldFinishWhenComplete = true,
             ),
-            SpecialCircumstance.ShareNewSend(
-                data = mockk(),
-                shouldFinishWhenComplete = true,
-            ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
             SpecialCircumstance.PasswordlessRequest(
                 passwordlessRequestData = mockk(),
@@ -90,10 +86,6 @@ class SpecialCircumstanceExtensionsTest {
             SpecialCircumstance.AutofillSave(
                 autofillSaveItem = mockk(),
             ),
-            SpecialCircumstance.ShareNewSend(
-                data = mockk(),
-                shouldFinishWhenComplete = true,
-            ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
             SpecialCircumstance.PasswordlessRequest(
                 passwordlessRequestData = mockk(),
@@ -130,10 +122,6 @@ class SpecialCircumstanceExtensionsTest {
                 autofillSaveItem = mockk(),
             ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
-            SpecialCircumstance.ShareNewSend(
-                data = mockk(),
-                shouldFinishWhenComplete = true,
-            ),
             SpecialCircumstance.PasswordlessRequest(
                 passwordlessRequestData = mockk(),
                 shouldFinishWhenComplete = true,
@@ -197,10 +185,6 @@ class SpecialCircumstanceExtensionsTest {
             SpecialCircumstance.AutofillSave(
                 autofillSaveItem = mockk(),
             ),
-            SpecialCircumstance.ShareNewSend(
-                data = mockk(),
-                shouldFinishWhenComplete = true,
-            ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
             SpecialCircumstance.PasswordlessRequest(
                 passwordlessRequestData = mockk(),
@@ -245,10 +229,6 @@ class SpecialCircumstanceExtensionsTest {
             ),
             SpecialCircumstance.AutofillSave(
                 autofillSaveItem = mockk(),
-            ),
-            SpecialCircumstance.ShareNewSend(
-                data = mockk(),
-                shouldFinishWhenComplete = true,
             ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
             SpecialCircumstance.PasswordlessRequest(
@@ -295,10 +275,6 @@ class SpecialCircumstanceExtensionsTest {
             SpecialCircumstance.AutofillSave(
                 autofillSaveItem = mockk(),
             ),
-            SpecialCircumstance.ShareNewSend(
-                data = mockk(),
-                shouldFinishWhenComplete = true,
-            ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
             SpecialCircumstance.PasswordlessRequest(
                 passwordlessRequestData = mockk(),
@@ -335,7 +311,6 @@ class SpecialCircumstanceExtensionsTest {
         listOf(
             mockk<SpecialCircumstance.AutofillSelection>(),
             mockk<SpecialCircumstance.AutofillSave>(),
-            mockk<SpecialCircumstance.ShareNewSend>(),
             mockk<SpecialCircumstance.PasswordlessRequest>(),
             mockk<SpecialCircumstance.ProviderCreateCredential>(),
             mockk<SpecialCircumstance.Fido2Assertion>(),
@@ -376,10 +351,6 @@ class SpecialCircumstanceExtensionsTest {
             ),
             SpecialCircumstance.AutofillSave(
                 autofillSaveItem = mockk(),
-            ),
-            SpecialCircumstance.ShareNewSend(
-                data = mockk(),
-                shouldFinishWhenComplete = true,
             ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
             SpecialCircumstance.PasswordlessRequest(

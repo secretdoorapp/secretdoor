@@ -1741,7 +1741,6 @@ class VaultViewModel @Inject constructor(
             ),
             collectionViewList = emptyList(),
             folderViewList = emptyList(),
-            sendViewList = emptyList(),
         )
         updateVaultState(
             vaultData = data,

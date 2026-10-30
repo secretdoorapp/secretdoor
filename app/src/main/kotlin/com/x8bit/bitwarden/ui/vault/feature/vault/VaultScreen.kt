@@ -363,7 +363,6 @@ private fun VaultScreenScaffold(
                             BitwardenString.the_vault_protects_more_than_just_passwords,
                         ),
                         buttonText = stringResource(id = BitwardenString.add_login),
-                        policyDisablesSend = false,
                         addItemClickAction = {
                             vaultHandlers.addItemClickAction(CreateVaultItemType.LOGIN)
                         },

@@ -30,7 +30,6 @@ import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
 import com.x8bit.bitwarden.data.vault.manager.VaultMigrationManager
 import com.x8bit.bitwarden.data.vault.manager.model.VaultMigrationData
-import com.x8bit.bitwarden.ui.tools.feature.send.model.SendItemType
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -351,52 +350,6 @@ class RootNavViewModelTest : BaseViewModelTest() {
         val viewModel = createViewModel()
         assertEquals(
             RootNavState.VaultUnlocked(activeUserId = "activeUserId"),
-            viewModel.stateFlow.value,
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `when the active user has an unlocked vault but the is a ShareNewSend special circumstance the nav state should be VaultUnlockedForNewSend`() {
-        specialCircumstanceManager.specialCircumstance =
-            SpecialCircumstance.ShareNewSend(
-                data = mockk<ShareData.TextSend>(),
-                shouldFinishWhenComplete = true,
-            )
-        mutableUserStateFlow.tryEmit(
-            UserState(
-                activeUserId = "activeUserId",
-                accounts = listOf(
-                    UserState.Account(
-                        userId = "activeUserId",
-                        name = "name",
-                        email = "email",
-                        avatarColorHex = "avatarColorHex",
-                        environment = Environment.Prod.Us,
-                        isPremium = true,
-                        isPremiumFromSelf = true,
-                        isLoggedIn = true,
-                        isVaultUnlocked = true,
-                        needsPasswordReset = false,
-                        isBiometricsEnabled = false,
-                        organizations = emptyList(),
-                        needsMasterPassword = false,
-                        trustedDevice = null,
-                        hasMasterPassword = true,
-                        isUsingKeyConnector = false,
-                        onboardingStatus = OnboardingStatus.COMPLETE,
-                        firstTimeState = FirstTimeState(
-                            showImportLoginsCard = true,
-                        ),
-                        isExportable = true,
-                        creationDate = null,
-                    ),
-                ),
-            ),
-        )
-        val viewModel = createViewModel()
-        assertEquals(
-            RootNavState.VaultUnlockedForNewSend(sendType = SendItemType.TEXT),
             viewModel.stateFlow.value,
         )
     }
@@ -739,19 +692,6 @@ class RootNavViewModelTest : BaseViewModelTest() {
                 activeUserId = "activeUserId",
                 getCredentialsRequest = fido2GetCredentialsRequest,
             ),
-            viewModel.stateFlow.value,
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `when the active user has an unlocked vault but there is an SendShortcut special circumstance the nav state should be VaultUnlocked`() {
-        specialCircumstanceManager.specialCircumstance =
-            SpecialCircumstance.SendShortcut
-        mutableUserStateFlow.tryEmit(MOCK_VAULT_UNLOCKED_USER_STATE)
-        val viewModel = createViewModel()
-        assertEquals(
-            RootNavState.VaultUnlocked(activeUserId = "activeUserId"),
             viewModel.stateFlow.value,
         )
     }
@@ -1482,22 +1422,6 @@ class RootNavViewModelTest : BaseViewModelTest() {
                 activeUserId = "activeUserId",
                 type = AutofillSelectionData.Type.LOGIN,
             ),
-            viewModel.stateFlow.value,
-        )
-    }
-
-    @Test
-    fun `when migration required with ShareNewSend shortcut should show migration screen`() {
-        specialCircumstanceManager.specialCircumstance = SpecialCircumstance.ShareNewSend(
-            data = mockk<ShareData.TextSend>(),
-            shouldFinishWhenComplete = true,
-        )
-        mutableVaultMigrationDataStateFlow.value = MOCK_VAULT_MIGRATION_DATA
-        mutableUserStateFlow.tryEmit(MOCK_VAULT_UNLOCKED_USER_STATE)
-        val viewModel = createViewModel()
-
-        assertEquals(
-            RootNavState.MigrateToMyItems,
             viewModel.stateFlow.value,
         )
     }

@@ -6,9 +6,7 @@ import com.bitwarden.ui.platform.resource.BitwardenString
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.UserState
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
-import com.x8bit.bitwarden.data.platform.manager.model.EffectiveSendPolicy
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
 import io.mockk.every
 import io.mockk.just
@@ -33,11 +31,6 @@ class VaultUnlockedNavBarViewModelTest : BaseViewModelTest() {
     private val mutableSettingsBadgeCountFlow = MutableStateFlow(0)
     private val firstTimeActionManager: FirstTimeActionManager = mockk {
         every { allSettingsBadgeCountFlow } returns mutableSettingsBadgeCountFlow
-    }
-    private val mutableEffectiveSendPolicyFlow = MutableStateFlow(DEFAULT_EFFECTIVE_SEND_POLICY)
-    private val policyManager: PolicyManager = mockk {
-        every { getEffectiveSendPolicyFlow() } returns mutableEffectiveSendPolicyFlow
-        every { getEffectiveSendPolicy() } answers { mutableEffectiveSendPolicyFlow.value }
     }
 
     @Suppress("MaxLineLength")
@@ -134,7 +127,6 @@ class VaultUnlockedNavBarViewModelTest : BaseViewModelTest() {
         val expectedWithOrganizations = VaultUnlockedNavBarState(
             vaultNavBarLabelRes = BitwardenString.vaults,
             notificationState = DEFAULT_NOTIFICATION_STATE,
-            areSendsDisabled = false,
         )
         val accountWithoutOrganizations: UserState.Account = mockk {
             every { userId } returns activeUserId
@@ -143,7 +135,6 @@ class VaultUnlockedNavBarViewModelTest : BaseViewModelTest() {
         val expectedWithoutOrganizations = VaultUnlockedNavBarState(
             vaultNavBarLabelRes = BitwardenString.my_vault,
             notificationState = DEFAULT_NOTIFICATION_STATE,
-            areSendsDisabled = false,
         )
 
         val viewModel = createViewModel()
@@ -187,15 +178,6 @@ class VaultUnlockedNavBarViewModelTest : BaseViewModelTest() {
                 VaultUnlockedNavBarEvent.NavigateToVaultScreen(labelRes = BitwardenString.my_vault),
                 awaitItem(),
             )
-        }
-    }
-
-    @Test
-    fun `SendTabClick should navigate to the send screen`() = runTest {
-        val viewModel = createViewModel()
-        viewModel.eventFlow.test {
-            viewModel.trySendAction(VaultUnlockedNavBarAction.SendTabClick)
-            assertEquals(VaultUnlockedNavBarEvent.NavigateToSendScreen, awaitItem())
         }
     }
 
@@ -254,28 +236,6 @@ class VaultUnlockedNavBarViewModelTest : BaseViewModelTest() {
 
     @Suppress("MaxLineLength")
     @Test
-    fun `on init with SendShortcut special circumstance should navigate to the send screen with shortcut event`() =
-        runTest {
-            every {
-                specialCircumstancesManager.specialCircumstance
-            } returns SpecialCircumstance.SendShortcut
-
-            val viewModel = createViewModel()
-
-            viewModel.eventFlow.test {
-                assertEquals(
-                    VaultUnlockedNavBarEvent.Shortcut.NavigateToSendScreen,
-                    awaitItem(),
-                )
-            }
-            verify(exactly = 1) {
-                specialCircumstancesManager.specialCircumstance
-                specialCircumstancesManager.specialCircumstance = null
-            }
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
     fun `on init with VerificationCodeShortcut special circumstance should navigate to the Vault screen with shortcut event`() =
         runTest {
             every {
@@ -320,29 +280,11 @@ class VaultUnlockedNavBarViewModelTest : BaseViewModelTest() {
             }
         }
 
-    @Test
-    fun `effective send policy flow update should set areSendsDisabled to match disableSend`() =
-        runTest {
-            val viewModel = createViewModel()
-            viewModel.stateFlow.test {
-                assertEquals(DEFAULT_STATE.copy(areSendsDisabled = false), awaitItem())
-
-                mutableEffectiveSendPolicyFlow.emit(
-                    DEFAULT_EFFECTIVE_SEND_POLICY.copy(disableSend = true),
-                )
-                assertEquals(DEFAULT_STATE.copy(areSendsDisabled = true), awaitItem())
-
-                mutableEffectiveSendPolicyFlow.emit(DEFAULT_EFFECTIVE_SEND_POLICY)
-                assertEquals(DEFAULT_STATE.copy(areSendsDisabled = false), awaitItem())
-            }
-        }
-
     private fun createViewModel() =
         VaultUnlockedNavBarViewModel(
             authRepository = authRepository,
             specialCircumstancesManager = specialCircumstancesManager,
             firstTimeActionManager = firstTimeActionManager,
-            policyManager = policyManager,
         )
 }
 
@@ -353,14 +295,5 @@ private val DEFAULT_NOTIFICATION_STATE = VaultUnlockedNavBarNotificationState(
 private val DEFAULT_STATE = VaultUnlockedNavBarState(
     vaultNavBarLabelRes = BitwardenString.my_vault,
     notificationState = DEFAULT_NOTIFICATION_STATE,
-    areSendsDisabled = false,
 )
 
-private val DEFAULT_EFFECTIVE_SEND_POLICY = EffectiveSendPolicy(
-    allowedDomains = null,
-    allowedSendTypes = null,
-    deletionHours = null,
-    disableHideEmail = false,
-    disableSend = false,
-    whoCanAccess = null,
-)

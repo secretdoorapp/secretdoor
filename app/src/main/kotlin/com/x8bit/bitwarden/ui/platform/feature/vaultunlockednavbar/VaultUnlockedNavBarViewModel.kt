@@ -8,13 +8,11 @@ import com.bitwarden.ui.platform.resource.BitwardenString
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.UserState
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
 import com.x8bit.bitwarden.ui.platform.feature.vaultunlockednavbar.model.VaultUnlockedNavBarTab
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
@@ -27,14 +25,12 @@ class VaultUnlockedNavBarViewModel @Inject constructor(
     authRepository: AuthRepository,
     specialCircumstancesManager: SpecialCircumstanceManager,
     firstTimeActionManager: FirstTimeActionManager,
-    policyManager: PolicyManager,
 ) : BaseViewModel<VaultUnlockedNavBarState, VaultUnlockedNavBarEvent, VaultUnlockedNavBarAction>(
     initialState = VaultUnlockedNavBarState(
         vaultNavBarLabelRes = BitwardenString.my_vault,
         notificationState = VaultUnlockedNavBarNotificationState(
             settingsTabNotificationCount = firstTimeActionManager.allSettingsBadgeCountFlow.value,
         ),
-        areSendsDisabled = policyManager.getEffectiveSendPolicy().disableSend,
     ),
 ) {
     init {
@@ -50,12 +46,6 @@ class VaultUnlockedNavBarViewModel @Inject constructor(
             .onEach {
                 sendAction(VaultUnlockedNavBarAction.Internal.SettingsNotificationCountUpdate(it))
             }
-            .launchIn(viewModelScope)
-
-        policyManager
-            .getEffectiveSendPolicyFlow()
-            .map { VaultUnlockedNavBarAction.Internal.SendPolicyUpdateReceive(it.disableSend) }
-            .onEach(::sendAction)
             .launchIn(viewModelScope)
 
         when (specialCircumstancesManager.specialCircumstance) {
@@ -75,11 +65,6 @@ class VaultUnlockedNavBarViewModel @Inject constructor(
 
             SpecialCircumstance.AccountSecurityShortcut -> {
                 sendEvent(VaultUnlockedNavBarEvent.Shortcut.NavigateToSettingsScreen)
-            }
-
-            SpecialCircumstance.SendShortcut -> {
-                sendEvent(VaultUnlockedNavBarEvent.Shortcut.NavigateToSendScreen)
-                specialCircumstancesManager.specialCircumstance = null
             }
 
             is SpecialCircumstance.SearchShortcut -> {
@@ -105,7 +90,6 @@ class VaultUnlockedNavBarViewModel @Inject constructor(
     override fun handleAction(action: VaultUnlockedNavBarAction) {
         when (action) {
             VaultUnlockedNavBarAction.GeneratorTabClick -> handleGeneratorTabClicked()
-            VaultUnlockedNavBarAction.SendTabClick -> handleSendTabClicked()
             VaultUnlockedNavBarAction.SettingsTabClick -> handleSettingsTabClicked()
             VaultUnlockedNavBarAction.VaultTabClick -> handleVaultTabClicked()
             is VaultUnlockedNavBarAction.Internal -> handleInternalAction(action)
@@ -121,10 +105,6 @@ class VaultUnlockedNavBarViewModel @Inject constructor(
             is VaultUnlockedNavBarAction.Internal.SettingsNotificationCountUpdate -> {
                 handleSettingsNotificationCountUpdate(action)
             }
-
-            is VaultUnlockedNavBarAction.Internal.SendPolicyUpdateReceive -> {
-                handleSendPolicyUpdateReceive(action)
-            }
         }
     }
     // #region BottomTabViewModel Action Handlers
@@ -133,13 +113,6 @@ class VaultUnlockedNavBarViewModel @Inject constructor(
      */
     private fun handleGeneratorTabClicked() {
         sendEvent(VaultUnlockedNavBarEvent.NavigateToGeneratorScreen)
-    }
-
-    /**
-     * Attempts to send [VaultUnlockedNavBarEvent.NavigateToSendScreen] event
-     */
-    private fun handleSendTabClicked() {
-        sendEvent(VaultUnlockedNavBarEvent.NavigateToSendScreen)
     }
 
     /**
@@ -189,12 +162,6 @@ class VaultUnlockedNavBarViewModel @Inject constructor(
             )
         }
     }
-
-    private fun handleSendPolicyUpdateReceive(
-        action: VaultUnlockedNavBarAction.Internal.SendPolicyUpdateReceive,
-    ) {
-        mutableStateFlow.update { it.copy(areSendsDisabled = action.hasPolicy) }
-    }
     // #endregion BottomTabViewModel Action Handlers
 }
 
@@ -204,7 +171,6 @@ class VaultUnlockedNavBarViewModel @Inject constructor(
 data class VaultUnlockedNavBarState(
     @field:StringRes val vaultNavBarLabelRes: Int,
     val notificationState: VaultUnlockedNavBarNotificationState,
-    val areSendsDisabled: Boolean,
 )
 
 /**
@@ -222,11 +188,6 @@ sealed class VaultUnlockedNavBarAction {
      * Click Generator tab.
      */
     data object GeneratorTabClick : VaultUnlockedNavBarAction()
-
-    /**
-     * Click Send tab.
-     */
-    data object SendTabClick : VaultUnlockedNavBarAction()
 
     /**
      * Click Vault tab.
@@ -251,11 +212,6 @@ sealed class VaultUnlockedNavBarAction {
          * Indicates a change to the count of settings notifications to show
          */
         data class SettingsNotificationCountUpdate(val count: Int) : Internal()
-
-        /**
-         * Indicates a change to the count of settings notifications to show
-         */
-        data class SendPolicyUpdateReceive(val hasPolicy: Boolean) : Internal()
     }
 }
 
@@ -274,13 +230,6 @@ sealed class VaultUnlockedNavBarEvent {
      */
     data object NavigateToGeneratorScreen : VaultUnlockedNavBarEvent() {
         override val tab: VaultUnlockedNavBarTab = VaultUnlockedNavBarTab.Generator
-    }
-
-    /**
-     * Navigate to the Send screen.
-     */
-    data object NavigateToSendScreen : VaultUnlockedNavBarEvent() {
-        override val tab: VaultUnlockedNavBarTab = VaultUnlockedNavBarTab.Send
     }
 
     /**
@@ -329,13 +278,6 @@ sealed class VaultUnlockedNavBarEvent {
          */
         data object NavigateToSettingsScreen : Shortcut() {
             override val tab: VaultUnlockedNavBarTab = VaultUnlockedNavBarTab.Settings()
-        }
-
-        /**
-         * Navigate to the Send Screen.
-         */
-        data object NavigateToSendScreen : Shortcut() {
-            override val tab: VaultUnlockedNavBarTab = VaultUnlockedNavBarTab.Send
         }
     }
 }

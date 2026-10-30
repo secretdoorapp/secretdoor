@@ -43,16 +43,6 @@ class AppResumeManagerTest {
     )
 
     @Test
-    fun `setResumeScreen should update the app resume screen in the settings disk source`() =
-        runTest {
-            val expectedValue = AppResumeScreenData.SendScreen
-            appResumeManager.setResumeScreen(expectedValue)
-            val actualValue = fakeSettingsDiskSource.getAppResumeScreen(USER_ID)
-
-            assertEquals(expectedValue, actualValue)
-        }
-
-    @Test
     fun `getResumeScreen should return null when there is no app resume screen saved`() =
         runTest {
             val actualValue = appResumeManager.getResumeScreen()
@@ -93,20 +83,6 @@ class AppResumeManagerTest {
             )
             fakeAuthDiskSource.storeLastLockTimestamp(USER_ID, fixedClock.instant())
             val expectedValue = SpecialCircumstance.GeneratorShortcut
-            val actualValue = appResumeManager.getResumeSpecialCircumstance()
-            assertEquals(expectedValue, actualValue)
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `getResumeSpecialCircumstance should return SendShortcut when the resume screen is SendScreen`() =
-        runTest {
-            fakeSettingsDiskSource.storeAppResumeScreen(
-                userId = USER_ID,
-                screenData = AppResumeScreenData.SendScreen,
-            )
-            fakeAuthDiskSource.storeLastLockTimestamp(USER_ID, fixedClock.instant())
-            val expectedValue = SpecialCircumstance.SendShortcut
             val actualValue = appResumeManager.getResumeSpecialCircumstance()
             assertEquals(expectedValue, actualValue)
         }

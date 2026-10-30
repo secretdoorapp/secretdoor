@@ -268,7 +268,6 @@ class PremiumStateManagerTest {
                     ),
                     collectionViewList = emptyList(),
                     folderViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             val manager = createManager()
@@ -291,7 +290,6 @@ class PremiumStateManagerTest {
                     ),
                     collectionViewList = emptyList(),
                     folderViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             val manager = createManager()
@@ -1179,7 +1177,6 @@ private fun createVaultDataWithItemCount(count: Int): VaultData = VaultData(
     ),
     collectionViewList = emptyList(),
     folderViewList = emptyList(),
-    sendViewList = emptyList(),
 )
 
 private const val ACTIVE_USER_ID = "activeUserId"

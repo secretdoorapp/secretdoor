@@ -9,7 +9,6 @@ import com.bitwarden.ui.platform.resource.BitwardenString
 import com.x8bit.bitwarden.ui.platform.base.BitwardenComposeTest
 import com.x8bit.bitwarden.ui.platform.feature.settings.SettingsGraphRoute
 import com.x8bit.bitwarden.ui.tools.feature.generator.GeneratorGraphRoute
-import com.x8bit.bitwarden.ui.tools.feature.send.SendGraphRoute
 import com.x8bit.bitwarden.ui.vault.feature.vault.VaultGraphRoute
 import io.mockk.every
 import io.mockk.mockk
@@ -47,15 +46,12 @@ class VaultUnlockedNavBarScreenTest : BitwardenComposeTest() {
                 onNavigateToVaultAddItem = {},
                 onNavigateToVaultItem = {},
                 onNavigateToVaultEditItem = {},
-                onNavigateToAddEditSend = {},
-                onNavigateToViewSend = {},
                 onNavigateToDeleteAccount = {},
                 onNavigateToExportVault = {},
                 onNavigateToFolders = {},
                 onNavigateToPasswordHistory = {},
                 onNavigateToPendingRequests = {},
                 onNavigateToSearchVault = {},
-                onNavigateToSearchSend = {},
                 onNavigateToSetupAutoFillScreen = {},
                 onNavigateToSetupBrowserAutofill = {},
                 onNavigateToSetupUnlockScreen = {},
@@ -121,23 +117,6 @@ class VaultUnlockedNavBarScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `send tab click should send SendTabClick action`() {
-        composeTestRule.onNodeWithText(text = "Send").performClick()
-        verify { viewModel.trySendAction(VaultUnlockedNavBarAction.SendTabClick) }
-    }
-
-    @Test
-    fun `NavigateToSendScreen should navigate to SendScreen`() {
-        mutableEventFlow.tryEmit(VaultUnlockedNavBarEvent.NavigateToSendScreen)
-        composeTestRule.runOnIdle {
-            mockNavHostController.navigate(
-                route = SendGraphRoute,
-                navOptions = expectedNavOptions,
-            )
-        }
-    }
-
-    @Test
     fun `generator tab click should send GeneratorTabClick action`() {
         composeTestRule.onNodeWithText(text = "Generator").performClick()
         verify { viewModel.trySendAction(VaultUnlockedNavBarAction.GeneratorTabClick) }
@@ -166,12 +145,6 @@ class VaultUnlockedNavBarScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `settings tab click should send SendTabClick action`() {
-        composeTestRule.onNodeWithText(text = "Settings").performClick()
-        verify { viewModel.trySendAction(VaultUnlockedNavBarAction.SettingsTabClick) }
-    }
-
-    @Test
     fun `NavigateToSettingsScreen should navigate to SettingsScreen`() {
         mutableEventFlow.tryEmit(VaultUnlockedNavBarEvent.NavigateToSettingsScreen)
         composeTestRule.runOnIdle {
@@ -193,21 +166,11 @@ class VaultUnlockedNavBarScreenTest : BitwardenComposeTest() {
                 notificationState = VaultUnlockedNavBarNotificationState(
                     settingsTabNotificationCount = 0,
                 ),
-                areSendsDisabled = false,
             ),
         )
 
         composeTestRule.onNodeWithText(text = "My vault").assertDoesNotExist()
         composeTestRule.onNodeWithText(text = "Vaults").assertExists()
-    }
-
-    @Test
-    fun `send tab should be hidden when areSendsDisabled is true`() {
-        composeTestRule.onNodeWithText(text = "Send").assertExists()
-
-        mutableStateFlow.update { it.copy(areSendsDisabled = true) }
-
-        composeTestRule.onNodeWithText(text = "Send").assertDoesNotExist()
     }
 
     @Suppress("MaxLineLength")
@@ -242,5 +205,4 @@ private val DEFAULT_STATE = VaultUnlockedNavBarState(
     notificationState = VaultUnlockedNavBarNotificationState(
         settingsTabNotificationCount = 0,
     ),
-    areSendsDisabled = false,
 )

@@ -6,8 +6,6 @@ import androidx.annotation.DrawableRes
 import com.bitwarden.collections.CollectionView
 import com.bitwarden.core.data.repository.util.SpecialCharWithPrecedenceComparator
 import com.bitwarden.core.data.util.toFormattedDateTimeStyle
-import com.bitwarden.send.SendType
-import com.bitwarden.send.SendView
 import com.bitwarden.ui.platform.base.util.removeDiacritics
 import com.bitwarden.ui.platform.components.icon.model.IconData
 import com.bitwarden.ui.platform.resource.BitwardenDrawable
@@ -24,8 +22,6 @@ import com.x8bit.bitwarden.data.platform.util.isActive
 import com.x8bit.bitwarden.ui.platform.feature.search.SearchState
 import com.x8bit.bitwarden.ui.platform.feature.search.SearchTypeData
 import com.x8bit.bitwarden.ui.platform.feature.search.model.AutofillSelectionOption
-import com.x8bit.bitwarden.ui.tools.feature.send.util.toLabelIcons
-import com.x8bit.bitwarden.ui.tools.feature.send.util.toOverflowActions
 import com.x8bit.bitwarden.ui.vault.feature.util.toLabelIcons
 import com.x8bit.bitwarden.ui.vault.feature.util.toOverflowActions
 import com.x8bit.bitwarden.ui.vault.feature.vault.util.toLoginIconData
@@ -58,9 +54,6 @@ fun SearchTypeData.updateWithAdditionalDataIfNecessary(
                 .orEmpty(),
         )
 
-        SearchTypeData.Sends.All -> this
-        SearchTypeData.Sends.Files -> this
-        SearchTypeData.Sends.Texts -> this
         SearchTypeData.Vault.All -> this
         SearchTypeData.Vault.Archive -> this
         SearchTypeData.Vault.Cards -> this
@@ -80,10 +73,7 @@ fun SearchTypeData.updateWithAdditionalDataIfNecessary(
  * The semantic test tag to use for the search item.
  */
 val SearchTypeData.searchItemTestTag: String
-    get() = when (this) {
-        is SearchTypeData.Sends -> "SendCell"
-        is SearchTypeData.Vault -> "CipherCell"
-    }
+    get() = "CipherCell"
 
 /**
  * Filters out any [CipherView]s that do not adhere to the [searchTypeData] and [searchTerm] and
@@ -99,17 +89,17 @@ fun List<CipherListView>.filterAndOrganize(
         this
             .filter { it.filterBySearchType(searchTypeData) }
             .groupBy { it.matchedSearch(searchTerm) }
-            .flatMap { (priority, sends) ->
+            .flatMap { (priority, ciphers) ->
                 when (priority) {
-                    SortPriority.HIGH -> sends.sortedBy { it.name }
-                    SortPriority.LOW -> sends.sortedBy { it.name }
+                    SortPriority.HIGH -> ciphers.sortedBy { it.name }
+                    SortPriority.LOW -> ciphers.sortedBy { it.name }
                     null -> emptyList()
                 }
             }
     }
 
 /**
- * Determines a predicate to filter a list of [SendView] based on the [SearchTypeData.Sends].
+ * Determines a predicate to filter a list of [CipherListView] based on the [SearchTypeData.Vault].
  */
 private fun CipherListView.filterBySearchType(
     searchTypeData: SearchTypeData.Vault,
@@ -292,128 +282,6 @@ private val CipherListViewType.iconRes: Int
         CipherListViewType.DriversLicense -> BitwardenDrawable.ic_note
         CipherListViewType.Passport -> BitwardenDrawable.ic_passport
     }
-
-/**
- * Filters out any [SendView]s that do not adhere to the [searchTypeData] and [searchTerm] and
- * sorts the remaining items.
- */
-fun List<SendView>.filterAndOrganize(
-    searchTypeData: SearchTypeData.Sends,
-    searchTerm: String,
-): List<SendView> =
-    if (searchTerm.isBlank()) {
-        emptyList()
-    } else {
-        this
-            .filter { it.filterBySearchType(searchTypeData) }
-            .groupBy { it.matchedSearch(searchTerm) }
-            .flatMap { (priority, sends) ->
-                when (priority) {
-                    SortPriority.HIGH -> sends.sortedBy { it.name }
-                    SortPriority.LOW -> sends.sortedBy { it.name }
-                    null -> emptyList()
-                }
-            }
-    }
-
-/**
- * Determines a predicate to filter a list of [SendView] based on the [SearchTypeData.Sends].
- */
-private fun SendView.filterBySearchType(
-    searchTypeData: SearchTypeData.Sends,
-): Boolean =
-    when (searchTypeData) {
-        SearchTypeData.Sends.All -> true
-        is SearchTypeData.Sends.Files -> type == SendType.FILE
-        is SearchTypeData.Sends.Texts -> type == SendType.TEXT
-    }
-
-/**
- * Determines the priority of a given [SendView] based on the [searchTerm]. Null indicates that
- * this item should be removed from the list.
- */
-private fun SendView.matchedSearch(searchTerm: String): SortPriority? {
-    val term = searchTerm.removeDiacritics()
-    val sendName = name.removeDiacritics()
-    val sendText = text?.text.orEmpty().removeDiacritics()
-    val sendFileName = file?.fileName.orEmpty().removeDiacritics()
-    return when {
-        sendName.contains(other = term, ignoreCase = true) -> SortPriority.HIGH
-        sendText.contains(other = term, ignoreCase = true) -> SortPriority.LOW
-        sendFileName.contains(other = term, ignoreCase = true) -> SortPriority.LOW
-        else -> null
-    }
-}
-
-/**
- * Transforms a list of [SendView] into [SearchState.ViewState].
- */
-fun List<SendView>.toViewState(
-    searchTerm: String,
-    baseWebSendUrl: String,
-    clock: Clock,
-): SearchState.ViewState =
-    when {
-        searchTerm.isEmpty() -> SearchState.ViewState.Empty(message = null)
-        isNotEmpty() -> {
-            SearchState.ViewState.Content(
-                displayItems = toDisplayItemList(
-                    baseWebSendUrl = baseWebSendUrl,
-                    clock = clock,
-                ),
-            )
-        }
-
-        else -> {
-            SearchState.ViewState.Empty(
-                message = BitwardenString.there_are_no_items_that_match_the_search.asText(),
-            )
-        }
-    }
-
-private fun List<SendView>.toDisplayItemList(
-    baseWebSendUrl: String,
-    clock: Clock,
-): ImmutableList<SearchState.DisplayItem> =
-    this
-        .map {
-            it.toDisplayItem(
-                baseWebSendUrl = baseWebSendUrl,
-                clock = clock,
-            )
-        }
-        .sortAlphabetically()
-        .toImmutableList()
-
-private fun SendView.toDisplayItem(
-    baseWebSendUrl: String,
-    clock: Clock,
-): SearchState.DisplayItem =
-    SearchState.DisplayItem(
-        id = id.orEmpty(),
-        title = name,
-        titleTestTag = "SendNameLabel",
-        subtitle = deletionDate.toFormattedDateTimeStyle(
-            dateStyle = FormatStyle.MEDIUM,
-            timeStyle = FormatStyle.SHORT,
-            clock = clock,
-        ),
-        subtitleTestTag = "SendDateLabel",
-        iconData = IconData.Local(
-            iconRes = when (type) {
-                SendType.TEXT -> BitwardenDrawable.ic_file_text
-                SendType.FILE -> BitwardenDrawable.ic_file
-                SendType.ITEM -> TODO("[PM-41095] Support Item SendType")
-            },
-        ),
-        extraIconList = toLabelIcons(clock = clock),
-        overflowOptions = toOverflowActions(baseWebSendUrl = baseWebSendUrl),
-        overflowTestTag = "SendOptionsButton",
-        totpCode = null,
-        autofillSelectionOptions = persistentListOf(),
-        shouldDisplayMasterPasswordReprompt = false,
-        itemType = SearchState.DisplayItem.ItemType.Sends(type = this.type),
-    )
 
 /**
  * Sort a list of [SearchState.DisplayItem] by their titles alphabetically giving digits and

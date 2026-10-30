@@ -12,7 +12,6 @@ import com.bitwarden.cxf.util.getProviderImportCredentialsRequest
 import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.feature.settings.appearance.model.AppLanguage
 import com.bitwarden.ui.platform.feature.settings.appearance.model.AppTheme
-import com.bitwarden.ui.platform.manager.share.ShareManager
 import com.bitwarden.ui.platform.model.TotpData
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.vault.CipherView
@@ -84,7 +83,6 @@ class MainViewModel @Inject constructor(
     private val specialCircumstanceManager: SpecialCircumstanceManager,
     private val garbageCollectionManager: GarbageCollectionManager,
     private val credentialProviderRequestManager: CredentialProviderRequestManager,
-    private val shareManager: ShareManager,
     private val settingsRepository: SettingsRepository,
     private val featureFlagManager: FeatureFlagManager,
     private val vaultRepository: VaultRepository,
@@ -338,7 +336,6 @@ class MainViewModel @Inject constructor(
         val passwordlessRequestData = intent.getPasswordlessRequestDataIntentOrNull()
         val autofillSaveItem = intent.getAutofillSaveItemOrNull()
         val autofillSelectionData = intent.getAutofillSelectionDataOrNull()
-        val shareData = shareManager.getShareDataOrNull(intent = intent)
         val totpData: TotpData? =
             // First grab TOTP URI directly from the intent data:
             intent.getTotpDataOrNull()
@@ -406,16 +403,6 @@ class MainViewModel @Inject constructor(
             totpData != null -> {
                 specialCircumstanceManager.specialCircumstance =
                     SpecialCircumstance.AddTotpLoginItem(data = totpData)
-            }
-
-            shareData != null -> {
-                specialCircumstanceManager.specialCircumstance =
-                    SpecialCircumstance.ShareNewSend(
-                        data = shareData,
-                        // Allow users back into the already-running app when completing the
-                        // Send task when this is not the first intent.
-                        shouldFinishWhenComplete = isFirstIntent,
-                    )
             }
 
             hasPremiumCheckoutCallback -> {

@@ -20,7 +20,6 @@ import com.x8bit.bitwarden.ui.platform.feature.premium.plan.navigateToPlanModal
 import com.x8bit.bitwarden.ui.platform.feature.premium.plan.planModalDestination
 import com.x8bit.bitwarden.ui.platform.feature.premium.upgraded.navigateToUpgradedToPremium
 import com.x8bit.bitwarden.ui.platform.feature.premium.upgraded.upgradedToPremiumDestination
-import com.x8bit.bitwarden.ui.platform.feature.search.SearchRoute
 import com.x8bit.bitwarden.ui.platform.feature.search.navigateToSearch
 import com.x8bit.bitwarden.ui.platform.feature.search.searchDestination
 import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.deleteaccount.deleteAccountDestination
@@ -53,10 +52,6 @@ import com.x8bit.bitwarden.ui.tools.feature.generator.model.GeneratorPasswordHis
 import com.x8bit.bitwarden.ui.tools.feature.generator.navigateToGeneratorModal
 import com.x8bit.bitwarden.ui.tools.feature.generator.passwordhistory.navigateToPasswordHistory
 import com.x8bit.bitwarden.ui.tools.feature.generator.passwordhistory.passwordHistoryDestination
-import com.x8bit.bitwarden.ui.tools.feature.send.addedit.addEditSendDestination
-import com.x8bit.bitwarden.ui.tools.feature.send.addedit.navigateToAddEditSend
-import com.x8bit.bitwarden.ui.tools.feature.send.viewsend.navigateToViewSend
-import com.x8bit.bitwarden.ui.tools.feature.send.viewsend.viewSendDestination
 import com.x8bit.bitwarden.ui.vault.feature.addedit.VaultAddEditRoute
 import com.x8bit.bitwarden.ui.vault.feature.addedit.navigateToVaultAddEdit
 import com.x8bit.bitwarden.ui.vault.feature.addedit.vaultAddEditDestination
@@ -124,9 +119,6 @@ fun NavGraphBuilder.vaultUnlockedGraph(
             onNavigateToVaultItem = { navController.navigateToVaultItem(it) },
             onNavigateToVaultEditItem = { navController.navigateToVaultAddEdit(it) },
             onNavigateToSearchVault = { navController.navigateToSearch(searchType = it) },
-            onNavigateToSearchSend = { navController.navigateToSearch(searchType = it) },
-            onNavigateToAddEditSend = { navController.navigateToAddEditSend(it) },
-            onNavigateToViewSend = { navController.navigateToViewSend(route = it) },
             onNavigateToDeleteAccount = { navController.navigateToDeleteAccount() },
             onNavigateToPendingRequests = { navController.navigateToPendingRequests() },
             onNavigateToManageDevices = { navController.navigateToManageDevices() },
@@ -258,16 +250,6 @@ fun NavGraphBuilder.vaultUnlockedGraph(
             onNavigateBack = { navController.popBackStack() },
         )
 
-        addEditSendDestination(
-            onNavigateBack = { navController.popBackStack() },
-            onNavigateUpToSearchOrRoot = { navController.navigateUpToSearchOrVaultUnlockedRoot() },
-            onNavigateToGeneratorModal = { navController.navigateToGeneratorModal(mode = it) },
-            onNavigateToPlan = { navController.navigateToPlanModal() },
-        )
-        viewSendDestination(
-            onNavigateBack = { navController.popBackStack() },
-            onNavigateToAddEditSend = { navController.navigateToAddEditSend(it) },
-        )
         passwordHistoryDestination(onNavigateBack = { navController.popBackStack() })
         exportVaultDestination(onNavigateBack = { navController.popBackStack() })
         foldersDestination(
@@ -286,8 +268,6 @@ fun NavGraphBuilder.vaultUnlockedGraph(
         generatorModalDestination(onNavigateBack = { navController.popBackStack() })
         searchDestination(
             onNavigateBack = { navController.popBackStack() },
-            onNavigateToAddEditSend = { navController.navigateToAddEditSend(it) },
-            onNavigateToViewSend = { navController.navigateToViewSend(it) },
             onNavigateToEditCipher = { navController.navigateToVaultAddEdit(it) },
             onNavigateToViewCipher = { navController.navigateToVaultItem(it) },
             onNavigateToPlan = { navController.navigateToPlanModal() },
@@ -330,14 +310,4 @@ fun NavGraphBuilder.vaultUnlockedGraph(
             },
         )
     }
-}
-
-private fun NavController.navigateUpToSearchOrVaultUnlockedRoot() {
-    if (!this.popBackStack<SearchRoute>(inclusive = false)) {
-        this.navigateUpToVaultUnlockedRoot()
-    }
-}
-
-private fun NavController.navigateUpToVaultUnlockedRoot() {
-    this.popBackStack<VaultUnlockedNavbarRoute>(inclusive = false)
 }

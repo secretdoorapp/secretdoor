@@ -24,7 +24,6 @@ import com.bitwarden.network.model.createMockCipher
 import com.bitwarden.network.model.createMockFolder
 import com.bitwarden.network.model.createMockOrganizationKeys
 import com.bitwarden.sdk.Fido2CredentialStore
-import com.bitwarden.send.SendView
 import com.bitwarden.vault.CipherListViewType
 import com.bitwarden.vault.CipherType
 import com.bitwarden.vault.CipherView
@@ -48,8 +47,6 @@ import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockCardListVie
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockCipherListView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockLoginListView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkFolder
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkSend
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSendView
 import com.x8bit.bitwarden.data.vault.manager.CredentialExchangeImportManager
 import com.x8bit.bitwarden.data.vault.manager.PinProtectedUserKeyManager
 import com.x8bit.bitwarden.data.vault.manager.TotpCodeManager
@@ -62,7 +59,6 @@ import com.x8bit.bitwarden.data.vault.repository.model.DomainsData
 import com.x8bit.bitwarden.data.vault.repository.model.ExportVaultDataResult
 import com.x8bit.bitwarden.data.vault.repository.model.GenerateTotpResult
 import com.x8bit.bitwarden.data.vault.repository.model.ImportCredentialsResult
-import com.x8bit.bitwarden.data.vault.repository.model.SendData
 import com.x8bit.bitwarden.data.vault.repository.model.VaultData
 import com.x8bit.bitwarden.data.vault.repository.model.VaultUnlockResult
 import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkCipher
@@ -116,14 +112,12 @@ class VaultRepositoryTest {
         MutableStateFlow<DataState<DomainsData>>(DataState.Loading)
     private val mutableFoldersStateFlow =
         MutableStateFlow<DataState<List<FolderView>>>(DataState.Loading)
-    private val mutableSendDataStateFlow = MutableStateFlow<DataState<SendData>>(DataState.Loading)
     private val vaultSyncManager: VaultSyncManager = mockk {
         every { vaultDataStateFlow } returns mutableVaultDataStateFlow
         every { collectionsStateFlow } returns mutableCollectionsStateFlow
         every { decryptCipherListResultStateFlow } returns mutableDecryptCipherListResultStateFlow
         every { domainsStateFlow } returns mutableDomainsStateFlow
         every { foldersStateFlow } returns mutableFoldersStateFlow
-        every { sendDataStateFlow } returns mutableSendDataStateFlow
     }
     private val credentialExchangeImportManager: CredentialExchangeImportManager = mockk()
     private val pinProtectedUserKeyManager: PinProtectedUserKeyManager = mockk {
@@ -147,7 +141,6 @@ class VaultRepositoryTest {
         totpCodeManager = totpCodeManager,
         cipherManager = mockk(),
         folderManager = mockk(),
-        sendManager = mockk(),
         vaultSyncManager = vaultSyncManager,
         credentialExchangeImportManager = credentialExchangeImportManager,
         pinProtectedUserKeyManager = pinProtectedUserKeyManager,
@@ -1191,48 +1184,6 @@ class VaultRepositoryTest {
         }
 
     @Test
-    fun `getSendStateFlow should update emit SendView when present`() = runTest {
-        val sendId = 1
-        fakeAuthDiskSource.userState = MOCK_USER_STATE
-        val sendView = createMockSendView(number = sendId)
-
-        vaultRepository.getSendStateFlow("mockId-$sendId").test {
-            assertEquals(DataState.Loading, awaitItem())
-            mutableSendDataStateFlow.value = DataState.Loaded(SendData(emptyList()))
-            assertEquals(DataState.Loaded<SendView?>(null), awaitItem())
-            mutableSendDataStateFlow.value = DataState.Loaded(SendData(listOf(sendView)))
-            assertEquals(DataState.Loaded<SendView?>(sendView), awaitItem())
-        }
-    }
-
-    @Test
-    fun `getSendStateFlow should update to NoNetwork when NoNetwork value is emitted`() =
-        runTest {
-            val sendId = 1234
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-
-            vaultRepository.getSendStateFlow("mockId-$sendId").test {
-                assertEquals(DataState.Loading, awaitItem())
-                mutableSendDataStateFlow.value = DataState.NoNetwork()
-                assertEquals(DataState.NoNetwork<SendView?>(), awaitItem())
-            }
-        }
-
-    @Test
-    fun `getSendStateFlow should update to Error when an error is emitted`() =
-        runTest {
-            val sendId = 1234
-            val throwable = Throwable("Fail")
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-
-            vaultRepository.getSendStateFlow("mockId-$sendId").test {
-                assertEquals(DataState.Loading, awaitItem())
-                mutableSendDataStateFlow.value = DataState.Error(throwable)
-                assertEquals(DataState.Error<SendView?>(throwable), awaitItem())
-            }
-        }
-
-    @Test
     fun `generateTotp with no active user should return GenerateTotpResult Error`() =
         runTest {
             fakeAuthDiskSource.userState = null
@@ -1500,7 +1451,6 @@ class VaultRepositoryTest {
                     ),
                     collectionViewList = emptyList(),
                     folderViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
 
@@ -1545,7 +1495,6 @@ class VaultRepositoryTest {
                 ),
                 collectionViewList = emptyList(),
                 folderViewList = emptyList(),
-                sendViewList = emptyList(),
             ),
         )
 
@@ -1899,12 +1848,6 @@ class VaultRepositoryTest {
         coEvery {
             vaultSyncManager.syncForResult(forced = any())
         } returns SyncVaultDataResult.Success(itemsAvailable = true)
-        coEvery {
-            vaultSdkSource.decryptSendList(
-                userId = userId,
-                sendList = listOf(createMockSdkSend(number = 1)),
-            )
-        } returns listOf(createMockSendView(number = 1)).asSuccess()
         fakeAuthDiskSource.storeAccountCryptographicState(
             userId = userId,
             accountCryptographicState = MOCK_ACCOUNT_CRYPTOGRAPHIC_STATE,

@@ -20,8 +20,6 @@ import androidx.core.net.toUri
 import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
 import com.bitwarden.data.repository.model.Environment
 import com.bitwarden.data.repository.util.baseIconUrl
-import com.bitwarden.data.repository.util.baseWebSendUrl
-import com.bitwarden.send.SendType
 import com.bitwarden.ui.platform.base.util.toHostOrPathOrNull
 import com.bitwarden.ui.platform.components.account.model.AccountSummary
 import com.bitwarden.ui.platform.components.icon.model.IconData
@@ -59,10 +57,6 @@ import com.x8bit.bitwarden.ui.platform.base.BitwardenComposeTest
 import com.x8bit.bitwarden.ui.platform.feature.search.model.SearchType
 import com.x8bit.bitwarden.ui.platform.manager.biometrics.BiometricsManager
 import com.x8bit.bitwarden.ui.platform.model.FeatureFlagsState
-import com.x8bit.bitwarden.ui.tools.feature.send.addedit.AddEditSendRoute
-import com.x8bit.bitwarden.ui.tools.feature.send.addedit.ModeType
-import com.x8bit.bitwarden.ui.tools.feature.send.model.SendItemType
-import com.x8bit.bitwarden.ui.tools.feature.send.viewsend.ViewSendRoute
 import com.x8bit.bitwarden.ui.vault.components.model.CreateVaultItemType
 import com.x8bit.bitwarden.ui.vault.feature.addedit.VaultAddEditArgs
 import com.x8bit.bitwarden.ui.vault.feature.item.VaultItemArgs
@@ -93,8 +87,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
 
     private var onNavigateBackCalled = false
     private var onNavigateToVaultAddItemScreenCalled = false
-    private var onNavigateToAddEditSendScreenRoute: AddEditSendRoute? = null
-    private var onNavigateToViewSendScreenRoute: ViewSendRoute? = null
     private var onNavigateToVaultItemArgs: VaultItemArgs? = null
     private var onNavigateToVaultEditItemScreenArgs: VaultAddEditArgs? = null
     private var onNavigateToSearchType: SearchType? = null
@@ -140,8 +132,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
                 onNavigateBack = { onNavigateBackCalled = true },
                 onNavigateToVaultItemScreen = { onNavigateToVaultItemArgs = it },
                 onNavigateToVaultAddItemScreen = { onNavigateToVaultAddItemScreenCalled = true },
-                onNavigateToAddEditSendItem = { onNavigateToAddEditSendScreenRoute = it },
-                onNavigateToViewSendItem = { onNavigateToViewSendScreenRoute = it },
                 onNavigateToSearch = { onNavigateToSearchType = it },
                 onNavigateToVaultEditItemScreen = { onNavigateToVaultEditItemScreenArgs = it },
                 onNavigateToVaultItemListing = { this.onNavigateToVaultItemListingScreenType = it },
@@ -214,7 +204,7 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
             isPremium = false,
             itemListingType = VaultItemListingState.ItemListingType.Vault.Archive,
             viewState = VaultItemListingState.ViewState.Content(
-                displayItemList = listOf(createDisplayItem(number = 1)),
+                displayItemList = listOf(createCipherDisplayItem(number = 1)),
                 displayFolderList = emptyList(),
                 displayCollectionList = emptyList(),
             ),
@@ -235,7 +225,7 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
             isPremium = false,
             itemListingType = VaultItemListingState.ItemListingType.Vault.Archive,
             viewState = VaultItemListingState.ViewState.Content(
-                displayItemList = listOf(createDisplayItem(number = 1)),
+                displayItemList = listOf(createCipherDisplayItem(number = 1)),
                 displayFolderList = emptyList(),
                 displayCollectionList = emptyList(),
             ),
@@ -470,36 +460,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `policy warning should update according to state`() {
-        mutableStateFlow.update {
-            it.copy(
-                itemListingType = VaultItemListingState.ItemListingType.Send.SendFile,
-                viewState = VaultItemListingState.ViewState.NoItems(
-                    header = "Save and protect your data".asText(),
-                    message = "There are no Sends in your account.".asText(),
-                    shouldShowAddButton = true,
-                    buttonText = "Add an Item".asText(),
-                ),
-            )
-        }
-        val policyText = "Due to an enterprise policy, you are only " +
-            "able to delete an existing Send."
-        composeTestRule
-            .onNodeWithText(policyText)
-            .assertDoesNotExist()
-
-        mutableStateFlow.update {
-            it.copy(
-                policyDisablesSend = true,
-            )
-        }
-
-        composeTestRule
-            .onNodeWithText(policyText)
-            .assertIsDisplayed()
-    }
-
-    @Test
     fun `floating action button click should send AddItemClick action`() {
         composeTestRule
             .onNodeWithContentDescription("Add item")
@@ -554,29 +514,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `NavigateToAddSendItem should call onNavigateToAddEditSendScreen`() {
-        val sendType = SendItemType.TEXT
-        mutableEventFlow.tryEmit(VaultItemListingEvent.NavigateToAddSendItem(sendType = sendType))
-        assertEquals(
-            AddEditSendRoute(sendType = sendType, modeType = ModeType.ADD),
-            onNavigateToAddEditSendScreenRoute,
-        )
-    }
-
-    @Test
-    fun `NavigateToViewSendItem should call onNavigateToViewSendScreen`() {
-        val sendId = "id"
-        val sendType = SendItemType.TEXT
-        mutableEventFlow.tryEmit(
-            VaultItemListingEvent.NavigateToViewSendItem(id = sendId, sendType = sendType),
-        )
-        assertEquals(
-            ViewSendRoute(sendId = sendId, sendType = sendType),
-            onNavigateToViewSendScreenRoute,
-        )
-    }
-
-    @Test
     fun `NavigateToVaultSearchScreen should call onNavigateToSearch`() {
         val searchType = SearchType.Vault.SecureNotes
         mutableEventFlow.tryEmit(VaultItemListingEvent.NavigateToSearchScreen(searchType))
@@ -596,19 +533,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
                 vaultItemCipherType = type,
             ),
             onNavigateToVaultEditItemScreenArgs,
-        )
-    }
-
-    @Test
-    fun `NavigateToEditSendItem event should call onNavigateToAddEditSendScreen`() {
-        val sendId = "sendId"
-        val sendType = SendItemType.FILE
-        mutableEventFlow.tryEmit(
-            VaultItemListingEvent.NavigateToEditSendItem(id = sendId, sendType = sendType),
-        )
-        assertEquals(
-            AddEditSendRoute(sendType = sendType, modeType = ModeType.EDIT, sendId = sendId),
-            onNavigateToAddEditSendScreenRoute,
         )
     }
 
@@ -1029,7 +953,7 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
                 viewState = VaultItemListingState.ViewState.Content(
                     displayCollectionList = emptyList(),
                     displayItemList = listOf(
-                        createDisplayItem(number = 1),
+                        createCipherDisplayItem(number = 1),
                     ),
                     displayFolderList = emptyList(),
                 ),
@@ -1052,7 +976,7 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
                 viewState = VaultItemListingState.ViewState.Content(
                     displayCollectionList = emptyList(),
                     displayItemList = listOf(
-                        createDisplayItem(number = 1),
+                        createCipherDisplayItem(number = 1),
                     ),
                     displayFolderList = emptyList(),
                 ),
@@ -1067,10 +991,10 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
                 viewState = VaultItemListingState.ViewState.Content(
                     displayCollectionList = emptyList(),
                     displayItemList = listOf(
-                        createDisplayItem(number = 1),
-                        createDisplayItem(number = 2),
-                        createDisplayItem(number = 3),
-                        createDisplayItem(number = 4),
+                        createCipherDisplayItem(number = 1),
+                        createCipherDisplayItem(number = 2),
+                        createCipherDisplayItem(number = 3),
+                        createCipherDisplayItem(number = 4),
                     ),
                     displayFolderList = emptyList(),
                 ),
@@ -1089,7 +1013,7 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
                 viewState = VaultItemListingState.ViewState.Content(
                     displayCollectionList = emptyList(),
                     displayItemList = listOf(
-                        createDisplayItem(number = 1),
+                        createCipherDisplayItem(number = 1),
                     ),
                     displayFolderList = emptyList(),
                 ),
@@ -1106,46 +1030,13 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
 
     @Suppress("MaxLineLength")
     @Test
-    fun `clicking on a display item when master password reprompt is not required should send ItemClick action`() {
-        mutableStateFlow.update {
-            it.copy(
-                viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
-                    displayItemList = listOf(
-                        createDisplayItem(number = 1)
-                            .copy(
-                                isAutofill = false,
-                                shouldShowMasterPasswordReprompt = false,
-                            ),
-                    ),
-                    displayFolderList = emptyList(),
-                ),
-            )
-        }
-
-        composeTestRule
-            .onNodeWithText(text = "mockTitle-1")
-            .assertIsDisplayed()
-            .performClick()
-        verify {
-            viewModel.trySendAction(
-                VaultItemListingsAction.ItemClick(
-                    id = "mockId-1",
-                    type = VaultItemListingState.DisplayItem.ItemType.Sends(type = SendType.TEXT),
-                ),
-            )
-        }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
     fun `clicking on a display item when master password reprompt is required for autofill should show the master password dialog`() {
         mutableStateFlow.update {
             it.copy(
                 viewState = VaultItemListingState.ViewState.Content(
                     displayCollectionList = emptyList(),
                     displayItemList = listOf(
-                        createDisplayItem(number = 1)
+                        createCipherDisplayItem(number = 1)
                             .copy(
                                 isAutofill = true,
                                 shouldShowMasterPasswordReprompt = true,
@@ -1198,7 +1089,7 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
                 viewState = VaultItemListingState.ViewState.Content(
                     displayCollectionList = emptyList(),
                     displayItemList = listOf(
-                        createDisplayItem(number = 1).copy(
+                        createCipherDisplayItem(number = 1).copy(
                             shouldShowMasterPasswordReprompt = true,
                         ),
                     ),
@@ -1248,7 +1139,7 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
                 viewState = VaultItemListingState.ViewState.Content(
                     displayCollectionList = emptyList(),
                     displayItemList = listOf(
-                        createDisplayItem(number = 1)
+                        createCipherDisplayItem(number = 1)
                             .copy(
                                 isAutofill = true,
                                 shouldShowMasterPasswordReprompt = true,
@@ -1279,7 +1170,7 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
                 viewState = VaultItemListingState.ViewState.Content(
                     displayCollectionList = emptyList(),
                     displayItemList = listOf(
-                        createDisplayItem(number = 1)
+                        createCipherDisplayItem(number = 1)
                             .copy(
                                 isAutofill = true,
                                 shouldShowMasterPasswordReprompt = true,
@@ -1569,225 +1460,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
         verify(exactly = 0) { viewModel.trySendAction(any()) }
 
         composeTestRule.assertMasterPasswordDialogDisplayed()
-    }
-
-    @Test
-    fun `send item overflow item button should update according to state`() {
-        mutableStateFlow.update {
-            it.copy(
-                itemListingType = VaultItemListingState.ItemListingType.Send.SendFile,
-                viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
-                    displayItemList = listOf(createDisplayItem(number = 1)),
-                    displayFolderList = emptyList(),
-                ),
-            )
-        }
-        composeTestRule
-            .onAllNodesWithContentDescription("More options")
-            .assertCountEquals(2)
-
-        mutableStateFlow.update {
-            it.copy(
-                policyDisablesSend = true,
-            )
-        }
-
-        composeTestRule
-            .onAllNodesWithContentDescription("More options")
-            .assertCountEquals(1)
-    }
-
-    @Test
-    fun `on send item overflow click should display dialog`() {
-        val number = 1
-        mutableStateFlow.update {
-            it.copy(
-                viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
-                    displayItemList = listOf(createDisplayItem(number = number)),
-                    displayFolderList = emptyList(),
-                ),
-            )
-        }
-        composeTestRule.assertNoDialogExists()
-
-        composeTestRule
-            .onNodeWithText("mockTitle-$number")
-            .onChildren()
-            .filterToOne(hasContentDescription("More options"))
-            .assertIsDisplayed()
-            .performClick()
-
-        composeTestRule
-            .onAllNodesWithText("mockTitle-$number")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .assertIsDisplayed()
-    }
-
-    @Suppress("LongMethod")
-    @Test
-    fun `on send item overflow option click should emit the appropriate action`() {
-        val number = 1
-        mutableStateFlow.update {
-            it.copy(
-                viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
-                    displayItemList = listOf(createDisplayItem(number = number)),
-                    displayFolderList = emptyList(),
-                ),
-            )
-        }
-
-        composeTestRule.assertNoDialogExists()
-
-        composeTestRule
-            .onNodeWithText("mockTitle-$number")
-            .onChildren()
-            .filterToOne(hasContentDescription("More options"))
-            .assertIsDisplayed()
-            .performClick()
-        composeTestRule
-            .onNodeWithText(text = "View")
-            .assert(hasAnyAncestor(isDialog()))
-            .performClick()
-        verify(exactly = 1) {
-            viewModel.trySendAction(
-                VaultItemListingsAction.OverflowOptionClick(
-                    action = ListingItemOverflowAction.SendAction.ViewClick(
-                        sendId = "mockId-$number",
-                        sendType = SendType.FILE,
-                    ),
-                ),
-            )
-        }
-
-        composeTestRule
-            .onNodeWithText("mockTitle-$number")
-            .onChildren()
-            .filterToOne(hasContentDescription("More options"))
-            .assertIsDisplayed()
-            .performClick()
-        composeTestRule
-            .onNodeWithText("Edit")
-            .assert(hasAnyAncestor(isDialog()))
-            .performClick()
-        verify(exactly = 1) {
-            viewModel.trySendAction(
-                VaultItemListingsAction.OverflowOptionClick(
-                    action = ListingItemOverflowAction.SendAction.EditClick(
-                        sendId = "mockId-$number",
-                        sendType = SendType.TEXT,
-                    ),
-                ),
-            )
-        }
-
-        composeTestRule
-            .onNodeWithText("mockTitle-$number")
-            .onChildren()
-            .filterToOne(hasContentDescription("More options"))
-            .assertIsDisplayed()
-            .performClick()
-        composeTestRule
-            .onNodeWithText("Copy link")
-            .assert(hasAnyAncestor(isDialog()))
-            .performClick()
-        verify(exactly = 1) {
-            viewModel.trySendAction(
-                VaultItemListingsAction.OverflowOptionClick(
-                    action = ListingItemOverflowAction.SendAction.CopyUrlClick(
-                        sendUrl = "www.test.com",
-                    ),
-                ),
-            )
-        }
-
-        composeTestRule
-            .onNodeWithText("mockTitle-$number")
-            .onChildren()
-            .filterToOne(hasContentDescription("More options"))
-            .assertIsDisplayed()
-            .performClick()
-        composeTestRule
-            .onNodeWithText("Share link")
-            .assert(hasAnyAncestor(isDialog()))
-            .performClick()
-        verify(exactly = 1) {
-            viewModel.trySendAction(
-                VaultItemListingsAction.OverflowOptionClick(
-                    action = ListingItemOverflowAction.SendAction.ShareUrlClick(
-                        sendUrl = "www.test.com",
-                    ),
-                ),
-            )
-        }
-
-        composeTestRule
-            .onNodeWithText("mockTitle-$number")
-            .onChildren()
-            .filterToOne(hasContentDescription("More options"))
-            .assertIsDisplayed()
-            .performClick()
-        composeTestRule
-            .onNodeWithText("Remove password")
-            .assert(hasAnyAncestor(isDialog()))
-            .performClick()
-        verify(exactly = 1) {
-            viewModel.trySendAction(
-                VaultItemListingsAction.OverflowOptionClick(
-                    action = ListingItemOverflowAction.SendAction.RemovePasswordClick(
-                        sendId = "mockId-$number",
-                    ),
-                ),
-            )
-        }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `on send item delete overflow option click should display delete confirmation dialog and emits DeleteSendConfirmClick on confirmation`() {
-        val sendId = "mockId-1"
-        val message = "Are you sure you want to delete this Send?"
-        mutableStateFlow.update {
-            it.copy(
-                viewState = VaultItemListingState.ViewState.Content(
-                    displayCollectionList = emptyList(),
-                    displayItemList = listOf(createDisplayItem(number = 1)),
-                    displayFolderList = emptyList(),
-                ),
-            )
-        }
-        composeTestRule.onNode(isDialog()).assertDoesNotExist()
-        composeTestRule.onNodeWithText(message).assertDoesNotExist()
-
-        composeTestRule
-            .onNodeWithText("mockTitle-1")
-            .onChildren()
-            .filterToOne(hasContentDescription("More options"))
-            .assertIsDisplayed()
-            .performClick()
-        composeTestRule
-            .onNodeWithText("Delete")
-            .assert(hasAnyAncestor(isDialog()))
-            .performClick()
-
-        composeTestRule
-            .onNodeWithText(message)
-            .assertIsDisplayed()
-            .assert(hasAnyAncestor(isDialog()))
-        composeTestRule
-            .onNodeWithText("Yes")
-            .assert(hasAnyAncestor(isDialog()))
-            .performClick()
-
-        verify(exactly = 1) {
-            viewModel.trySendAction(
-                VaultItemListingsAction.OverflowOptionClick(
-                    action = ListingItemOverflowAction.SendAction.DeleteClick(sendId = sendId),
-                ),
-            )
-        }
     }
 
     @Test
@@ -2621,41 +2293,6 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
         }
     }
 
-    @Test
-    fun `FileTypeRequiresPremium dialog should display based on state`() {
-        composeTestRule.assertNoDialogExists()
-        mutableStateFlow.update {
-            it.copy(dialogState = VaultItemListingState.DialogState.FileTypeRequiresPremium)
-        }
-
-        composeTestRule
-            .onNodeWithText(text = "Premium subscription required")
-            .assert(hasAnyAncestor(isDialog()))
-            .assertIsDisplayed()
-        composeTestRule
-            .onNodeWithText(
-                text = "Free accounts are restricted to sharing text only. " +
-                    "A Premium membership is required to use files with Send.",
-            )
-            .assert(hasAnyAncestor(isDialog()))
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun `FileTypeRequiresPremium dialog Upgrade click should send UpgradeToPremiumClick`() {
-        mutableStateFlow.update {
-            it.copy(dialogState = VaultItemListingState.DialogState.FileTypeRequiresPremium)
-        }
-
-        composeTestRule
-            .onNodeWithText(text = "Upgrade to Premium")
-            .assert(hasAnyAncestor(isDialog()))
-            .performClick()
-
-        verify(exactly = 1) {
-            viewModel.trySendAction(VaultItemListingsAction.UpgradeToPremiumClick)
-        }
-    }
 }
 
 private val ACTIVE_ACCOUNT_SUMMARY = AccountSummary(
@@ -2698,12 +2335,10 @@ private val DEFAULT_STATE = VaultItemListingState(
     accountSummaries = ACCOUNT_SUMMARIES,
     viewState = VaultItemListingState.ViewState.Loading,
     vaultFilterType = VaultFilterType.AllVaults,
-    baseWebSendUrl = Environment.Prod.Us.baseWebSendUrl,
     isIconLoadingDisabled = false,
     baseIconUrl = Environment.Prod.Us.baseIconUrl,
     isPullToRefreshSettingEnabled = false,
     dialogState = null,
-    policyDisablesSend = false,
     hasMasterPassword = true,
     isPremium = false,
     isRefreshing = false,
@@ -2714,63 +2349,7 @@ private val STATE_FOR_AUTOFILL = DEFAULT_STATE.copy(
     autofillSelectionData = AUTOFILL_SELECTION_DATA,
 )
 
-private fun createDisplayItem(number: Int): VaultItemListingState.DisplayItem =
-    VaultItemListingState.DisplayItem(
-        id = "mockId-$number",
-        title = "mockTitle-$number".asText(),
-        titleTestTag = "SendNameLabel",
-        secondSubtitle = null,
-        secondSubtitleTestTag = null,
-        subtitle = "mockSubtitle-$number",
-        subtitleTestTag = "SendDateLabel",
-        iconData = IconData.Local(BitwardenDrawable.ic_payment_card),
-        extraIconList = persistentListOf(
-            IconData.Local(
-                iconRes = BitwardenDrawable.ic_send_disabled,
-                contentDescription = BitwardenString.disabled.asText(),
-            ),
-            IconData.Local(
-                iconRes = BitwardenDrawable.ic_key,
-                contentDescription = BitwardenString.password.asText(),
-            ),
-            IconData.Local(
-                iconRes = BitwardenDrawable.ic_send_max_access_count_reached,
-                contentDescription = BitwardenString.maximum_access_count_reached.asText(),
-            ),
-            IconData.Local(
-                iconRes = BitwardenDrawable.ic_send_expired,
-                contentDescription = BitwardenString.expired.asText(),
-            ),
-            IconData.Local(
-                iconRes = BitwardenDrawable.ic_send_pending_delete,
-                contentDescription = BitwardenString.pending_delete.asText(),
-            ),
-        ),
-        overflowOptions = listOf(
-            ListingItemOverflowAction.SendAction.CopyUrlClick(sendUrl = "www.test.com"),
-            ListingItemOverflowAction.SendAction.ShareUrlClick(sendUrl = "www.test.com"),
-            ListingItemOverflowAction.SendAction.ViewClick(
-                sendId = "mockId-$number",
-                sendType = SendType.FILE,
-            ),
-            ListingItemOverflowAction.SendAction.EditClick(
-                sendId = "mockId-$number",
-                sendType = SendType.TEXT,
-            ),
-            ListingItemOverflowAction.SendAction.RemovePasswordClick(sendId = "mockId-$number"),
-            ListingItemOverflowAction.SendAction.DeleteClick(sendId = "mockId-$number"),
-        ),
-        optionsTestTag = "SendOptionsButton",
-        isAutofill = false,
-        isCredentialCreation = false,
-        shouldShowMasterPasswordReprompt = false,
-        iconTestTag = null,
-        itemType = VaultItemListingState.DisplayItem.ItemType.Sends(type = SendType.TEXT),
-    )
-
-private fun createCipherDisplayItem(
-    @Suppress("SameParameterValue") number: Int,
-): VaultItemListingState.DisplayItem =
+private fun createCipherDisplayItem(number: Int): VaultItemListingState.DisplayItem =
     VaultItemListingState.DisplayItem(
         id = "mockId-$number",
         title = "mockTitle-$number".asText(),

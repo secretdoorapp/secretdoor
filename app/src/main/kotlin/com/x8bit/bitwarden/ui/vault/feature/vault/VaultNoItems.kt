@@ -22,7 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bitwarden.ui.platform.base.util.standardHorizontalMargin
 import com.bitwarden.ui.platform.components.button.BitwardenFilledButton
-import com.bitwarden.ui.platform.components.card.BitwardenInfoCalloutCard
 import com.bitwarden.ui.platform.components.util.rememberVectorPainter
 import com.bitwarden.ui.platform.resource.BitwardenDrawable
 import com.bitwarden.ui.platform.resource.BitwardenString
@@ -34,7 +33,6 @@ import com.bitwarden.ui.platform.theme.BitwardenTheme
 @Composable
 fun VaultNoItems(
     addItemClickAction: () -> Unit,
-    policyDisablesSend: Boolean,
     message: String,
     buttonText: String,
     modifier: Modifier = Modifier,
@@ -45,15 +43,6 @@ fun VaultNoItems(
         modifier = modifier.verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        if (policyDisablesSend) {
-            BitwardenInfoCalloutCard(
-                text = stringResource(id = BitwardenString.send_disabled_warning),
-                modifier = Modifier
-                    .standardHorizontalMargin()
-                    .fillMaxWidth(),
-            )
-        }
-
         Spacer(modifier = Modifier.weight(1F))
 
         vectorRes?.let {
@@ -119,28 +108,8 @@ private fun VaultNoItems_preview() {
                 ),
                 buttonText = stringResource(id = BitwardenString.add_login),
                 addItemClickAction = {},
-                policyDisablesSend = false,
             )
         }
     }
 }
 
-@Preview(name = "Light theme")
-@Preview(name = "Dark theme", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun VaultNoItemsPolicyDisabled_preview() {
-    BitwardenTheme {
-        Column(
-            modifier = Modifier.background(BitwardenTheme.colorScheme.background.primary),
-        ) {
-            VaultNoItems(
-                message = stringResource(
-                    BitwardenString.the_vault_protects_more_than_just_passwords,
-                ),
-                buttonText = stringResource(id = BitwardenString.add_login),
-                addItemClickAction = {},
-                policyDisablesSend = true,
-            )
-        }
-    }
-}

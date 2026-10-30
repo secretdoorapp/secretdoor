@@ -78,6 +78,11 @@ stored key material.
   they phone home.
 - Shrink the `:network` module to only the HIBP client (or remove it).
 - Remove the `:authenticator` and `:authenticatorbridge` modules from the build (separate app).
+- Progress:
+  - [x] Send: delete the Send tab, screens, `SendManager`, Send results/data models, Send search
+    and listing types, the `ShareNewSend` special circumstance and the `ACTION_SEND` intent filter.
+  - [ ] Send data layer: `VaultDiskSource` Send storage, `VaultSdkSource` Send encrypt/decrypt,
+    `VaultSdkSendExtensions` (goes with the `:network` cleanup).
 
 ### Phase 4: Backup and restore
 - Free: "Export encrypted backup" saves the password-protected file wherever the user picks

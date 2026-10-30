@@ -21,7 +21,6 @@ import com.bitwarden.data.repository.model.Environment
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.feature.settings.appearance.model.AppLanguage
 import com.bitwarden.ui.platform.feature.settings.appearance.model.AppTheme
-import com.bitwarden.ui.platform.manager.share.ShareManager
 import com.bitwarden.ui.platform.manager.share.model.ShareData
 import com.bitwarden.ui.platform.model.TotpData
 import com.bitwarden.ui.platform.resource.BitwardenString
@@ -157,9 +156,6 @@ class MainViewModelTest : BaseViewModelTest() {
         )
     private val environmentRepository = mockk<EnvironmentRepository>(relaxed = true) {
         every { loadEnvironmentForEmail(any()) } returns true
-    }
-    private val shareManager: ShareManager = mockk {
-        every { getShareDataOrNull(any()) } returns null
     }
     private val savedStateHandle = SavedStateHandle()
 
@@ -483,28 +479,6 @@ class MainViewModelTest : BaseViewModelTest() {
 
     @Suppress("MaxLineLength")
     @Test
-    fun `on ReceiveFirstIntent with share data should set the special circumstance to ShareNewSend`() {
-        val viewModel = createViewModel()
-        val mockIntent = createMockIntent()
-        val shareData = mockk<ShareData>()
-        every { shareManager.getShareDataOrNull(mockIntent) } returns shareData
-
-        viewModel.trySendAction(
-            MainAction.ReceiveFirstIntent(
-                intent = mockIntent,
-            ),
-        )
-        assertEquals(
-            SpecialCircumstance.ShareNewSend(
-                data = shareData,
-                shouldFinishWhenComplete = true,
-            ),
-            specialCircumstanceManager.specialCircumstance,
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
     fun `on ReceiveFirstIntent with autofill data should set the special circumstance to AutofillSelection`() {
         val viewModel = createViewModel()
         val autofillSelectionData = mockk<AutofillSelectionData>()
@@ -702,28 +676,6 @@ class MainViewModelTest : BaseViewModelTest() {
             SpecialCircumstance.PasswordlessRequest(
                 passwordlessRequestData = passwordlessRequestData,
                 shouldFinishWhenComplete = true,
-            ),
-            specialCircumstanceManager.specialCircumstance,
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `on ReceiveNewIntent with share data should set the special circumstance to ShareNewSend`() {
-        val viewModel = createViewModel()
-        val mockIntent = createMockIntent()
-        val shareData = mockk<ShareData>()
-        every { shareManager.getShareDataOrNull(mockIntent) } returns shareData
-
-        viewModel.trySendAction(
-            MainAction.ReceiveNewIntent(
-                intent = mockIntent,
-            ),
-        )
-        assertEquals(
-            SpecialCircumstance.ShareNewSend(
-                data = shareData,
-                shouldFinishWhenComplete = false,
             ),
             specialCircumstanceManager.specialCircumstance,
         )
@@ -1355,7 +1307,6 @@ class MainViewModelTest : BaseViewModelTest() {
         specialCircumstanceManager = specialCircumstanceManager,
         garbageCollectionManager = garbageCollectionManager,
         credentialProviderRequestManager = credentialProviderRequestManager,
-        shareManager = shareManager,
         settingsRepository = settingsRepository,
         featureFlagManager = featureFlagManager,
         vaultRepository = vaultRepository,

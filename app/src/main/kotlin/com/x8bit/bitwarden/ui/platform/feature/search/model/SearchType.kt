@@ -4,29 +4,9 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * Represents the difference between searching sends and searching vault items.
+ * Represents the kind of vault items being searched.
  */
 sealed class SearchType : Parcelable {
-    /**
-     * Indicates that we should be searching sends.
-     */
-    @Parcelize
-    sealed class Sends : SearchType() {
-        /**
-         * Indicates that we should be searching all sends.
-         */
-        data object All : Sends()
-
-        /**
-         * Indicates that we should be searching only text sends.
-         */
-        data object Texts : Sends()
-
-        /**
-         * Indicates that we should be searching only file sends.
-         */
-        data object Files : Sends()
-    }
 
     /**
      * Indicates that we should be searching vault items.

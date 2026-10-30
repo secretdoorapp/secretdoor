@@ -8,9 +8,6 @@ import com.x8bit.bitwarden.ui.platform.feature.search.model.SearchType
  */
 fun SearchType.toSearchTypeData(): SearchTypeData =
     when (this) {
-        SearchType.Sends.All -> SearchTypeData.Sends.All
-        SearchType.Sends.Files -> SearchTypeData.Sends.Files
-        SearchType.Sends.Texts -> SearchTypeData.Sends.Texts
         SearchType.Vault.All -> SearchTypeData.Vault.All
         SearchType.Vault.Archive -> SearchTypeData.Vault.Archive
         SearchType.Vault.Cards -> SearchTypeData.Vault.Cards

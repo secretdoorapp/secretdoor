@@ -65,7 +65,6 @@ import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockLoginView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockPassportView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkCipher
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkPolicy
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSendView
 import com.x8bit.bitwarden.data.vault.manager.model.GetCipherResult
 import com.x8bit.bitwarden.data.vault.manager.model.SyncVaultDataResult
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
@@ -322,7 +321,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                 ),
                 collectionViewList = emptyList(),
                 folderViewList = emptyList(),
-                sendViewList = emptyList(),
             ),
         )
         val viewModel = createViewModel()
@@ -1068,7 +1066,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                 ),
             collectionViewList = listOf(createMockCollectionView(number = 1)),
             folderViewList = listOf(createMockFolderView(number = 1)),
-            sendViewList = listOf(createMockSendView(number = 1)),
         )
         viewModel.eventFlow.test {
             mutableVaultDataStateFlow.tryEmit(
@@ -1522,7 +1519,6 @@ class VaultViewModelTest : BaseViewModelTest() {
             decryptCipherListResult = createMockDecryptCipherListResult(number = 1),
             collectionViewList = listOf(createMockCollectionView(number = 1)),
             folderViewList = listOf(createMockFolderView(number = 1)),
-            sendViewList = listOf(createMockSendView(number = 1)),
         )
         mutableVaultDataStateFlow.tryEmit(
             value = DataState.Loaded(
@@ -1638,7 +1634,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                         createMockFolderView(number = 4),
                         createMockFolderView(number = 5),
                     ),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             ),
         )
@@ -1777,7 +1772,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                             ),
                             collectionViewList = emptyList(),
                             folderViewList = emptyList(),
-                            sendViewList = emptyList(),
                         ),
                     ),
                 )
@@ -1803,7 +1797,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                     ),
                     collectionViewList = emptyList(),
                     folderViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             ),
         )
@@ -1834,7 +1827,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                         ),
                         collectionViewList = emptyList(),
                         folderViewList = emptyList(),
-                        sendViewList = emptyList(),
                     ),
                 )
                 // Allow time for state to update
@@ -1859,7 +1851,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                     ),
                     collectionViewList = listOf(createMockCollectionView(number = 1)),
                     folderViewList = listOf(createMockFolderView(number = 1)),
-                    sendViewList = listOf(createMockSendView(number = 1)),
                 ),
             ),
         )
@@ -1925,7 +1916,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                     ),
                     collectionViewList = emptyList(),
                     folderViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             ),
         )
@@ -2004,7 +1994,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                         ),
                         collectionViewList = listOf(createMockCollectionView(number = 1)),
                         folderViewList = listOf(createMockFolderView(number = 1)),
-                        sendViewList = listOf(createMockSendView(number = 1)),
                     ),
                 ),
             )
@@ -2079,7 +2068,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                         ),
                         collectionViewList = listOf(createMockCollectionView(number = 1)),
                         folderViewList = listOf(createMockFolderView(number = 1)),
-                        sendViewList = listOf(createMockSendView(number = 1)),
                     ),
                 ),
             )
@@ -2155,7 +2143,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                         ),
                         collectionViewList = emptyList(),
                         folderViewList = emptyList(),
-                        sendViewList = emptyList(),
                     ),
                 ),
             )
@@ -2200,7 +2187,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                         ),
                         collectionViewList = listOf(createMockCollectionView(number = 1)),
                         folderViewList = listOf(createMockFolderView(number = 1)),
-                        sendViewList = listOf(createMockSendView(number = 1)),
                     ),
                 ),
             )
@@ -2266,7 +2252,6 @@ class VaultViewModelTest : BaseViewModelTest() {
             ),
             collectionViewList = listOf(createMockCollectionView(number = 1)),
             folderViewList = listOf(createMockFolderView(number = 1)),
-            sendViewList = listOf(createMockSendView(number = 1)),
         )
         mutableVaultDataStateFlow.value = DataState.Loaded(data = vaultData)
         coEvery {
@@ -2321,7 +2306,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                 ),
                 collectionViewList = emptyList(),
                 folderViewList = emptyList(),
-                sendViewList = emptyList(),
             ),
         )
 
@@ -2349,7 +2333,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                         ),
                         collectionViewList = listOf(),
                         folderViewList = listOf(),
-                        sendViewList = listOf(),
                     ),
                 ),
             )
@@ -2589,7 +2572,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                         ),
                         collectionViewList = emptyList(),
                         folderViewList = emptyList(),
-                        sendViewList = emptyList(),
                     ),
                 )
             }
@@ -2627,7 +2609,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                         ),
                         collectionViewList = emptyList(),
                         folderViewList = emptyList(),
-                        sendViewList = emptyList(),
                     ),
                 )
             }
@@ -2690,7 +2671,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                         ),
                         collectionViewList = emptyList(),
                         folderViewList = emptyList(),
-                        sendViewList = emptyList(),
                     ),
                 )
             }
@@ -2838,7 +2818,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                     ),
                     collectionViewList = emptyList(),
                     folderViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             val viewModel = createViewModel()
@@ -2906,7 +2885,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                         ),
                     collectionViewList = emptyList(),
                     folderViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             mutableVaultDataStateFlow.value = dataState
@@ -2980,7 +2958,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                 ),
                 collectionViewList = emptyList(),
                 folderViewList = emptyList(),
-                sendViewList = emptyList(),
             ),
         )
         val viewModel = createViewModel()
@@ -3050,7 +3027,6 @@ class VaultViewModelTest : BaseViewModelTest() {
             ),
             collectionViewList = listOf(createMockCollectionView(number = 1)),
             folderViewList = listOf(createMockFolderView(number = 1)),
-            sendViewList = listOf(createMockSendView(number = 1)),
         )
         mutableVaultDataStateFlow.value = DataState.Loaded(data = vaultData)
         coEvery {
@@ -4636,7 +4612,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                     ),
                     collectionViewList = emptyList(),
                     folderViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             val viewModel = createViewModel()
@@ -4705,7 +4680,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                     ),
                     collectionViewList = emptyList(),
                     folderViewList = emptyList(),
-                    sendViewList = emptyList(),
                 ),
             )
             val viewModel = createViewModel()
@@ -4800,7 +4774,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                             ),
                             collectionViewList = emptyList(),
                             folderViewList = emptyList(),
-                            sendViewList = emptyList(),
                         ),
                     ),
                 )
@@ -4858,7 +4831,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                             ),
                             collectionViewList = emptyList(),
                             folderViewList = emptyList(),
-                            sendViewList = emptyList(),
                         ),
                     ),
                 )

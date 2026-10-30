@@ -13,9 +13,6 @@ import com.x8bit.bitwarden.ui.auth.feature.vaultunlock.VaultUnlockRoute
 import com.x8bit.bitwarden.ui.platform.base.BitwardenComposeTest
 import com.x8bit.bitwarden.ui.platform.feature.splash.SplashRoute
 import com.x8bit.bitwarden.ui.platform.feature.vaultunlocked.VaultUnlockedGraphRoute
-import com.x8bit.bitwarden.ui.tools.feature.send.addedit.AddEditSendRoute
-import com.x8bit.bitwarden.ui.tools.feature.send.addedit.ModeType
-import com.x8bit.bitwarden.ui.tools.feature.send.model.SendItemType
 import com.x8bit.bitwarden.ui.vault.feature.addedit.VaultAddEditMode
 import com.x8bit.bitwarden.ui.vault.feature.addedit.VaultAddEditRoute
 import com.x8bit.bitwarden.ui.vault.feature.exportitems.ExportItemsGraphRoute
@@ -131,34 +128,6 @@ class RootNavScreenTest : BitwardenComposeTest() {
                     route = VaultItemListingRoute.AsRoot(
                         type = ItemListingType.LOGIN,
                         itemId = null,
-                    ),
-                    navOptions = expectedNavOptions,
-                )
-            }
-        }
-
-        // Make sure navigating to vault unlocked for new sends works as expected:
-        rootNavStateFlow.value = RootNavState.VaultUnlockedForNewSend(sendType = SendItemType.FILE)
-        composeTestRule.runOnIdle {
-            verify {
-                mockNavHostController.navigate(
-                    route = AddEditSendRoute(
-                        modeType = ModeType.ADD,
-                        sendType = SendItemType.FILE,
-                        sendId = null,
-                    ),
-                    navOptions = expectedNavOptions,
-                )
-            }
-        }
-        rootNavStateFlow.value = RootNavState.VaultUnlockedForNewSend(sendType = SendItemType.TEXT)
-        composeTestRule.runOnIdle {
-            verify {
-                mockNavHostController.navigate(
-                    route = AddEditSendRoute(
-                        modeType = ModeType.ADD,
-                        sendType = SendItemType.TEXT,
-                        sendId = null,
                     ),
                     navOptions = expectedNavOptions,
                 )
