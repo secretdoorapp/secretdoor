@@ -7,8 +7,6 @@ import com.bitwarden.cxf.parser.CredentialExchangePayloadParser
 import com.bitwarden.data.manager.appstate.AppStateManager
 import com.bitwarden.data.manager.file.FileManager
 import com.bitwarden.network.service.CiphersService
-import com.bitwarden.network.service.DownloadService
-import com.bitwarden.network.service.FolderService
 import com.bitwarden.network.service.SendsService
 import com.bitwarden.network.service.SyncService
 import com.bitwarden.ui.platform.feature.cardscanner.manager.CardScanManager
@@ -101,8 +99,6 @@ object VaultManagerModule {
     @Provides
     @Singleton
     fun provideCipherManager(
-        downloadService: DownloadService,
-        ciphersService: CiphersService,
         settingsDiskSource: SettingsDiskSource,
         vaultDiskSource: VaultDiskSource,
         vaultSdkSource: VaultSdkSource,
@@ -110,40 +106,28 @@ object VaultManagerModule {
         fileManager: FileManager,
         clock: Clock,
         reviewPromptManager: ReviewPromptManager,
-        dispatcherManager: DispatcherManager,
-        pushManager: PushManager,
     ): CipherManager = CipherManagerImpl(
-        downloadService = downloadService,
         fileManager = fileManager,
         settingsDiskSource = settingsDiskSource,
         authDiskSource = authDiskSource,
-        ciphersService = ciphersService,
         vaultDiskSource = vaultDiskSource,
         vaultSdkSource = vaultSdkSource,
         clock = clock,
         reviewPromptManager = reviewPromptManager,
-        dispatcherManager = dispatcherManager,
-        pushManager = pushManager,
     )
 
     @Provides
     @Singleton
     fun provideFolderManager(
-        folderService: FolderService,
-        settingsDiskSource: SettingsDiskSource,
         vaultDiskSource: VaultDiskSource,
         vaultSdkSource: VaultSdkSource,
         authDiskSource: AuthDiskSource,
-        dispatcherManager: DispatcherManager,
-        pushManager: PushManager,
+        clock: Clock,
     ): FolderManager = FolderManagerImpl(
         authDiskSource = authDiskSource,
-        settingsDiskSource = settingsDiskSource,
-        folderService = folderService,
         vaultDiskSource = vaultDiskSource,
         vaultSdkSource = vaultSdkSource,
-        dispatcherManager = dispatcherManager,
-        pushManager = pushManager,
+        clock = clock,
     )
 
     @Provides
@@ -267,13 +251,15 @@ object VaultManagerModule {
     @Singleton
     fun provideCredentialExchangeImportManager(
         vaultSdkSource: VaultSdkSource,
-        ciphersService: CiphersService,
+        vaultDiskSource: VaultDiskSource,
+        clock: Clock,
         vaultSyncManager: VaultSyncManager,
         policyManager: PolicyManager,
         credentialExchangePayloadParser: CredentialExchangePayloadParser,
     ): CredentialExchangeImportManager = CredentialExchangeImportManagerImpl(
         vaultSdkSource = vaultSdkSource,
-        ciphersService = ciphersService,
+        vaultDiskSource = vaultDiskSource,
+        clock = clock,
         vaultSyncManager = vaultSyncManager,
         policyManager = policyManager,
         credentialExchangePayloadParser = credentialExchangePayloadParser,

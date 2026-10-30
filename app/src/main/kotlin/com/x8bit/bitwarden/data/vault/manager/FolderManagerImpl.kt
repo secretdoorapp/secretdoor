@@ -1,67 +1,39 @@
 package com.x8bit.bitwarden.data.vault.manager
 
-import com.bitwarden.core.data.manager.dispatcher.DispatcherManager
 import com.bitwarden.core.data.util.flatMap
-import com.bitwarden.network.model.UpdateFolderResponseJson
-import com.bitwarden.network.service.FolderService
 import com.bitwarden.vault.FolderView
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
-import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.data.platform.error.NoActiveUserException
-import com.x8bit.bitwarden.data.platform.manager.PushManager
-import com.x8bit.bitwarden.data.platform.manager.model.SyncFolderDeleteData
-import com.x8bit.bitwarden.data.platform.manager.model.SyncFolderUpsertData
 import com.x8bit.bitwarden.data.vault.datasource.disk.VaultDiskSource
 import com.x8bit.bitwarden.data.vault.datasource.sdk.VaultSdkSource
 import com.x8bit.bitwarden.data.vault.repository.model.CreateFolderResult
 import com.x8bit.bitwarden.data.vault.repository.model.DeleteFolderResult
 import com.x8bit.bitwarden.data.vault.repository.model.UpdateFolderResult
-import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedNetworkFolder
-import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkFolder
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedNetworkFolderResponse
+import java.time.Clock
+import java.util.UUID
 
 /**
  * The default implementation of the [FolderManager].
+ *
+ * SecretDoor keeps the vault only on this device, so folders are encrypted by the SDK and written
+ * straight to the local database.
  */
-@Suppress("LongParameterList")
 class FolderManagerImpl(
     private val authDiskSource: AuthDiskSource,
-    private val settingsDiskSource: SettingsDiskSource,
-    private val folderService: FolderService,
     private val vaultDiskSource: VaultDiskSource,
     private val vaultSdkSource: VaultSdkSource,
-    dispatcherManager: DispatcherManager,
-    pushManager: PushManager,
+    private val clock: Clock,
 ) : FolderManager {
-    private val unconfinedScope = CoroutineScope(dispatcherManager.unconfined)
-    private val ioScope = CoroutineScope(dispatcherManager.io)
     private val activeUserId: String? get() = authDiskSource.userState?.activeUserId
-
-    init {
-        pushManager
-            .syncFolderDeleteFlow
-            .onEach(::deleteFolder)
-            .launchIn(unconfinedScope)
-
-        pushManager
-            .syncFolderUpsertFlow
-            .onEach(::syncFolderIfNecessary)
-            .launchIn(ioScope)
-    }
 
     override suspend fun createFolder(folderView: FolderView): CreateFolderResult {
         val userId = activeUserId
             ?: return CreateFolderResult.Error(error = NoActiveUserException())
-        return vaultSdkSource
-            .encryptFolder(userId = userId, folder = folderView)
-            .flatMap { folderService.createFolder(body = it.toEncryptedNetworkFolder()) }
-            .onSuccess { vaultDiskSource.saveFolder(userId = userId, folder = it) }
-            .flatMap {
-                vaultSdkSource.decryptFolder(userId = userId, folder = it.toEncryptedSdkFolder())
-            }
+        return saveFolder(
+            userId = userId,
+            folderView = folderView.copy(id = UUID.randomUUID().toString()),
+        )
             .fold(
                 onSuccess = { CreateFolderResult.Success(folderView = it) },
                 onFailure = { CreateFolderResult.Error(error = it) },
@@ -71,16 +43,9 @@ class FolderManagerImpl(
     override suspend fun deleteFolder(folderId: String): DeleteFolderResult {
         val userId = activeUserId
             ?: return DeleteFolderResult.Error(error = NoActiveUserException())
-        return folderService
-            .deleteFolder(folderId = folderId)
-            .onSuccess {
-                clearFolderIdFromCiphers(userId = userId, folderId = folderId)
-                vaultDiskSource.deleteFolder(userId = userId, folderId = folderId)
-            }
-            .fold(
-                onSuccess = { DeleteFolderResult.Success },
-                onFailure = { DeleteFolderResult.Error(error = it) },
-            )
+        clearFolderIdFromCiphers(userId = userId, folderId = folderId)
+        vaultDiskSource.deleteFolder(userId = userId, folderId = folderId)
+        return DeleteFolderResult.Success
     }
 
     override suspend fun updateFolder(
@@ -89,40 +54,33 @@ class FolderManagerImpl(
     ): UpdateFolderResult {
         val userId = activeUserId
             ?: return UpdateFolderResult.Error(error = NoActiveUserException())
-        return vaultSdkSource
-            .encryptFolder(userId = userId, folder = folderView)
-            .flatMap { folder ->
-                folderService.updateFolder(
-                    folderId = folder.id.toString(),
-                    body = folder.toEncryptedNetworkFolder(),
-                )
-            }
+        return saveFolder(userId = userId, folderView = folderView.copy(id = folderId))
             .fold(
-                onSuccess = { response ->
-                    when (response) {
-                        is UpdateFolderResponseJson.Success -> {
-                            vaultDiskSource.saveFolder(userId = userId, folder = response.folder)
-                            vaultSdkSource
-                                .decryptFolder(
-                                    userId = userId,
-                                    folder = response.folder.toEncryptedSdkFolder(),
-                                )
-                                .fold(
-                                    onSuccess = { UpdateFolderResult.Success(it) },
-                                    onFailure = {
-                                        UpdateFolderResult.Error(error = it)
-                                    },
-                                )
-                        }
-
-                        is UpdateFolderResponseJson.Invalid -> {
-                            UpdateFolderResult.Error(errorMessage = response.message, error = null)
-                        }
-                    }
-                },
+                onSuccess = { UpdateFolderResult.Success(it) },
                 onFailure = { UpdateFolderResult.Error(error = it) },
             )
     }
+
+    /**
+     * Encrypts the [folderView] with a new revision date, saves it to disk and returns the
+     * decrypted result.
+     */
+    private suspend fun saveFolder(
+        userId: String,
+        folderView: FolderView,
+    ): Result<FolderView> =
+        vaultSdkSource
+            .encryptFolder(
+                userId = userId,
+                folder = folderView.copy(revisionDate = clock.instant()),
+            )
+            .onSuccess {
+                vaultDiskSource.saveFolder(
+                    userId = userId,
+                    folder = it.toEncryptedNetworkFolderResponse(),
+                )
+            }
+            .flatMap { vaultSdkSource.decryptFolder(userId = userId, folder = it) }
 
     private suspend fun clearFolderIdFromCiphers(userId: String, folderId: String) {
         vaultDiskSource.getCiphers(userId = userId).forEach {
@@ -130,50 +88,5 @@ class FolderManagerImpl(
                 vaultDiskSource.saveCipher(userId = userId, cipher = it.copy(folderId = null))
             }
         }
-    }
-
-    /**
-     * Deletes the folder specified by [syncFolderDeleteData] from disk.
-     */
-    private suspend fun deleteFolder(syncFolderDeleteData: SyncFolderDeleteData) {
-        clearFolderIdFromCiphers(
-            folderId = syncFolderDeleteData.folderId,
-            userId = syncFolderDeleteData.userId,
-        )
-        vaultDiskSource.deleteFolder(
-            folderId = syncFolderDeleteData.folderId,
-            userId = syncFolderDeleteData.userId,
-        )
-    }
-
-    /**
-     * Syncs an individual folder contained in [syncFolderUpsertData] to disk if certain criteria
-     * are met.
-     */
-    private suspend fun syncFolderIfNecessary(syncFolderUpsertData: SyncFolderUpsertData) {
-        val userId = syncFolderUpsertData.userId
-        val folderId = syncFolderUpsertData.folderId
-        val isUpdate = syncFolderUpsertData.isUpdate
-        val revisionDate = syncFolderUpsertData.revisionDate
-        val localFolder = vaultDiskSource
-            .getFoldersFlow(userId = userId)
-            .first()
-            .find { it.id == folderId }
-        val isValidCreate = !isUpdate && localFolder == null
-        val isValidUpdate = isUpdate &&
-            localFolder != null &&
-            localFolder.revisionDate.epochSecond < revisionDate.epochSecond
-
-        if (!isValidCreate && !isValidUpdate) return
-        if (activeUserId != userId) {
-            // We cannot update right now since the accounts do not match, so we will
-            // do a full-sync on the next check.
-            settingsDiskSource.storeLastSyncTime(userId = userId, lastSyncTime = null)
-            return
-        }
-
-        folderService
-            .getFolder(folderId = folderId)
-            .onSuccess { vaultDiskSource.saveFolder(userId = userId, folder = it) }
     }
 }

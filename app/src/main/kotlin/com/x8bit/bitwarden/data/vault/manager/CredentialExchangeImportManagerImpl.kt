@@ -1,30 +1,28 @@
 package com.x8bit.bitwarden.data.vault.manager
 
-import androidx.credentials.providerevents.exception.ImportCredentialsUnknownErrorException
-import com.bitwarden.core.data.util.asFailure
-import com.bitwarden.core.data.util.asSuccess
-import com.bitwarden.core.data.util.flatMap
 import com.bitwarden.cxf.model.CredentialExchangePayload
 import com.bitwarden.cxf.parser.CredentialExchangePayloadParser
-import com.bitwarden.network.model.ImportCiphersJsonRequest
-import com.bitwarden.network.model.ImportCiphersResponseJson
-import com.bitwarden.network.service.CiphersService
 import com.bitwarden.vault.CipherType
 import com.bitwarden.vault.EncryptionContext
 import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.util.hasRestrictItemTypes
+import com.x8bit.bitwarden.data.vault.datasource.disk.VaultDiskSource
 import com.x8bit.bitwarden.data.vault.datasource.sdk.VaultSdkSource
 import com.x8bit.bitwarden.data.vault.manager.model.ImportCxfPayloadResult
 import com.x8bit.bitwarden.data.vault.manager.model.SyncVaultDataResult
-import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedNetworkCipher
-import timber.log.Timber
+import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedNetworkCipherResponse
+import java.time.Clock
+import java.util.UUID
 
 /**
  * Default implementation of [CredentialExchangeImportManager].
+ *
+ * Imported items are encrypted by the SDK and saved straight to the local vault.
  */
 class CredentialExchangeImportManagerImpl(
     private val vaultSdkSource: VaultSdkSource,
-    private val ciphersService: CiphersService,
+    private val vaultDiskSource: VaultDiskSource,
+    private val clock: Clock,
     private val vaultSyncManager: VaultSyncManager,
     private val policyManager: PolicyManager,
     private val credentialExchangePayloadParser: CredentialExchangePayloadParser,
@@ -72,39 +70,29 @@ class CredentialExchangeImportManagerImpl(
             return ImportCxfPayloadResult.NoItems
         }
 
-        return uploadCiphers(ciphers = filteredCipherList)
-            .map { syncVault(it) }
-            .fold(
-                onSuccess = { it },
-                onFailure = { ImportCxfPayloadResult.Error(error = it) },
-            )
+        return syncVault(saveCiphers(userId = userId, ciphers = filteredCipherList))
     }
 
-    private suspend fun uploadCiphers(
+    private suspend fun saveCiphers(
+        userId: String,
         ciphers: List<EncryptionContext>,
-    ): Result<ImportCxfPayloadResult.Success> {
-        val request = ImportCiphersJsonRequest(
-            ciphers = ciphers.map { it.toEncryptedNetworkCipher() },
-            folders = emptyList(),
-            folderRelationships = emptyList(),
+    ): ImportCxfPayloadResult.Success {
+        val now = clock.instant()
+        vaultDiskSource.saveCiphers(
+            userId = userId,
+            ciphers = ciphers.map {
+                it
+                    .toEncryptedNetworkCipherResponse()
+                    .copy(
+                        id = UUID.randomUUID().toString(),
+                        creationDate = now,
+                        revisionDate = now,
+                        shouldEdit = true,
+                        shouldViewPassword = true,
+                    )
+            },
         )
-        return ciphersService
-            .importCiphers(request)
-            .flatMap { response ->
-                when (response) {
-                    is ImportCiphersResponseJson.Invalid -> {
-                        Timber.w(
-                            "Import ciphers validation failed: %s",
-                            response.validationErrors,
-                        )
-                        ImportCredentialsUnknownErrorException().asFailure()
-                    }
-
-                    is ImportCiphersResponseJson.Success -> {
-                        ImportCxfPayloadResult.Success(itemCount = ciphers.size).asSuccess()
-                    }
-                }
-            }
+        return ImportCxfPayloadResult.Success(itemCount = ciphers.size)
     }
 
     private suspend fun syncVault(result: ImportCxfPayloadResult): ImportCxfPayloadResult =

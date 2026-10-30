@@ -59,6 +59,17 @@ stored key material.
 - Attachments: store encrypted attachment files in app-private storage.
 - `VaultSyncManagerImpl`: remove server sync; the vault flows come straight from disk.
 - Import (`importCiphers`) writes to disk instead of the server.
+- Progress:
+  - [x] `FolderManagerImpl`: create/update/delete write to `VaultDiskSource` (IDs via `UUID`,
+    revision dates from `Clock`).
+  - [x] `CipherManagerImpl`: create/update/archive/unarchive/soft delete/restore/hard delete
+    write to disk; organization share and collection updates return an unsupported error.
+  - [x] Attachments: encrypted files stored at `files/attachments/<userId>/<cipherId>/<id>`,
+    decrypted from a cache copy when opened, deleted with the attachment or cipher.
+  - [x] Credential Exchange import saves ciphers to disk.
+  - [ ] Delete attachment files when the vault is deleted (logout / account removal).
+  - [ ] Logout currently deletes the local vault (there is no server copy); decide whether to
+    hide or rename "Log out" before release.
 
 ### Phase 3: Remove server-only features and network code
 - Delete organizations, collections, Send, emergency access, billing, push, events, config/feature
