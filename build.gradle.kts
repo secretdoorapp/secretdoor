@@ -185,9 +185,10 @@ subprojects {
     }
     tasks.withType<Test>().configureEach {
         useJUnitPlatform()
+        // Override on low-memory machines, e.g. -PtestMaxHeapSize=1280m -PtestForkEvery=100.
         @Suppress("MagicNumber")
-        forkEvery = 500
-        maxHeapSize = "2g"
+        forkEvery = providers.gradleProperty("testForkEvery").orNull?.toLong() ?: 500
+        maxHeapSize = providers.gradleProperty("testMaxHeapSize").orNull ?: "2g"
         maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
         @Suppress("UselessCallOnNotNull")
         jvmArgs = jvmArgs.orEmpty() + "-XX:+UseParallelGC" +

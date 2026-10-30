@@ -47,7 +47,6 @@ import com.bitwarden.core.data.util.advanceTimeByAndRunCurrent
 import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarData
 import com.bitwarden.ui.platform.manager.IntentManager
 import com.bitwarden.ui.platform.manager.exit.ExitManager
-import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.asText
 import com.bitwarden.ui.util.assertNoDialogExists
 import com.bitwarden.ui.util.assertScrollableNodeDoesNotExist
@@ -74,7 +73,6 @@ import com.x8bit.bitwarden.ui.vault.model.VaultAddEditType
 import com.x8bit.bitwarden.ui.vault.model.VaultBankAccountType
 import com.x8bit.bitwarden.ui.vault.model.VaultCardBrand
 import com.x8bit.bitwarden.ui.vault.model.VaultCardExpirationMonth
-import com.x8bit.bitwarden.ui.vault.model.VaultCollection
 import com.x8bit.bitwarden.ui.vault.model.VaultIdentityTitle
 import com.x8bit.bitwarden.ui.vault.model.VaultItemCipherType
 import io.mockk.every
@@ -83,9 +81,6 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.runTest
@@ -3415,92 +3410,6 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `clicking a Ownership option should clear focus from the focused text field`() {
-        mutableStateFlow.value = DEFAULT_STATE_CARD
-        updateStateWithOwners()
-        composeTestRule.waitForIdle()
-        mutableEventFlow.tryEmit(VaultAddEditEvent.FocusCardHolderName)
-        composeTestRule.waitForIdle()
-        composeTestRule
-            .onNodeWithTag("CardholderNameEntry")
-            .performScrollTo()
-            .assertIsFocused()
-
-        composeTestRule
-            .onNodeWithContentDescriptionAfterScroll(
-                label = "My vault. Vault",
-            )
-            .performClick()
-
-        composeTestRule
-            .onNodeWithTag("CardholderNameEntry")
-            .performScrollTo()
-            .assertIsNotFocused()
-    }
-
-    @Test
-    fun `the Ownership control should display the text provided by the state`() {
-        updateStateWithOwners()
-        composeTestRule
-            .onNodeWithContentDescriptionAfterScroll(
-                label = "My vault. Vault",
-            )
-            .assertIsDisplayed()
-
-        mutableStateFlow.update { currentState ->
-            updateCommonContent(currentState) { copy(selectedOwnerId = "mockOwnerId-2") }
-        }
-
-        composeTestRule
-            .onNodeWithContentDescriptionAfterScroll(label = "mockOwnerName-2. Vault")
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun `ownership section should not be displayed when no organizations present`() {
-        updateStateWithOwners(selectedOwnerId = "mockOwnerId-2")
-
-        composeTestRule
-            .onNodeWithTextAfterScroll(text = "mockCollectionName-2")
-            .assertIsDisplayed()
-
-        updateStateWithOwners(
-            selectedOwnerId = null,
-            availableOwners = listOf(
-                VaultAddEditState.Owner(
-                    id = null,
-                    name = BitwardenString.my_vault.asText(),
-                    collections = DEFAULT_COLLECTIONS,
-                ),
-            )
-                .toImmutableList(),
-            hasOrganizations = false,
-        )
-
-        composeTestRule
-            .onNodeWithText(text = "mockCollectionName-2")
-            .assertDoesNotExist()
-    }
-
-    @Test
-    fun `Collection list should display according to state`() {
-        updateStateWithOwners(selectedOwnerId = "mockOwnerId-2")
-
-        composeTestRule
-            .onNodeWithTextAfterScroll("mockCollectionName-2")
-            .assertIsDisplayed()
-
-        updateStateWithOwners(
-            selectedOwnerId = "mockOwnerId-2",
-            availableOwners = ALTERED_OWNERS,
-        )
-
-        composeTestRule
-            .onNodeWithTextAfterScroll("mockCollectionName-new")
-            .assertIsDisplayed()
-    }
-
-    @Test
     fun `changing Name text field should trigger NameTextChange`() {
         mutableStateFlow.value = DEFAULT_STATE_SECURE_NOTES
 
@@ -3873,28 +3782,6 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
             .onAllNodesWithTextAfterScroll("Notes")
             .filterToOne(hasSetTextAction())
             .assertTextContains("NewNote")
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `in ItemType_SecureNotes the Ownership control should display the text provided by the state`() {
-        updateStateWithOwners()
-
-        composeTestRule
-            .onNodeWithContentDescriptionAfterScroll(
-                label = "My vault. Vault",
-            )
-            .assertIsDisplayed()
-
-        mutableStateFlow.update { currentState ->
-            updateCommonContent(currentState) { copy(selectedOwnerId = "mockOwnerId-2") }
-        }
-
-        composeTestRule
-            .onNodeWithContentDescriptionAfterScroll(
-                label = "mockOwnerName-2. Vault",
-            )
-            .assertIsDisplayed()
     }
 
     @Test
@@ -5169,22 +5056,6 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
         return currentState.copy(viewState = updatedType)
     }
 
-    private fun updateStateWithOwners(
-        selectedOwnerId: String? = null,
-        availableOwners: ImmutableList<VaultAddEditState.Owner> = DEFAULT_OWNERS,
-        hasOrganizations: Boolean = true,
-    ) {
-        mutableStateFlow.update { currentState ->
-            updateCommonContent(currentState) {
-                copy(
-                    selectedOwnerId = selectedOwnerId,
-                    availableOwners = availableOwners,
-                    hasOrganizations = hasOrganizations,
-                )
-            }
-        }
-    }
-
     private fun updateStateWithFolders() {
         mutableStateFlow.update {
             updateCommonContent(it) {
@@ -5567,60 +5438,6 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
             hasPremium = false,
             isCardScannerEnabled = false,
             isVfo1FoundationEnabled = true,
-        )
-
-        private val ALTERED_COLLECTIONS = listOf(
-            VaultCollection(
-                id = "mockCollectionId-new",
-                name = "mockCollectionName-new",
-                isSelected = true,
-                isDefaultUserCollection = false,
-            ),
-        )
-
-        private val ALTERED_OWNERS = persistentListOf(
-            VaultAddEditState.Owner(
-                id = null,
-                name = BitwardenString.my_vault.asText(),
-                collections = emptyList(),
-            ),
-            VaultAddEditState.Owner(
-                id = "mockOwnerId-1",
-                name = "mockOwnerName-1".asText(),
-                collections = emptyList(),
-            ),
-            VaultAddEditState.Owner(
-                id = "mockOwnerId-2",
-                name = "mockOwnerName-2".asText(),
-                collections = ALTERED_COLLECTIONS,
-            ),
-        )
-
-        private val DEFAULT_COLLECTIONS = listOf(
-            VaultCollection(
-                id = "mockCollectionId-2",
-                name = "mockCollectionName-2",
-                isSelected = false,
-                isDefaultUserCollection = false,
-            ),
-        )
-
-        private val DEFAULT_OWNERS = persistentListOf(
-            VaultAddEditState.Owner(
-                id = null,
-                name = BitwardenString.my_vault.asText(),
-                collections = emptyList(),
-            ),
-            VaultAddEditState.Owner(
-                id = "mockOwnerId-1",
-                name = "mockOwnerName-1".asText(),
-                collections = emptyList(),
-            ),
-            VaultAddEditState.Owner(
-                id = "mockOwnerId-2",
-                name = "mockOwnerName-2".asText(),
-                collections = DEFAULT_COLLECTIONS,
-            ),
         )
 
         private val DEFAULT_FOLDERS = listOf(

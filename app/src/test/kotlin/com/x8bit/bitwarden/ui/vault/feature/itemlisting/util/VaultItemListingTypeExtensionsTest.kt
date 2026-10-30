@@ -7,4 +7,40 @@ import org.junit.Test
 
 class VaultItemListingTypeExtensionsTest {
 
+    @Suppress("MaxLineLength")
+    @Test
+    fun `toItemListingType should transform a VaultItemListingType into a VaultItemListingState ItemListingType`() {
+        val itemListingTypeList = listOf(
+            VaultItemListingType.Folder(folderId = "mock"),
+            VaultItemListingType.Archive,
+            VaultItemListingType.Trash,
+            VaultItemListingType.SshKey,
+            VaultItemListingType.Card,
+            VaultItemListingType.Identity,
+            VaultItemListingType.Login,
+            VaultItemListingType.SecureNote,
+            VaultItemListingType.BankAccount,
+            VaultItemListingType.License,
+            VaultItemListingType.Passport,
+        )
+
+        val result = itemListingTypeList.map { it.toItemListingType() }
+
+        assertEquals(
+            listOf(
+                VaultItemListingState.ItemListingType.Vault.Folder(folderId = "mock"),
+                VaultItemListingState.ItemListingType.Vault.Archive,
+                VaultItemListingState.ItemListingType.Vault.Trash,
+                VaultItemListingState.ItemListingType.Vault.SshKey,
+                VaultItemListingState.ItemListingType.Vault.Card,
+                VaultItemListingState.ItemListingType.Vault.Identity,
+                VaultItemListingState.ItemListingType.Vault.Login,
+                VaultItemListingState.ItemListingType.Vault.SecureNote,
+                VaultItemListingState.ItemListingType.Vault.BankAccount,
+                VaultItemListingState.ItemListingType.Vault.License,
+                VaultItemListingState.ItemListingType.Vault.Passport,
+            ),
+            result,
+        )
+    }
 }
