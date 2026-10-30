@@ -352,6 +352,17 @@ interface AuthDiskSource : AppIdProvider {
     fun storeMasterPasswordHash(userId: String, passwordHash: String?)
 
     /**
+     * Gets the master password hint for the given [userId]. The hint is stored only on this
+     * device.
+     */
+    fun getMasterPasswordHint(userId: String): String?
+
+    /**
+     * Stores the master password [hint] for the given [userId].
+     */
+    fun storeMasterPasswordHint(userId: String, hint: String?)
+
+    /**
      * Gets the policies for the given [userId].
      */
     fun getPolicies(userId: String): List<SyncResponseJson.Policy>?

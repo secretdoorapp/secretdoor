@@ -62,6 +62,7 @@ class VaultUnlockViewModelTest : BaseViewModelTest() {
         every { switchAccount(any()) } returns SwitchAccountResult.AccountSwitched
         every { getOrCreateCipher(userId = any()) } returns CIPHER
         every { isBiometricIntegrityValid(userId = any()) } returns true
+        every { getMasterPasswordHint() } returns null
     }
     private val vaultRepository: VaultRepository = mockk(relaxed = true) {
         every { lockVault(any(), any()) } just runs
@@ -112,6 +113,16 @@ class VaultUnlockViewModelTest : BaseViewModelTest() {
         val viewModel = createViewModel()
         assertEquals(DEFAULT_STATE, viewModel.stateFlow.value)
         verify { authRepository.getOrCreateCipher(USER_ID) }
+    }
+
+    @Test
+    fun `initial state should include the locally stored master password hint`() {
+        every { authRepository.getMasterPasswordHint() } returns "hint"
+        val viewModel = createViewModel()
+        assertEquals(
+            DEFAULT_STATE.copy(masterPasswordHint = "hint"),
+            viewModel.stateFlow.value,
+        )
     }
 
     @Test

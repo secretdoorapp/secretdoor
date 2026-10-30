@@ -43,6 +43,7 @@ import com.bitwarden.ui.platform.components.appbar.action.BitwardenOverflowActio
 import com.bitwarden.ui.platform.components.appbar.model.OverflowMenuItemData
 import com.bitwarden.ui.platform.components.button.BitwardenFilledButton
 import com.bitwarden.ui.platform.components.button.BitwardenOutlinedButton
+import com.bitwarden.ui.platform.components.button.BitwardenTextButton
 import com.bitwarden.ui.platform.components.dialog.BitwardenBasicDialog
 import com.bitwarden.ui.platform.components.dialog.BitwardenLoadingDialog
 import com.bitwarden.ui.platform.components.field.BitwardenPasswordField
@@ -171,6 +172,16 @@ fun VaultUnlockScreen(
     }
 
     // Static dialogs
+    var showMasterPasswordHintDialog by rememberSaveable { mutableStateOf(false) }
+    val masterPasswordHint = state.masterPasswordHint
+    if (showMasterPasswordHintDialog && masterPasswordHint != null) {
+        BitwardenBasicDialog(
+            title = stringResource(id = BitwardenString.master_password_hint_not_specified),
+            message = masterPasswordHint,
+            onDismissRequest = { showMasterPasswordHintDialog = false },
+        )
+    }
+
     var showLogoutConfirmationDialog by remember { mutableStateOf(false) }
     if (showLogoutConfirmationDialog) {
         BitwardenLogoutConfirmationDialog(
@@ -332,6 +343,17 @@ fun VaultUnlockScreen(
                     isEnabled = state.input.isNotEmpty(),
                     modifier = Modifier
                         .testTag("UnlockVaultButton")
+                        .standardHorizontalMargin()
+                        .fillMaxWidth(),
+                )
+            }
+            if (state.showMasterPasswordHint) {
+                Spacer(modifier = Modifier.height(12.dp))
+                BitwardenTextButton(
+                    label = stringResource(id = BitwardenString.show_master_password_hint),
+                    onClick = { showMasterPasswordHintDialog = true },
+                    modifier = Modifier
+                        .testTag("ShowMasterPasswordHintButton")
                         .standardHorizontalMargin()
                         .fillMaxWidth(),
                 )

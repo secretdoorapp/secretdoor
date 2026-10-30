@@ -265,6 +265,24 @@ interface AuthRepository :
     ): RegisterResult
 
     /**
+     * Creates a new vault that exists only on this device, protected by the given
+     * [masterPassword], and unlocks it. The optional [masterPasswordHint] is stored only on this
+     * device. No server is contacted unless [shouldCheckDataBreaches] is `true`.
+     */
+    suspend fun createLocalVault(
+        masterPassword: String,
+        masterPasswordHint: String?,
+        shouldCheckDataBreaches: Boolean,
+        isMasterPasswordStrong: Boolean,
+    ): RegisterResult
+
+    /**
+     * Returns the locally stored master password hint for the active user, or `null` if there is
+     * no active user or no hint was set.
+     */
+    fun getMasterPasswordHint(): String?
+
+    /**
      * Attempt to request a password hint.
      */
     suspend fun passwordHintRequest(

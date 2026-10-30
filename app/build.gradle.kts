@@ -60,7 +60,7 @@ configure<ApplicationExtension> {
     }
 
     defaultConfig {
-        applicationId = "com.x8bit.bitwarden"
+        applicationId = "io.github.zcoklin.secretdoor"
         minSdk {
             version = release(libs.versions.minSdk.get().toInt())
         }

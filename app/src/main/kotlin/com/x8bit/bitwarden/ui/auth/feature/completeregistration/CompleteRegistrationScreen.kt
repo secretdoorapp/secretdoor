@@ -1,6 +1,5 @@
 package com.x8bit.bitwarden.ui.auth.feature.completeregistration
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -71,14 +70,11 @@ fun CompleteRegistrationScreen(
     onNavigateBack: () -> Unit,
     onNavigateToPasswordGuidance: () -> Unit,
     onNavigateToPreventAccountLockout: () -> Unit,
-    onNavigateToLogin: (email: String) -> Unit,
     viewModel: CompleteRegistrationViewModel = hiltViewModel(),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     val handler = rememberCompleteRegistrationHandler(viewModel = viewModel)
     val snackbarHostState = rememberBitwardenSnackbarHostState()
-    // route OS back actions through the VM to clear the special circumstance
-    BackHandler(onBack = handler.onBackClick)
 
     EventsEffect(viewModel) { event ->
         when (event) {
@@ -90,12 +86,6 @@ fun CompleteRegistrationScreen(
             CompleteRegistrationEvent.NavigateToMakePasswordStrong -> onNavigateToPasswordGuidance()
             CompleteRegistrationEvent.NavigateToPreventAccountLockout -> {
                 onNavigateToPreventAccountLockout()
-            }
-
-            is CompleteRegistrationEvent.NavigateToLogin -> {
-                onNavigateToLogin(
-                    event.email,
-                )
             }
         }
     }
@@ -124,7 +114,7 @@ fun CompleteRegistrationScreen(
         }
 
         CompleteRegistrationDialog.Loading -> {
-            BitwardenLoadingDialog(text = stringResource(id = BitwardenString.create_account))
+            BitwardenLoadingDialog(text = stringResource(id = BitwardenString.create_vault))
         }
 
         null -> Unit
@@ -137,11 +127,9 @@ fun CompleteRegistrationScreen(
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             BitwardenTopAppBar(
-                title = stringResource(id = BitwardenString.create_account),
+                title = stringResource(id = BitwardenString.create_vault),
                 scrollBehavior = scrollBehavior,
-                navigationIcon = rememberVectorPainter(id = BitwardenDrawable.ic_back),
-                navigationIconContentDescription = stringResource(id = BitwardenString.back),
-                onNavigationIconClick = handler.onBackClick,
+                navigationIcon = null,
             )
         },
         snackbarHost = { BitwardenSnackbarHost(bitwardenHostState = snackbarHostState) },
@@ -160,7 +148,7 @@ fun CompleteRegistrationScreen(
                 isCheckDataBreachesToggled = state.isCheckDataBreachesToggled,
                 handler = handler,
                 nextButtonEnabled = state.validSubmissionReady,
-                callToActionText = stringResource(BitwardenString.next),
+                callToActionText = stringResource(BitwardenString.create_vault),
                 minimumPasswordLength = state.minimumPasswordLength,
             )
             Spacer(modifier = Modifier.height(height = 16.dp))
@@ -245,37 +233,38 @@ private fun CompleteRegistrationContent(
                 .standardHorizontalMargin(),
         )
         BitwardenTextField(
-            label = stringResource(
-                id = BitwardenString.master_password_hint_not_specified,
-            ),
+            label = stringResource(id = BitwardenString.master_password_hint_not_specified),
             value = passwordHintInput,
             onValueChange = handler.onPasswordHintChange,
-            supportingContentPadding = PaddingValues(top = 12.dp),
-            supportingContent = {
-                Text(
-                    text = stringResource(
-                        id = BitwardenString
-                            .bitwarden_cannot_recover_a_lost_or_forgotten_master_password,
-                    ),
-                    style = BitwardenTheme.typography.bodySmall,
-                    color = BitwardenTheme.colorScheme.text.secondary,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth(),
-                )
-                BitwardenClickableText(
-                    label = stringResource(
-                        id = BitwardenString.learn_about_other_ways_to_prevent_account_lockout,
-                    ),
-                    onClick = handler.onLearnToPreventLockout,
-                    style = BitwardenTheme.typography.labelMedium,
-                    shape = BitwardenTheme.shapes.contentBottom,
-                    innerPadding = PaddingValues(vertical = 4.dp, horizontal = 16.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            },
+            supportingText = stringResource(
+                id = BitwardenString
+                    .your_hint_is_shown_on_the_unlock_screen_dont_put_your_password_in_it,
+            ),
             textFieldTestTag = "MasterPasswordHintLabel",
             cardStyle = CardStyle.Bottom,
+            modifier = Modifier
+                .fillMaxWidth()
+                .standardHorizontalMargin(),
+        )
+        Spacer(modifier = Modifier.height(height = 12.dp))
+        Text(
+            text = stringResource(
+                id = BitwardenString.secretdoor_cannot_recover_a_lost_or_forgotten_master_password,
+            ),
+            style = BitwardenTheme.typography.bodySmall,
+            color = BitwardenTheme.colorScheme.text.secondary,
+            modifier = Modifier
+                .fillMaxWidth()
+                .standardHorizontalMargin()
+                .padding(horizontal = 16.dp),
+        )
+        BitwardenClickableText(
+            label = stringResource(
+                id = BitwardenString.learn_about_other_ways_to_prevent_account_lockout,
+            ),
+            onClick = handler.onLearnToPreventLockout,
+            style = BitwardenTheme.typography.labelMedium,
+            innerPadding = PaddingValues(vertical = 4.dp, horizontal = 16.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .standardHorizontalMargin(),

@@ -18,7 +18,6 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
 import com.bitwarden.ui.util.asText
-import com.x8bit.bitwarden.ui.auth.feature.completeregistration.CompleteRegistrationAction.BackClick
 import com.x8bit.bitwarden.ui.auth.feature.completeregistration.CompleteRegistrationAction.CheckDataBreachesToggle
 import com.x8bit.bitwarden.ui.auth.feature.completeregistration.CompleteRegistrationAction.ConfirmPasswordInputChange
 import com.x8bit.bitwarden.ui.auth.feature.completeregistration.CompleteRegistrationAction.ContinueWithBreachedPasswordClick
@@ -42,7 +41,6 @@ class CompleteRegistrationScreenTest : BitwardenComposeTest() {
     private var onNavigateBackCalled = false
     private var onNavigateToPreventAccountLockoutCalled = false
     private var onNavigateToPasswordGuidanceCalled = false
-    private var onNavigateToLoginCalled = false
 
     private val mutableStateFlow = MutableStateFlow(DEFAULT_STATE)
     private val mutableEventFlow = bufferedMutableSharedFlow<CompleteRegistrationEvent>()
@@ -61,10 +59,6 @@ class CompleteRegistrationScreenTest : BitwardenComposeTest() {
                 onNavigateToPreventAccountLockout = {
                     onNavigateToPreventAccountLockoutCalled = true
                 },
-                onNavigateToLogin = { email ->
-                    onNavigateToLoginCalled = true
-                    assertTrue(email == EMAIL)
-                },
                 viewModel = viewModel,
             )
         }
@@ -79,9 +73,8 @@ class CompleteRegistrationScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `close click should send CloseClick action`() {
-        composeTestRule.onNodeWithContentDescription("Back").performClick()
-        verify { viewModel.trySendAction(BackClick) }
+    fun `top app bar should not show a back button`() {
+        composeTestRule.onNodeWithContentDescription("Back").assertDoesNotExist()
     }
 
     @Test
@@ -97,12 +90,6 @@ class CompleteRegistrationScreenTest : BitwardenComposeTest() {
     fun `NavigateBack event should invoke navigate back lambda`() {
         mutableEventFlow.tryEmit(CompleteRegistrationEvent.NavigateBack)
         assertTrue(onNavigateBackCalled)
-    }
-
-    @Test
-    fun `system back event should send BackClick action`() {
-        backDispatcher?.onBackPressed()
-        verify { viewModel.trySendAction(BackClick) }
     }
 
     @Test
@@ -122,6 +109,7 @@ class CompleteRegistrationScreenTest : BitwardenComposeTest() {
     fun `password hint input change should send PasswordHintChange action`() {
         composeTestRule
             .onNodeWithText("Master password hint")
+            .performScrollTo()
             .performTextInput(TEST_INPUT)
         verify { viewModel.trySendAction(PasswordHintChange(TEST_INPUT)) }
     }
@@ -263,22 +251,11 @@ class CompleteRegistrationScreenTest : BitwardenComposeTest() {
         assertTrue(onNavigateToPasswordGuidanceCalled)
     }
 
-    @Test
-    fun `NavigateToLogin event should invoke navigate to login lambda`() {
-        mutableEventFlow.tryEmit(
-            CompleteRegistrationEvent.NavigateToLogin(
-                email = EMAIL,
-            ),
-        )
-
-        assertTrue(onNavigateToLoginCalled)
-    }
-
     // New Onboarding UI tests
     @Test
     fun `determine if using the new ui by title text`() {
         composeTestRule
-            .onNode(hasText("Create account") and !hasClickAction())
+            .onNode(hasText("Create vault") and !hasClickAction())
             .assertIsDisplayed()
 
         composeTestRule
@@ -295,7 +272,7 @@ class CompleteRegistrationScreenTest : BitwardenComposeTest() {
             )
         }
         composeTestRule
-            .onNodeWithText("Next")
+            .onNode(hasText("Create vault") and hasClickAction())
             .assertIsNotEnabled()
             .performScrollTo()
             .performClick()
@@ -311,7 +288,7 @@ class CompleteRegistrationScreenTest : BitwardenComposeTest() {
         }
 
         composeTestRule
-            .onNodeWithText("Next")
+            .onNode(hasText("Create vault") and hasClickAction())
             .assertIsEnabled()
             .performScrollTo()
             .performClick()

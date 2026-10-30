@@ -17,14 +17,12 @@ import com.x8bit.bitwarden.data.auth.datasource.sdk.model.PasswordStrength.LEVEL
 import com.x8bit.bitwarden.data.auth.datasource.sdk.model.PasswordStrength.LEVEL_3
 import com.x8bit.bitwarden.data.auth.datasource.sdk.model.PasswordStrength.LEVEL_4
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
-import com.x8bit.bitwarden.data.auth.repository.model.LoginResult
 import com.x8bit.bitwarden.data.auth.repository.model.PasswordStrengthResult
 import com.x8bit.bitwarden.data.auth.repository.model.RegisterResult
 import com.x8bit.bitwarden.data.auth.repository.model.UserState
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance.RegistrationEvent
-import com.x8bit.bitwarden.data.platform.repository.util.FakeEnvironmentRepository
 import com.x8bit.bitwarden.data.tools.generator.repository.GeneratorRepository
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratorResult
 import com.x8bit.bitwarden.ui.auth.feature.completeregistration.CompleteRegistrationAction.BackClick
@@ -61,13 +59,10 @@ class CompleteRegistrationViewModelTest : BaseViewModelTest() {
     private val mutableUserStateFlow = MutableStateFlow<UserState?>(null)
     private val mockAuthRepository = mockk<AuthRepository> {
         every { userStateFlow } returns mutableUserStateFlow
-        coEvery { login(email = any(), password = any()) } returns LoginResult.Success
         coEvery {
-            register(
-                email = any(),
+            createLocalVault(
                 masterPassword = any(),
                 masterPasswordHint = any(),
-                emailVerificationToken = any(),
                 shouldCheckDataBreaches = any(),
                 isMasterPasswordStrong = any(),
             )
@@ -77,8 +72,6 @@ class CompleteRegistrationViewModelTest : BaseViewModelTest() {
     private val toastManager: ToastManager = mockk {
         every { show(messageId = any(), duration = any()) } just runs
     }
-
-    private val fakeEnvironmentRepository = FakeEnvironmentRepository()
 
     private val specialCircumstanceManager: SpecialCircumstanceManager =
         SpecialCircumstanceManagerImpl(
@@ -109,7 +102,7 @@ class CompleteRegistrationViewModelTest : BaseViewModelTest() {
 
     @Test
     fun `initial state should be correct`() {
-        val viewModel = createCompleteRegistrationViewModel(DEFAULT_STATE)
+        val viewModel = createCompleteRegistrationViewModel(completeRegistrationState = null)
         assertEquals(DEFAULT_STATE, viewModel.stateFlow.value)
     }
 
@@ -140,11 +133,9 @@ class CompleteRegistrationViewModelTest : BaseViewModelTest() {
     fun `CallToActionClick with all inputs valid should account created toast and hide dialog`() =
         runTest {
             coEvery {
-                mockAuthRepository.register(
-                    email = EMAIL,
+                mockAuthRepository.createLocalVault(
                     masterPassword = PASSWORD,
                     masterPasswordHint = null,
-                    emailVerificationToken = TOKEN,
                     shouldCheckDataBreaches = false,
                     isMasterPasswordStrong = true,
                 )
@@ -161,7 +152,7 @@ class CompleteRegistrationViewModelTest : BaseViewModelTest() {
                 assertEquals(VALID_INPUT_STATE, awaitItem())
             }
             verify(exactly = 1) {
-                toastManager.show(messageId = BitwardenString.account_created_success)
+                toastManager.show(messageId = BitwardenString.your_new_vault_has_been_created)
             }
         }
 
@@ -169,11 +160,9 @@ class CompleteRegistrationViewModelTest : BaseViewModelTest() {
     fun `CallToActionClick register returns error should update errorDialogState`() = runTest {
         val error = Throwable("Fail!")
         coEvery {
-            mockAuthRepository.register(
-                email = EMAIL,
+            mockAuthRepository.createLocalVault(
                 masterPassword = PASSWORD,
                 masterPasswordHint = null,
-                emailVerificationToken = TOKEN,
                 shouldCheckDataBreaches = false,
                 isMasterPasswordStrong = true,
             )
@@ -200,19 +189,38 @@ class CompleteRegistrationViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `CallToActionClick register returns Success should attempt login`() = runTest {
+    fun `CallToActionClick register returns Success should create local vault`() = runTest {
         val viewModel = createCompleteRegistrationViewModel(VALID_INPUT_STATE)
         viewModel.trySendAction(CompleteRegistrationAction.CallToActionClick)
-        coVerify {
-            mockAuthRepository.login(
-                email = EMAIL,
-                password = PASSWORD,
+        coVerify(exactly = 1) {
+            mockAuthRepository.createLocalVault(
+                masterPassword = PASSWORD,
+                masterPasswordHint = null,
+                shouldCheckDataBreaches = false,
+                isMasterPasswordStrong = true,
+            )
+        }
+        coVerify(exactly = 0) { mockAuthRepository.login(email = any(), password = any()) }
+    }
+
+    @Test
+    fun `CallToActionClick with a hint should create local vault with the hint`() = runTest {
+        val viewModel = createCompleteRegistrationViewModel(
+            VALID_INPUT_STATE.copy(passwordHintInput = "hint"),
+        )
+        viewModel.trySendAction(CompleteRegistrationAction.CallToActionClick)
+        coVerify(exactly = 1) {
+            mockAuthRepository.createLocalVault(
+                masterPassword = PASSWORD,
+                masterPasswordHint = "hint",
+                shouldCheckDataBreaches = false,
+                isMasterPasswordStrong = true,
             )
         }
     }
 
     @Test
-    fun `when login attempt returns success should wait for state based navigation`() = runTest {
+    fun `when local vault is created should wait for state based navigation`() = runTest {
         val viewModel = createCompleteRegistrationViewModel(VALID_INPUT_STATE)
         viewModel.trySendAction(CompleteRegistrationAction.CallToActionClick)
         viewModel.eventFlow.test {
@@ -223,38 +231,12 @@ class CompleteRegistrationViewModelTest : BaseViewModelTest() {
         }
     }
 
-    @Suppress("MaxLineLength")
-    @Test
-    fun `when login attempt returns anything other than success should send navigate to login event`() =
-        runTest {
-            coEvery {
-                mockAuthRepository.login(
-                    email = EMAIL,
-                    password = PASSWORD,
-                )
-            } returns LoginResult.TwoFactorRequired
-
-            val viewModel = createCompleteRegistrationViewModel(VALID_INPUT_STATE)
-            viewModel.trySendAction(CompleteRegistrationAction.CallToActionClick)
-            viewModel.eventFlow.test {
-                assertEquals(
-                    CompleteRegistrationEvent.NavigateToLogin(EMAIL),
-                    awaitItem(),
-                )
-            }
-            verify(exactly = 1) {
-                mockAuthRepository.setOnboardingStatus(OnboardingStatus.NOT_STARTED)
-            }
-        }
-
     @Test
     fun `ContinueWithBreachedPasswordClick should call repository with checkDataBreaches false`() {
         coEvery {
-            mockAuthRepository.register(
-                email = EMAIL,
+            mockAuthRepository.createLocalVault(
                 masterPassword = PASSWORD,
                 masterPasswordHint = null,
-                emailVerificationToken = TOKEN,
                 shouldCheckDataBreaches = false,
                 isMasterPasswordStrong = true,
             )
@@ -262,11 +244,9 @@ class CompleteRegistrationViewModelTest : BaseViewModelTest() {
         val viewModel = createCompleteRegistrationViewModel(VALID_INPUT_STATE)
         viewModel.trySendAction(CompleteRegistrationAction.ContinueWithBreachedPasswordClick)
         coVerify {
-            mockAuthRepository.register(
-                email = EMAIL,
+            mockAuthRepository.createLocalVault(
                 masterPassword = PASSWORD,
                 masterPasswordHint = null,
-                emailVerificationToken = TOKEN,
                 shouldCheckDataBreaches = false,
                 isMasterPasswordStrong = true,
             )
@@ -278,11 +258,9 @@ class CompleteRegistrationViewModelTest : BaseViewModelTest() {
         runTest {
             mockAuthRepository.apply {
                 coEvery {
-                    register(
-                        email = EMAIL,
+                    createLocalVault(
                         masterPassword = PASSWORD,
                         masterPasswordHint = null,
-                        emailVerificationToken = TOKEN,
                         shouldCheckDataBreaches = true,
                         isMasterPasswordStrong = true,
                     )
@@ -316,11 +294,9 @@ class CompleteRegistrationViewModelTest : BaseViewModelTest() {
         runTest {
             mockAuthRepository.apply {
                 coEvery {
-                    register(
-                        email = EMAIL,
+                    createLocalVault(
                         masterPassword = PASSWORD,
                         masterPasswordHint = null,
-                        emailVerificationToken = TOKEN,
                         shouldCheckDataBreaches = true,
                         isMasterPasswordStrong = false,
                     )
@@ -348,11 +324,9 @@ class CompleteRegistrationViewModelTest : BaseViewModelTest() {
         runTest {
             mockAuthRepository.apply {
                 coEvery {
-                    register(
-                        email = EMAIL,
+                    createLocalVault(
                         masterPassword = PASSWORD,
                         masterPasswordHint = null,
-                        emailVerificationToken = TOKEN,
                         shouldCheckDataBreaches = true,
                         isMasterPasswordStrong = false,
                     )
@@ -617,27 +591,18 @@ class CompleteRegistrationViewModelTest : BaseViewModelTest() {
         }
 
     @Test
-    fun `CreateAccountClick with no email not should show dialog`() = runTest {
-        coEvery {
-            mockAuthRepository.getPasswordStrength("", PASSWORD)
-        } returns PasswordStrengthResult.Error(error = Throwable("Fail!"))
+    fun `CreateAccountClick with no email should create local vault`() = runTest {
         val viewModel = createCompleteRegistrationViewModel(
-            DEFAULT_STATE.copy(userEmail = ""),
-        )
-        viewModel.trySendAction(PasswordInputChange(PASSWORD))
-        val expectedState = DEFAULT_STATE.copy(
-            userEmail = "",
-            passwordInput = PASSWORD,
-            dialog = CompleteRegistrationDialog.Error(
-                title = BitwardenString.an_error_has_occurred.asText(),
-                message = BitwardenString.validation_field_required.asText(
-                    BitwardenString.email_address.asText(),
-                ),
-            ),
+            VALID_INPUT_STATE.copy(userEmail = "", emailVerificationToken = ""),
         )
         viewModel.trySendAction(CompleteRegistrationAction.CallToActionClick)
-        viewModel.stateFlow.test {
-            assertEquals(expectedState, awaitItem())
+        coVerify(exactly = 1) {
+            mockAuthRepository.createLocalVault(
+                masterPassword = PASSWORD,
+                masterPasswordHint = null,
+                shouldCheckDataBreaches = false,
+                isMasterPasswordStrong = true,
+            )
         }
     }
 
@@ -653,7 +618,6 @@ class CompleteRegistrationViewModelTest : BaseViewModelTest() {
             )
         },
         authRepository = mockAuthRepository,
-        environmentRepository = fakeEnvironmentRepository,
         specialCircumstanceManager = specialCircumstanceManager,
         generatorRepository = generatorRepository,
         toastManager = toastManager,
@@ -670,7 +634,7 @@ class CompleteRegistrationViewModelTest : BaseViewModelTest() {
             passwordInput = "",
             confirmPasswordInput = "",
             passwordHintInput = "",
-            isCheckDataBreachesToggled = true,
+            isCheckDataBreachesToggled = false,
             dialog = null,
             passwordStrengthState = PasswordStrengthState.NONE,
             minimumPasswordLength = 12,

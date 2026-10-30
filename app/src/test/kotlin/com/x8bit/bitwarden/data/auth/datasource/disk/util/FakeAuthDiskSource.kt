@@ -59,6 +59,7 @@ class FakeAuthDiskSource : AuthDiskSource {
     private val storedBiometricInitVectors = mutableMapOf<String, ByteArray?>()
     private val storedBiometricKeys = mutableMapOf<String, String?>()
     private val storedMasterPasswordHashes = mutableMapOf<String, String?>()
+    private val storedMasterPasswordHints = mutableMapOf<String, String?>()
     private val storedAuthenticationSyncKeys = mutableMapOf<String, String?>()
     private val storedPolicies = mutableMapOf<String, List<SyncResponseJson.Policy>?>()
     private val storedOnboardingStatus = mutableMapOf<String, OnboardingStatus?>()
@@ -103,6 +104,7 @@ class FakeAuthDiskSource : AuthDiskSource {
         storedPinProtectedUserKeys.remove(userId)
         storedV2UpgradeTokens.remove(userId)
         storedUserKeyIds.remove(userId)
+        storedMasterPasswordHints.remove(userId)
 
         mutableShouldUseKeyConnectorFlowMap.remove(userId)
         mutableOrganizationsFlowMap.remove(userId)
@@ -313,6 +315,13 @@ class FakeAuthDiskSource : AuthDiskSource {
 
     override fun storeMasterPasswordHash(userId: String, passwordHash: String?) {
         storedMasterPasswordHashes[userId] = passwordHash
+    }
+
+    override fun getMasterPasswordHint(userId: String): String? =
+        storedMasterPasswordHints[userId]
+
+    override fun storeMasterPasswordHint(userId: String, hint: String?) {
+        storedMasterPasswordHints[userId] = hint
     }
 
     override fun getAuthenticatorSyncUnlockKey(userId: String): String? =
@@ -602,6 +611,13 @@ class FakeAuthDiskSource : AuthDiskSource {
      */
     fun assertMasterPasswordHash(userId: String, passwordHash: String?) {
         assertEquals(passwordHash, storedMasterPasswordHashes[userId])
+    }
+
+    /**
+     * Assert that the master password [hint] was stored successfully using the [userId].
+     */
+    fun assertMasterPasswordHint(userId: String, hint: String?) {
+        assertEquals(hint, storedMasterPasswordHints[userId])
     }
 
     /**

@@ -92,12 +92,12 @@ class RootNavViewModelTest : BaseViewModelTest() {
 
     @Suppress("MaxLineLength")
     @Test
-    fun `when there are no accounts and the user has not logged on before the nav state should be Auth with the welcome route`() {
+    fun `when there are no accounts and the user has not logged on before the nav state should be Auth without the welcome route`() {
         every { authRepository.showWelcomeCarousel } returns true
         mutableUserStateFlow.tryEmit(null)
         val viewModel = createViewModel()
         assertEquals(
-            RootNavState.AuthWithWelcome,
+            RootNavState.Auth,
             viewModel.stateFlow.value,
         )
     }
@@ -140,171 +140,6 @@ class RootNavViewModelTest : BaseViewModelTest() {
             RootNavState.Auth,
             viewModel.stateFlow.value,
         )
-    }
-
-    @Test
-    fun `when the active user needs a password reset the nav state should be ResetPassword`() {
-        mutableUserStateFlow.tryEmit(
-            UserState(
-                activeUserId = "activeUserId",
-                accounts = listOf(
-                    UserState.Account(
-                        userId = "activeUserId",
-                        name = "name",
-                        email = "email",
-                        avatarColorHex = "avatarColorHex",
-                        environment = Environment.Prod.Us,
-                        isPremium = true,
-                        isPremiumFromSelf = true,
-                        isLoggedIn = false,
-                        isVaultUnlocked = true,
-                        needsPasswordReset = true,
-                        isBiometricsEnabled = false,
-                        organizations = emptyList(),
-                        needsMasterPassword = false,
-                        trustedDevice = null,
-                        hasMasterPassword = true,
-                        isUsingKeyConnector = false,
-                        onboardingStatus = OnboardingStatus.COMPLETE,
-                        firstTimeState = FirstTimeState(
-                            showImportLoginsCard = true,
-                        ),
-                        isExportable = true,
-                        creationDate = null,
-                    ),
-                ),
-            ),
-        )
-        val viewModel = createViewModel()
-        assertEquals(RootNavState.ResetPassword, viewModel.stateFlow.value)
-    }
-
-    @Test
-    fun `when the active user needs a master password the nav state should be SetPassword`() {
-        mutableUserStateFlow.tryEmit(
-            UserState(
-                activeUserId = "activeUserId",
-                accounts = listOf(
-                    UserState.Account(
-                        userId = "activeUserId",
-                        name = "name",
-                        email = "email",
-                        avatarColorHex = "avatarColorHex",
-                        environment = Environment.Prod.Us,
-                        isPremium = true,
-                        isPremiumFromSelf = true,
-                        isLoggedIn = false,
-                        isVaultUnlocked = false,
-                        needsPasswordReset = true,
-                        isBiometricsEnabled = false,
-                        organizations = emptyList(),
-                        needsMasterPassword = true,
-                        trustedDevice = null,
-                        hasMasterPassword = true,
-                        isUsingKeyConnector = false,
-                        onboardingStatus = OnboardingStatus.COMPLETE,
-                        firstTimeState = FirstTimeState(
-                            showImportLoginsCard = true,
-                        ),
-                        isExportable = true,
-                        creationDate = null,
-                    ),
-                ),
-            ),
-        )
-        val viewModel = createViewModel()
-        assertEquals(
-            RootNavState.SetPassword,
-            viewModel.stateFlow.value,
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `when the active user has an untrusted device without password the nav state should be TrustedDevice`() {
-        every { authRepository.tdeLoginComplete } returns null
-        mutableUserStateFlow.tryEmit(
-            UserState(
-                activeUserId = "activeUserId",
-                accounts = listOf(
-                    UserState.Account(
-                        userId = "activeUserId",
-                        name = "name",
-                        email = "email",
-                        avatarColorHex = "avatarColorHex",
-                        environment = Environment.Prod.Us,
-                        isPremium = true,
-                        isPremiumFromSelf = true,
-                        isLoggedIn = false,
-                        isVaultUnlocked = false,
-                        needsPasswordReset = false,
-                        isBiometricsEnabled = false,
-                        organizations = emptyList(),
-                        needsMasterPassword = false,
-                        trustedDevice = UserState.TrustedDevice(
-                            isDeviceTrusted = false,
-                            hasAdminApproval = true,
-                            hasLoginApprovingDevice = true,
-                            hasResetPasswordPermission = false,
-                        ),
-                        hasMasterPassword = false,
-                        isUsingKeyConnector = false,
-                        onboardingStatus = OnboardingStatus.COMPLETE,
-                        firstTimeState = FirstTimeState(
-                            showImportLoginsCard = true,
-                        ),
-                        isExportable = true,
-                        creationDate = null,
-                    ),
-                ),
-            ),
-        )
-        val viewModel = createViewModel()
-        assertEquals(RootNavState.TrustedDevice, viewModel.stateFlow.value)
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `when the active user has an untrusted device with password the nav state should be TrustedDevice`() {
-        every { authRepository.tdeLoginComplete } returns null
-        mutableUserStateFlow.tryEmit(
-            UserState(
-                activeUserId = "activeUserId",
-                accounts = listOf(
-                    UserState.Account(
-                        userId = "activeUserId",
-                        name = "name",
-                        email = "email",
-                        avatarColorHex = "avatarColorHex",
-                        environment = Environment.Prod.Us,
-                        isPremium = true,
-                        isPremiumFromSelf = true,
-                        isLoggedIn = true,
-                        isVaultUnlocked = false,
-                        needsPasswordReset = false,
-                        isBiometricsEnabled = false,
-                        organizations = emptyList(),
-                        needsMasterPassword = false,
-                        trustedDevice = UserState.TrustedDevice(
-                            isDeviceTrusted = false,
-                            hasAdminApproval = true,
-                            hasLoginApprovingDevice = true,
-                            hasResetPasswordPermission = false,
-                        ),
-                        hasMasterPassword = true,
-                        isUsingKeyConnector = false,
-                        onboardingStatus = OnboardingStatus.COMPLETE,
-                        firstTimeState = FirstTimeState(
-                            showImportLoginsCard = true,
-                        ),
-                        isExportable = true,
-                        creationDate = null,
-                    ),
-                ),
-            ),
-        )
-        val viewModel = createViewModel()
-        assertEquals(RootNavState.TrustedDevice, viewModel.stateFlow.value)
     }
 
     @Suppress("MaxLineLength")
@@ -394,58 +229,6 @@ class RootNavViewModelTest : BaseViewModelTest() {
             RootNavState.Auth,
             viewModel.stateFlow.value,
         )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `when the active user has an unlocked vault with an external user, a key-connector user account and is not currently using key connector the nav state should be RemovePassword`() {
-        val jwtTokenDataJson = mockk<JwtTokenDataJson> {
-            every { isExternal } returns true
-        }
-        every { parseJwtTokenDataOrNull(ACCESS_TOKEN) } returns jwtTokenDataJson
-        mutableUserStateFlow.tryEmit(
-            UserState(
-                activeUserId = "activeUserId",
-                accounts = listOf(
-                    UserState.Account(
-                        userId = "activeUserId",
-                        name = "name",
-                        email = "email",
-                        avatarColorHex = "avatarColorHex",
-                        environment = Environment.Prod.Us,
-                        isPremium = true,
-                        isPremiumFromSelf = true,
-                        isLoggedIn = true,
-                        isVaultUnlocked = true,
-                        needsPasswordReset = false,
-                        isBiometricsEnabled = false,
-                        organizations = listOf(
-                            createMockOrganization(
-                                number = 1,
-                                id = "orgId",
-                                name = "orgName",
-                                shouldUseKeyConnector = true,
-                                role = OrganizationType.USER,
-                                keyConnectorUrl = "bitwarden.com",
-                            ),
-                        ),
-                        needsMasterPassword = false,
-                        trustedDevice = null,
-                        hasMasterPassword = true,
-                        isUsingKeyConnector = false,
-                        onboardingStatus = OnboardingStatus.COMPLETE,
-                        firstTimeState = FirstTimeState(
-                            showImportLoginsCard = true,
-                        ),
-                        isExportable = true,
-                        creationDate = null,
-                    ),
-                ),
-            ),
-        )
-        mutableAuthStateFlow.value = AuthState.Authenticated(accessToken = ACCESS_TOKEN)
-        val viewModel = createViewModel()
-        assertEquals(RootNavState.RemovePassword, viewModel.stateFlow.value)
     }
 
     @Test
@@ -1001,7 +784,7 @@ class RootNavViewModelTest : BaseViewModelTest() {
 
     @Suppress("MaxLineLength")
     @Test
-    fun `when there are no accounts but there is a CompleteRegistration special circumstance the nav state should be CompleteRegistration`() {
+    fun `when there are no accounts but there is a CompleteRegistration special circumstance the nav state should be Auth`() {
         every { authRepository.hasPendingAccountAddition } returns false
 
         specialCircumstanceManager.specialCircumstance =
@@ -1015,20 +798,12 @@ class RootNavViewModelTest : BaseViewModelTest() {
             )
         mutableUserStateFlow.tryEmit(null)
         val viewModel = createViewModel()
-        assertEquals(
-            RootNavState.CompleteOngoingRegistration(
-                email = "example@email.com",
-                verificationToken = "token",
-                fromEmail = true,
-                timestamp = FIXED_CLOCK.instant().toEpochMilli(),
-            ),
-            viewModel.stateFlow.value,
-        )
+        assertEquals(RootNavState.Auth, viewModel.stateFlow.value)
     }
 
     @Suppress("MaxLineLength")
     @Test
-    fun `when the active user has an unlocked vault but there is a CompleteRegistration special circumstance the nav state should be CompleteRegistration`() {
+    fun `when the active user has an unlocked vault but there is a CompleteRegistration special circumstance the nav state should be VaultUnlocked`() {
         every { authRepository.hasPendingAccountAddition } returns true
 
         specialCircumstanceManager.specialCircumstance =
@@ -1072,20 +847,12 @@ class RootNavViewModelTest : BaseViewModelTest() {
             ),
         )
         val viewModel = createViewModel()
-        assertEquals(
-            RootNavState.CompleteOngoingRegistration(
-                email = "example@email.com",
-                verificationToken = "token",
-                fromEmail = true,
-                timestamp = FIXED_CLOCK.instant().toEpochMilli(),
-            ),
-            viewModel.stateFlow.value,
-        )
+        assertEquals(RootNavState.VaultUnlocked(activeUserId = "activeUserId"), viewModel.stateFlow.value)
     }
 
     @Suppress("MaxLineLength")
     @Test
-    fun `when the active user has a locked vault but there is a CompleteRegistration special circumstance the nav state should be CompleteRegistration`() {
+    fun `when the active user has a locked vault but there is a CompleteRegistration special circumstance the nav state should be VaultLocked`() {
         every { authRepository.hasPendingAccountAddition } returns true
 
         specialCircumstanceManager.specialCircumstance =
@@ -1129,35 +896,24 @@ class RootNavViewModelTest : BaseViewModelTest() {
             ),
         )
         val viewModel = createViewModel()
-        assertEquals(
-            RootNavState.CompleteOngoingRegistration(
-                email = "example@email.com",
-                verificationToken = "token",
-                fromEmail = true,
-                timestamp = FIXED_CLOCK.instant().toEpochMilli(),
-            ),
-            viewModel.stateFlow.value,
-        )
+        assertEquals(RootNavState.VaultLocked, viewModel.stateFlow.value)
     }
 
     @Suppress("MaxLineLength")
     @Test
-    fun `when there are no accounts but there is a ExpiredRegistrationLink special circumstance the nav state should be ExpiredRegistrationLink`() {
+    fun `when there are no accounts but there is a ExpiredRegistrationLink special circumstance the nav state should be Auth`() {
         every { authRepository.hasPendingAccountAddition } returns false
 
         specialCircumstanceManager.specialCircumstance =
             SpecialCircumstance.RegistrationEvent.ExpiredRegistrationLink
         mutableUserStateFlow.tryEmit(null)
         val viewModel = createViewModel()
-        assertEquals(
-            RootNavState.ExpiredRegistrationLink,
-            viewModel.stateFlow.value,
-        )
+        assertEquals(RootNavState.Auth, viewModel.stateFlow.value)
     }
 
     @Suppress("MaxLineLength")
     @Test
-    fun `when the active user has an unlocked vault but there is a ExpiredRegistrationLink special circumstance the nav state should be ExpiredRegistrationLink`() {
+    fun `when the active user has an unlocked vault but there is a ExpiredRegistrationLink special circumstance the nav state should be VaultUnlocked`() {
         every { authRepository.hasPendingAccountAddition } returns true
 
         specialCircumstanceManager.specialCircumstance =
@@ -1194,15 +950,12 @@ class RootNavViewModelTest : BaseViewModelTest() {
             ),
         )
         val viewModel = createViewModel()
-        assertEquals(
-            RootNavState.ExpiredRegistrationLink,
-            viewModel.stateFlow.value,
-        )
+        assertEquals(RootNavState.VaultUnlocked(activeUserId = "activeUserId"), viewModel.stateFlow.value)
     }
 
     @Suppress("MaxLineLength")
     @Test
-    fun `when the active user has a locked vault but there is a ExpiredRegistrationLink special circumstance the nav state should be ExpiredRegistrationLink`() {
+    fun `when the active user has a locked vault but there is a ExpiredRegistrationLink special circumstance the nav state should be VaultLocked`() {
         every { authRepository.hasPendingAccountAddition } returns true
 
         specialCircumstanceManager.specialCircumstance =
@@ -1239,10 +992,7 @@ class RootNavViewModelTest : BaseViewModelTest() {
             ),
         )
         val viewModel = createViewModel()
-        assertEquals(
-            RootNavState.ExpiredRegistrationLink,
-            viewModel.stateFlow.value,
-        )
+        assertEquals(RootNavState.VaultLocked, viewModel.stateFlow.value)
     }
 
     @Test

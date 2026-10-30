@@ -75,6 +75,7 @@
     <string name="yes">Yes</string>
     <string name="account">Account</string>
     <string name="account_created_success">Your new account has been created!</string>
+    <string name="your_new_vault_has_been_created">Your new vault has been created!</string>
     <string name="set_bitwarden_as_passkey_manager_description">Set Bitwarden as your passkey provider in device settings.</string>
     <string name="avoid_ambiguous_characters">Avoid ambiguous characters</string>
     <string name="bitwarden_autofill_service">Bitwarden Autofill Service</string>
@@ -83,6 +84,7 @@
     <string name="close_app">Close app</string>
     <string name="continue_text">Continue</string>
     <string name="create_account">Create account</string>
+    <string name="create_vault">Create vault</string>
     <string name="create_an_account">Create an account</string>
     <string name="edit_item">Edit item</string>
     <string name="edit_login">Edit login</string>
@@ -809,6 +811,9 @@ Do you want to switch to this account?</string>
     <string name="change_email_address">Change email address</string>
     <string name="next">Next</string>
     <string name="bitwarden_cannot_recover_a_lost_or_forgotten_master_password">Bitwarden cannot recover a lost or forgotten master password.</string>
+    <string name="show_master_password_hint">Show master password hint</string>
+    <string name="your_hint_is_shown_on_the_unlock_screen_dont_put_your_password_in_it">Your hint is shown on the unlock screen. Don’t put your password in it.</string>
+    <string name="secretdoor_cannot_recover_a_lost_or_forgotten_master_password">SecretDoor cannot recover a lost or forgotten master password. Keep it somewhere safe and back up your vault regularly.</string>
     <string name="bitwarden_cannot_reset_a_lost_or_forgotten_master_password">Bitwarden cannot reset a lost or forgotten master password.</string>
     <string name="choose_your_master_password">Choose your master password</string>
     <string name="choose_a_unique_and_strong_password_to_keep_your_information_safe">Choose a unique and strong password to keep your information safe.</string>

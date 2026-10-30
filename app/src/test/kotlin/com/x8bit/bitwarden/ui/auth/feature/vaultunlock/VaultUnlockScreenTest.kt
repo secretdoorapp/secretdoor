@@ -428,6 +428,39 @@ class VaultUnlockScreenTest : BitwardenComposeTest() {
     }
 
     @Test
+    fun `show master password hint button should only display when a hint is available`() {
+        composeTestRule.onNodeWithText("Show master password hint").assertDoesNotExist()
+
+        mutableStateFlow.update { it.copy(masterPasswordHint = "hint") }
+        composeTestRule
+            .onNodeWithText("Show master password hint")
+            .performScrollTo()
+            .assertIsDisplayed()
+
+        mutableStateFlow.update { it.copy(vaultUnlockType = VaultUnlockType.PIN) }
+        composeTestRule.onNodeWithText("Show master password hint").assertDoesNotExist()
+    }
+
+    @Test
+    fun `show master password hint click should display the hint dialog`() {
+        mutableStateFlow.update { it.copy(masterPasswordHint = "my hint") }
+        composeTestRule
+            .onNodeWithText("Show master password hint")
+            .performScrollTo()
+            .performClick()
+
+        composeTestRule
+            .onAllNodesWithText("my hint")
+            .filterToOne(hasAnyAncestor(isDialog()))
+            .assertIsDisplayed()
+        composeTestRule
+            .onAllNodesWithText("Okay")
+            .filterToOne(hasAnyAncestor(isDialog()))
+            .performClick()
+        composeTestRule.assertNoDialogExists()
+    }
+
+    @Test
     fun `email state change should update logged in as text`() {
         val newEmail = "david@bitwarden.com"
         val textBeforeUpdate = "Logged in as ${DEFAULT_STATE.email} on $DEFAULT_ENVIRONMENT_URL."

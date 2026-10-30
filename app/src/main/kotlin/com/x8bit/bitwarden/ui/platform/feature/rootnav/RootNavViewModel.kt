@@ -2,8 +2,6 @@ package com.x8bit.bitwarden.ui.platform.feature.rootnav
 
 import android.os.Parcelable
 import androidx.lifecycle.viewModelScope
-import com.bitwarden.network.model.OrganizationType
-import com.bitwarden.network.util.parseJwtTokenDataOrNull
 import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.base.util.toAndroidAppUriString
 import com.bitwarden.ui.platform.manager.share.model.ShareData
@@ -73,28 +71,9 @@ class RootNavViewModel @Inject constructor(
         val specialCircumstance = action.specialCircumstance
 
         val updatedRootNavState = when {
-            userState?.activeAccount?.trustedDevice?.isDeviceTrusted == false &&
-                authRepository.tdeLoginComplete != true &&
-                !userState.activeAccount.isVaultUnlocked -> RootNavState.TrustedDevice
-
-            userState?.activeAccount?.needsMasterPassword == true -> RootNavState.SetPassword
-
-            userState?.activeAccount?.isVaultUnlocked == true &&
-                userState.activeAccount.needsPasswordReset -> RootNavState.ResetPassword
-
-            specialCircumstance is SpecialCircumstance.RegistrationEvent -> {
-                getRegistrationEventNavState(specialCircumstance)
-            }
-
             userState == null ||
                 !userState.activeAccount.isLoggedIn ||
-                userState.hasPendingAccountAddition -> {
-                if (authRepository.showWelcomeCarousel) {
-                    RootNavState.AuthWithWelcome
-                } else {
-                    RootNavState.Auth
-                }
-            }
+                userState.hasPendingAccountAddition -> RootNavState.Auth
 
             specialCircumstance is SpecialCircumstance.CredentialExchangeExport -> {
                 val exportableAccounts = userState.accounts.filter { it.isExportable }
@@ -105,11 +84,6 @@ class RootNavViewModel @Inject constructor(
                 } else {
                     RootNavState.CredentialExchangeExport
                 }
-            }
-
-            userState.activeAccount.isVaultUnlocked &&
-                userState.shouldShowRemovePassword(authState = action.authState) -> {
-                RootNavState.RemovePassword
             }
 
             userState.activeAccount.isVaultUnlocked &&
@@ -215,11 +189,12 @@ class RootNavViewModel @Inject constructor(
                     SpecialCircumstance.SendShortcut,
                     is SpecialCircumstance.SearchShortcut,
                     SpecialCircumstance.VerificationCodeShortcut,
+                    // SecretDoor has no email registration, so registration links are ignored.
+                    is SpecialCircumstance.RegistrationEvent,
                     null,
                         -> RootNavState.VaultUnlocked(activeUserId = userState.activeAccount.userId)
 
                     is SpecialCircumstance.CredentialExchangeExport,
-                    is SpecialCircumstance.RegistrationEvent,
                         -> {
                         throw IllegalStateException(
                             "Special circumstance should have been already handled.",
@@ -244,37 +219,6 @@ class RootNavViewModel @Inject constructor(
         OnboardingStatus.BROWSER_AUTOFILL_SETUP -> RootNavState.OnboardingBrowserAutofillSetup
         OnboardingStatus.FINAL_STEP -> RootNavState.OnboardingStepsComplete
         OnboardingStatus.COMPLETE -> throw IllegalStateException("Should not have entered here.")
-    }
-
-    private fun getRegistrationEventNavState(
-        registrationEvent: SpecialCircumstance.RegistrationEvent,
-    ): RootNavState = when (registrationEvent) {
-        is SpecialCircumstance.RegistrationEvent.CompleteRegistration -> {
-            RootNavState.CompleteOngoingRegistration(
-                email = registrationEvent.completeRegistrationData.email,
-                verificationToken = registrationEvent.completeRegistrationData.verificationToken,
-                fromEmail = registrationEvent.completeRegistrationData.fromEmail,
-                timestamp = registrationEvent.timestamp,
-            )
-        }
-
-        SpecialCircumstance.RegistrationEvent.ExpiredRegistrationLink -> {
-            RootNavState.ExpiredRegistrationLink
-        }
-    }
-
-    private fun UserState.shouldShowRemovePassword(authState: AuthState): Boolean {
-        val isLoggedInUsingSso = (authState as? AuthState.Authenticated)
-            ?.accessToken
-            ?.let(::parseJwtTokenDataOrNull)
-            ?.isExternal == true
-        val usesKeyConnectorAndNotAdmin = this.activeAccount.organizations.any {
-            it.isKeyConnectorEnabled &&
-                it.role != OrganizationType.OWNER &&
-                it.role != OrganizationType.ADMIN
-        }
-        val userIsNotUsingKeyConnector = !this.activeAccount.isUsingKeyConnector
-        return isLoggedInUsingSso && usesKeyConnectorAndNotAdmin && userIsNotUsingKeyConnector
     }
 
     /**
@@ -321,40 +265,10 @@ sealed class RootNavState : Parcelable {
     data object Auth : RootNavState()
 
     /**
-     * App should show auth nav graph starting with the welcome carousel.
-     */
-    @Parcelize
-    data object AuthWithWelcome : RootNavState()
-
-    /**
-     * App should show remove password graph.
-     */
-    @Parcelize
-    data object RemovePassword : RootNavState()
-
-    /**
-     * App should show reset password graph.
-     */
-    @Parcelize
-    data object ResetPassword : RootNavState()
-
-    /**
-     * App should show set password graph.
-     */
-    @Parcelize
-    data object SetPassword : RootNavState()
-
-    /**
      * App should show splash nav graph.
      */
     @Parcelize
     data object Splash : RootNavState()
-
-    /**
-     * App should show the trusted device destination.
-     */
-    @Parcelize
-    data object TrustedDevice : RootNavState()
 
     /**
      * App should show vault locked nav graph.
@@ -467,27 +381,10 @@ sealed class RootNavState : Parcelable {
     ) : RootNavState()
 
     /**
-     * App should show the screen to complete an ongoing registration process.
-     */
-    @Parcelize
-    data class CompleteOngoingRegistration(
-        val email: String,
-        val verificationToken: String,
-        val fromEmail: Boolean,
-        val timestamp: Long,
-    ) : RootNavState()
-
-    /**
      * App should show the auth confirmation screen for an unlocked user.
      */
     @Parcelize
     data object VaultUnlockedForAuthRequest : RootNavState()
-
-    /**
-     * App should show the expired registration link screen.
-     */
-    @Parcelize
-    data object ExpiredRegistrationLink : RootNavState()
 
     /**
      * App should show the set up account lock onboarding screen.

@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:1093287226212:android:6ec272cee7c1c17a4b2871",
         "android_client_info": {
-          "package_name": "com.x8bit.bitwarden.dev"
+          "package_name": "io.github.zcoklin.secretdoor.dev"
         }
       },
       "oauth_client": [

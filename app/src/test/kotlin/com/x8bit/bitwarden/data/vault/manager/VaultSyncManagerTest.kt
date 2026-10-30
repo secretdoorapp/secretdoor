@@ -3,30 +3,18 @@ package com.x8bit.bitwarden.data.vault.manager
 import app.cash.turbine.test
 import app.cash.turbine.turbineScope
 import com.bitwarden.collections.CollectionView
-import com.bitwarden.core.InitOrgCryptoRequest
-import com.bitwarden.core.ReinitUserCryptoRequest
 import com.bitwarden.core.data.manager.dispatcher.FakeDispatcherManager
 import com.bitwarden.core.data.repository.error.MissingPropertyException
 import com.bitwarden.core.data.repository.model.DataState
 import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
 import com.bitwarden.core.data.util.asFailure
 import com.bitwarden.core.data.util.asSuccess
-import com.bitwarden.network.model.KdfTypeJson
 import com.bitwarden.network.model.SyncResponseJson
-import com.bitwarden.network.model.UserDecryptionOptionsJson
 import com.bitwarden.network.model.createMockCipher
 import com.bitwarden.network.model.createMockCollection
 import com.bitwarden.network.model.createMockDomains
 import com.bitwarden.network.model.createMockFolder
-import com.bitwarden.network.model.createMockMasterPasswordUnlock
-import com.bitwarden.network.model.createMockOrganizationKeys
-import com.bitwarden.network.model.createMockOrganizationNetwork
-import com.bitwarden.network.model.createMockPolicy
-import com.bitwarden.network.model.createMockProfile
 import com.bitwarden.network.model.createMockSend
-import com.bitwarden.network.model.createMockSyncResponse
-import com.bitwarden.network.model.createMockUserDecryption
-import com.bitwarden.network.model.createMockV2UpgradeToken
 import com.bitwarden.network.service.SyncService
 import com.bitwarden.send.SendView
 import com.bitwarden.vault.DecryptCipherListResult
@@ -38,7 +26,6 @@ import com.x8bit.bitwarden.data.auth.datasource.disk.util.FakeAuthDiskSource
 import com.x8bit.bitwarden.data.auth.manager.UserLogoutManager
 import com.x8bit.bitwarden.data.auth.manager.UserStateManager
 import com.x8bit.bitwarden.data.auth.repository.model.LogoutReason
-import com.x8bit.bitwarden.data.auth.repository.model.createMockWrappedAccountCryptographicState
 import com.x8bit.bitwarden.data.autofill.manager.FillAssistManager
 import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.data.platform.error.NoActiveUserException
@@ -46,7 +33,6 @@ import com.x8bit.bitwarden.data.platform.manager.DatabaseSchemeManager
 import com.x8bit.bitwarden.data.platform.manager.PushManager
 import com.x8bit.bitwarden.data.vault.datasource.disk.VaultDiskSource
 import com.x8bit.bitwarden.data.vault.datasource.sdk.VaultSdkSource
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.InitializeCryptoResult
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockCollectionView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockDecryptCipherListResult
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockFolderView
@@ -65,7 +51,6 @@ import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkCipherList
 import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkCollectionList
 import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkFolderList
 import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkSendList
-import com.x8bit.bitwarden.data.vault.repository.util.toV2UpgradeToken
 import io.mockk.awaits
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -87,7 +72,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.net.UnknownHostException
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
@@ -191,13 +175,13 @@ class VaultSyncManagerTest {
     @Test
     fun `userSwitchingChangesFlow should cancel any pending sync call`() = runTest {
         fakeAuthDiskSource.userState = MOCK_USER_STATE
-        coEvery { syncService.sync() } just awaits
+        coEvery { vaultDiskSource.resyncVaultData(any()) } just awaits
 
         vaultSyncManager.sync()
         vaultSyncManager.sync()
         coVerify(exactly = 1) {
             // Despite being called twice, we only allow 1 sync
-            syncService.sync()
+            vaultDiskSource.resyncVaultData(userId = MOCK_USER_STATE.activeUserId)
         }
 
         fakeAuthDiskSource.userState = UserStateJson(
@@ -205,10 +189,9 @@ class VaultSyncManagerTest {
             accounts = mapOf("mockId-2" to mockk()),
         )
         vaultSyncManager.sync()
-        coVerify(exactly = 2) {
+        coVerify(exactly = 1) {
             // A second sync should have happened now since it was cancelled by the userState change
-            syncService.getAccountRevisionDateMillis()
-            syncService.sync()
+            vaultDiskSource.resyncVaultData(userId = "mockId-2")
         }
     }
 
@@ -689,454 +672,67 @@ class VaultSyncManagerTest {
     @Test
     fun `databaseSchemeChangeFlow should trigger sync on emission`() = runTest {
         fakeAuthDiskSource.userState = MOCK_USER_STATE
-        coEvery { syncService.sync() } just awaits
 
         mutableDatabaseSchemeChangeFlow.tryEmit(Unit)
 
-        coVerify(exactly = 1) { syncService.sync() }
+        coVerify(exactly = 1) {
+            vaultDiskSource.resyncVaultData(userId = MOCK_USER_STATE.activeUserId)
+        }
     }
 
     @Test
-    fun `sync with forced should skip checks and call the syncService sync`() {
+    fun `sync should resync local vault data without contacting the server`() {
+        val userId = "mockId-1"
         fakeAuthDiskSource.userState = MOCK_USER_STATE
-        coEvery { syncService.sync() } returns Throwable("failure").asFailure()
 
-        vaultSyncManager.sync(forced = true)
+        vaultSyncManager.sync()
 
+        verify(exactly = 1) {
+            settingsDiskSource.storeLastSyncTime(userId = userId, lastSyncTime = clock.instant())
+        }
+        coVerify(exactly = 1) { vaultDiskSource.resyncVaultData(userId = userId) }
         coVerify(exactly = 0) {
             syncService.getAccountRevisionDateMillis()
-        }
-        coVerify(exactly = 1) {
             syncService.sync()
         }
     }
 
-    @Suppress("MaxLineLength")
     @Test
-    fun `sync with syncService Success should unlock the vault for orgs if necessary and update AuthDiskSource and VaultDiskSource`() =
-        runTest {
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-            val userId = "mockId-1"
-            val mockSyncResponse = createMockSyncResponse(number = 1)
-            coEvery { syncService.sync() } returns mockSyncResponse.asSuccess()
-            coEvery {
-                vaultSdkSource.initializeOrganizationCrypto(
-                    userId = userId,
-                    request = InitOrgCryptoRequest(
-                        organizationKeys = createMockOrganizationKeys(number = 1),
-                    ),
-                )
-            } returns InitializeCryptoResult.Success.asSuccess()
-            coEvery {
-                vaultDiskSource.replaceVaultData(userId = userId, vault = mockSyncResponse)
-            } just runs
-            every {
-                settingsDiskSource.storeLastSyncTime(
-                    userId = userId,
-                    lastSyncTime = clock.instant(),
-                )
-            } just runs
-
-            vaultSyncManager.sync()
-
-            val updatedUserState = MOCK_USER_STATE.copy(
-                accounts = mapOf(
-                    userId to MOCK_ACCOUNT.copy(
-                        profile = MOCK_PROFILE.copy(
-                            avatarColorHex = "mockAvatarColor-1",
-                            stamp = "mockSecurityStamp-1",
-                            hasPremiumFromOrganization = false,
-                            kdfType = KdfTypeJson.PBKDF2_SHA256,
-                            kdfIterations = 600000,
-                            kdfMemory = null,
-                            kdfParallelism = null,
-                            userDecryptionOptions = UserDecryptionOptionsJson(
-                                hasMasterPassword = true,
-                                masterPasswordUnlock = createMockMasterPasswordUnlock(number = 1),
-                                trustedDeviceUserDecryptionOptions = null,
-                                keyConnectorUserDecryptionOptions = null,
-                            ),
-                        ),
-                    ),
-                ),
-            )
-            fakeAuthDiskSource.assertUserState(userState = updatedUserState)
-            fakeAuthDiskSource.assertAccountCryptographicState(
-                userId = userId,
-                accountCryptographicState = createMockWrappedAccountCryptographicState(number = 1),
-            )
-            fakeAuthDiskSource.assertV2UpgradeToken(
-                userId = userId,
-                v2UpgradeToken = createMockV2UpgradeToken(number = 1),
-            )
-            fakeAuthDiskSource.assertOrganizationKeys(
-                userId = userId,
-                organizationKeys = mapOf(userId to "mockKey-1"),
-            )
-            fakeAuthDiskSource.assertOrganizations(
-                userId = userId,
-                organizations = listOf(createMockOrganizationNetwork(number = 1)),
-            )
-            fakeAuthDiskSource.assertPolicies(
-                userId = userId,
-                policies = listOf(createMockPolicy(number = 1)),
-            )
-            fakeAuthDiskSource.assertShouldUseKeyConnector(
-                userId = userId,
-                shouldUseKeyConnector = false,
-            )
-            coVerify {
-                vaultDiskSource.replaceVaultData(userId = userId, vault = mockSyncResponse)
-                vaultSdkSource.initializeOrganizationCrypto(
-                    userId = userId,
-                    request = InitOrgCryptoRequest(
-                        organizationKeys = createMockOrganizationKeys(number = 1),
-                    ),
-                )
-            }
-            verify(exactly = 1) { fillAssistManager.syncIfNecessary() }
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `sync with syncService Success and both an account cryptographic state and a V2 upgrade token and an unlocked vault should reinitialize the crypto`() =
-        runTest {
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-            val userId = "mockId-1"
-            val mockSyncResponse = createMockSyncResponse(number = 1)
-            coEvery { syncService.sync() } returns mockSyncResponse.asSuccess()
-            coEvery {
-                vaultSdkSource.initializeOrganizationCrypto(
-                    userId = userId,
-                    request = InitOrgCryptoRequest(
-                        organizationKeys = createMockOrganizationKeys(number = 1),
-                    ),
-                )
-            } returns InitializeCryptoResult.Success.asSuccess()
-            coEvery {
-                vaultDiskSource.replaceVaultData(userId = userId, vault = mockSyncResponse)
-            } just runs
-            every {
-                settingsDiskSource.storeLastSyncTime(
-                    userId = userId,
-                    lastSyncTime = clock.instant(),
-                )
-            } just runs
-            setVaultToUnlocked(userId = userId)
-
-            vaultSyncManager.sync()
-
-            coVerify(exactly = 1) {
-                vaultSdkSource.reinitializeCrypto(
-                    userId = userId,
-                    request = ReinitUserCryptoRequest(
-                        accountCryptographicState = createMockWrappedAccountCryptographicState(
-                            number = 1,
-                        ),
-                        upgradeToken = createMockV2UpgradeToken(number = 1).toV2UpgradeToken(),
-                    ),
-                )
-            }
-        }
-
-    @Test
-    fun `sync with syncService Success and a locked vault should not reinitialize the crypto`() =
-        runTest {
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-            val userId = "mockId-1"
-            val mockSyncResponse = createMockSyncResponse(number = 1)
-            coEvery { syncService.sync() } returns mockSyncResponse.asSuccess()
-            coEvery {
-                vaultSdkSource.initializeOrganizationCrypto(
-                    userId = userId,
-                    request = InitOrgCryptoRequest(
-                        organizationKeys = createMockOrganizationKeys(number = 1),
-                    ),
-                )
-            } returns InitializeCryptoResult.Success.asSuccess()
-            coEvery {
-                vaultDiskSource.replaceVaultData(userId = userId, vault = mockSyncResponse)
-            } just runs
-            every {
-                settingsDiskSource.storeLastSyncTime(
-                    userId = userId,
-                    lastSyncTime = clock.instant(),
-                )
-            } just runs
-
-            vaultSyncManager.sync()
-
-            fakeAuthDiskSource.assertAccountCryptographicState(
-                userId = userId,
-                accountCryptographicState = createMockWrappedAccountCryptographicState(number = 1),
-            )
-            fakeAuthDiskSource.assertV2UpgradeToken(
-                userId = userId,
-                v2UpgradeToken = createMockV2UpgradeToken(number = 1),
-            )
-            coVerify(exactly = 0) {
-                vaultSdkSource.reinitializeCrypto(userId = any(), request = any())
-            }
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `sync with syncService Success and a null V2 upgrade token should not reinitialize the crypto`() =
-        runTest {
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-            val userId = "mockId-1"
-            val mockSyncResponse = createMockSyncResponse(
-                number = 1,
-                userDecryption = createMockUserDecryption(number = 1, v2UpgradeToken = null),
-            )
-            coEvery { syncService.sync() } returns mockSyncResponse.asSuccess()
-            coEvery {
-                vaultSdkSource.initializeOrganizationCrypto(
-                    userId = userId,
-                    request = InitOrgCryptoRequest(
-                        organizationKeys = createMockOrganizationKeys(number = 1),
-                    ),
-                )
-            } returns InitializeCryptoResult.Success.asSuccess()
-            coEvery {
-                vaultDiskSource.replaceVaultData(userId = userId, vault = mockSyncResponse)
-            } just runs
-            every {
-                settingsDiskSource.storeLastSyncTime(
-                    userId = userId,
-                    lastSyncTime = clock.instant(),
-                )
-            } just runs
-            setVaultToUnlocked(userId = userId)
-
-            vaultSyncManager.sync()
-
-            fakeAuthDiskSource.assertV2UpgradeToken(userId = userId, v2UpgradeToken = null)
-            coVerify(exactly = 0) {
-                vaultSdkSource.reinitializeCrypto(userId = any(), request = any())
-            }
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `sync with syncService Success and a null account cryptographic state should not reinitialize the crypto`() =
-        runTest {
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-            val userId = "mockId-1"
-            val mockSyncResponse = createMockSyncResponse(
-                number = 1,
-                profile = createMockProfile(number = 1, privateKey = null, accountKeys = null),
-            )
-            coEvery { syncService.sync() } returns mockSyncResponse.asSuccess()
-            coEvery {
-                vaultSdkSource.initializeOrganizationCrypto(
-                    userId = userId,
-                    request = InitOrgCryptoRequest(
-                        organizationKeys = createMockOrganizationKeys(number = 1),
-                    ),
-                )
-            } returns InitializeCryptoResult.Success.asSuccess()
-            coEvery {
-                vaultDiskSource.replaceVaultData(userId = userId, vault = mockSyncResponse)
-            } just runs
-            every {
-                settingsDiskSource.storeLastSyncTime(
-                    userId = userId,
-                    lastSyncTime = clock.instant(),
-                )
-            } just runs
-            setVaultToUnlocked(userId = userId)
-
-            vaultSyncManager.sync()
-
-            fakeAuthDiskSource.assertAccountCryptographicState(
-                userId = userId,
-                accountCryptographicState = null,
-            )
-            coVerify(exactly = 0) {
-                vaultSdkSource.reinitializeCrypto(userId = any(), request = any())
-            }
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `sync with syncService Success with a different security stamp should logout and return early`() =
-        runTest {
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-            val userId = "mockId-1"
-            val mockSyncResponse = createMockSyncResponse(
-                number = 1,
-                profile = createMockProfile(number = 1, securityStamp = "newStamp"),
-            )
-            coEvery { syncService.sync() } returns mockSyncResponse.asSuccess()
-            coEvery {
-                vaultSdkSource.initializeOrganizationCrypto(
-                    userId = userId,
-                    request = InitOrgCryptoRequest(
-                        organizationKeys = createMockOrganizationKeys(number = 1),
-                    ),
-                )
-            } returns InitializeCryptoResult.Success.asSuccess()
-
-            vaultSyncManager.sync()
-
-            coVerify(exactly = 1) {
-                userLogoutManager.logout(userId = userId, reason = LogoutReason.SecurityStamp)
-            }
-
-            coVerify(exactly = 0) {
-                vaultDiskSource.replaceVaultData(
-                    userId = MOCK_USER_STATE.activeUserId,
-                    vault = any(),
-                )
-                vaultSdkSource.initializeOrganizationCrypto(
-                    userId = userId,
-                    request = InitOrgCryptoRequest(
-                        organizationKeys = createMockOrganizationKeys(number = 1),
-                    ),
-                )
-            }
-            verify(exactly = 0) { fillAssistManager.syncIfNecessary() }
-        }
-
-    @Test
-    fun `sync with syncService Failure should update DataStateFlow with an Error`() = runTest {
+    fun `sync with forced should resync local vault data without contacting the server`() {
+        val userId = "mockId-1"
         fakeAuthDiskSource.userState = MOCK_USER_STATE
-        val mockException = IllegalStateException("sad")
-        coEvery { syncService.sync() } returns mockException.asFailure()
+
+        vaultSyncManager.sync(forced = true)
+
+        coVerify(exactly = 1) { vaultDiskSource.resyncVaultData(userId = userId) }
+        coVerify(exactly = 0) {
+            syncService.getAccountRevisionDateMillis()
+            syncService.sync()
+        }
+    }
+
+    @Test
+    fun `sync should not modify the stored account or log out`() {
+        fakeAuthDiskSource.userState = MOCK_USER_STATE
 
         vaultSyncManager.sync()
 
-        assertEquals(
-            DataState.Error<DecryptCipherListResult>(mockException),
-            vaultSyncManager.decryptCipherListResultStateFlow.value,
-        )
-        assertEquals(
-            DataState.Error<List<CollectionView>>(mockException),
-            vaultSyncManager.collectionsStateFlow.value,
-        )
-        assertEquals(
-            DataState.Error<DomainsData>(mockException),
-            vaultSyncManager.domainsStateFlow.value,
-        )
-        assertEquals(
-            DataState.Error<List<FolderView>>(mockException),
-            vaultSyncManager.foldersStateFlow.value,
-        )
-        assertEquals(
-            DataState.Error<SendData>(mockException),
-            vaultSyncManager.sendDataStateFlow.value,
-        )
-    }
-
-    @Test
-    fun `sync with syncService Failure should update vaultDataStateFlow with an Error`() = runTest {
-        fakeAuthDiskSource.userState = MOCK_USER_STATE
-        val mockException = IllegalStateException("sad")
-        coEvery { syncService.sync() } returns mockException.asFailure()
-        setupVaultDiskSourceFlows()
-
-        vaultSyncManager
-            .vaultDataStateFlow
-            .test {
-                assertEquals(DataState.Loading, awaitItem())
-                vaultSyncManager.sync()
-                assertEquals(DataState.Error<VaultData>(mockException), awaitItem())
-            }
-    }
-
-    @Test
-    fun `sync with NoNetwork should update DataStateFlows to NoNetwork`() = runTest {
-        fakeAuthDiskSource.userState = MOCK_USER_STATE
-        coEvery { syncService.sync() } returns UnknownHostException().asFailure()
-
-        vaultSyncManager.sync()
-
-        assertEquals(
-            DataState.NoNetwork(data = null),
-            vaultSyncManager.decryptCipherListResultStateFlow.value,
-        )
-        assertEquals(
-            DataState.NoNetwork(data = null),
-            vaultSyncManager.collectionsStateFlow.value,
-        )
-        assertEquals(
-            DataState.NoNetwork(data = null),
-            vaultSyncManager.domainsStateFlow.value,
-        )
-        assertEquals(
-            DataState.NoNetwork(data = null),
-            vaultSyncManager.foldersStateFlow.value,
-        )
-        assertEquals(
-            DataState.NoNetwork(data = null),
-            vaultSyncManager.sendDataStateFlow.value,
-        )
-    }
-
-    @Test
-    fun `sync with NoNetwork should update vaultDataStateFlow to NoNetwork`() = runTest {
-        fakeAuthDiskSource.userState = MOCK_USER_STATE
-        coEvery { syncService.sync() } returns UnknownHostException().asFailure()
-        setupVaultDiskSourceFlows()
-
-        vaultSyncManager
-            .vaultDataStateFlow
-            .test {
-                assertEquals(DataState.Loading, awaitItem())
-                vaultSyncManager.sync()
-                assertEquals(DataState.NoNetwork(data = null), awaitItem())
-            }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `sync with NoNetwork data should update sendDataStateFlow to Pending and NoNetwork with data`() =
-        runTest {
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-            val userId = "mockId-1"
-            setVaultToUnlocked(userId = userId)
-            coEvery { syncService.sync() } returns UnknownHostException().asFailure()
-            val sendsFlow = bufferedMutableSharedFlow<List<SyncResponseJson.Send>>()
-            setupVaultDiskSourceFlows(sendsFlow = sendsFlow)
-            coEvery {
-                vaultSdkSource.decryptSendList(
-                    userId = userId,
-                    sendList = listOf(createMockSdkSend(1)),
-                )
-            } returns listOf(createMockSendView(1)).asSuccess()
-
-            vaultSyncManager
-                .sendDataStateFlow
-                .test {
-                    assertEquals(DataState.Loading, awaitItem())
-                    sendsFlow.tryEmit(listOf(createMockSend(1)))
-                    assertEquals(
-                        DataState.Loaded(data = SendData(listOf(createMockSendView(1)))),
-                        awaitItem(),
-                    )
-                    vaultSyncManager.sync()
-                    assertEquals(
-                        DataState.Pending(data = SendData(listOf(createMockSendView(1)))),
-                        awaitItem(),
-                    )
-                    assertEquals(
-                        DataState.NoNetwork(data = SendData(listOf(createMockSendView(1)))),
-                        awaitItem(),
-                    )
-                }
+        fakeAuthDiskSource.assertUserState(userState = MOCK_USER_STATE)
+        verify(exactly = 0) {
+            userLogoutManager.logout(userId = any(), reason = any())
+            fillAssistManager.syncIfNecessary()
         }
+    }
 
     @Test
     fun `syncIfNecessary when there is no last sync time should sync the vault`() {
         val userId = "mockId-1"
         fakeAuthDiskSource.userState = MOCK_USER_STATE
         every { settingsDiskSource.getLastSyncTime(userId = userId) } returns null
-        coEvery { syncService.sync() } just awaits
 
         vaultSyncManager.syncIfNecessary()
 
-        coVerify { syncService.sync() }
+        coVerify(exactly = 1) { vaultDiskSource.resyncVaultData(userId = userId) }
     }
 
     @Suppress("MaxLineLength")
@@ -1147,11 +743,10 @@ class VaultSyncManagerTest {
         every {
             settingsDiskSource.getLastSyncTime(userId = userId)
         } returns clock.instant().minus(31, ChronoUnit.MINUTES)
-        coEvery { syncService.sync() } just awaits
 
         vaultSyncManager.syncIfNecessary()
 
-        coVerify { syncService.sync() }
+        coVerify(exactly = 1) { vaultDiskSource.resyncVaultData(userId = userId) }
     }
 
     @Suppress("MaxLineLength")
@@ -1162,47 +757,11 @@ class VaultSyncManagerTest {
         every {
             settingsDiskSource.getLastSyncTime(userId = userId)
         } returns clock.instant().minus(29, ChronoUnit.MINUTES)
-        coEvery { syncService.sync() } just awaits
 
         vaultSyncManager.syncIfNecessary()
 
-        coVerify(exactly = 0) { syncService.sync() }
+        coVerify(exactly = 0) { vaultDiskSource.resyncVaultData(userId = any()) }
     }
-
-    @Test
-    fun `sync when the last sync time is older than the revision date should sync the vault`() {
-        val userId = "mockId-1"
-        fakeAuthDiskSource.userState = MOCK_USER_STATE
-        every {
-            settingsDiskSource.getLastSyncTime(userId = userId)
-        } returns clock.instant().minus(1, ChronoUnit.MINUTES)
-
-        coEvery { syncService.sync() } just awaits
-
-        vaultSyncManager.sync()
-
-        coVerify { syncService.sync() }
-    }
-
-    @Test
-    fun `sync when the last sync time is more recent than the revision date should not sync `() =
-        runTest {
-            val userId = "mockId-1"
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-            every {
-                settingsDiskSource.getLastSyncTime(userId = userId)
-            } returns clock.instant().plus(2, ChronoUnit.MINUTES)
-
-            vaultSyncManager.sync()
-
-            verify(exactly = 1) {
-                settingsDiskSource.storeLastSyncTime(
-                    userId = userId,
-                    lastSyncTime = clock.instant(),
-                )
-            }
-            coVerify(exactly = 0) { syncService.sync() }
-        }
 
     @Test
     fun `vaultDataStateFlow should return empty when last sync time is populated`() =
@@ -1311,11 +870,10 @@ class VaultSyncManagerTest {
     fun `fullSyncFlow emission with active user ID should trigger an unforced sync`() {
         val userId = "mockId-1"
         fakeAuthDiskSource.userState = MOCK_USER_STATE
-        coEvery { syncService.sync() } just awaits
 
         mutableFullSyncFlow.tryEmit(userId)
 
-        coVerify(exactly = 1) { syncService.sync() }
+        coVerify(exactly = 1) { vaultDiskSource.resyncVaultData(userId = userId) }
     }
 
     @Suppress("MaxLineLength")
@@ -1333,120 +891,37 @@ class VaultSyncManagerTest {
 
     @Suppress("MaxLineLength")
     @Test
-    fun `syncForResult should return success result with itemsAvailable = true when sync succeeds and ciphers list is not empty`() =
+    fun `syncForResult should return success result with itemsAvailable = true when ciphers list is not empty`() =
         runTest {
             fakeAuthDiskSource.userState = MOCK_USER_STATE
-            val userId = "mockId-1"
-            val mockSyncResponse = createMockSyncResponse(number = 1)
-            coEvery { syncService.sync() } returns mockSyncResponse.asSuccess()
-            coEvery {
-                vaultSdkSource.initializeOrganizationCrypto(
-                    userId = userId,
-                    request = InitOrgCryptoRequest(
-                        organizationKeys = createMockOrganizationKeys(number = 1),
-                    ),
-                )
-            } returns InitializeCryptoResult.Success.asSuccess()
-            coEvery {
-                vaultDiskSource.replaceVaultData(
-                    userId = userId,
-                    vault = mockSyncResponse,
-                )
-            } just runs
-
-            every {
-                settingsDiskSource.storeLastSyncTime(
-                    userId = userId,
-                    lastSyncTime = clock.instant(),
-                )
-            } just runs
 
             val syncResult = vaultSyncManager.syncForResult()
+
             assertEquals(SyncVaultDataResult.Success(itemsAvailable = true), syncResult)
-            verify(exactly = 1) { fillAssistManager.syncIfNecessary() }
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `syncForResult should return success result with itemsAvailable = false when sync succeeds and ciphers list is empty`() =
-        runTest {
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-            val userId = "mockId-1"
-            val mockSyncResponse = createMockSyncResponse(number = 1, ciphers = emptyList())
-            coEvery { syncService.sync() } returns mockSyncResponse.asSuccess()
-            coEvery {
-                vaultSdkSource.initializeOrganizationCrypto(
-                    userId = userId,
-                    request = InitOrgCryptoRequest(
-                        organizationKeys = createMockOrganizationKeys(number = 1),
-                    ),
-                )
-            } returns InitializeCryptoResult.Success.asSuccess()
-            coEvery {
-                vaultDiskSource.replaceVaultData(userId = userId, vault = mockSyncResponse)
-            } just runs
-
-            every {
-                settingsDiskSource.storeLastSyncTime(
-                    userId = userId,
-                    lastSyncTime = clock.instant(),
-                )
-            } just runs
-
-            val syncResult = vaultSyncManager.syncForResult()
-            assertEquals(SyncVaultDataResult.Success(itemsAvailable = false), syncResult)
-            verify(exactly = 1) { fillAssistManager.syncIfNecessary() }
-        }
-
-    @Test
-    fun `syncForResult should return error when getAccountRevisionDateMillis fails`() =
-        runTest {
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-            val throwable = Throwable()
-            coEvery { syncService.getAccountRevisionDateMillis() } returns throwable.asFailure()
-            val syncResult = vaultSyncManager.syncForResult()
-            assertEquals(
-                SyncVaultDataResult.Error(throwable = throwable),
-                syncResult,
-            )
-        }
-
-    @Test
-    fun `syncForResult should return error when sync fails`() = runTest {
-        fakeAuthDiskSource.userState = MOCK_USER_STATE
-        val throwable = Throwable()
-        coEvery { syncService.sync() } returns throwable.asFailure()
-        val syncResult = vaultSyncManager.syncForResult()
-        assertEquals(
-            SyncVaultDataResult.Error(throwable = throwable),
-            syncResult,
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `syncForResult when the last sync time is more recent than the revision date should return result from disk source data`() =
-        runTest {
-            val userId = "mockId-1"
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-            every {
-                settingsDiskSource.getLastSyncTime(userId = userId)
-            } returns clock.instant().plus(2, ChronoUnit.MINUTES)
-            mutableGetCiphersFlow.update { emptyList() }
-            val result = vaultSyncManager.syncForResult()
-            assertEquals(
-                SyncVaultDataResult.Success(itemsAvailable = false),
-                result,
-            )
-            verify(exactly = 1) {
-                settingsDiskSource.storeLastSyncTime(
-                    userId = userId,
-                    lastSyncTime = clock.instant(),
-                )
-            }
             coVerify(exactly = 0) { syncService.sync() }
-            verify(exactly = 0) { fillAssistManager.syncIfNecessary() }
         }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `syncForResult should return success result with itemsAvailable = false when ciphers list is empty`() =
+        runTest {
+            fakeAuthDiskSource.userState = MOCK_USER_STATE
+            mutableGetCiphersFlow.update { emptyList() }
+
+            val syncResult = vaultSyncManager.syncForResult()
+
+            assertEquals(SyncVaultDataResult.Success(itemsAvailable = false), syncResult)
+            coVerify(exactly = 0) { syncService.sync() }
+        }
+
+    @Test
+    fun `syncForResult with no active user should return error`() = runTest {
+        fakeAuthDiskSource.userState = null
+
+        val syncResult = vaultSyncManager.syncForResult()
+
+        assertEquals(SyncVaultDataResult.Error(throwable = NoActiveUserException()), syncResult)
+    }
 
     //region Helper functions
 

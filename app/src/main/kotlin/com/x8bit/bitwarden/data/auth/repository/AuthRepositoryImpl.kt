@@ -25,6 +25,7 @@ import com.bitwarden.network.model.DeleteAccountResponseJson
 import com.bitwarden.network.model.GetTokenResponseJson
 import com.bitwarden.network.model.IdentityTokenAuthModel
 import com.bitwarden.network.model.KeysJson
+import com.bitwarden.network.model.MasterPasswordUnlockDataJson
 import com.bitwarden.network.model.OrganizationAutoEnrollStatusResponseJson
 import com.bitwarden.network.model.OrganizationKeysResponseJson
 import com.bitwarden.network.model.OrganizationType
@@ -42,6 +43,7 @@ import com.bitwarden.network.model.SetPasswordRequestJson
 import com.bitwarden.network.model.TrustedDeviceUserDecryptionOptionsJson
 import com.bitwarden.network.model.TwoFactorAuthMethod
 import com.bitwarden.network.model.TwoFactorDataModel
+import com.bitwarden.network.model.UserDecryptionOptionsJson
 import com.bitwarden.network.model.VerificationCodeResponseJson
 import com.bitwarden.network.model.VerificationOtpResponseJson
 import com.bitwarden.network.model.VerifyEmailTokenRequestJson
@@ -58,6 +60,7 @@ import com.x8bit.bitwarden.data.auth.datasource.disk.model.AccountJson
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.AccountTokensJson
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.ForcePasswordResetReason
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.OnboardingStatus
+import com.x8bit.bitwarden.data.auth.datasource.disk.model.UserStateJson
 import com.x8bit.bitwarden.data.auth.datasource.network.model.DeviceDataModel
 import com.x8bit.bitwarden.data.auth.datasource.sdk.AuthSdkSource
 import com.x8bit.bitwarden.data.auth.datasource.sdk.util.toKdf
@@ -138,7 +141,19 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import timber.log.Timber
 import java.time.Clock
+import java.util.UUID
 import javax.inject.Singleton
+
+/**
+ * Placeholder access token stored for a local vault account so that it is treated as logged in.
+ * It is not a JWT and is never accepted by any server.
+ */
+private const val LOCAL_VAULT_ACCESS_TOKEN: String = "secretdoor-local-vault"
+
+/**
+ * Suffix used to build the local-only email (master key salt) of a local vault account.
+ */
+private const val LOCAL_VAULT_EMAIL_SUFFIX: String = "@secretdoor.local"
 
 /**
  * Default implementation of [AuthRepository].
@@ -910,6 +925,115 @@ internal class AuthRepositoryImpl(
                 onFailure = { RegisterResult.Error(errorMessage = null, error = it) },
             )
     }
+
+    @Suppress("LongMethod")
+    override suspend fun createLocalVault(
+        masterPassword: String,
+        masterPasswordHint: String?,
+        shouldCheckDataBreaches: Boolean,
+        isMasterPasswordStrong: Boolean,
+    ): RegisterResult {
+        if (shouldCheckDataBreaches) {
+            haveIBeenPwnedService
+                .hasPasswordBeenBreached(password = masterPassword)
+                .onSuccess { foundDataBreaches ->
+                    if (foundDataBreaches) {
+                        return if (isMasterPasswordStrong) {
+                            RegisterResult.DataBreachFound
+                        } else {
+                            RegisterResult.DataBreachAndWeakPassword
+                        }
+                    }
+                }
+        }
+        if (!isMasterPasswordStrong) {
+            return RegisterResult.WeakPassword
+        }
+
+        val userId = UUID.randomUUID().toString()
+        // The email is only used locally as the master key salt, so it is unique per vault.
+        val email = "$userId$LOCAL_VAULT_EMAIL_SUFFIX"
+        val kdf = Kdf.Pbkdf2(iterations = DEFAULT_PBKDF2_ITERATIONS.toUInt())
+        val registerKeyResponse = authSdkSource
+            .makeRegisterKeys(email = email, password = masterPassword, kdf = kdf)
+            .getOrElse { return RegisterResult.Error(errorMessage = null, error = it) }
+
+        val kdfJson = kdf.toKdfRequestModel()
+        val account = AccountJson(
+            profile = AccountJson.Profile(
+                userId = userId,
+                email = email,
+                isEmailVerified = true,
+                isTwoFactorEnabled = false,
+                name = null,
+                stamp = null,
+                organizationId = null,
+                avatarColorHex = null,
+                hasPremiumPersonally = true,
+                hasPremiumFromOrganization = null,
+                forcePasswordResetReason = null,
+                kdfType = kdfJson.kdfType,
+                kdfIterations = kdfJson.iterations,
+                kdfMemory = kdfJson.memory,
+                kdfParallelism = kdfJson.parallelism,
+                userDecryptionOptions = UserDecryptionOptionsJson(
+                    hasMasterPassword = true,
+                    masterPasswordUnlock = MasterPasswordUnlockDataJson(
+                        salt = email,
+                        kdf = kdfJson,
+                        masterKeyWrappedUserKey = registerKeyResponse.encryptedUserKey,
+                    ),
+                    trustedDeviceUserDecryptionOptions = null,
+                    keyConnectorUserDecryptionOptions = null,
+                ),
+                creationDate = clock.instant(),
+            ),
+            settings = AccountJson.Settings(
+                environmentUrlData = environmentRepository.environment.environmentUrlData,
+            ),
+        )
+
+        val unlockResult = userStateManager.userStateTransaction {
+            authDiskSource.storeAccountCryptographicState(
+                userId = userId,
+                accountCryptographicState = WrappedAccountCryptographicState.V1(
+                    privateKey = registerKeyResponse.keys.private,
+                ),
+            )
+            authDiskSource.storeMasterPasswordHash(
+                userId = userId,
+                passwordHash = registerKeyResponse.masterPasswordHash,
+            )
+            authDiskSource.storeMasterPasswordHint(userId = userId, hint = masterPasswordHint)
+            // A local vault has no server session; this token only marks the account as active.
+            authDiskSource.storeAccountTokens(
+                userId = userId,
+                accountTokens = AccountTokensJson(
+                    accessToken = LOCAL_VAULT_ACCESS_TOKEN,
+                    refreshToken = null,
+                ),
+            )
+            // SecretDoor keeps a single vault per device.
+            authDiskSource.userState = UserStateJson(
+                activeUserId = userId,
+                accounts = mapOf(userId to account),
+            )
+            vaultRepository.unlockVaultWithMasterPassword(masterPassword = masterPassword)
+        }
+        return when (unlockResult) {
+            is VaultUnlockResult.Success -> {
+                settingsRepository.hasUserLoggedInOrCreatedAccount = true
+                RegisterResult.Success
+            }
+
+            is VaultUnlockError -> {
+                RegisterResult.Error(errorMessage = null, error = unlockResult.error)
+            }
+        }
+    }
+
+    override fun getMasterPasswordHint(): String? =
+        activeUserId?.let { authDiskSource.getMasterPasswordHint(userId = it) }
 
     override suspend fun passwordHintRequest(email: String): PasswordHintResult {
         return accountsService.requestPasswordHint(email).fold(

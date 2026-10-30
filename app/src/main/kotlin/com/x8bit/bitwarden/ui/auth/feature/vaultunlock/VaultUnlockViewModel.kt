@@ -110,6 +110,7 @@ class VaultUnlockViewModel @Inject constructor(
             createCredentialRequest = specialCircumstance?.toCreateCredentialRequestOrNull(),
             hasMasterPassword = activeAccount.hasMasterPassword,
             isFromLockFlow = vaultLockManager.isFromLockFlow,
+            masterPasswordHint = authRepository.getMasterPasswordHint(),
         )
     },
 ) {
@@ -517,6 +518,7 @@ data class VaultUnlockState(
     private val hasMasterPassword: Boolean,
     val isFromLockFlow: Boolean,
     val keystoreAuthorizationFailureCount: Int = 0,
+    val masterPasswordHint: String? = null,
 ) : Parcelable {
 
     /**
@@ -533,6 +535,14 @@ data class VaultUnlockState(
      * Indicates if we want force focus on Master Password \ PIN input field and show keyboard.
      */
     val showKeyboard: Boolean get() = !showBiometricLogin && !hideInput
+
+    /**
+     * Indicates if the locally stored master password hint can be shown.
+     */
+    val showMasterPasswordHint: Boolean
+        get() = !hideInput &&
+            vaultUnlockType == VaultUnlockType.MASTER_PASSWORD &&
+            !masterPasswordHint.isNullOrBlank()
 
     /**
      * Returns the user ID present in the current CredentialManager request, or null when no request

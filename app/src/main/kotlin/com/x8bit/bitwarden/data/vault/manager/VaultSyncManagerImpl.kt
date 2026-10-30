@@ -1,30 +1,22 @@
 package com.x8bit.bitwarden.data.vault.manager
 
 import com.bitwarden.collections.CollectionView
-import com.bitwarden.core.InitOrgCryptoRequest
-import com.bitwarden.core.ReinitUserCryptoRequest
 import com.bitwarden.core.data.manager.dispatcher.DispatcherManager
 import com.bitwarden.core.data.repository.model.DataState
 import com.bitwarden.core.data.repository.util.combineDataStates
 import com.bitwarden.core.data.repository.util.map
 import com.bitwarden.core.data.repository.util.updateToPendingOrLoading
 import com.bitwarden.network.model.OrganizationStatusType
-import com.bitwarden.network.model.SyncResponseJson
 import com.bitwarden.network.service.SyncService
-import com.bitwarden.network.util.isNoConnectionError
 import com.bitwarden.vault.DecryptCipherListResult
 import com.bitwarden.vault.FolderView
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
 import com.x8bit.bitwarden.data.auth.manager.UserLogoutManager
 import com.x8bit.bitwarden.data.auth.manager.UserStateManager
-import com.x8bit.bitwarden.data.auth.repository.model.LogoutReason
-import com.x8bit.bitwarden.data.auth.repository.util.toAccountCryptographicState
-import com.x8bit.bitwarden.data.auth.repository.util.toUpdatedUserStateJson
 import com.x8bit.bitwarden.data.auth.repository.util.userSwitchingChangesFlow
 import com.x8bit.bitwarden.data.autofill.manager.FillAssistManager
 import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.data.platform.error.NoActiveUserException
-import com.x8bit.bitwarden.data.platform.error.SecurityStampMismatchException
 import com.x8bit.bitwarden.data.platform.manager.DatabaseSchemeManager
 import com.x8bit.bitwarden.data.platform.manager.PushManager
 import com.x8bit.bitwarden.data.platform.repository.util.observeWhenSubscribedAndLoggedIn
@@ -42,7 +34,6 @@ import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkCipherList
 import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkCollectionList
 import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkFolderList
 import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkSendList
-import com.x8bit.bitwarden.data.vault.repository.util.toV2UpgradeToken
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -270,153 +261,22 @@ internal class VaultSyncManagerImpl(
             }
     }
 
-    @Suppress("LongMethod")
+    /**
+     * SecretDoor keeps the vault only on this device, so a "sync" just re-emits the locally
+     * stored vault data and never contacts a server.
+     */
+    @Suppress("UnusedParameter")
     private suspend fun syncInternal(
         userId: String,
         forced: Boolean,
     ): SyncVaultDataResult {
-        if (!forced) {
-            // Skip this check if we are forcing the request.
-            val lastSyncInstant = settingsDiskSource
-                .getLastSyncTime(userId = userId)
-                ?.toEpochMilli()
-            lastSyncInstant?.let { lastSyncTimeMs ->
-                // If the lasSyncState is null we just sync, no checks required.
-                syncService.getAccountRevisionDateMillis().fold(
-                    onSuccess = { serverRevisionDate ->
-                        if (serverRevisionDate < lastSyncTimeMs) {
-                            // We can skip the actual sync call if there is no new data or
-                            // database scheme changes since the last sync.
-                            settingsDiskSource.storeLastSyncTime(
-                                userId = userId,
-                                lastSyncTime = clock.instant(),
-                            )
-                            vaultDiskSource.resyncVaultData(userId = userId)
-                            val itemsAvailable = vaultDiskSource
-                                .getCiphersFlow(userId)
-                                .firstOrNull()
-                                ?.isNotEmpty() == true
-                            return SyncVaultDataResult.Success(itemsAvailable = itemsAvailable)
-                        }
-                    },
-                    onFailure = {
-                        updateVaultStateFlowsToError(throwable = it)
-                        return SyncVaultDataResult.Error(throwable = it)
-                    },
-                )
-            }
-        }
-
-        return syncService.sync().fold(
-            onSuccess = { syncResponse ->
-                userStateManager.userStateTransaction {
-                    val localSecurityStamp = authDiskSource.userState?.activeAccount?.profile?.stamp
-                    val serverSecurityStamp = syncResponse.profile.securityStamp
-                    // Log the user out if the stamps do not match
-                    localSecurityStamp?.let {
-                        if (serverSecurityStamp != localSecurityStamp) {
-                            // Ensure UserLogoutManager is available
-                            userLogoutManager.logout(
-                                userId = userId,
-                                reason = LogoutReason.SecurityStamp,
-                            )
-                            return@userStateTransaction SyncVaultDataResult.Error(
-                                SecurityStampMismatchException(),
-                            )
-                        }
-                    }
-
-                    // Update user information with additional information from sync response
-                    authDiskSource.userState = authDiskSource.userState?.toUpdatedUserStateJson(
-                        syncResponse = syncResponse,
-                    )
-
-                    unlockVaultForOrganizationsIfNecessary(syncResponse = syncResponse)
-                    storeProfileData(syncResponse = syncResponse)
-
-                    // Treat absent network policies as known empty data to
-                    // distinguish between unknown null data.
-                    authDiskSource.storePolicies(
-                        userId = userId,
-                        policies = syncResponse.policies.orEmpty(),
-                    )
-
-                    settingsDiskSource.storeLastSyncTime(
-                        userId = userId,
-                        lastSyncTime = clock.instant(),
-                    )
-                    vaultDiskSource.replaceVaultData(userId = userId, vault = syncResponse)
-                    fillAssistManager.syncIfNecessary()
-                    val itemsAvailable = syncResponse.ciphers?.isNotEmpty() == true
-                    SyncVaultDataResult.Success(itemsAvailable = itemsAvailable)
-                }
-            },
-            onFailure = {
-                updateVaultStateFlowsToError(throwable = it)
-                SyncVaultDataResult.Error(throwable = it)
-            },
-        )
-    }
-
-    private suspend fun unlockVaultForOrganizationsIfNecessary(
-        syncResponse: SyncResponseJson,
-    ) {
-        val profile = syncResponse.profile
-        val organizationKeys = profile.organizations
-            .orEmpty()
-            .filter { it.key != null }
-            .associate { it.id to requireNotNull(it.key) }
-            .takeUnless { it.isEmpty() }
-            ?: return
-
-        // There shouldn't be issues when unlocking directly from the syncResponse so we can ignore
-        // the return type here.
-        vaultSdkSource.initializeOrganizationCrypto(
-            userId = syncResponse.profile.id,
-            request = InitOrgCryptoRequest(organizationKeys = organizationKeys),
-        )
-    }
-
-    private suspend fun storeProfileData(
-        syncResponse: SyncResponseJson,
-    ) {
-        val profile = syncResponse.profile
-        val userId = profile.id
-        authDiskSource.apply {
-            val accountCryptographicState = profile.privateKeyOrNull()?.let {
-                profile.accountKeys.toAccountCryptographicState(privateKey = it)
-            }
-            val v2UpgradeToken = syncResponse.userDecryption?.v2UpgradeToken
-            storeAccountCryptographicState(
-                userId = userId,
-                accountCryptographicState = accountCryptographicState,
-            )
-            storeV2UpgradeToken(userId = userId, v2UpgradeToken = v2UpgradeToken)
-            if (accountCryptographicState != null &&
-                v2UpgradeToken != null &&
-                vaultLockManager.isVaultUnlocked(userId = userId)
-            ) {
-                vaultSdkSource.reinitializeCrypto(
-                    userId = userId,
-                    request = ReinitUserCryptoRequest(
-                        accountCryptographicState = accountCryptographicState,
-                        upgradeToken = v2UpgradeToken.toV2UpgradeToken(),
-                    ),
-                )
-            }
-            storeOrganizationKeys(
-                userId = userId,
-                organizationKeys = profile.organizations
-                    .orEmpty()
-                    .filter { it.key != null }
-                    .associate { it.id to requireNotNull(it.key) },
-            )
-            storeShouldUseKeyConnector(
-                userId = userId,
-                shouldUseKeyConnector = profile.shouldUseKeyConnector,
-            )
-            storeOrganizations(userId = userId, organizations = profile.organizations)
-        }
+        settingsDiskSource.storeLastSyncTime(userId = userId, lastSyncTime = clock.instant())
+        vaultDiskSource.resyncVaultData(userId = userId)
+        val itemsAvailable = vaultDiskSource
+            .getCiphersFlow(userId)
+            .firstOrNull()
+            ?.isNotEmpty() == true
+        return SyncVaultDataResult.Success(itemsAvailable = itemsAvailable)
     }
 
     private fun observeVaultDiskCiphersToCipherListView(
@@ -533,24 +393,6 @@ internal class VaultSyncManagerImpl(
         mutableSendDataStateFlow.update { DataState.Loading }
     }
 
-    private fun updateVaultStateFlowsToError(throwable: Throwable) {
-        mutableDecryptCipherListResultFlow.update { currentState ->
-            throwable.toNetworkOrErrorState(data = currentState.data)
-        }
-        mutableDomainsStateFlow.update { currentState ->
-            throwable.toNetworkOrErrorState(data = currentState.data)
-        }
-        mutableFoldersStateFlow.update { currentState ->
-            throwable.toNetworkOrErrorState(data = currentState.data)
-        }
-        mutableCollectionsStateFlow.update { currentState ->
-            throwable.toNetworkOrErrorState(data = currentState.data)
-        }
-        mutableSendDataStateFlow.update { currentState ->
-            throwable.toNetworkOrErrorState(data = currentState.data)
-        }
-    }
-
     /**
      * Returns the given [DataState] as-is, or [DataState.Loading] if vault data for the given
      * [userId] has not synced. This can be used to distinguish between empty data in the database
@@ -564,18 +406,3 @@ internal class VaultSyncManagerImpl(
             ?: DataState.Loading
 }
 
-/**
- * Convenience function to extract the private key from the [SyncResponseJson.Profile] response.
- */
-private fun SyncResponseJson.Profile.privateKeyOrNull(): String? =
-    this.accountKeys?.publicKeyEncryptionKeyPair?.wrappedPrivateKey
-        ?: this.privateKey
-
-private fun <T> Throwable.toNetworkOrErrorState(
-    data: T?,
-): DataState<T> =
-    if (isNoConnectionError()) {
-        DataState.NoNetwork(data = data)
-    } else {
-        DataState.Error(error = this, data = data)
-    }

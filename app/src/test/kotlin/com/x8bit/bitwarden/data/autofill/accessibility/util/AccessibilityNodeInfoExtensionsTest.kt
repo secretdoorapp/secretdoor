@@ -162,9 +162,9 @@ class AccessibilityNodeInfoExtensionsTest {
 
     @Suppress("MaxLineLength")
     @Test
-    fun `shouldSkipPackage when packageName is prefixed with bitwarden package should return true`() {
+    fun `shouldSkipPackage when packageName is prefixed with secretdoor package should return true`() {
         val accessibilityNodeInfo = mockk<AccessibilityNodeInfo> {
-            every { packageName } returns "com.x8bit.bitwarden.beta"
+            every { packageName } returns "io.github.zcoklin.secretdoor.beta"
         }
 
         assertTrue(accessibilityNodeInfo.shouldSkipPackage)

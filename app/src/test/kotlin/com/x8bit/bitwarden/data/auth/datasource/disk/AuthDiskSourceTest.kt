@@ -362,6 +362,7 @@ class AuthDiskSourceTest {
             ),
         )
         authDiskSource.storeMasterPasswordHash(userId = userId, passwordHash = "passwordHash")
+        authDiskSource.storeMasterPasswordHint(userId = userId, hint = "hint")
         authDiskSource.storeAuthenticatorSyncUnlockKey(
             userId = userId,
             authenticatorSyncUnlockKey = "authenticatorSyncUnlockKey",
@@ -410,6 +411,7 @@ class AuthDiskSourceTest {
         assertNull(authDiskSource.getPolicies(userId = userId))
         assertNull(authDiskSource.getAccountTokens(userId = userId))
         assertNull(authDiskSource.getMasterPasswordHash(userId = userId))
+        assertNull(authDiskSource.getMasterPasswordHint(userId = userId))
         assertNull(authDiskSource.getShouldUseKeyConnector(userId = userId))
         assertNull(authDiskSource.getIsTdeLoginComplete(userId = userId))
         assertNull(authDiskSource.getAuthenticatorSyncUnlockKey(userId = userId))
@@ -1193,6 +1195,33 @@ class AuthDiskSourceTest {
         assertEquals(
             json.encodeToJsonElement(mockOrganizationsMap),
             json.parseToJsonElement(requireNotNull(actual)),
+        )
+    }
+
+    @Test
+    fun `getMasterPasswordHint should pull from SharedPreferences`() {
+        val mockUserId = "mockUserId"
+        val mockHint = "mockHint"
+        fakeSharedPreferences.edit {
+            putString("bwPreferencesStorage:masterPasswordHint_$mockUserId", mockHint)
+        }
+
+        assertEquals(mockHint, authDiskSource.getMasterPasswordHint(userId = mockUserId))
+    }
+
+    @Test
+    fun `storeMasterPasswordHint should update SharedPreferences`() {
+        val mockUserId = "mockUserId"
+        val mockHint = "mockHint"
+
+        authDiskSource.storeMasterPasswordHint(userId = mockUserId, hint = mockHint)
+
+        assertEquals(
+            mockHint,
+            fakeSharedPreferences.getString(
+                "bwPreferencesStorage:masterPasswordHint_$mockUserId",
+                null,
+            ),
         )
     }
 

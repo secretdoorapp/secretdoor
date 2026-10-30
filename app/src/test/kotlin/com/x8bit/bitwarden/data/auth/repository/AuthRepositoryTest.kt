@@ -6151,6 +6151,230 @@ class AuthRepositoryTest {
         }
 
     @Test
+    fun `createLocalVault check data breaches found and strong password should return DataBreachFound`() =
+        runTest {
+            coEvery {
+                haveIBeenPwnedService.hasPasswordBeenBreached(PASSWORD)
+            } returns true.asSuccess()
+
+            val result = repository.createLocalVault(
+                masterPassword = PASSWORD,
+                masterPasswordHint = null,
+                shouldCheckDataBreaches = true,
+                isMasterPasswordStrong = true,
+            )
+
+            assertEquals(RegisterResult.DataBreachFound, result)
+            fakeAuthDiskSource.assertUserState(userState = null)
+        }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `createLocalVault check data breaches found and weak password should return DataBreachAndWeakPassword`() =
+        runTest {
+            coEvery {
+                haveIBeenPwnedService.hasPasswordBeenBreached(PASSWORD)
+            } returns true.asSuccess()
+
+            val result = repository.createLocalVault(
+                masterPassword = PASSWORD,
+                masterPasswordHint = null,
+                shouldCheckDataBreaches = true,
+                isMasterPasswordStrong = false,
+            )
+
+            assertEquals(RegisterResult.DataBreachAndWeakPassword, result)
+            fakeAuthDiskSource.assertUserState(userState = null)
+        }
+
+    @Test
+    fun `createLocalVault without data breach check and weak password should return WeakPassword`() =
+        runTest {
+            val result = repository.createLocalVault(
+                masterPassword = PASSWORD,
+                masterPasswordHint = null,
+                shouldCheckDataBreaches = false,
+                isMasterPasswordStrong = false,
+            )
+
+            assertEquals(RegisterResult.WeakPassword, result)
+            fakeAuthDiskSource.assertUserState(userState = null)
+            coVerify(exactly = 0) {
+                haveIBeenPwnedService.hasPasswordBeenBreached(password = any())
+                authSdkSource.makeRegisterKeys(email = any(), password = any(), kdf = any())
+            }
+        }
+
+    @Test
+    fun `createLocalVault with makeRegisterKeys failure should return Error`() = runTest {
+        val error = Throwable("Fail")
+        coEvery {
+            authSdkSource.makeRegisterKeys(email = any(), password = PASSWORD, kdf = any())
+        } returns error.asFailure()
+
+        val result = repository.createLocalVault(
+            masterPassword = PASSWORD,
+            masterPasswordHint = null,
+            shouldCheckDataBreaches = false,
+            isMasterPasswordStrong = true,
+        )
+
+        assertEquals(RegisterResult.Error(errorMessage = null, error = error), result)
+        fakeAuthDiskSource.assertUserState(userState = null)
+        coVerify(exactly = 0) {
+            vaultRepository.unlockVaultWithMasterPassword(masterPassword = any())
+        }
+    }
+
+    @Suppress("LongMethod")
+    @Test
+    fun `createLocalVault success should store local account, unlock vault and return Success`() =
+        runTest {
+            val emailSlot = slot<String>()
+            val kdf = Kdf.Pbkdf2(DEFAULT_KDF_ITERATIONS.toUInt())
+            coEvery {
+                authSdkSource.makeRegisterKeys(
+                    email = capture(emailSlot),
+                    password = PASSWORD,
+                    kdf = kdf,
+                )
+            } returns RegisterKeyResponse(
+                masterPasswordHash = PASSWORD_HASH,
+                encryptedUserKey = ENCRYPTED_USER_KEY,
+                keys = RsaKeyPair(public = PUBLIC_KEY, private = PRIVATE_KEY),
+            )
+                .asSuccess()
+            coEvery {
+                vaultRepository.unlockVaultWithMasterPassword(masterPassword = PASSWORD)
+            } returns VaultUnlockResult.Success
+
+            val result = repository.createLocalVault(
+                masterPassword = PASSWORD,
+                masterPasswordHint = "hint",
+                shouldCheckDataBreaches = false,
+                isMasterPasswordStrong = true,
+            )
+
+            assertEquals(RegisterResult.Success, result)
+            val userId = requireNotNull(fakeAuthDiskSource.userState?.activeUserId)
+            val email = "$userId@secretdoor.local"
+            assertEquals(email, emailSlot.captured)
+            val kdfJson = KdfJson(
+                kdfType = KdfTypeJson.PBKDF2_SHA256,
+                iterations = DEFAULT_KDF_ITERATIONS,
+                memory = null,
+                parallelism = null,
+            )
+            fakeAuthDiskSource.assertUserState(
+                userState = UserStateJson(
+                    activeUserId = userId,
+                    accounts = mapOf(
+                        userId to AccountJson(
+                            profile = AccountJson.Profile(
+                                userId = userId,
+                                email = email,
+                                isEmailVerified = true,
+                                isTwoFactorEnabled = false,
+                                name = null,
+                                stamp = null,
+                                organizationId = null,
+                                avatarColorHex = null,
+                                hasPremiumPersonally = true,
+                                hasPremiumFromOrganization = null,
+                                forcePasswordResetReason = null,
+                                kdfType = KdfTypeJson.PBKDF2_SHA256,
+                                kdfIterations = DEFAULT_KDF_ITERATIONS,
+                                kdfMemory = null,
+                                kdfParallelism = null,
+                                userDecryptionOptions = UserDecryptionOptionsJson(
+                                    hasMasterPassword = true,
+                                    masterPasswordUnlock = MasterPasswordUnlockDataJson(
+                                        salt = email,
+                                        kdf = kdfJson,
+                                        masterKeyWrappedUserKey = ENCRYPTED_USER_KEY,
+                                    ),
+                                    trustedDeviceUserDecryptionOptions = null,
+                                    keyConnectorUserDecryptionOptions = null,
+                                ),
+                                creationDate = FIXED_CLOCK.instant(),
+                            ),
+                            settings = AccountJson.Settings(
+                                environmentUrlData = Environment.Prod.Us.environmentUrlData,
+                            ),
+                        ),
+                    ),
+                ),
+            )
+            fakeAuthDiskSource.assertAccountTokens(
+                userId = userId,
+                accountTokens = AccountTokensJson(
+                    accessToken = "secretdoor-local-vault",
+                    refreshToken = null,
+                ),
+            )
+            fakeAuthDiskSource.assertMasterPasswordHash(
+                userId = userId,
+                passwordHash = PASSWORD_HASH,
+            )
+            fakeAuthDiskSource.assertMasterPasswordHint(userId = userId, hint = "hint")
+            fakeAuthDiskSource.assertAccountCryptographicState(
+                userId = userId,
+                accountCryptographicState = WrappedAccountCryptographicState.V1(
+                    privateKey = PRIVATE_KEY,
+                ),
+            )
+            verify(exactly = 1) {
+                settingsRepository.hasUserLoggedInOrCreatedAccount = true
+            }
+            coVerify(exactly = 0) {
+                haveIBeenPwnedService.hasPasswordBeenBreached(password = any())
+            }
+        }
+
+    @Test
+    fun `createLocalVault with unlock failure should return Error`() = runTest {
+        val error = Throwable("Fail")
+        coEvery {
+            authSdkSource.makeRegisterKeys(email = any(), password = PASSWORD, kdf = any())
+        } returns RegisterKeyResponse(
+            masterPasswordHash = PASSWORD_HASH,
+            encryptedUserKey = ENCRYPTED_USER_KEY,
+            keys = RsaKeyPair(public = PUBLIC_KEY, private = PRIVATE_KEY),
+        )
+            .asSuccess()
+        coEvery {
+            vaultRepository.unlockVaultWithMasterPassword(masterPassword = PASSWORD)
+        } returns VaultUnlockResult.GenericError(error = error)
+
+        val result = repository.createLocalVault(
+            masterPassword = PASSWORD,
+            masterPasswordHint = null,
+            shouldCheckDataBreaches = false,
+            isMasterPasswordStrong = true,
+        )
+
+        assertEquals(RegisterResult.Error(errorMessage = null, error = error), result)
+        verify(exactly = 0) {
+            settingsRepository.hasUserLoggedInOrCreatedAccount = true
+        }
+    }
+
+    @Test
+    fun `getMasterPasswordHint should return the stored hint for the active user`() {
+        fakeAuthDiskSource.userState = SINGLE_USER_STATE_1
+        fakeAuthDiskSource.storeMasterPasswordHint(userId = USER_ID_1, hint = "hint")
+
+        assertEquals("hint", repository.getMasterPasswordHint())
+    }
+
+    @Test
+    fun `getMasterPasswordHint with no active user should return null`() {
+        fakeAuthDiskSource.userState = null
+
+        assertNull(repository.getMasterPasswordHint())
+    }
+
+    @Test
     fun `passwordHintRequest with valid email should return Success`() = runTest {
         val email = "valid@example.com"
         coEvery {

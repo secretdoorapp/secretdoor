@@ -52,6 +52,7 @@ private const val ORGANIZATIONS_KEY = "organizations"
 private const val ORGANIZATION_KEYS_KEY = "encOrgKeys"
 private const val TWO_FACTOR_TOKEN_KEY = "twoFactorToken"
 private const val MASTER_PASSWORD_HASH_KEY = "keyHash"
+private const val MASTER_PASSWORD_HINT_KEY = "masterPasswordHint"
 private const val POLICIES_KEY = "policies"
 private const val SHOULD_TRUST_DEVICE_KEY = "shouldTrustDevice"
 private const val TDE_LOGIN_COMPLETE = "tdeLoginComplete"
@@ -186,6 +187,7 @@ class AuthDiskSourceImpl(
         storeUserBiometricInitVector(userId = userId, iv = null)
         storeUserBiometricUnlockKey(userId = userId, biometricsKey = null)
         storeMasterPasswordHash(userId = userId, passwordHash = null)
+        storeMasterPasswordHint(userId = userId, hint = null)
         storePolicies(userId = userId, policies = null)
         storeAccountTokens(userId = userId, accountTokens = null)
         storeShouldUseKeyConnector(userId = userId, shouldUseKeyConnector = null)
@@ -523,6 +525,13 @@ class AuthDiskSourceImpl(
 
     override fun storeMasterPasswordHash(userId: String, passwordHash: String?) {
         putString(key = MASTER_PASSWORD_HASH_KEY.appendIdentifier(userId), value = passwordHash)
+    }
+
+    override fun getMasterPasswordHint(userId: String): String? =
+        getString(key = MASTER_PASSWORD_HINT_KEY.appendIdentifier(userId))
+
+    override fun storeMasterPasswordHint(userId: String, hint: String?) {
+        putString(key = MASTER_PASSWORD_HINT_KEY.appendIdentifier(userId), value = hint)
     }
 
     override fun getPolicies(userId: String): List<SyncResponseJson.Policy>? =

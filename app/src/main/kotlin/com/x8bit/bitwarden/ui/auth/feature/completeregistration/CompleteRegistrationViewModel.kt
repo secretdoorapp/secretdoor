@@ -5,7 +5,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.bitwarden.core.data.manager.toast.ToastManager
 import com.bitwarden.ui.platform.base.BaseViewModel
-import com.bitwarden.ui.platform.base.util.isValidEmail
 import com.bitwarden.ui.platform.resource.BitwardenPlurals
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.Text
@@ -14,11 +13,9 @@ import com.bitwarden.ui.util.asText
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.OnboardingStatus
 import com.x8bit.bitwarden.data.auth.datasource.sdk.model.PasswordStrength
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
-import com.x8bit.bitwarden.data.auth.repository.model.LoginResult
 import com.x8bit.bitwarden.data.auth.repository.model.PasswordStrengthResult
 import com.x8bit.bitwarden.data.auth.repository.model.RegisterResult
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
-import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.tools.generator.repository.GeneratorRepository
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratorResult
 import com.x8bit.bitwarden.ui.auth.feature.completeregistration.CompleteRegistrationAction.BackClick
@@ -53,7 +50,6 @@ class CompleteRegistrationViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     generatorRepository: GeneratorRepository,
     private val authRepository: AuthRepository,
-    private val environmentRepository: EnvironmentRepository,
     private val specialCircumstanceManager: SpecialCircumstanceManager,
     private val toastManager: ToastManager,
 ) : BaseViewModel<CompleteRegistrationState, CompleteRegistrationEvent, CompleteRegistrationAction>(
@@ -66,7 +62,7 @@ class CompleteRegistrationViewModel @Inject constructor(
             passwordInput = "",
             confirmPasswordInput = "",
             passwordHintInput = "",
-            isCheckDataBreachesToggled = true,
+            isCheckDataBreachesToggled = false,
             dialog = null,
             passwordStrengthState = PasswordStrengthState.NONE,
             minimumPasswordLength = MIN_PASSWORD_LENGTH,
@@ -124,7 +120,6 @@ class CompleteRegistrationViewModel @Inject constructor(
             is Internal.GeneratedPasswordResult -> handleGeneratedPasswordResult(action)
             is ReceivePasswordStrengthResult -> handlePasswordStrengthResult(action)
             is Internal.ReceiveRegisterResult -> handleReceiveRegisterAccountResult(action)
-            is Internal.ReceiveLoginResult -> handleLoginResult(action)
         }
     }
 
@@ -193,17 +188,10 @@ class CompleteRegistrationViewModel @Inject constructor(
             }
 
             is RegisterResult.Success -> {
-                viewModelScope.launch {
-                    val loginResult = authRepository.login(
-                        email = state.userEmail,
-                        password = state.passwordInput,
-                    )
-                    sendAction(
-                        Internal.ReceiveLoginResult(
-                            loginResult = loginResult,
-                        ),
-                    )
-                }
+                // The local vault is created and unlocked, so state-based navigation takes over.
+                clearDialogState()
+                toastManager.show(messageId = BitwardenString.your_new_vault_has_been_created)
+                authRepository.setOnboardingStatus(status = OnboardingStatus.NOT_STARTED)
             }
 
             RegisterResult.DataBreachFound -> {
@@ -241,25 +229,6 @@ class CompleteRegistrationViewModel @Inject constructor(
         }
     }
 
-    private fun handleLoginResult(action: Internal.ReceiveLoginResult) {
-        clearDialogState()
-        toastManager.show(messageId = BitwardenString.account_created_success)
-
-        authRepository.setOnboardingStatus(
-            status = OnboardingStatus.NOT_STARTED,
-        )
-
-        // If the login result is Success the state based navigation will take care of it.
-        // otherwise we need to navigate to the login screen.
-        if (action.loginResult !is LoginResult.Success) {
-            sendEvent(
-                CompleteRegistrationEvent.NavigateToLogin(
-                    email = state.userEmail,
-                ),
-            )
-        }
-    }
-
     private fun handleCheckDataBreachesToggle(action: CheckDataBreachesToggle) {
         mutableStateFlow.update {
             it.copy(isCheckDataBreachesToggled = action.newState)
@@ -291,29 +260,6 @@ class CompleteRegistrationViewModel @Inject constructor(
     }
 
     private fun handleCallToActionClick() = when {
-        state.userEmail.isBlank() -> {
-            mutableStateFlow.update {
-                it.copy(
-                    dialog = CompleteRegistrationDialog.Error(
-                        title = BitwardenString.an_error_has_occurred.asText(),
-                        message = BitwardenString.validation_field_required
-                            .asText(BitwardenString.email_address.asText()),
-                    ),
-                )
-            }
-        }
-
-        !state.userEmail.isValidEmail() -> {
-            mutableStateFlow.update {
-                it.copy(
-                    dialog = CompleteRegistrationDialog.Error(
-                        title = BitwardenString.an_error_has_occurred.asText(),
-                        message = BitwardenString.invalid_email.asText(),
-                    ),
-                )
-            }
-        }
-
         state.passwordInput.length < MIN_PASSWORD_LENGTH -> {
             mutableStateFlow.update {
                 it.copy(
@@ -371,16 +317,12 @@ class CompleteRegistrationViewModel @Inject constructor(
             it.copy(dialog = CompleteRegistrationDialog.Loading)
         }
         viewModelScope.launch {
-            // Update region accordingly to a user email
-            environmentRepository.loadEnvironmentForEmail(state.userEmail)
-            val result = authRepository.register(
+            val result = authRepository.createLocalVault(
+                masterPassword = state.passwordInput,
+                masterPasswordHint = state.passwordHintInput.ifBlank { null },
                 shouldCheckDataBreaches = shouldCheckForDataBreaches,
                 isMasterPasswordStrong = shouldIgnorePasswordStrength ||
                     state.isMasterPasswordStrong,
-                emailVerificationToken = state.emailVerificationToken,
-                email = state.userEmail,
-                masterPassword = state.passwordInput,
-                masterPasswordHint = state.passwordHintInput.ifBlank { null },
             )
             sendAction(
                 Internal.ReceiveRegisterResult(
@@ -515,13 +457,6 @@ sealed class CompleteRegistrationEvent {
      * Navigates to make password strong screen
      */
     data object NavigateToMakePasswordStrong : CompleteRegistrationEvent()
-
-    /**
-     * Navigates to the Login screen.
-     */
-    data class NavigateToLogin(
-        val email: String,
-    ) : CompleteRegistrationEvent()
 }
 
 /**
@@ -601,14 +536,5 @@ sealed class CompleteRegistrationAction {
          * Indicates a generated password has been received.
          */
         data class GeneratedPasswordResult(val generatedPassword: String) : Internal()
-
-        /**
-         * Indicates registration was successful and will now attempt to login and unlock the vault.
-         *
-         * @see [AuthRepository.login]
-         */
-        data class ReceiveLoginResult(
-            val loginResult: LoginResult,
-        ) : Internal()
     }
 }

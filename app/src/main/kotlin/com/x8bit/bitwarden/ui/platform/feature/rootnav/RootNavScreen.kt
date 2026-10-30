@@ -32,23 +32,9 @@ import com.x8bit.bitwarden.ui.auth.feature.accountsetup.setupUnlockDestinationAs
 import com.x8bit.bitwarden.ui.auth.feature.auth.AuthGraphRoute
 import com.x8bit.bitwarden.ui.auth.feature.auth.authGraph
 import com.x8bit.bitwarden.ui.auth.feature.auth.navigateToAuthGraph
-import com.x8bit.bitwarden.ui.auth.feature.completeregistration.navigateToCompleteRegistration
-import com.x8bit.bitwarden.ui.auth.feature.expiredregistrationlink.navigateToExpiredRegistrationLinkScreen
-import com.x8bit.bitwarden.ui.auth.feature.removepassword.RemovePasswordRoute
-import com.x8bit.bitwarden.ui.auth.feature.removepassword.navigateToRemovePassword
-import com.x8bit.bitwarden.ui.auth.feature.removepassword.removePasswordDestination
-import com.x8bit.bitwarden.ui.auth.feature.resetpassword.ResetPasswordGraphRoute
-import com.x8bit.bitwarden.ui.auth.feature.resetpassword.navigateToResetPasswordGraph
-import com.x8bit.bitwarden.ui.auth.feature.resetpassword.passwordResetGraph
-import com.x8bit.bitwarden.ui.auth.feature.setpassword.SetPasswordRoute
-import com.x8bit.bitwarden.ui.auth.feature.setpassword.navigateToSetPassword
-import com.x8bit.bitwarden.ui.auth.feature.trusteddevice.TrustedDeviceGraphRoute
-import com.x8bit.bitwarden.ui.auth.feature.trusteddevice.navigateToTrustedDeviceGraph
-import com.x8bit.bitwarden.ui.auth.feature.trusteddevice.trustedDeviceGraph
 import com.x8bit.bitwarden.ui.auth.feature.vaultunlock.VaultUnlockRoute
 import com.x8bit.bitwarden.ui.auth.feature.vaultunlock.navigateToVaultUnlock
 import com.x8bit.bitwarden.ui.auth.feature.vaultunlock.vaultUnlockDestination
-import com.x8bit.bitwarden.ui.auth.feature.welcome.navigateToWelcome
 import com.x8bit.bitwarden.ui.platform.components.util.rememberBitwardenNavController
 import com.x8bit.bitwarden.ui.platform.feature.rootnav.util.toVaultItemListingType
 import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.loginapproval.navigateToLoginApproval
@@ -105,9 +91,6 @@ fun RootNavScreen(
     ) {
         splashDestination()
         authGraph(navController)
-        removePasswordDestination()
-        passwordResetGraph(navController)
-        trustedDeviceGraph(navController)
         vaultUnlockDestination()
         vaultUnlockedGraph(navController)
         setupUnlockDestinationAsRoot()
@@ -119,17 +102,8 @@ fun RootNavScreen(
     }
 
     val targetRoute = when (state) {
-        RootNavState.Auth,
-        is RootNavState.CompleteOngoingRegistration,
-        RootNavState.AuthWithWelcome,
-        RootNavState.ExpiredRegistrationLink,
-            -> AuthGraphRoute
-
-        RootNavState.ResetPassword -> ResetPasswordGraphRoute
-        RootNavState.SetPassword -> SetPasswordRoute
-        RootNavState.RemovePassword -> RemovePasswordRoute
+        RootNavState.Auth -> AuthGraphRoute
         RootNavState.Splash -> SplashRoute
-        RootNavState.TrustedDevice -> TrustedDeviceGraphRoute
         RootNavState.VaultLocked -> VaultUnlockRoute.Standard
         is RootNavState.VaultUnlocked,
         is RootNavState.VaultUnlockedForAutofillSave,
@@ -189,33 +163,11 @@ fun RootNavScreen(
     LaunchedEffect(state) {
         when (val currentState = state) {
             RootNavState.Auth -> navController.navigateToAuthGraph(rootNavOptions)
-            RootNavState.AuthWithWelcome -> navController.navigateToWelcome(rootNavOptions)
-            is RootNavState.CompleteOngoingRegistration -> {
-                navController.navigateToAuthGraph(rootNavOptions)
-                navController.navigateToCompleteRegistration(
-                    emailAddress = currentState.email,
-                    verificationToken = currentState.verificationToken,
-                    fromEmail = currentState.fromEmail,
-                )
-            }
-
-            RootNavState.ExpiredRegistrationLink -> {
-                navController.navigateToAuthGraph(rootNavOptions)
-                navController.navigateToExpiredRegistrationLinkScreen()
-            }
-
             is RootNavState.MigrateToMyItems -> {
                 navController.navigateToMigrateToMyItemsGraph(rootNavOptions)
             }
 
-            RootNavState.RemovePassword -> navController.navigateToRemovePassword(rootNavOptions)
-            RootNavState.ResetPassword -> {
-                navController.navigateToResetPasswordGraph(rootNavOptions)
-            }
-
-            RootNavState.SetPassword -> navController.navigateToSetPassword(rootNavOptions)
             RootNavState.Splash -> navController.navigateToSplash(rootNavOptions)
-            RootNavState.TrustedDevice -> navController.navigateToTrustedDeviceGraph(rootNavOptions)
             RootNavState.VaultLocked -> navController.navigateToVaultUnlock(rootNavOptions)
             is RootNavState.VaultUnlocked -> navController.navigateToVaultUnlockedGraph(
                 navOptions = rootNavOptions,
@@ -349,17 +301,14 @@ private fun AnimatedContentTransitionScope<NavBackStackEntry>.toEnterTransition(
     } else {
         when (targetState.destination.rootLevelRoute()) {
             MigrateToMyItemsGraphRoute.toObjectNavigationRoute(),
-            ResetPasswordGraphRoute.toObjectNavigationRoute(),
                 -> RootTransitionProviders.Enter.slideUp
 
             else -> when (initialState.destination.rootLevelRoute()) {
                 // Disable transitions when coming from the splash screen
                 SplashRoute.toObjectNavigationRoute() -> RootTransitionProviders.Enter.none
-                // The MigrateToMyItemsGraphRoute and ResetPasswordRoute animation
-                // should stay but due to an issue when combining certain animations,
-                // we are just using a fadeIn instead.
+                // The MigrateToMyItemsGraphRoute animation should stay but due to an issue
+                // when combining certain animations, we are just using a fadeIn instead.
                 MigrateToMyItemsGraphRoute.toObjectNavigationRoute(),
-                ResetPasswordGraphRoute.toObjectNavigationRoute(),
                     -> RootTransitionProviders.Enter.fadeIn
 
                 else -> RootTransitionProviders.Enter.fadeIn
@@ -382,12 +331,10 @@ private fun AnimatedContentTransitionScope<NavBackStackEntry>.toExitTransition()
             // Disable transitions when coming from the splash screen
             SplashRoute.toObjectNavigationRoute() -> RootTransitionProviders.Exit.none
             MigrateToMyItemsGraphRoute.toObjectNavigationRoute(),
-            ResetPasswordGraphRoute.toObjectNavigationRoute(),
                 -> RootTransitionProviders.Exit.slideDown
 
             else -> when (targetRoute) {
                 MigrateToMyItemsGraphRoute.toObjectNavigationRoute(),
-                ResetPasswordGraphRoute.toObjectNavigationRoute(),
                     -> RootTransitionProviders.Exit.stay
 
                 else -> RootTransitionProviders.Exit.fadeOut

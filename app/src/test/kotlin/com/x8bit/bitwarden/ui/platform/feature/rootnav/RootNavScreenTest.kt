@@ -9,13 +9,7 @@ import com.x8bit.bitwarden.ui.auth.feature.accountsetup.SetupBrowserAutofillRout
 import com.x8bit.bitwarden.ui.auth.feature.accountsetup.SetupCompleteRoute
 import com.x8bit.bitwarden.ui.auth.feature.accountsetup.SetupUnlockRoute
 import com.x8bit.bitwarden.ui.auth.feature.auth.AuthGraphRoute
-import com.x8bit.bitwarden.ui.auth.feature.completeregistration.CompleteRegistrationRoute
-import com.x8bit.bitwarden.ui.auth.feature.expiredregistrationlink.ExpiredRegistrationLinkRoute
-import com.x8bit.bitwarden.ui.auth.feature.resetpassword.ResetPasswordGraphRoute
-import com.x8bit.bitwarden.ui.auth.feature.setpassword.SetPasswordRoute
-import com.x8bit.bitwarden.ui.auth.feature.trusteddevice.TrustedDeviceGraphRoute
 import com.x8bit.bitwarden.ui.auth.feature.vaultunlock.VaultUnlockRoute
-import com.x8bit.bitwarden.ui.auth.feature.welcome.WelcomeRoute
 import com.x8bit.bitwarden.ui.platform.base.BitwardenComposeTest
 import com.x8bit.bitwarden.ui.platform.feature.splash.SplashRoute
 import com.x8bit.bitwarden.ui.platform.feature.vaultunlocked.VaultUnlockedGraphRoute
@@ -39,9 +33,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import java.time.Clock
-import java.time.Instant
-import java.time.ZoneOffset
 
 class RootNavScreenTest : BitwardenComposeTest() {
     private val mockNavHostController = createMockNavHostController()
@@ -110,84 +101,12 @@ class RootNavScreenTest : BitwardenComposeTest() {
         }
         assertTrue(isSplashScreenRemoved)
 
-        // Make sure navigating to Auth with the welcome route works as expected:
-        rootNavStateFlow.value = RootNavState.AuthWithWelcome
-        composeTestRule.runOnIdle {
-            verify {
-                mockNavHostController.navigate(
-                    route = WelcomeRoute,
-                    navOptions = expectedNavOptions,
-                )
-            }
-        }
-
-        // Make sure navigating to complete registration route works as expected:
-        rootNavStateFlow.value = RootNavState.CompleteOngoingRegistration(
-            email = "example@email.com",
-            verificationToken = "verificationToken",
-            fromEmail = true,
-            timestamp = FIXED_CLOCK.millis(),
-        )
-        composeTestRule.runOnIdle {
-            verify {
-                mockNavHostController.navigate(
-                    route = CompleteRegistrationRoute(
-                        emailAddress = "example@email.com",
-                        verificationToken = "verificationToken",
-                        fromEmail = true,
-                    ),
-                    navOptions = null,
-                )
-            }
-        }
-
-        // Make sure navigating to expired registration link route works as expected:
-        rootNavStateFlow.value = RootNavState.ExpiredRegistrationLink
-        composeTestRule.runOnIdle {
-            verify {
-                mockNavHostController.navigate(route = ExpiredRegistrationLinkRoute)
-            }
-        }
-
         // Make sure navigating to vault locked works as expected:
         rootNavStateFlow.value = RootNavState.VaultLocked
         composeTestRule.runOnIdle {
             verify {
                 mockNavHostController.navigate(
                     route = VaultUnlockRoute.Standard,
-                    navOptions = expectedNavOptions,
-                )
-            }
-        }
-
-        // Make sure navigating to reset password works as expected:
-        rootNavStateFlow.value = RootNavState.ResetPassword
-        composeTestRule.runOnIdle {
-            verify {
-                mockNavHostController.navigate(
-                    route = ResetPasswordGraphRoute,
-                    navOptions = expectedNavOptions,
-                )
-            }
-        }
-
-        // Make sure navigating to set password works as expected:
-        rootNavStateFlow.value = RootNavState.SetPassword
-        composeTestRule.runOnIdle {
-            verify {
-                mockNavHostController.navigate(
-                    route = SetPasswordRoute,
-                    navOptions = expectedNavOptions,
-                )
-            }
-        }
-
-        // Make sure navigating to set password works as expected:
-        rootNavStateFlow.value = RootNavState.TrustedDevice
-        composeTestRule.runOnIdle {
-            verify {
-                mockNavHostController.navigate(
-                    route = TrustedDeviceGraphRoute,
                     navOptions = expectedNavOptions,
                 )
             }
@@ -505,8 +424,3 @@ class RootNavScreenTest : BitwardenComposeTest() {
         }
     }
 }
-
-private val FIXED_CLOCK: Clock = Clock.fixed(
-    Instant.parse("2023-10-27T12:00:00Z"),
-    ZoneOffset.UTC,
-)

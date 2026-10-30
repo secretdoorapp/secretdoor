@@ -10,7 +10,7 @@
             android:action="android.intent.action.VIEW"
             android:data="bitwarden://password_generator"
             android:targetClass="com.x8bit.bitwarden.MainActivity"
-            android:targetPackage="com.x8bit.bitwarden" />
+            android:targetPackage="io.github.zcoklin.secretdoor" />
     </shortcut>
     <shortcut
         android:enabled="true"
@@ -22,6 +22,6 @@
             android:action="android.intent.action.VIEW"
             android:data="bitwarden://my_vault"
             android:targetClass="com.x8bit.bitwarden.MainActivity"
-            android:targetPackage="com.x8bit.bitwarden" />
+            android:targetPackage="io.github.zcoklin.secretdoor" />
     </shortcut>
 </shortcuts>
