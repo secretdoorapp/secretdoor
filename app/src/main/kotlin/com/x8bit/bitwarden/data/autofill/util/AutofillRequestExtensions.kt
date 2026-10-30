@@ -1,0 +1,44 @@
+package com.x8bit.bitwarden.data.autofill.util
+
+import com.x8bit.bitwarden.data.autofill.model.AutofillPartition
+import com.x8bit.bitwarden.data.autofill.model.AutofillRequest
+import com.x8bit.bitwarden.data.autofill.model.AutofillSaveItem
+
+/**
+ * Convert the [AutofillRequest.Fillable] to an [AutofillSaveItem], or null if this partition does
+ * not support save requests.
+ */
+fun AutofillRequest.Fillable.toAutofillSaveItem(): AutofillSaveItem? =
+    when (this.partition) {
+        is AutofillPartition.Card -> {
+            AutofillSaveItem.Card(
+                cardholderName = partition.cardholderNameSaveValue,
+                number = partition.numberSaveValue,
+                expirationMonth = partition.expirationMonthSaveValue,
+                expirationYear = partition.expirationYearSaveValue,
+                securityCode = partition.securityCodeSaveValue,
+                brand = partition.brandSaveValue,
+            )
+        }
+
+        is AutofillPartition.Login -> {
+            // Skip the scheme for the save value.
+            val uri = this
+                .uri
+                ?.replace("https://", "")
+                ?.replace("http://", "")
+
+            AutofillSaveItem.Login(
+                username = partition.usernameSaveValue,
+                password = partition.passwordSaveValue,
+                uri = uri,
+            )
+        }
+
+        is AutofillPartition.Identity -> {
+            // Capturing identity data from a filled form is out of scope. This is never actually
+            // reached because AutofillPartition.Identity.canPerformSaveRequest is always false, so
+            // SaveInfo (and therefore a save callback) is never built for it.
+            null
+        }
+    }

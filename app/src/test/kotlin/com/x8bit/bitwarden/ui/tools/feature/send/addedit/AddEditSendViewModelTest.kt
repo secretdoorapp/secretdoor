@@ -1,0 +1,2392 @@
+package com.x8bit.bitwarden.ui.tools.feature.send.addedit
+
+import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
+import app.cash.turbine.test
+import com.bitwarden.core.data.manager.model.FlagKey
+import com.bitwarden.core.data.repository.model.DataState
+import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
+import com.bitwarden.data.repository.model.Environment
+import com.bitwarden.network.model.SendAccessTypeJson
+import com.bitwarden.send.SendType
+import com.bitwarden.send.SendView
+import com.bitwarden.ui.platform.base.BaseViewModelTest
+import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarData
+import com.bitwarden.ui.platform.manager.snackbar.SnackbarRelayManager
+import com.bitwarden.ui.platform.model.FileData
+import com.bitwarden.ui.platform.resource.BitwardenString
+import com.bitwarden.ui.util.Text
+import com.bitwarden.ui.util.asText
+import com.x8bit.bitwarden.data.auth.datasource.disk.model.OnboardingStatus
+import com.x8bit.bitwarden.data.auth.repository.AuthRepository
+import com.x8bit.bitwarden.data.auth.repository.model.UserState
+import com.x8bit.bitwarden.data.billing.manager.PremiumStateManager
+import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
+import com.x8bit.bitwarden.data.platform.manager.PolicyManager
+import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
+import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
+import com.x8bit.bitwarden.data.platform.manager.model.EffectiveSendPolicy
+import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
+import com.x8bit.bitwarden.data.platform.manager.network.NetworkConnectionManager
+import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
+import com.x8bit.bitwarden.data.tools.generator.repository.GeneratorRepository
+import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratorResult
+import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSendView
+import com.x8bit.bitwarden.data.vault.repository.VaultRepository
+import com.x8bit.bitwarden.data.vault.repository.model.CreateSendResult
+import com.x8bit.bitwarden.data.vault.repository.model.DeleteSendResult
+import com.x8bit.bitwarden.data.vault.repository.model.RemovePasswordSendResult
+import com.x8bit.bitwarden.data.vault.repository.model.UpdateSendResult
+import com.x8bit.bitwarden.ui.platform.model.SnackbarRelay
+import com.x8bit.bitwarden.ui.tools.feature.generator.model.GeneratorMode
+import com.x8bit.bitwarden.ui.tools.feature.send.addedit.model.AddEditSendType
+import com.x8bit.bitwarden.ui.tools.feature.send.addedit.model.AuthEmail
+import com.x8bit.bitwarden.ui.tools.feature.send.addedit.model.SendAuth
+import com.x8bit.bitwarden.ui.tools.feature.send.addedit.util.toSendView
+import com.x8bit.bitwarden.ui.tools.feature.send.addedit.util.toViewState
+import com.x8bit.bitwarden.ui.tools.feature.send.model.SendItemType
+import com.x8bit.bitwarden.ui.tools.feature.send.util.toSendUrl
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.runs
+import io.mockk.unmockkStatic
+import io.mockk.verify
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneOffset
+import java.util.UUID
+
+@Suppress("LargeClass")
+class AddEditSendViewModelTest : BaseViewModelTest() {
+
+    private val clock = Clock.fixed(
+        Instant.parse("2023-10-27T12:00:00Z"),
+        ZoneOffset.UTC,
+    )
+    private val clipboardManager: BitwardenClipboardManager = mockk {
+        every { setText(any<String>(), toastDescriptorOverride = any<Text>()) } just runs
+    }
+    private val mutableGeneratorResultFlow = bufferedMutableSharedFlow<GeneratorResult>()
+    private val mutableUserStateFlow = MutableStateFlow<UserState?>(DEFAULT_USER_STATE)
+    private val authRepository = mockk<AuthRepository> {
+        every { userStateFlow } returns mutableUserStateFlow
+    }
+    private val generatorRepository = mockk<GeneratorRepository>(relaxed = true) {
+        every { generatorResultFlow } returns mutableGeneratorResultFlow
+    }
+    private val environmentRepository: EnvironmentRepository = mockk {
+        every { environment } returns Environment.Prod.Us
+    }
+    private val specialCircumstanceManager: SpecialCircumstanceManager = mockk {
+        every { specialCircumstance } returns null
+        every { specialCircumstance = any() } just runs
+    }
+    private val mutableSendDataStateFlow = MutableStateFlow<DataState<SendView>>(DataState.Loading)
+    private val vaultRepository: VaultRepository = mockk {
+        every { getSendStateFlow(any()) } returns mutableSendDataStateFlow
+    }
+    private val mutableEffectiveSendPolicyFlow = MutableStateFlow(DEFAULT_EFFECTIVE_SEND_POLICY)
+    private val mutableSendControlsFlagFlow = MutableStateFlow(false)
+    private val policyManager: PolicyManager = mockk {
+        every { getEffectiveSendPolicy() } answers { mutableEffectiveSendPolicyFlow.value }
+        every { getEffectiveSendPolicyFlow() } returns mutableEffectiveSendPolicyFlow
+    }
+    private val featureFlagManager: FeatureFlagManager = mockk {
+        every { getFeatureFlag(key = FlagKey.SendControls) } answers {
+            mutableSendControlsFlagFlow.value
+        }
+        every { getFeatureFlagFlow(key = FlagKey.SendControls) } returns mutableSendControlsFlagFlow
+    }
+    private val networkConnectionManager = mockk<NetworkConnectionManager> {
+        every { isNetworkConnected } returns true
+    }
+    private val snackbarRelayManager: SnackbarRelayManager<SnackbarRelay> = mockk {
+        every { sendSnackbarData(data = any(), relay = any()) } just runs
+    }
+
+    private val premiumStateManager: PremiumStateManager = mockk {
+        every { isInAppUpgradeAvailable() } returns false
+    }
+
+    @BeforeEach
+    fun setup() {
+        mockkStatic(
+            SavedStateHandle::toAddEditSendArgs,
+            AddEditSendState.ViewState.Content::toSendView,
+            SendView::toSendUrl,
+            SendView::toViewState,
+            UUID::randomUUID,
+        )
+        every { UUID.randomUUID().toString() } returns "uuid"
+    }
+
+    @AfterEach
+    fun tearDown() {
+        unmockkStatic(
+            SavedStateHandle::toAddEditSendArgs,
+            AddEditSendState.ViewState.Content::toSendView,
+            SendView::toSendUrl,
+            SendView::toViewState,
+            UUID::randomUUID,
+        )
+    }
+
+    @Test
+    fun `initial state should be correct`() {
+        val viewModel = createViewModel()
+        assertEquals(DEFAULT_STATE, viewModel.stateFlow.value)
+    }
+
+    @Test
+    fun `initial state should be correct when the effective policy disables hide email`() {
+        mutableEffectiveSendPolicyFlow.value =
+            DEFAULT_EFFECTIVE_SEND_POLICY.copy(disableHideEmail = true)
+        val viewModel = createViewModel()
+        val viewState = DEFAULT_VIEW_STATE.copy(
+            common = DEFAULT_COMMON_STATE.copy(
+                isHideEmailAddressEnabled = false,
+            ),
+        )
+        assertEquals(DEFAULT_STATE.copy(viewState = viewState), viewModel.stateFlow.value)
+    }
+
+    @Test
+    fun `initial state should be correct when the send controls feature flag is enabled`() {
+        mutableSendControlsFlagFlow.value = true
+        val viewModel = createViewModel()
+        assertEquals(
+            DEFAULT_STATE.copy(isSendControlsEnabled = true),
+            viewModel.stateFlow.value,
+        )
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `state should update when the send controls feature flag changes while the screen is open`() =
+        runTest {
+            mutableEffectiveSendPolicyFlow.value =
+                DEFAULT_EFFECTIVE_SEND_POLICY.copy(disableHideEmail = true)
+            val expectedState = DEFAULT_STATE.copy(
+                viewState = DEFAULT_VIEW_STATE.copy(
+                    common = DEFAULT_COMMON_STATE.copy(isHideEmailAddressEnabled = false),
+                ),
+            )
+            val viewModel = createViewModel()
+
+            viewModel.stateFlow.test {
+                assertEquals(expectedState, awaitItem())
+
+                mutableSendControlsFlagFlow.value = true
+
+                assertEquals(expectedState.copy(isSendControlsEnabled = true), awaitItem())
+            }
+        }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `state should update when the effective send policy changes while the screen is open`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.stateFlow.test {
+                assertEquals(DEFAULT_STATE, awaitItem())
+
+                mutableEffectiveSendPolicyFlow.value =
+                    DEFAULT_EFFECTIVE_SEND_POLICY.copy(disableHideEmail = true)
+
+                assertEquals(
+                    DEFAULT_STATE.copy(
+                        viewState = DEFAULT_VIEW_STATE.copy(
+                            common = DEFAULT_COMMON_STATE.copy(
+                                isHideEmailAddressEnabled = false,
+                            ),
+                        ),
+                    ),
+                    awaitItem(),
+                )
+            }
+        }
+
+    @Test
+    fun `initial state should use the enforced deletion window when send controls is enabled`() {
+        mutableSendControlsFlagFlow.value = true
+        mutableEffectiveSendPolicyFlow.value =
+            DEFAULT_EFFECTIVE_SEND_POLICY.copy(deletionHours = ENFORCED_DELETION_HOURS)
+
+        assertEquals(ENFORCED_DELETION_STATE, createViewModel().stateFlow.value)
+    }
+
+    @Test
+    fun `initial state should use the default deletion window when send controls is disabled`() {
+        mutableEffectiveSendPolicyFlow.value =
+            DEFAULT_EFFECTIVE_SEND_POLICY.copy(deletionHours = ENFORCED_DELETION_HOURS)
+
+        assertEquals(
+            DEFAULT_STATE.copy(deletionHours = ENFORCED_DELETION_HOURS),
+            createViewModel().stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `deletion date should update when the enforced deletion window changes in add mode`() =
+        runTest {
+            mutableSendControlsFlagFlow.value = true
+            val viewModel = createViewModel()
+
+            viewModel.stateFlow.test {
+                assertEquals(DEFAULT_STATE.copy(isSendControlsEnabled = true), awaitItem())
+
+                mutableEffectiveSendPolicyFlow.value =
+                    DEFAULT_EFFECTIVE_SEND_POLICY.copy(deletionHours = ENFORCED_DELETION_HOURS)
+
+                assertEquals(ENFORCED_DELETION_STATE, awaitItem())
+            }
+        }
+
+    @Test
+    fun `deletion date should not change when the enforced deletion window changes in edit mode`() =
+        runTest {
+            mutableSendControlsFlagFlow.value = true
+            val sendId = "sendId-1"
+            val mockSendView = createMockSendView(number = 1)
+            every {
+                mockSendView.toViewState(
+                    baseWebSendUrl = DEFAULT_ENVIRONMENT_URL,
+                    isHideEmailAddressEnabled = true,
+                )
+            } returns DEFAULT_VIEW_STATE
+            mutableSendDataStateFlow.value = DataState.Loaded(mockSendView)
+            val initialState = DEFAULT_STATE.copy(
+                addEditSendType = AddEditSendType.EditItem(sendItemId = sendId),
+                isSendControlsEnabled = true,
+            )
+            val viewModel = createViewModel(
+                state = initialState,
+                addEditSendType = AddEditSendType.EditItem(sendItemId = sendId),
+            )
+
+            viewModel.stateFlow.test {
+                assertEquals(initialState, awaitItem())
+
+                mutableEffectiveSendPolicyFlow.value =
+                    DEFAULT_EFFECTIVE_SEND_POLICY.copy(deletionHours = ENFORCED_DELETION_HOURS)
+
+                // The existing Send keeps its own deletion date even though it is now enforced.
+                assertEquals(
+                    initialState.copy(deletionHours = ENFORCED_DELETION_HOURS),
+                    awaitItem(),
+                )
+            }
+        }
+
+    @Test
+    fun `deletion date should not change when the policy changes with send controls off`() =
+        runTest {
+            val viewModel = createViewModel()
+
+            viewModel.stateFlow.test {
+                assertEquals(DEFAULT_STATE, awaitItem())
+
+                mutableEffectiveSendPolicyFlow.value = DEFAULT_EFFECTIVE_SEND_POLICY.copy(
+                    deletionHours = ENFORCED_DELETION_HOURS,
+                    disableHideEmail = true,
+                )
+
+                assertEquals(
+                    DEFAULT_STATE.copy(
+                        deletionHours = ENFORCED_DELETION_HOURS,
+                        viewState = DEFAULT_VIEW_STATE.copy(
+                            common = DEFAULT_COMMON_STATE.copy(
+                                isHideEmailAddressEnabled = false,
+                            ),
+                        ),
+                    ),
+                    awaitItem(),
+                )
+            }
+        }
+
+    @Test
+    fun `deletion date should revert to the default window when send controls is turned off`() =
+        runTest {
+            mutableSendControlsFlagFlow.value = true
+            mutableEffectiveSendPolicyFlow.value =
+                DEFAULT_EFFECTIVE_SEND_POLICY.copy(deletionHours = ENFORCED_DELETION_HOURS)
+            val viewModel = createViewModel()
+
+            viewModel.stateFlow.test {
+                assertEquals(ENFORCED_DELETION_STATE, awaitItem())
+
+                mutableSendControlsFlagFlow.value = false
+
+                assertEquals(
+                    DEFAULT_STATE.copy(deletionHours = ENFORCED_DELETION_HOURS),
+                    awaitItem(),
+                )
+            }
+        }
+
+    @Test
+    fun `deletion date should revert to the default window when the enforcement is lifted`() =
+        runTest {
+            mutableSendControlsFlagFlow.value = true
+            mutableEffectiveSendPolicyFlow.value =
+                DEFAULT_EFFECTIVE_SEND_POLICY.copy(deletionHours = ENFORCED_DELETION_HOURS)
+            val viewModel = createViewModel()
+
+            viewModel.stateFlow.test {
+                assertEquals(ENFORCED_DELETION_STATE, awaitItem())
+
+                mutableEffectiveSendPolicyFlow.value = DEFAULT_EFFECTIVE_SEND_POLICY
+
+                assertEquals(DEFAULT_STATE.copy(isSendControlsEnabled = true), awaitItem())
+            }
+        }
+
+    @Test
+    fun `initial state should use the enforced access type when send controls is enabled`() {
+        every { UUID.randomUUID().toString() } returns "uuid"
+        mutableSendControlsFlagFlow.value = true
+        mutableEffectiveSendPolicyFlow.value =
+            DEFAULT_EFFECTIVE_SEND_POLICY.copy(whoCanAccess = SendAccessTypeJson.SPECIFIC_PEOPLE)
+
+        assertEquals(
+            enforcedAccessState(
+                whoCanAccess = SendAccessTypeJson.SPECIFIC_PEOPLE,
+                sendAuth = SendAuth.Email(),
+            ),
+            createViewModel().stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `initial state should use the enforced access type for a password protected policy`() {
+        mutableSendControlsFlagFlow.value = true
+        mutableEffectiveSendPolicyFlow.value =
+            DEFAULT_EFFECTIVE_SEND_POLICY.copy(whoCanAccess = SendAccessTypeJson.PASSWORD_PROTECTED)
+
+        assertEquals(
+            enforcedAccessState(
+                whoCanAccess = SendAccessTypeJson.PASSWORD_PROTECTED,
+                sendAuth = SendAuth.Password,
+            ),
+            createViewModel().stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `initial state should leave the access type alone for an any policy`() {
+        mutableSendControlsFlagFlow.value = true
+        mutableEffectiveSendPolicyFlow.value =
+            DEFAULT_EFFECTIVE_SEND_POLICY.copy(whoCanAccess = SendAccessTypeJson.ANY)
+
+        // Every option stays available, so nothing is enforced and the chooser stays interactive.
+        val state = createViewModel().stateFlow.value
+        assertEquals(
+            DEFAULT_STATE.copy(
+                isSendControlsEnabled = true,
+                whoCanAccess = SendAccessTypeJson.ANY,
+            ),
+            state,
+        )
+        assertNull(state.enforcedWhoCanAccess)
+    }
+
+    @Test
+    fun `access type should stay put when an any policy arrives`() = runTest {
+        mutableSendControlsFlagFlow.value = true
+        val initialState = DEFAULT_STATE.copy(
+            isSendControlsEnabled = true,
+            viewState = DEFAULT_VIEW_STATE.copy(
+                common = DEFAULT_COMMON_STATE.copy(sendAuth = SendAuth.Password),
+            ),
+        )
+        val viewModel = createViewModel(state = initialState)
+
+        viewModel.stateFlow.test {
+            assertEquals(initialState, awaitItem())
+
+            mutableEffectiveSendPolicyFlow.value = DEFAULT_EFFECTIVE_SEND_POLICY
+                .copy(whoCanAccess = SendAccessTypeJson.ANY)
+
+            val state = awaitItem()
+            assertEquals(initialState.copy(whoCanAccess = SendAccessTypeJson.ANY), state)
+            assertNull(state.enforcedWhoCanAccess)
+        }
+    }
+
+    @Test
+    fun `initial state should use the enforced access type without a premium account`() {
+        every { UUID.randomUUID().toString() } returns "uuid"
+        mutableUserStateFlow.value = DEFAULT_USER_STATE.copy(
+            accounts = listOf(DEFAULT_ACCOUNT.copy(isPremium = false)),
+        )
+        mutableSendControlsFlagFlow.value = true
+        mutableEffectiveSendPolicyFlow.value =
+            DEFAULT_EFFECTIVE_SEND_POLICY.copy(whoCanAccess = SendAccessTypeJson.SPECIFIC_PEOPLE)
+
+        // The policy outranks the premium requirement that gates picking this option by hand.
+        assertEquals(
+            enforcedAccessState(
+                whoCanAccess = SendAccessTypeJson.SPECIFIC_PEOPLE,
+                sendAuth = SendAuth.Email(),
+            ).copy(isPremium = false),
+            createViewModel().stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `initial state should leave the access type alone when send controls is disabled`() {
+        mutableEffectiveSendPolicyFlow.value =
+            DEFAULT_EFFECTIVE_SEND_POLICY.copy(whoCanAccess = SendAccessTypeJson.SPECIFIC_PEOPLE)
+
+        assertEquals(
+            DEFAULT_STATE.copy(whoCanAccess = SendAccessTypeJson.SPECIFIC_PEOPLE),
+            createViewModel().stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `access type should update when the enforced access type changes in add mode`() = runTest {
+        mutableSendControlsFlagFlow.value = true
+        val viewModel = createViewModel()
+
+        viewModel.stateFlow.test {
+            assertEquals(DEFAULT_STATE.copy(isSendControlsEnabled = true), awaitItem())
+
+            mutableEffectiveSendPolicyFlow.value = DEFAULT_EFFECTIVE_SEND_POLICY
+                .copy(whoCanAccess = SendAccessTypeJson.PASSWORD_PROTECTED)
+
+            assertEquals(
+                enforcedAccessState(
+                    whoCanAccess = SendAccessTypeJson.PASSWORD_PROTECTED,
+                    sendAuth = SendAuth.Password,
+                ),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun `access type should keep entered emails when the enforcement repeats the current type`() =
+        runTest {
+            mutableSendControlsFlagFlow.value = true
+            val enteredEmails = SendAuth.Email(
+                emails = persistentListOf(AuthEmail(value = "test@example.com")),
+            )
+            val initialState = DEFAULT_STATE.copy(
+                isSendControlsEnabled = true,
+                viewState = DEFAULT_VIEW_STATE.copy(
+                    common = DEFAULT_COMMON_STATE.copy(sendAuth = enteredEmails),
+                ),
+            )
+            val viewModel = createViewModel(state = initialState)
+
+            viewModel.stateFlow.test {
+                assertEquals(initialState, awaitItem())
+
+                mutableEffectiveSendPolicyFlow.value = DEFAULT_EFFECTIVE_SEND_POLICY
+                    .copy(whoCanAccess = SendAccessTypeJson.SPECIFIC_PEOPLE)
+
+                // The emails already typed survive the policy re-confirming the same type.
+                assertEquals(
+                    initialState.copy(whoCanAccess = SendAccessTypeJson.SPECIFIC_PEOPLE),
+                    awaitItem(),
+                )
+            }
+        }
+
+    @Test
+    fun `access type should not change when the enforced access type changes in edit mode`() =
+        runTest {
+            mutableSendControlsFlagFlow.value = true
+            val sendId = "sendId-1"
+            val mockSendView = createMockSendView(number = 1)
+            every {
+                mockSendView.toViewState(
+                    baseWebSendUrl = DEFAULT_ENVIRONMENT_URL,
+                    isHideEmailAddressEnabled = true,
+                )
+            } returns DEFAULT_VIEW_STATE
+            mutableSendDataStateFlow.value = DataState.Loaded(mockSendView)
+            val initialState = DEFAULT_STATE.copy(
+                addEditSendType = AddEditSendType.EditItem(sendItemId = sendId),
+                isSendControlsEnabled = true,
+            )
+            val viewModel = createViewModel(
+                state = initialState,
+                addEditSendType = AddEditSendType.EditItem(sendItemId = sendId),
+            )
+
+            viewModel.stateFlow.test {
+                assertEquals(initialState, awaitItem())
+
+                mutableEffectiveSendPolicyFlow.value =
+                    DEFAULT_EFFECTIVE_SEND_POLICY.copy(
+                        whoCanAccess = SendAccessTypeJson.SPECIFIC_PEOPLE,
+                    )
+
+                // The existing Send keeps its own access type even though it is now enforced.
+                assertEquals(
+                    initialState.copy(whoCanAccess = SendAccessTypeJson.SPECIFIC_PEOPLE),
+                    awaitItem(),
+                )
+            }
+        }
+
+    @Test
+    fun `access type should not change when the policy changes with send controls off`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.stateFlow.test {
+            assertEquals(DEFAULT_STATE, awaitItem())
+
+            mutableEffectiveSendPolicyFlow.value = DEFAULT_EFFECTIVE_SEND_POLICY
+                .copy(whoCanAccess = SendAccessTypeJson.SPECIFIC_PEOPLE)
+
+            assertEquals(
+                DEFAULT_STATE.copy(whoCanAccess = SendAccessTypeJson.SPECIFIC_PEOPLE),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun `access type should stay put when the enforcement is lifted`() = runTest {
+        mutableSendControlsFlagFlow.value = true
+        mutableEffectiveSendPolicyFlow.value =
+            DEFAULT_EFFECTIVE_SEND_POLICY.copy(whoCanAccess = SendAccessTypeJson.PASSWORD_PROTECTED)
+        val viewModel = createViewModel()
+
+        viewModel.stateFlow.test {
+            assertEquals(
+                enforcedAccessState(
+                    whoCanAccess = SendAccessTypeJson.PASSWORD_PROTECTED,
+                    sendAuth = SendAuth.Password,
+                ),
+                awaitItem(),
+            )
+
+            mutableEffectiveSendPolicyFlow.value = DEFAULT_EFFECTIVE_SEND_POLICY
+
+            // Unlocking the chooser leaves the selection as-is rather than discarding it.
+            assertEquals(
+                DEFAULT_STATE.copy(
+                    isSendControlsEnabled = true,
+                    viewState = DEFAULT_VIEW_STATE.copy(
+                        common = DEFAULT_COMMON_STATE.copy(sendAuth = SendAuth.Password),
+                    ),
+                ),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun `access type should stay put when send controls is turned off`() = runTest {
+        mutableSendControlsFlagFlow.value = true
+        mutableEffectiveSendPolicyFlow.value =
+            DEFAULT_EFFECTIVE_SEND_POLICY.copy(whoCanAccess = SendAccessTypeJson.PASSWORD_PROTECTED)
+        val viewModel = createViewModel()
+
+        viewModel.stateFlow.test {
+            assertEquals(
+                enforcedAccessState(
+                    whoCanAccess = SendAccessTypeJson.PASSWORD_PROTECTED,
+                    sendAuth = SendAuth.Password,
+                ),
+                awaitItem(),
+            )
+
+            mutableSendControlsFlagFlow.value = false
+
+            assertEquals(
+                DEFAULT_STATE.copy(
+                    whoCanAccess = SendAccessTypeJson.PASSWORD_PROTECTED,
+                    viewState = DEFAULT_VIEW_STATE.copy(
+                        common = DEFAULT_COMMON_STATE.copy(sendAuth = SendAuth.Password),
+                    ),
+                ),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun `copy mode should apply the enforced deletion window to the copy`() {
+        mutableSendControlsFlagFlow.value = true
+        mutableEffectiveSendPolicyFlow.value =
+            DEFAULT_EFFECTIVE_SEND_POLICY.copy(deletionHours = ENFORCED_DELETION_HOURS)
+        val mockSendView = createMockSendView(number = 1, type = SendType.TEXT)
+        mutableSendDataStateFlow.value = DataState.Loaded(mockSendView)
+
+        val state = createViewModel(
+            addEditSendType = AddEditSendType.CopyItem(sendItemId = COPY_SEND_ID),
+        )
+            .stateFlow
+            .value
+
+        // The copy adopts the policy window rather than the original send's deletion date.
+        assertEquals(
+            copyModeState(
+                sendAuth = SendAuth.Password,
+                deletionDate = ENFORCED_DELETION_DATE,
+                isSendControlsEnabled = true,
+                deletionHours = ENFORCED_DELETION_HOURS,
+            ),
+            state,
+        )
+    }
+
+    @Test
+    fun `copy mode should apply the enforced access type to the copy`() {
+        mutableSendControlsFlagFlow.value = true
+        mutableEffectiveSendPolicyFlow.value = DEFAULT_EFFECTIVE_SEND_POLICY
+            .copy(whoCanAccess = SendAccessTypeJson.PASSWORD_PROTECTED)
+        val mockSendView = createMockSendView(
+            number = 1,
+            type = SendType.TEXT,
+            hasPassword = false,
+        )
+        mutableSendDataStateFlow.value = DataState.Loaded(mockSendView)
+
+        val state = createViewModel(
+            addEditSendType = AddEditSendType.CopyItem(sendItemId = COPY_SEND_ID),
+        )
+            .stateFlow
+            .value
+
+        assertEquals(
+            copyModeState(
+                sendAuth = SendAuth.Password,
+                isSendControlsEnabled = true,
+                whoCanAccess = SendAccessTypeJson.PASSWORD_PROTECTED,
+            ),
+            state,
+        )
+    }
+
+    @Test
+    fun `copy mode should be treated as a new send`() {
+        val mockSendView = createMockSendView(number = 1, type = SendType.TEXT)
+        mutableSendDataStateFlow.value = DataState.Loaded(mockSendView)
+
+        val state = createViewModel(
+            addEditSendType = AddEditSendType.CopyItem(sendItemId = COPY_SEND_ID),
+        )
+            .stateFlow
+            .value
+
+        assertEquals(copyModeState(sendAuth = SendAuth.Password), state)
+        assertTrue(state.isNewSend)
+    }
+
+    @Test
+    fun `SaveClick in copy mode should create a new send rather than update the original`() =
+        runTest {
+            val sendId = "sendId-1"
+            val mockSendView = createMockSendView(number = 1, type = SendType.TEXT)
+            mutableSendDataStateFlow.value = DataState.Loaded(mockSendView)
+            val viewModel = createViewModel(
+                addEditSendType = AddEditSendType.CopyItem(sendItemId = sendId),
+            )
+            val content = viewModel.stateFlow.value.viewState as AddEditSendState.ViewState.Content
+            val createdSendView = mockk<SendView>()
+            every { content.toSendView(clock) } returns createdSendView
+            coEvery {
+                vaultRepository.createSend(sendView = createdSendView, fileUri = null)
+            } returns CreateSendResult.Error(message = null, error = null)
+
+            viewModel.trySendAction(AddEditSendAction.SaveClick)
+
+            coVerify(exactly = 1) {
+                vaultRepository.createSend(sendView = createdSendView, fileUri = null)
+            }
+            coVerify(exactly = 0) {
+                vaultRepository.updateSend(sendId = any(), sendView = any())
+            }
+        }
+
+    @Test
+    fun `initial state should read from saved state when present`() {
+        val savedState = DEFAULT_STATE.copy(
+            dialogState = AddEditSendState.DialogState.Loading("Loading".asText()),
+        )
+        val viewModel = createViewModel(savedState)
+        assertEquals(savedState, viewModel.stateFlow.value)
+    }
+
+    @Test
+    fun `CloseClick should emit NavigateBack`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(AddEditSendAction.CloseClick)
+            assertEquals(AddEditSendEvent.NavigateBack, awaitItem())
+        }
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `SaveClick with createSend success should copy the send URL to the clipboard and emit NavigateBack`() =
+        runTest {
+            val viewState = DEFAULT_VIEW_STATE.copy(
+                common = DEFAULT_COMMON_STATE.copy(name = "input"),
+            )
+            val initialState = DEFAULT_STATE.copy(
+                shouldFinishOnComplete = false,
+                isShared = true,
+                viewState = viewState,
+            )
+            val mockSendView = mockk<SendView>()
+            every { viewState.toSendView(clock) } returns mockSendView
+            val sendUrl = "www.test.com/send/test"
+            val resultSendView = mockk<SendView> {
+                every { toSendUrl(DEFAULT_ENVIRONMENT_URL) } returns sendUrl
+            }
+            coEvery {
+                vaultRepository.createSend(sendView = mockSendView, fileUri = null)
+            } returns CreateSendResult.Success(sendView = resultSendView)
+            val viewModel = createViewModel(initialState)
+
+            viewModel.eventFlow.test {
+                viewModel.trySendAction(AddEditSendAction.SaveClick)
+                assertEquals(AddEditSendEvent.NavigateBack, awaitItem())
+                assertEquals(
+                    AddEditSendEvent.ShowShareSheet(message = "www.test.com/send/test"),
+                    awaitItem(),
+                )
+            }
+            assertEquals(initialState, viewModel.stateFlow.value)
+            coVerify(exactly = 1) {
+                vaultRepository.createSend(sendView = mockSendView, fileUri = null)
+                specialCircumstanceManager.specialCircumstance = null
+            }
+        }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `SaveClick with createSend success should copy the send URL to the clipboard and emit ExitApp`() =
+        runTest {
+            val viewState = DEFAULT_VIEW_STATE.copy(
+                common = DEFAULT_COMMON_STATE.copy(name = "input"),
+            )
+            val initialState = DEFAULT_STATE.copy(
+                shouldFinishOnComplete = true,
+                isShared = true,
+                viewState = viewState,
+            )
+            val mockSendView = mockk<SendView>()
+            every { viewState.toSendView(clock) } returns mockSendView
+            val sendUrl = "www.test.com/send/test"
+            val resultSendView = mockk<SendView> {
+                every { toSendUrl(DEFAULT_ENVIRONMENT_URL) } returns sendUrl
+            }
+            coEvery {
+                vaultRepository.createSend(sendView = mockSendView, fileUri = null)
+            } returns CreateSendResult.Success(sendView = resultSendView)
+            val viewModel = createViewModel(initialState)
+
+            viewModel.eventFlow.test {
+                viewModel.trySendAction(AddEditSendAction.SaveClick)
+                assertEquals(AddEditSendEvent.ExitApp, awaitItem())
+                assertEquals(
+                    AddEditSendEvent.ShowShareSheet(message = "www.test.com/send/test"),
+                    awaitItem(),
+                )
+            }
+            assertEquals(initialState, viewModel.stateFlow.value)
+            coVerify(exactly = 1) {
+                vaultRepository.createSend(sendView = mockSendView, fileUri = null)
+                specialCircumstanceManager.specialCircumstance = null
+            }
+        }
+
+    @Test
+    fun `SaveClick with createSend failure should show error dialog`() = runTest {
+        val viewState = DEFAULT_VIEW_STATE.copy(
+            common = DEFAULT_COMMON_STATE.copy(name = "input"),
+        )
+        val initialState = DEFAULT_STATE.copy(viewState = viewState)
+        val mockSendView = mockk<SendView>()
+        every { viewState.toSendView(clock) } returns mockSendView
+        coEvery {
+            vaultRepository.createSend(sendView = mockSendView, fileUri = null)
+        } returns CreateSendResult.Error(message = "Fail", error = null)
+        val viewModel = createViewModel(initialState)
+
+        viewModel.stateFlow.test {
+            assertEquals(initialState, awaitItem())
+            viewModel.trySendAction(AddEditSendAction.SaveClick)
+            assertEquals(
+                initialState.copy(
+                    dialogState = AddEditSendState.DialogState.Loading(
+                        message = BitwardenString.saving.asText(),
+                    ),
+                ),
+                awaitItem(),
+            )
+            assertEquals(
+                initialState.copy(
+                    dialogState = AddEditSendState.DialogState.Error(
+                        title = BitwardenString.an_error_has_occurred.asText(),
+                        message = "Fail".asText(),
+                    ),
+                ),
+                awaitItem(),
+            )
+        }
+        coVerify(exactly = 1) {
+            vaultRepository.createSend(sendView = mockSendView, fileUri = null)
+        }
+    }
+
+    @Test
+    fun `SaveClick with updateSend success should emit NavigateBack and ShowShareSheet`() =
+        runTest {
+            val sendId = "sendId-1"
+            val viewState = DEFAULT_VIEW_STATE.copy(
+                common = DEFAULT_COMMON_STATE.copy(name = "input"),
+            )
+            val initialState = DEFAULT_STATE.copy(
+                addEditSendType = AddEditSendType.EditItem(sendId),
+                viewState = viewState,
+            )
+            val mockSendView = createMockSendView(number = 1)
+            every {
+                mockSendView.toViewState(
+                    baseWebSendUrl = DEFAULT_ENVIRONMENT_URL,
+                    isHideEmailAddressEnabled = true,
+                )
+            } returns viewState
+            every { viewState.toSendView(clock) } returns mockSendView
+            val sendUrl = "www.test.com/send/test"
+            val resultSendView = mockk<SendView> {
+                every { toSendUrl(DEFAULT_ENVIRONMENT_URL) } returns sendUrl
+                every { id } returns sendId
+            }
+            coEvery {
+                vaultRepository.updateSend(sendId = sendId, sendView = mockSendView)
+            } returns UpdateSendResult.Success(sendView = resultSendView)
+            mutableSendDataStateFlow.value = DataState.Loaded(mockSendView)
+            val viewModel = createViewModel(initialState, AddEditSendType.EditItem(sendId))
+
+            viewModel.eventFlow.test {
+                viewModel.trySendAction(AddEditSendAction.SaveClick)
+                assertEquals(AddEditSendEvent.NavigateBack, awaitItem())
+                assertEquals(AddEditSendEvent.ShowShareSheet(sendUrl), awaitItem())
+            }
+            assertEquals(initialState, viewModel.stateFlow.value)
+            coVerify(exactly = 1) {
+                vaultRepository.updateSend(sendId = sendId, sendView = mockSendView)
+            }
+        }
+
+    @Test
+    fun `SaveClick with updateSend failure should show error dialog`() = runTest {
+        val sendId = "sendId-1"
+        val viewState = DEFAULT_VIEW_STATE.copy(
+            common = DEFAULT_COMMON_STATE.copy(name = "input"),
+        )
+        val initialState = DEFAULT_STATE.copy(
+            addEditSendType = AddEditSendType.EditItem(sendId),
+            viewState = viewState,
+        )
+        val mockSendView = mockk<SendView> {
+            every { id } returns sendId
+        }
+        val errorMessage = "Failure"
+        every {
+            mockSendView.toViewState(
+                baseWebSendUrl = DEFAULT_ENVIRONMENT_URL,
+                isHideEmailAddressEnabled = true,
+            )
+        } returns viewState
+        every { viewState.toSendView(clock) } returns mockSendView
+        coEvery {
+            vaultRepository.updateSend(sendId = sendId, sendView = mockSendView)
+        } returns UpdateSendResult.Error(errorMessage = errorMessage, error = null)
+        mutableSendDataStateFlow.value = DataState.Loaded(mockSendView)
+        val viewModel = createViewModel(initialState, AddEditSendType.EditItem(sendId))
+
+        viewModel.stateFlow.test {
+            assertEquals(initialState, awaitItem())
+            viewModel.trySendAction(AddEditSendAction.SaveClick)
+            assertEquals(
+                initialState.copy(
+                    dialogState = AddEditSendState.DialogState.Loading(
+                        message = BitwardenString.saving.asText(),
+                    ),
+                ),
+                awaitItem(),
+            )
+            assertEquals(
+                initialState.copy(
+                    dialogState = AddEditSendState.DialogState.Error(
+                        title = BitwardenString.an_error_has_occurred.asText(),
+                        message = errorMessage.asText(),
+                    ),
+                ),
+                awaitItem(),
+            )
+        }
+        coVerify(exactly = 1) {
+            vaultRepository.updateSend(sendId = sendId, sendView = mockSendView)
+        }
+    }
+
+    @Test
+    fun `SaveClick with blank name should show error dialog`() {
+        val viewModel = createViewModel(DEFAULT_STATE)
+
+        viewModel.trySendAction(AddEditSendAction.SaveClick)
+
+        assertEquals(
+            DEFAULT_STATE.copy(
+                dialogState = AddEditSendState.DialogState.Error(
+                    title = BitwardenString.an_error_has_occurred.asText(),
+                    message = BitwardenString.validation_field_required.asText(
+                        BitwardenString.name.asText(),
+                    ),
+                ),
+            ),
+            viewModel.stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `SaveClick with EMAIL auth type and blank emails should show error dialog`() {
+        val viewState = DEFAULT_VIEW_STATE.copy(
+            common = DEFAULT_COMMON_STATE.copy(
+                name = "test",
+                sendAuth = SendAuth.Email(
+                    emails = persistentListOf(
+                        AuthEmail(value = ""),
+                        AuthEmail(value = "  "),
+                    ),
+                ),
+            ),
+        )
+        val viewModel = createViewModel(DEFAULT_STATE.copy(viewState = viewState))
+
+        viewModel.trySendAction(AddEditSendAction.SaveClick)
+
+        assertEquals(
+            DEFAULT_STATE.copy(
+                viewState = viewState,
+                dialogState = AddEditSendState.DialogState.Error(
+                    title = BitwardenString.no_email_addresses_entered.asText(),
+                    message = BitwardenString
+                        .enter_at_least_one_valid_email_address_to_share_this_send
+                        .asText(),
+                ),
+            ),
+            viewModel.stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `SaveClick with EMAIL auth type and valid and invalid emails should show error dialog`() {
+        val viewState = DEFAULT_VIEW_STATE.copy(
+            common = DEFAULT_COMMON_STATE.copy(
+                name = "test",
+                sendAuth = SendAuth.Email(
+                    emails = persistentListOf(
+                        AuthEmail(value = "valid@example.com"),
+                        AuthEmail(value = "invalid-email"),
+                    ),
+                ),
+            ),
+        )
+        val viewModel = createViewModel(DEFAULT_STATE.copy(viewState = viewState))
+
+        viewModel.trySendAction(AddEditSendAction.SaveClick)
+
+        assertEquals(
+            DEFAULT_STATE.copy(
+                viewState = viewState,
+                dialogState = AddEditSendState.DialogState.Error(
+                    title = BitwardenString.invalid_email_addresses.asText(),
+                    message = BitwardenString.one_or_more_email_addresses_are_incorrect.asText(),
+                ),
+            ),
+            viewModel.stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `SaveClick with a recipient outside the allowed domains should show error dialog`() {
+        val viewState = emailViewState(emails = listOf("recipient@example.com"))
+        val viewModel = createViewModelWithDomainPolicy(
+            viewState = viewState,
+            allowedDomains = "bitwarden.com",
+        )
+
+        viewModel.trySendAction(AddEditSendAction.SaveClick)
+
+        assertEquals(
+            domainPolicyState(viewState = viewState, allowedDomains = "bitwarden.com").copy(
+                dialogState = AddEditSendState.DialogState.Error(
+                    title = BitwardenString.invalid_email_addresses.asText(),
+                    message = BitwardenString
+                        .only_include_the_following_domains_x_please_review_and_try_again
+                        .asText("bitwarden.com"),
+                ),
+            ),
+            viewModel.stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `SaveClick outside the allowed domains should list every allowed domain`() {
+        val viewState = emailViewState(emails = listOf("recipient@example.com"))
+        val domains = "bitwarden.com,bitwarden.eu"
+        val viewModel = createViewModelWithDomainPolicy(
+            viewState = viewState,
+            allowedDomains = domains,
+        )
+
+        viewModel.trySendAction(AddEditSendAction.SaveClick)
+
+        assertEquals(
+            domainPolicyState(viewState = viewState, allowedDomains = domains).copy(
+                dialogState = AddEditSendState.DialogState.Error(
+                    title = BitwardenString.invalid_email_addresses.asText(),
+                    message = BitwardenString
+                        .only_include_the_following_domains_x_please_review_and_try_again
+                        .asText("bitwarden.com, bitwarden.eu"),
+                ),
+            ),
+            viewModel.stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `SaveClick outside the allowed domains should normalize the policy value`() {
+        val viewState = emailViewState(emails = listOf("recipient@example.com"))
+        val domains = " bitwarden.com , , bitwarden.eu "
+        val viewModel = createViewModelWithDomainPolicy(
+            viewState = viewState,
+            allowedDomains = domains,
+        )
+
+        viewModel.trySendAction(AddEditSendAction.SaveClick)
+
+        // Padding and the empty entry are dropped for both matching and display.
+        assertEquals(
+            domainPolicyState(viewState = viewState, allowedDomains = domains).copy(
+                dialogState = AddEditSendState.DialogState.Error(
+                    title = BitwardenString.invalid_email_addresses.asText(),
+                    message = BitwardenString
+                        .only_include_the_following_domains_x_please_review_and_try_again
+                        .asText("bitwarden.com, bitwarden.eu"),
+                ),
+            ),
+            viewModel.stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `SaveClick with every recipient inside the allowed domains should save`() {
+        val viewState = emailViewState(
+            emails = listOf("one@bitwarden.com", "two@BITWARDEN.EU"),
+        )
+        val mockSendView = stubCreateSend(viewState = viewState)
+        val viewModel = createViewModelWithDomainPolicy(
+            viewState = viewState,
+            allowedDomains = "bitwarden.com, bitwarden.eu",
+        )
+
+        viewModel.trySendAction(AddEditSendAction.SaveClick)
+
+        // Matching is case-insensitive, so the save proceeds to the repository.
+        coVerify(exactly = 1) {
+            vaultRepository.createSend(sendView = mockSendView, fileUri = null)
+        }
+    }
+
+    @Test
+    fun `SaveClick should skip domain validation when send controls is disabled`() {
+        val viewState = emailViewState(emails = listOf("recipient@example.com"))
+        val mockSendView = stubCreateSend(viewState = viewState)
+        val viewModel = createViewModelWithDomainPolicy(
+            viewState = viewState,
+            allowedDomains = "bitwarden.com",
+            isSendControlsEnabled = false,
+        )
+
+        viewModel.trySendAction(AddEditSendAction.SaveClick)
+
+        coVerify(exactly = 1) {
+            vaultRepository.createSend(sendView = mockSendView, fileUri = null)
+        }
+    }
+
+    @Test
+    fun `SaveClick should skip domain validation when the policy sets no domains`() {
+        val viewState = emailViewState(emails = listOf("recipient@example.com"))
+        val mockSendView = stubCreateSend(viewState = viewState)
+        val viewModel = createViewModelWithDomainPolicy(
+            viewState = viewState,
+            allowedDomains = null,
+        )
+
+        viewModel.trySendAction(AddEditSendAction.SaveClick)
+
+        coVerify(exactly = 1) {
+            vaultRepository.createSend(sendView = mockSendView, fileUri = null)
+        }
+    }
+
+    @Test
+    fun `SaveClick should skip domain validation for other access types`() {
+        val viewState = DEFAULT_VIEW_STATE.copy(
+            common = DEFAULT_COMMON_STATE.copy(name = "test", sendAuth = SendAuth.Password),
+        )
+        val mockSendView = stubCreateSend(viewState = viewState)
+        val viewModel = createViewModelWithDomainPolicy(
+            viewState = viewState,
+            allowedDomains = "bitwarden.com",
+        )
+
+        viewModel.trySendAction(AddEditSendAction.SaveClick)
+
+        coVerify(exactly = 1) {
+            vaultRepository.createSend(sendView = mockSendView, fileUri = null)
+        }
+    }
+
+    /**
+     * Stubs out a successful conversion and creation of the Send backing [viewState], returning the
+     * [SendView] the repository is expected to be called with.
+     */
+    private fun stubCreateSend(viewState: AddEditSendState.ViewState.Content): SendView {
+        val mockSendView = mockk<SendView>()
+        every { viewState.toSendView(clock) } returns mockSendView
+        coEvery {
+            vaultRepository.createSend(sendView = mockSendView, fileUri = null)
+        } returns CreateSendResult.Error(message = null, error = null)
+        return mockSendView
+    }
+
+    /**
+     * Creates a view model whose SendControls policy restricts recipients to [allowedDomains].
+     *
+     * The policy is applied through the flows rather than the initial state, since the view model
+     * overwrites its own policy fields as soon as it subscribes to them.
+     */
+    private fun createViewModelWithDomainPolicy(
+        viewState: AddEditSendState.ViewState.Content,
+        allowedDomains: String?,
+        isSendControlsEnabled: Boolean = true,
+    ): AddEditSendViewModel {
+        mutableSendControlsFlagFlow.value = isSendControlsEnabled
+        mutableEffectiveSendPolicyFlow.value =
+            DEFAULT_EFFECTIVE_SEND_POLICY.copy(allowedDomains = allowedDomains)
+        return createViewModel(DEFAULT_STATE.copy(viewState = viewState))
+    }
+
+    @Test
+    fun `SaveClick for file without Premium show error dialog`() {
+        mutableUserStateFlow.value = DEFAULT_USER_STATE.copy(
+            accounts = listOf(DEFAULT_ACCOUNT.copy(isPremium = false)),
+        )
+        val initialState = DEFAULT_STATE.copy(
+            isPremium = false,
+            viewState = DEFAULT_VIEW_STATE.copy(
+                common = DEFAULT_COMMON_STATE.copy(name = "test"),
+                selectedType = AddEditSendState.ViewState.Content.SendType.File(
+                    uri = null,
+                    name = null,
+                    displaySize = null,
+                    sizeBytes = null,
+                ),
+            ),
+        )
+        val viewModel = createViewModel(initialState)
+
+        viewModel.trySendAction(AddEditSendAction.SaveClick)
+
+        assertEquals(
+            initialState.copy(
+                dialogState = AddEditSendState.DialogState.PremiumRequired(
+                    message = BitwardenString.send_file_premium_required.asText(),
+                ),
+            ),
+            viewModel.stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `SaveClick with file missing should show error dialog`() {
+        val initialState = DEFAULT_STATE.copy(
+            viewState = DEFAULT_VIEW_STATE.copy(
+                common = DEFAULT_COMMON_STATE.copy(name = "test"),
+                selectedType = AddEditSendState.ViewState.Content.SendType.File(
+                    uri = null,
+                    name = null,
+                    displaySize = null,
+                    sizeBytes = null,
+                ),
+            ),
+        )
+        val viewModel = createViewModel(initialState)
+
+        viewModel.trySendAction(AddEditSendAction.SaveClick)
+
+        assertEquals(
+            initialState.copy(
+                dialogState = AddEditSendState.DialogState.Error(
+                    title = BitwardenString.an_error_has_occurred.asText(),
+                    message = BitwardenString.you_must_attach_a_file_to_save_this_send.asText(),
+                ),
+            ),
+            viewModel.stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `SaveClick with file too large should show error dialog`() {
+        val initialState = DEFAULT_STATE.copy(
+            viewState = DEFAULT_VIEW_STATE.copy(
+                common = DEFAULT_COMMON_STATE.copy(name = "test"),
+                selectedType = AddEditSendState.ViewState.Content.SendType.File(
+                    uri = mockk(),
+                    name = "test.png",
+                    displaySize = null,
+                    // Max size is 104857600
+                    sizeBytes = 104857601,
+                ),
+            ),
+        )
+        val viewModel = createViewModel(initialState)
+
+        viewModel.trySendAction(AddEditSendAction.SaveClick)
+
+        assertEquals(
+            initialState.copy(
+                dialogState = AddEditSendState.DialogState.Error(
+                    title = BitwardenString.an_error_has_occurred.asText(),
+                    message = BitwardenString.max_file_size.asText(),
+                ),
+            ),
+            viewModel.stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `RegeneratePassword updates password in viewState`() = runTest {
+        val generatedPassword = "some-password"
+
+        val initialState = DEFAULT_STATE.copy(
+            viewState = DEFAULT_VIEW_STATE.copy(
+                common = DEFAULT_COMMON_STATE.copy(passwordInput = ""),
+            ),
+        )
+
+        val viewModel = createViewModel(state = initialState)
+
+        viewModel.trySendAction(
+            AddEditSendAction.Internal.GeneratorResultReceive(
+                GeneratorResult.Password(password = generatedPassword),
+            ),
+        )
+
+        val expectedState = initialState.copy(
+            viewState = DEFAULT_VIEW_STATE.copy(
+                common = DEFAULT_COMMON_STATE.copy(
+                    passwordInput = generatedPassword,
+                ),
+            ),
+        )
+
+        assertEquals(expectedState, viewModel.stateFlow.value)
+    }
+
+    @Test
+    fun `CopyLinkClick with nonnull sendUrl should copy to clipboard`() {
+        val sendUrl = "www.test.com/send-stuff"
+        val viewState = DEFAULT_VIEW_STATE.copy(
+            common = DEFAULT_COMMON_STATE.copy(sendUrl = sendUrl),
+        )
+        val mockSendView = createMockSendView(number = 1)
+        every {
+            mockSendView.toViewState(
+                baseWebSendUrl = DEFAULT_ENVIRONMENT_URL,
+                isHideEmailAddressEnabled = true,
+            )
+        } returns viewState
+        mutableSendDataStateFlow.value = DataState.Loaded(mockSendView)
+        val viewModel = createViewModel(
+            state = DEFAULT_STATE.copy(
+                addEditSendType = AddEditSendType.EditItem("sendId"),
+                viewState = viewState,
+            ),
+            addEditSendType = AddEditSendType.EditItem("sendId"),
+        )
+
+        viewModel.trySendAction(AddEditSendAction.CopyLinkClick)
+
+        verify(exactly = 1) {
+            clipboardManager.setText(
+                text = sendUrl,
+                toastDescriptorOverride = BitwardenString.send_link.asText(),
+            )
+        }
+    }
+
+    @Test
+    fun `OpenPasswordGeneratorClick should emit NavigateToGeneratorModal`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(AddEditSendAction.OpenPasswordGeneratorClick)
+            assertEquals(
+                AddEditSendEvent.NavigateToGeneratorModal(
+                    GeneratorMode.Modal.Password,
+                ),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun `in add item state, RemovePasswordClick should do nothing`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(AddEditSendAction.RemovePasswordClick)
+            expectNoEvents()
+        }
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `in edit item state, RemovePasswordClick vaultRepository removePasswordSend Error without message should show default error dialog`() =
+        runTest {
+            val sendId = "mockId-1"
+            coEvery {
+                vaultRepository.removePasswordSend(sendId)
+            } returns RemovePasswordSendResult.Error(errorMessage = null, error = null)
+            val initialState = DEFAULT_STATE.copy(
+                addEditSendType = AddEditSendType.EditItem(sendItemId = sendId),
+            )
+            val mockSendView = createMockSendView(number = 1)
+            every {
+                mockSendView.toViewState(
+                    baseWebSendUrl = DEFAULT_ENVIRONMENT_URL,
+                    isHideEmailAddressEnabled = true,
+                )
+            } returns DEFAULT_VIEW_STATE
+            mutableSendDataStateFlow.value = DataState.Loaded(mockSendView)
+            val viewModel = createViewModel(
+                state = initialState,
+                addEditSendType = AddEditSendType.EditItem(sendItemId = sendId),
+            )
+
+            viewModel.stateFlow.test {
+                assertEquals(initialState, awaitItem())
+                viewModel.trySendAction(AddEditSendAction.RemovePasswordClick)
+                assertEquals(
+                    initialState.copy(
+                        dialogState = AddEditSendState.DialogState.Loading(
+                            message = BitwardenString.removing_send_password.asText(),
+                        ),
+                    ),
+                    awaitItem(),
+                )
+                assertEquals(
+                    initialState.copy(
+                        dialogState = AddEditSendState.DialogState.Error(
+                            title = BitwardenString.an_error_has_occurred.asText(),
+                            message = BitwardenString.generic_error_message.asText(),
+                        ),
+                    ),
+                    awaitItem(),
+                )
+            }
+        }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `in edit item state, RemovePasswordClick vaultRepository removePasswordSend Error with message should show error dialog with message`() =
+        runTest {
+            val sendId = "mockId-1"
+            val errorMessage = "Fail"
+            coEvery {
+                vaultRepository.removePasswordSend(sendId)
+            } returns RemovePasswordSendResult.Error(errorMessage = errorMessage, error = null)
+            val mockSendView = createMockSendView(number = 1)
+            every {
+                mockSendView.toViewState(
+                    baseWebSendUrl = DEFAULT_ENVIRONMENT_URL,
+                    isHideEmailAddressEnabled = true,
+                )
+            } returns DEFAULT_VIEW_STATE
+            mutableSendDataStateFlow.value = DataState.Loaded(mockSendView)
+            val initialState = DEFAULT_STATE.copy(
+                addEditSendType = AddEditSendType.EditItem(sendItemId = sendId),
+            )
+            val viewModel = createViewModel(
+                state = initialState,
+                addEditSendType = AddEditSendType.EditItem(sendItemId = sendId),
+            )
+
+            viewModel.stateFlow.test {
+                assertEquals(initialState, awaitItem())
+                viewModel.trySendAction(AddEditSendAction.RemovePasswordClick)
+                assertEquals(
+                    initialState.copy(
+                        dialogState = AddEditSendState.DialogState.Loading(
+                            message = BitwardenString.removing_send_password.asText(),
+                        ),
+                    ),
+                    awaitItem(),
+                )
+                assertEquals(
+                    initialState.copy(
+                        dialogState = AddEditSendState.DialogState.Error(
+                            title = BitwardenString.an_error_has_occurred.asText(),
+                            message = errorMessage.asText(),
+                        ),
+                    ),
+                    awaitItem(),
+                )
+            }
+        }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `in edit item state, RemovePasswordClick vaultRepository removePasswordSend Success should show toast`() =
+        runTest {
+            val sendId = "mockId-1"
+            val mockSendView = createMockSendView(number = 1)
+            coEvery {
+                vaultRepository.removePasswordSend(sendId)
+            } returns RemovePasswordSendResult.Success(mockSendView)
+            val viewModel = createViewModel(
+                state = DEFAULT_STATE.copy(addEditSendType = AddEditSendType.EditItem(sendItemId = sendId)),
+                addEditSendType = AddEditSendType.EditItem(sendItemId = sendId),
+            )
+
+            viewModel.eventFlow.test {
+                viewModel.trySendAction(AddEditSendAction.RemovePasswordClick)
+                assertEquals(
+                    AddEditSendEvent.ShowSnackbar(
+                        data = BitwardenSnackbarData(message = BitwardenString.password_removed.asText()),
+                    ),
+                    awaitItem(),
+                )
+            }
+        }
+
+    @Test
+    fun `DeleteClick vaultRepository deleteSend Error should show error dialog`() = runTest {
+        val error = Throwable("Ooops")
+        val sendId = "mockId-1"
+        coEvery { vaultRepository.deleteSend(sendId) } returns DeleteSendResult.Error(
+            error = error,
+        )
+        val initialState = DEFAULT_STATE.copy(
+            addEditSendType = AddEditSendType.EditItem(sendItemId = sendId),
+        )
+        val mockSendView = createMockSendView(number = 1)
+        every {
+            mockSendView.toViewState(
+                baseWebSendUrl = DEFAULT_ENVIRONMENT_URL,
+                isHideEmailAddressEnabled = true,
+            )
+        } returns DEFAULT_VIEW_STATE
+        mutableSendDataStateFlow.value = DataState.Loaded(mockSendView)
+        val viewModel = createViewModel(
+            state = initialState,
+            addEditSendType = AddEditSendType.EditItem(sendItemId = sendId),
+        )
+
+        viewModel.stateFlow.test {
+            assertEquals(initialState, awaitItem())
+            viewModel.trySendAction(AddEditSendAction.DeleteClick)
+            assertEquals(
+                initialState.copy(
+                    dialogState = AddEditSendState.DialogState.Loading(
+                        message = BitwardenString.deleting.asText(),
+                    ),
+                ),
+                awaitItem(),
+            )
+            assertEquals(
+                initialState.copy(
+                    dialogState = AddEditSendState.DialogState.Error(
+                        title = BitwardenString.an_error_has_occurred.asText(),
+                        message = BitwardenString.generic_error_message.asText(),
+                        throwable = error,
+                    ),
+                ),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun `DeleteClick vaultRepository deleteSend Error with message should display error message`() =
+        runTest {
+            val errorMessage = "User-friendly error"
+            val error = Throwable("Ooops")
+            val sendId = "mockId-1"
+            coEvery {
+                vaultRepository.deleteSend(sendId)
+            } returns DeleteSendResult.Error(
+                errorMessage = errorMessage,
+                error = error,
+            )
+            val initialState = DEFAULT_STATE.copy(
+                addEditSendType = AddEditSendType.EditItem(sendItemId = sendId),
+            )
+            val mockSendView = createMockSendView(number = 1)
+            every {
+                mockSendView.toViewState(
+                    baseWebSendUrl = DEFAULT_ENVIRONMENT_URL,
+                    isHideEmailAddressEnabled = true,
+                )
+            } returns DEFAULT_VIEW_STATE
+            mutableSendDataStateFlow.value = DataState.Loaded(mockSendView)
+            val viewModel = createViewModel(
+                state = initialState,
+                addEditSendType = AddEditSendType.EditItem(sendItemId = sendId),
+            )
+
+            viewModel.stateFlow.test {
+                assertEquals(initialState, awaitItem())
+                viewModel.trySendAction(AddEditSendAction.DeleteClick)
+                assertEquals(
+                    initialState.copy(
+                        dialogState = AddEditSendState.DialogState.Loading(
+                            message = BitwardenString.deleting.asText(),
+                        ),
+                    ),
+                    awaitItem(),
+                )
+                assertEquals(
+                    initialState.copy(
+                        dialogState = AddEditSendState.DialogState.Error(
+                            title = BitwardenString.an_error_has_occurred.asText(),
+                            message = errorMessage.asText(),
+                            throwable = error,
+                        ),
+                    ),
+                    awaitItem(),
+                )
+            }
+        }
+
+    @Test
+    fun `DeleteClick vaultRepository deleteSend Success should emit NavigateUpToSearchOrRoot`() =
+        runTest {
+            val sendId = "mockId-1"
+            coEvery { vaultRepository.deleteSend(sendId) } returns DeleteSendResult.Success
+            val viewModel = createViewModel(
+                state = DEFAULT_STATE.copy(
+                    addEditSendType = AddEditSendType.EditItem(sendItemId = sendId),
+                ),
+                addEditSendType = AddEditSendType.EditItem(sendItemId = sendId),
+            )
+
+            viewModel.eventFlow.test {
+                viewModel.trySendAction(AddEditSendAction.DeleteClick)
+                assertEquals(AddEditSendEvent.NavigateUpToSearchOrRoot, awaitItem())
+            }
+            verify(exactly = 1) {
+                snackbarRelayManager.sendSnackbarData(
+                    data = BitwardenSnackbarData(message = BitwardenString.send_deleted.asText()),
+                    relay = SnackbarRelay.SEND_DELETED,
+                )
+            }
+        }
+
+    @Test
+    fun `ShareLinkClick with nonnull sendUrl should launch share sheet`() = runTest {
+        val sendUrl = "www.test.com/send-stuff"
+        val viewState = DEFAULT_VIEW_STATE.copy(
+            common = DEFAULT_COMMON_STATE.copy(sendUrl = sendUrl),
+        )
+        val mockSendView = createMockSendView(number = 1)
+        every {
+            mockSendView.toViewState(
+                baseWebSendUrl = DEFAULT_ENVIRONMENT_URL,
+                isHideEmailAddressEnabled = true,
+            )
+        } returns viewState
+        mutableSendDataStateFlow.value = DataState.Loaded(mockSendView)
+        val viewModel = createViewModel(
+            state = DEFAULT_STATE.copy(
+                addEditSendType = AddEditSendType.EditItem("sendId"),
+                viewState = viewState,
+            ),
+            addEditSendType = AddEditSendType.EditItem("sendId"),
+        )
+
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(AddEditSendAction.ShareLinkClick)
+            assertEquals(AddEditSendEvent.ShowShareSheet(sendUrl), awaitItem())
+        }
+    }
+
+    @Test
+    fun `DismissDialogClick should clear the dialog state`() {
+        val viewModel = createViewModel(
+            DEFAULT_STATE.copy(
+                dialogState = AddEditSendState.DialogState.Error(
+                    title = "Fail Title".asText(),
+                    message = "Fail Message".asText(),
+                ),
+            ),
+        )
+        viewModel.trySendAction(AddEditSendAction.DismissDialogClick)
+        assertEquals(DEFAULT_STATE, viewModel.stateFlow.value)
+    }
+
+    @Test
+    fun `DeletionDateChange should store the new deletion date`() {
+        val viewModel = createViewModel()
+        val newDeletionDate = Instant.parse("2024-09-13T00:00:00Z")
+        // DEFAULT deletion date is "2023-11-03T00:00Z"
+        assertEquals(DEFAULT_STATE, viewModel.stateFlow.value)
+
+        viewModel.trySendAction(AddEditSendAction.DeletionDateChange(newDeletionDate))
+
+        assertEquals(
+            DEFAULT_STATE.copy(
+                viewState = DEFAULT_VIEW_STATE.copy(
+                    common = DEFAULT_COMMON_STATE.copy(
+                        deletionDate = newDeletionDate,
+                    ),
+                ),
+            ),
+            viewModel.stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `FileChose should update the state accordingly`() = runTest {
+        val initialState = DEFAULT_STATE.copy(
+            viewState = DEFAULT_VIEW_STATE.copy(
+                selectedType = AddEditSendState.ViewState.Content.SendType.File(
+                    uri = null,
+                    name = null,
+                    displaySize = null,
+                    sizeBytes = null,
+                ),
+            ),
+        )
+        val fileName = "test.png"
+        val uri = mockk<Uri>()
+        val size = 50L
+        val fileData = FileData(
+            fileName = fileName,
+            uri = uri,
+            sizeBytes = size,
+        )
+        val viewModel = createViewModel(initialState)
+
+        viewModel.trySendAction(AddEditSendAction.FileChoose(fileData = fileData))
+
+        assertEquals(
+            initialState.copy(
+                viewState = DEFAULT_VIEW_STATE.copy(
+                    selectedType = AddEditSendState.ViewState.Content.SendType.File(
+                        uri = uri,
+                        name = fileName,
+                        displaySize = null,
+                        sizeBytes = size,
+                    ),
+                ),
+            ),
+            viewModel.stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `ChooseFileClick should emit ShowChooserSheet`() = runTest {
+        val arePermissionsGranted = true
+        val viewModel = createViewModel()
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(AddEditSendAction.ChooseFileClick(arePermissionsGranted))
+            assertEquals(AddEditSendEvent.ShowChooserSheet(arePermissionsGranted), awaitItem())
+        }
+    }
+
+    @Test
+    fun `NameChange should update name input`() = runTest {
+        val viewModel = createViewModel()
+        val expectedViewState = DEFAULT_VIEW_STATE.copy(
+            common = DEFAULT_COMMON_STATE.copy(name = "input"),
+        )
+
+        viewModel.stateFlow.test {
+            assertEquals(DEFAULT_STATE, awaitItem())
+            viewModel.trySendAction(AddEditSendAction.NameChange("input"))
+            assertEquals(DEFAULT_STATE.copy(viewState = expectedViewState), awaitItem())
+        }
+    }
+
+    @Test
+    fun `MaxAccessCountChange should update maxAccessCount to value when non-zero`() = runTest {
+        val viewModel = createViewModel()
+        val expectedViewState = DEFAULT_VIEW_STATE.copy(
+            common = DEFAULT_COMMON_STATE.copy(maxAccessCount = 5),
+        )
+
+        viewModel.stateFlow.test {
+            assertEquals(DEFAULT_STATE, awaitItem())
+            viewModel.trySendAction(AddEditSendAction.MaxAccessCountChange(5))
+            assertEquals(DEFAULT_STATE.copy(viewState = expectedViewState), awaitItem())
+        }
+    }
+
+    @Test
+    fun `MaxAccessCountChange should update maxAccessCount to null when zero`() = runTest {
+        val initialState = DEFAULT_STATE.copy(
+            viewState = DEFAULT_VIEW_STATE.copy(
+                common = DEFAULT_COMMON_STATE.copy(maxAccessCount = 5),
+            ),
+        )
+        val expectedViewState = DEFAULT_VIEW_STATE.copy(
+            common = DEFAULT_COMMON_STATE.copy(maxAccessCount = null),
+        )
+        val viewModel = createViewModel(initialState)
+
+        viewModel.stateFlow.test {
+            assertEquals(initialState, awaitItem())
+            viewModel.trySendAction(AddEditSendAction.MaxAccessCountChange(0))
+            assertEquals(initialState.copy(viewState = expectedViewState), awaitItem())
+        }
+    }
+
+    @Test
+    fun `TextChange should update text input`() = runTest {
+        val viewModel = createViewModel()
+        val expectedViewState = DEFAULT_VIEW_STATE.copy(
+            selectedType = AddEditSendState.ViewState.Content.SendType.Text(
+                input = "input",
+                isHideByDefaultChecked = false,
+            ),
+        )
+
+        viewModel.stateFlow.test {
+            assertEquals(DEFAULT_STATE, awaitItem())
+            viewModel.trySendAction(AddEditSendAction.TextChange("input"))
+            assertEquals(DEFAULT_STATE.copy(viewState = expectedViewState), awaitItem())
+        }
+    }
+
+    @Test
+    fun `NoteChange should update note input`() = runTest {
+        val viewModel = createViewModel()
+        val expectedViewState = DEFAULT_VIEW_STATE.copy(
+            common = DEFAULT_COMMON_STATE.copy(noteInput = "input"),
+        )
+
+        viewModel.stateFlow.test {
+            assertEquals(DEFAULT_STATE, awaitItem())
+            viewModel.trySendAction(AddEditSendAction.NoteChange("input"))
+            assertEquals(DEFAULT_STATE.copy(viewState = expectedViewState), awaitItem())
+        }
+    }
+
+    @Test
+    fun `DeactivateThisSendToggle should update isDeactivateChecked`() = runTest {
+        val viewModel = createViewModel()
+        val expectedViewState = DEFAULT_VIEW_STATE.copy(
+            common = DEFAULT_COMMON_STATE.copy(isDeactivateChecked = true),
+        )
+
+        viewModel.stateFlow.test {
+            assertEquals(DEFAULT_STATE, awaitItem())
+            viewModel.trySendAction(AddEditSendAction.DeactivateThisSendToggle(true))
+            assertEquals(DEFAULT_STATE.copy(viewState = expectedViewState), awaitItem())
+        }
+    }
+
+    @Test
+    fun `HideMyEmailToggle should update isHideEmailChecked`() = runTest {
+        val viewModel = createViewModel()
+        val expectedViewState = DEFAULT_VIEW_STATE.copy(
+            common = DEFAULT_COMMON_STATE.copy(isHideEmailChecked = true),
+        )
+
+        viewModel.stateFlow.test {
+            assertEquals(DEFAULT_STATE, awaitItem())
+            viewModel.trySendAction(AddEditSendAction.HideMyEmailToggle(isChecked = true))
+            assertEquals(DEFAULT_STATE.copy(viewState = expectedViewState), awaitItem())
+        }
+    }
+
+    @Test
+    fun `If there is no network connection, show dialog and do not attempt add send`() = runTest {
+        val viewState = DEFAULT_VIEW_STATE.copy(
+            common = DEFAULT_COMMON_STATE.copy(name = "input"),
+        )
+        val initialState = DEFAULT_STATE.copy(
+            shouldFinishOnComplete = true,
+            isShared = true,
+            viewState = viewState,
+        )
+        val mockSendView = mockk<SendView>()
+        every { viewState.toSendView(clock) } returns mockSendView
+        val sendUrl = "www.test.com/send/test"
+        val resultSendView = mockk<SendView> {
+            every { toSendUrl(DEFAULT_ENVIRONMENT_URL) } returns sendUrl
+        }
+        coEvery {
+            vaultRepository.createSend(sendView = mockSendView, fileUri = null)
+        } returns CreateSendResult.Success(sendView = resultSendView)
+        val viewModel = createViewModel(initialState)
+        every { networkConnectionManager.isNetworkConnected } returns false
+
+        viewModel.trySendAction(AddEditSendAction.SaveClick)
+        assertEquals(
+            initialState.copy(
+                dialogState = AddEditSendState.DialogState.Error(
+                    title = BitwardenString.internet_connection_required_title.asText(),
+                    message = BitwardenString.internet_connection_required_message.asText(),
+                ),
+            ),
+            viewModel.stateFlow.value,
+        )
+
+        coVerify(
+            exactly = 0,
+        ) {
+            vaultRepository.createSend(sendView = mockSendView, fileUri = null)
+        }
+    }
+
+    @Test
+    fun `PasswordCopyClick copies password to clipboard`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.trySendAction(
+            AddEditSendAction.PasswordCopyClick("some-password"),
+        )
+
+        verify(exactly = 1) {
+            clipboardManager.setText(
+                text = "some-password",
+                toastDescriptorOverride = BitwardenString.password.asText(),
+            )
+        }
+    }
+
+    //region Authentication Tests
+
+    @Test
+    fun `Changing AuthTypeSelect should not clear emails and password`() = runTest {
+        every { UUID.randomUUID().toString() } returns "uuid"
+        val initialCommonState = DEFAULT_COMMON_STATE.copy(
+            passwordInput = "oldpassword",
+            sendAuth = SendAuth.Password,
+        )
+
+        val initialState = DEFAULT_STATE.copy(
+            viewState = DEFAULT_VIEW_STATE.copy(
+                common = initialCommonState,
+            ),
+        )
+        val viewModel = createViewModel(initialState)
+        val expectedNoneViewState = DEFAULT_VIEW_STATE.copy(
+            common = initialCommonState.copy(
+                sendAuth = SendAuth.None,
+            ),
+        )
+
+        val expectedEmptyEmailViewState = DEFAULT_VIEW_STATE.copy(
+            common = initialCommonState.copy(
+                sendAuth = SendAuth.Email(
+                    emails = persistentListOf(AuthEmail(id = "uuid", value = "")),
+                ),
+            ),
+        )
+
+        viewModel.stateFlow.test {
+            assertEquals(initialState, awaitItem())
+            viewModel.trySendAction(
+                AddEditSendAction.AuthTypeSelect(
+                    SendAuth.None,
+                ),
+            )
+            assertEquals(initialState.copy(viewState = expectedNoneViewState), awaitItem())
+
+            viewModel.trySendAction(
+                AddEditSendAction.AuthTypeSelect(
+                    SendAuth.Email(),
+                ),
+            )
+
+            assertEquals(
+                initialState.copy(viewState = expectedEmptyEmailViewState),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun `AuthPasswordChange should update passwordInput`() = runTest {
+        val viewModel = createViewModel()
+        val expectedViewState = DEFAULT_VIEW_STATE.copy(
+            common = DEFAULT_COMMON_STATE.copy(passwordInput = "newpassword"),
+        )
+
+        viewModel.stateFlow.test {
+            assertEquals(DEFAULT_STATE, awaitItem())
+            viewModel.trySendAction(AddEditSendAction.AuthPasswordChange("newpassword"))
+            assertEquals(DEFAULT_STATE.copy(viewState = expectedViewState), awaitItem())
+        }
+    }
+
+    @Test
+    fun `AuthEmailChange should update email at specified index`() = runTest {
+        val email1 = AuthEmail(id = "id1", value = "test1@example.com")
+        val email2 = AuthEmail(id = "id2", value = "test2@example.com")
+        val initialState = DEFAULT_STATE.copy(
+            viewState = DEFAULT_VIEW_STATE.copy(
+                common = DEFAULT_COMMON_STATE.copy(
+                    sendAuth = SendAuth.Email(
+                        emails = persistentListOf(email1, email2),
+                    ),
+                ),
+            ),
+        )
+        val viewModel = createViewModel(initialState)
+        val expectedViewState = DEFAULT_VIEW_STATE.copy(
+            common = DEFAULT_COMMON_STATE.copy(
+                sendAuth = SendAuth.Email(
+                    emails = persistentListOf(
+                        email1,
+                        email2.copy(value = "updated@example.com"),
+                    ),
+                ),
+            ),
+        )
+
+        viewModel.stateFlow.test {
+            assertEquals(initialState, awaitItem())
+            viewModel.trySendAction(
+                AddEditSendAction.AuthEmailChange(
+                    AuthEmail(
+                        value = "updated@example.com",
+                        id = "id2",
+                    ),
+                ),
+            )
+            assertEquals(initialState.copy(viewState = expectedViewState), awaitItem())
+        }
+    }
+
+    @Test
+    fun `AuthEmailAdd should add empty email to list`() = runTest {
+        every { UUID.randomUUID().toString() } returns "uuid"
+        val email1 = AuthEmail(id = "id1", value = "test@example.com")
+        val initialState = DEFAULT_STATE.copy(
+            viewState = DEFAULT_VIEW_STATE.copy(
+                common = DEFAULT_COMMON_STATE.copy(
+                    sendAuth = SendAuth.Email(
+                        emails = persistentListOf(email1),
+                    ),
+                ),
+            ),
+        )
+        val viewStateTwoEmails = DEFAULT_VIEW_STATE.copy(
+            common = DEFAULT_COMMON_STATE.copy(
+                sendAuth = SendAuth.Email(
+                    emails = persistentListOf(
+                        email1,
+                        AuthEmail(id = "uuid", value = ""),
+                    ),
+                ),
+            ),
+        )
+        val viewModel = createViewModel(initialState)
+
+        viewModel.stateFlow.test {
+            assertEquals(initialState, awaitItem())
+            viewModel.trySendAction(AddEditSendAction.AuthEmailAdd)
+            assertEquals(
+                awaitItem(),
+                initialState.copy(viewState = viewStateTwoEmails),
+            )
+        }
+    }
+
+    @Test
+    fun `AuthEmailRemove should remove email at specified index`() = runTest {
+        val email1 = AuthEmail(id = "id1", value = "test1@example.com")
+        val email2 = AuthEmail(id = "id2", value = "test2@example.com")
+        val email3 = AuthEmail(id = "id3", value = "test3@example.com")
+        val initialState = DEFAULT_STATE.copy(
+            viewState = DEFAULT_VIEW_STATE.copy(
+                common = DEFAULT_COMMON_STATE.copy(
+                    sendAuth = SendAuth.Email(
+                        emails = persistentListOf(email1, email2, email3),
+                    ),
+                ),
+            ),
+        )
+        val viewModel = createViewModel(initialState)
+        val expectedViewState = DEFAULT_VIEW_STATE.copy(
+            common = DEFAULT_COMMON_STATE.copy(
+                sendAuth = SendAuth.Email(
+                    emails = persistentListOf(email1, email3),
+                ),
+            ),
+        )
+
+        viewModel.stateFlow.test {
+            assertEquals(initialState, awaitItem())
+            viewModel.trySendAction(
+                AddEditSendAction.AuthEmailRemove(
+                    AuthEmail(
+                        value = "test@example.com",
+                        id = "id2",
+                    ),
+                ),
+            )
+            assertEquals(initialState.copy(viewState = expectedViewState), awaitItem())
+        }
+    }
+
+    @Test
+    fun `AuthEmailRemove with last email should result in single empty AuthEmail`() = runTest {
+        every { UUID.randomUUID().toString() } returns "uuid"
+        val email1 = AuthEmail(id = "id1", value = "test@example.com")
+        val initialState = DEFAULT_STATE.copy(
+            viewState = DEFAULT_VIEW_STATE.copy(
+                common = DEFAULT_COMMON_STATE.copy(
+                    sendAuth = SendAuth.Email(
+                        emails = persistentListOf(email1),
+                    ),
+                ),
+            ),
+        )
+        val viewModel = createViewModel(initialState)
+
+        viewModel.stateFlow.test {
+            assertEquals(initialState, awaitItem())
+            viewModel.trySendAction(
+                AddEditSendAction.AuthEmailRemove(
+                    AuthEmail(
+                        value = "test@example.com",
+                        id = "id1",
+                    ),
+                ),
+            )
+            assertEquals(
+                initialState.copy(
+                    viewState = DEFAULT_VIEW_STATE.copy(
+                        common = DEFAULT_COMMON_STATE.copy(
+                            sendAuth = SendAuth.Email(
+                                emails = persistentListOf(
+                                    AuthEmail(id = "uuid", value = ""),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun `AuthTypeSelect with Email auth without Premium should show Premium dialog`() = runTest {
+        val nonPremiumState = DEFAULT_STATE.copy(isPremium = false)
+        val viewModel = createViewModel(nonPremiumState)
+
+        viewModel.stateFlow.test {
+            assertEquals(nonPremiumState, awaitItem())
+            viewModel.trySendAction(AddEditSendAction.AuthTypeSelect(SendAuth.Email()))
+            val newState = awaitItem()
+            assertEquals(
+                nonPremiumState.copy(
+                    dialogState = AddEditSendState.DialogState.PremiumRequired(
+                        message = BitwardenString
+                            .sharing_with_specific_people_is_a_premium_feature
+                            .asText(),
+                    ),
+                ),
+                newState,
+            )
+        }
+    }
+
+    @Test
+    fun `AuthTypeSelect with Email auth with Premium should allow selection`() = runTest {
+        every { UUID.randomUUID().toString() } returns "uuid"
+        val premiumState = DEFAULT_STATE.copy(isPremium = true)
+        val viewModel = createViewModel(premiumState)
+
+        viewModel.stateFlow.test {
+            assertEquals(premiumState, awaitItem())
+            viewModel.trySendAction(AddEditSendAction.AuthTypeSelect(SendAuth.Email()))
+            // Verify auth type was changed
+            assertEquals(
+                premiumState.copy(
+                    viewState = DEFAULT_VIEW_STATE.copy(
+                        common = DEFAULT_COMMON_STATE.copy(
+                            sendAuth = SendAuth.Email(
+                                emails = persistentListOf(
+                                    AuthEmail(id = "uuid", value = ""),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `UpgradeToPremiumClick should send NavigateToPremium when in-app upgrade not available`() =
+        runTest {
+            val viewModel = createViewModel()
+            viewModel.eventFlow.test {
+                viewModel.trySendAction(AddEditSendAction.UpgradeToPremiumClick)
+                assertEquals(
+                    AddEditSendEvent.NavigateToPremium(
+                        uri = "https://vault.bitwarden.com/#/settings/subscription/premium?callToAction=upgradeToPremium",
+                    ),
+                    awaitItem(),
+                )
+            }
+        }
+
+    @Test
+    fun `UpgradeToPremiumClick should send NavigateToPlanModal when in-app upgrade available`() =
+        runTest {
+            every { premiumStateManager.isInAppUpgradeAvailable() } returns true
+            val viewModel = createViewModel()
+            viewModel.eventFlow.test {
+                viewModel.trySendAction(AddEditSendAction.UpgradeToPremiumClick)
+                assertEquals(
+                    AddEditSendEvent.NavigateToPlanModal,
+                    awaitItem(),
+                )
+            }
+        }
+
+    //endregion Authentication Tests
+
+    private fun createViewModel(
+        state: AddEditSendState? = null,
+        addEditSendType: AddEditSendType = AddEditSendType.AddItem,
+        sendType: SendItemType = SendItemType.TEXT,
+        activityToken: String? = null,
+    ): AddEditSendViewModel = AddEditSendViewModel(
+        savedStateHandle = SavedStateHandle().apply {
+            set("state", state?.copy(addEditSendType = addEditSendType))
+            set("activityToken", activityToken)
+            every {
+                toAddEditSendArgs()
+            } returns AddEditSendArgs(sendType = sendType, addEditSendType = addEditSendType)
+        },
+        authRepo = authRepository,
+        environmentRepo = environmentRepository,
+        featureFlagManager = featureFlagManager,
+        specialCircumstanceManager = specialCircumstanceManager,
+        clock = clock,
+        clipboardManager = clipboardManager,
+        vaultRepo = vaultRepository,
+        policyManager = policyManager,
+        networkConnectionManager = networkConnectionManager,
+        snackbarRelayManager = snackbarRelayManager,
+        generatorRepository = generatorRepository,
+        premiumStateManager = premiumStateManager,
+    )
+}
+
+private val DEFAULT_COMMON_STATE = AddEditSendState.ViewState.Content.Common(
+    name = "",
+    currentAccessCount = null,
+    maxAccessCount = null,
+    passwordInput = "",
+    noteInput = "",
+    isHideEmailChecked = false,
+    isDeactivateChecked = false,
+    deletionDate = Instant.parse("2023-11-03T12:00:00Z"),
+    expirationDate = null,
+    sendUrl = null,
+    hasPassword = false,
+    isHideEmailAddressEnabled = true,
+    sendAuth = SendAuth.None,
+)
+
+private val DEFAULT_SELECTED_TYPE_STATE = AddEditSendState.ViewState.Content.SendType.Text(
+    input = "",
+    isHideByDefaultChecked = false,
+)
+
+private val DEFAULT_VIEW_STATE = AddEditSendState.ViewState.Content(
+    common = DEFAULT_COMMON_STATE,
+    selectedType = DEFAULT_SELECTED_TYPE_STATE,
+)
+
+private const val DEFAULT_ENVIRONMENT_URL = "https://send.bitwarden.com/#"
+
+private val DEFAULT_STATE = AddEditSendState(
+    addEditSendType = AddEditSendType.AddItem,
+    viewState = DEFAULT_VIEW_STATE,
+    dialogState = null,
+    shouldFinishOnComplete = false,
+    isShared = false,
+    baseWebSendUrl = DEFAULT_ENVIRONMENT_URL,
+    policyDisablesSend = false,
+    isSendControlsEnabled = false,
+    allowedDomains = null,
+    allowedSendTypes = null,
+    deletionHours = null,
+    whoCanAccess = null,
+    sendType = SendItemType.TEXT,
+    isPremium = true,
+)
+
+/**
+ * Builds the state expected once the SendControls policy restricting recipients to
+ * [allowedDomains] has been applied on top of [viewState].
+ */
+private fun domainPolicyState(
+    viewState: AddEditSendState.ViewState.Content,
+    allowedDomains: String?,
+): AddEditSendState = DEFAULT_STATE.copy(
+    viewState = viewState,
+    isSendControlsEnabled = true,
+    allowedDomains = allowedDomains,
+)
+
+/**
+ * Builds a named content view state whose recipients are [emails].
+ */
+private fun emailViewState(emails: List<String>): AddEditSendState.ViewState.Content =
+    DEFAULT_VIEW_STATE.copy(
+        common = DEFAULT_COMMON_STATE.copy(
+            name = "test",
+            sendAuth = SendAuth.Email(
+                emails = emails.map { AuthEmail(value = it) }.toImmutableList(),
+            ),
+        ),
+    )
+
+/**
+ * Builds the state expected when [whoCanAccess] is enforced and has forced [sendAuth].
+ */
+private fun enforcedAccessState(
+    whoCanAccess: SendAccessTypeJson,
+    sendAuth: SendAuth,
+): AddEditSendState = DEFAULT_STATE.copy(
+    isSendControlsEnabled = true,
+    whoCanAccess = whoCanAccess,
+    viewState = DEFAULT_VIEW_STATE.copy(
+        common = DEFAULT_COMMON_STATE.copy(sendAuth = sendAuth),
+    ),
+)
+
+private const val COPY_SEND_ID: String = "sendId-1"
+
+/**
+ * Builds the state expected in copy mode, where the content is derived from the send being copied
+ * rather than from [DEFAULT_VIEW_STATE].
+ */
+private fun copyModeState(
+    sendAuth: SendAuth,
+    deletionDate: Instant = Instant.parse("2023-11-03T12:00:00Z"),
+    isSendControlsEnabled: Boolean = false,
+    deletionHours: Int? = null,
+    whoCanAccess: SendAccessTypeJson? = null,
+): AddEditSendState = DEFAULT_STATE.copy(
+    addEditSendType = AddEditSendType.CopyItem(sendItemId = COPY_SEND_ID),
+    isSendControlsEnabled = isSendControlsEnabled,
+    deletionHours = deletionHours,
+    whoCanAccess = whoCanAccess,
+    viewState = AddEditSendState.ViewState.Content(
+        common = AddEditSendState.ViewState.Content.Common(
+            originalSendView = null,
+            name = "mockName-1",
+            currentAccessCount = null,
+            maxAccessCount = 1,
+            passwordInput = "",
+            noteInput = "mockNotes-1",
+            isHideEmailChecked = false,
+            isDeactivateChecked = false,
+            deletionDate = deletionDate,
+            expirationDate = null,
+            sendUrl = null,
+            hasPassword = false,
+            isHideEmailAddressEnabled = true,
+            sendAuth = sendAuth,
+        ),
+        selectedType = AddEditSendState.ViewState.Content.SendType.Text(
+            input = "mockText-1",
+            isHideByDefaultChecked = false,
+        ),
+    ),
+)
+
+private val ENFORCED_DELETION_DATE: Instant = Instant.parse("2023-10-28T12:00:00Z")
+
+private const val ENFORCED_DELETION_HOURS: Int = 24
+
+private val ENFORCED_DELETION_STATE = DEFAULT_STATE.copy(
+    isSendControlsEnabled = true,
+    deletionHours = ENFORCED_DELETION_HOURS,
+    viewState = DEFAULT_VIEW_STATE.copy(
+        common = DEFAULT_COMMON_STATE.copy(deletionDate = ENFORCED_DELETION_DATE),
+    ),
+)
+
+private val DEFAULT_EFFECTIVE_SEND_POLICY = EffectiveSendPolicy(
+    allowedDomains = null,
+    allowedSendTypes = null,
+    deletionHours = null,
+    disableHideEmail = false,
+    disableSend = false,
+    whoCanAccess = null,
+)
+
+private val DEFAULT_ACCOUNT = UserState.Account(
+    userId = "activeUserId",
+    name = "Active User",
+    email = "active@bitwarden.com",
+    environment = Environment.Prod.Us,
+    avatarColorHex = "#aa00aa",
+    isPremium = true,
+    isPremiumFromSelf = true,
+    isLoggedIn = true,
+    isVaultUnlocked = true,
+    needsPasswordReset = false,
+    isBiometricsEnabled = false,
+    organizations = emptyList(),
+    needsMasterPassword = false,
+    trustedDevice = null,
+    hasMasterPassword = true,
+    isUsingKeyConnector = false,
+    onboardingStatus = OnboardingStatus.COMPLETE,
+    firstTimeState = FirstTimeState(showImportLoginsCard = true),
+    isExportable = true,
+    creationDate = null,
+)
+
+private val DEFAULT_USER_STATE = UserState(
+    activeUserId = "activeUserId",
+    accounts = listOf(DEFAULT_ACCOUNT),
+)

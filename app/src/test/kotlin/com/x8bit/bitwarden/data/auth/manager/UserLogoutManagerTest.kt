@@ -1,0 +1,515 @@
+package com.x8bit.bitwarden.data.auth.manager
+
+import com.bitwarden.core.data.manager.dispatcher.FakeDispatcherManager
+import com.bitwarden.core.data.manager.toast.ToastManager
+import com.bitwarden.network.model.KdfTypeJson
+import com.bitwarden.ui.platform.base.MainDispatcherExtension
+import com.bitwarden.ui.platform.resource.BitwardenString
+import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
+import com.x8bit.bitwarden.data.auth.datasource.disk.model.AccountJson
+import com.x8bit.bitwarden.data.auth.datasource.disk.model.AccountTokensJson
+import com.x8bit.bitwarden.data.auth.datasource.disk.model.UserStateJson
+import com.x8bit.bitwarden.data.auth.repository.model.LogoutReason
+import com.x8bit.bitwarden.data.platform.datasource.disk.PushDiskSource
+import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
+import com.x8bit.bitwarden.data.platform.manager.CredentialExchangeRegistryManager
+import com.x8bit.bitwarden.data.platform.manager.model.UnregisterExportResult
+import com.x8bit.bitwarden.data.platform.manager.policy.UserNotificationPolicyManager
+import com.x8bit.bitwarden.data.platform.repository.model.VaultTimeoutAction
+import com.x8bit.bitwarden.data.tools.generator.datasource.disk.GeneratorDiskSource
+import com.x8bit.bitwarden.data.tools.generator.datasource.disk.PasswordHistoryDiskSource
+import com.x8bit.bitwarden.data.vault.datasource.disk.VaultDiskSource
+import com.x8bit.bitwarden.data.vault.datasource.sdk.VaultSdkSource
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.runs
+import io.mockk.verify
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import java.time.Instant
+
+@ExtendWith(MainDispatcherExtension::class)
+class UserLogoutManagerTest {
+    private val authDiskSource: AuthDiskSource = mockk {
+        every { userState = any() } just runs
+        every { clearData(any()) } just runs
+    }
+    private val generatorDiskSource: GeneratorDiskSource = mockk {
+        every { clearData(any()) } just runs
+    }
+    private val settingsDiskSource: SettingsDiskSource = mockk {
+        every { clearData(any()) } just runs
+        every { storeVaultTimeoutInMinutes(any(), any()) } just runs
+        every { storeVaultTimeoutAction(any(), any()) } just runs
+        every { storeAppRegisteredForExport(any()) } just runs
+        every { getVaultPolicyBannerDismissedDate(userId = any()) } returns null
+        every {
+            storeVaultPolicyBannerDismissedDate(userId = any(), dismissalRevisionDate = any())
+        } just runs
+    }
+    private val pushDiskSource: PushDiskSource = mockk {
+        coEvery { clearData(any()) } just runs
+    }
+    private val passwordHistoryDiskSource: PasswordHistoryDiskSource = mockk {
+        coEvery { clearPasswordHistories(any()) } just runs
+    }
+    private val vaultDiskSource: VaultDiskSource = mockk {
+        coEvery { deleteVaultData(any()) } just runs
+    }
+    private val vaultSdkSource: VaultSdkSource = mockk {
+        every { clearCrypto(userId = any()) } just runs
+    }
+    private val toastManager: ToastManager = mockk {
+        every { show(messageId = any()) } just runs
+    }
+    private val credentialExchangeRegistryManager: CredentialExchangeRegistryManager = mockk {
+        coEvery { unregister() } returns UnregisterExportResult.Success
+    }
+    private val userNotificationPolicyManager: UserNotificationPolicyManager = mockk {
+        every { shouldClearOnSoftLogout(userId = any()) } returns true
+    }
+
+    private val userLogoutManager: UserLogoutManager =
+        UserLogoutManagerImpl(
+            authDiskSource = authDiskSource,
+            generatorDiskSource = generatorDiskSource,
+            passwordHistoryDiskSource = passwordHistoryDiskSource,
+            pushDiskSource = pushDiskSource,
+            settingsDiskSource = settingsDiskSource,
+            toastManager = toastManager,
+            vaultDiskSource = vaultDiskSource,
+            vaultSdkSource = vaultSdkSource,
+            dispatcherManager = FakeDispatcherManager(),
+            credentialExchangeRegistryManager = credentialExchangeRegistryManager,
+            userNotificationPolicyManager = userNotificationPolicyManager,
+        )
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `logout for single account should clear data associated with the given user, null out the user state, and unregister app for export`() {
+        val userId = USER_ID_1
+        every { authDiskSource.userState } returns SINGLE_USER_STATE_1
+
+        userLogoutManager.logout(userId = USER_ID_1, reason = LogoutReason.Timeout)
+
+        coVerify {
+            authDiskSource.userState = null
+            credentialExchangeRegistryManager.unregister()
+        }
+        assertDataCleared(userId = userId)
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `logout for multiple accounts should clear data associated with the given user and change to the new active user`() {
+        val userId = USER_ID_1
+        every { authDiskSource.userState } returns MULTI_USER_STATE
+
+        userLogoutManager.logout(userId = USER_ID_1, reason = LogoutReason.Timeout)
+
+        verify {
+            authDiskSource.userState = SINGLE_USER_STATE_2
+            toastManager.show(messageId = BitwardenString.account_switched_automatically)
+        }
+        assertDataCleared(userId = userId)
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `logout for non-active accounts should clear data associated with the given user and leave the active user unchanged`() {
+        val userId = USER_ID_2
+        every { authDiskSource.userState } returns MULTI_USER_STATE
+
+        userLogoutManager.logout(userId = USER_ID_2, reason = LogoutReason.Timeout)
+
+        verify { authDiskSource.userState = SINGLE_USER_STATE_1 }
+        assertDataCleared(userId = userId)
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `logout with security stamp reason should switch active user and display the login expired toast`() {
+        val userId = USER_ID_1
+        every { authDiskSource.userState } returns MULTI_USER_STATE
+
+        userLogoutManager.logout(userId = userId, reason = LogoutReason.SecurityStamp)
+
+        verify(exactly = 1) {
+            authDiskSource.userState = SINGLE_USER_STATE_2
+            toastManager.show(messageId = BitwardenString.login_expired)
+        }
+        assertDataCleared(userId = userId)
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `softLogout should clear most data associated with the given user and remove token data in the authDiskSource`() {
+        val userId = USER_ID_1
+        val vaultTimeoutInMinutes = 360
+        val vaultTimeoutAction = VaultTimeoutAction.LOGOUT
+        val pinProtectedUserKey = "pinProtectedUserKey"
+        val pinProtectedUserKeyEnvelope = "pinProtectedUserKeyEnvelope"
+        val encryptedPin = "encryptedPin"
+
+        every {
+            settingsDiskSource.getVaultTimeoutInMinutes(userId = userId)
+        } returns vaultTimeoutInMinutes
+        every {
+            settingsDiskSource.getVaultTimeoutAction(userId = userId)
+        } returns vaultTimeoutAction
+        every {
+            authDiskSource.getEphemeralPinProtectedUserKeyEnvelope(userId = userId)
+        } returns pinProtectedUserKeyEnvelope
+        every {
+            authDiskSource.getPersistentPinProtectedUserKeyEnvelope(userId = userId)
+        } returns pinProtectedUserKeyEnvelope
+        every {
+            authDiskSource.storeEphemeralPinProtectedUserKeyEnvelope(
+                userId = userId,
+                pinProtectedUserKeyEnvelope = pinProtectedUserKeyEnvelope,
+            )
+        } just runs
+        every {
+            authDiskSource.storePersistentPinProtectedUserKeyEnvelope(
+                userId = userId,
+                pinProtectedUserKeyEnvelope = pinProtectedUserKeyEnvelope,
+            )
+        } just runs
+        every { authDiskSource.getPinProtectedUserKey(userId = userId) } returns pinProtectedUserKey
+        every {
+            authDiskSource.storePinProtectedUserKey(
+                userId = userId,
+                pinProtectedUserKey = pinProtectedUserKey,
+            )
+        } just runs
+        every { authDiskSource.getEncryptedPin(userId = userId) } returns encryptedPin
+        every {
+            authDiskSource.storeEncryptedPin(userId = userId, encryptedPin = encryptedPin)
+        } just runs
+
+        userLogoutManager.softLogout(userId = userId, reason = LogoutReason.Timeout)
+
+        assertDataCleared(userId = userId)
+
+        verify(exactly = 1) {
+            settingsDiskSource.storeVaultTimeoutInMinutes(
+                userId = userId,
+                vaultTimeoutInMinutes = vaultTimeoutInMinutes,
+            )
+            settingsDiskSource.storeVaultTimeoutAction(
+                userId = userId,
+                vaultTimeoutAction = vaultTimeoutAction,
+            )
+            settingsDiskSource.storeVaultTimeoutInMinutes(
+                userId = userId,
+                vaultTimeoutInMinutes = vaultTimeoutInMinutes,
+            )
+            settingsDiskSource.storeVaultTimeoutAction(
+                userId = userId,
+                vaultTimeoutAction = vaultTimeoutAction,
+            )
+            authDiskSource.storeEphemeralPinProtectedUserKeyEnvelope(
+                userId = userId,
+                pinProtectedUserKeyEnvelope = pinProtectedUserKeyEnvelope,
+            )
+            authDiskSource.storePersistentPinProtectedUserKeyEnvelope(
+                userId = userId,
+                pinProtectedUserKeyEnvelope = pinProtectedUserKeyEnvelope,
+            )
+            authDiskSource.storePinProtectedUserKey(
+                userId = userId,
+                pinProtectedUserKey = pinProtectedUserKey,
+            )
+            authDiskSource.storeEncryptedPin(userId = userId, encryptedPin = encryptedPin)
+        }
+    }
+
+    @Test
+    fun `softLogout should clear user data but keep the user in accounts list`() {
+        val userId = USER_ID_1
+        val vaultTimeoutInMinutes = 360
+        val vaultTimeoutAction = VaultTimeoutAction.LOGOUT
+        val pinProtectedUserKey = "pinProtectedUserKey"
+        val pinProtectedUserKeyEnvelope = "pinProtectedUserKeyEnvelope"
+        val encryptedPin = "encryptedPin"
+
+        every {
+            settingsDiskSource.getVaultTimeoutInMinutes(userId = userId)
+        } returns vaultTimeoutInMinutes
+        every {
+            settingsDiskSource.getVaultTimeoutAction(userId = userId)
+        } returns vaultTimeoutAction
+        every {
+            authDiskSource.getEphemeralPinProtectedUserKeyEnvelope(userId = userId)
+        } returns pinProtectedUserKeyEnvelope
+        every {
+            authDiskSource.getPersistentPinProtectedUserKeyEnvelope(userId = userId)
+        } returns pinProtectedUserKeyEnvelope
+        every {
+            authDiskSource.storeEphemeralPinProtectedUserKeyEnvelope(
+                userId = userId,
+                pinProtectedUserKeyEnvelope = pinProtectedUserKeyEnvelope,
+            )
+        } just runs
+        every {
+            authDiskSource.storePersistentPinProtectedUserKeyEnvelope(
+                userId = userId,
+                pinProtectedUserKeyEnvelope = pinProtectedUserKeyEnvelope,
+            )
+        } just runs
+        every { authDiskSource.getPinProtectedUserKey(userId = userId) } returns pinProtectedUserKey
+        every {
+            authDiskSource.storePinProtectedUserKey(
+                userId = userId,
+                pinProtectedUserKey = pinProtectedUserKey,
+            )
+        } just runs
+        every { authDiskSource.getEncryptedPin(userId = userId) } returns encryptedPin
+        every {
+            authDiskSource.storeEncryptedPin(userId = userId, encryptedPin = encryptedPin)
+        } just runs
+
+        userLogoutManager.softLogout(userId = userId, reason = LogoutReason.Timeout)
+
+        verify(exactly = 1) {
+            settingsDiskSource.storeVaultTimeoutInMinutes(
+                userId = userId,
+                vaultTimeoutInMinutes = vaultTimeoutInMinutes,
+            )
+            settingsDiskSource.storeVaultTimeoutAction(
+                userId = userId,
+                vaultTimeoutAction = vaultTimeoutAction,
+            )
+            authDiskSource.storeEphemeralPinProtectedUserKeyEnvelope(
+                userId = userId,
+                pinProtectedUserKeyEnvelope = pinProtectedUserKeyEnvelope,
+            )
+            authDiskSource.storePersistentPinProtectedUserKeyEnvelope(
+                userId = userId,
+                pinProtectedUserKeyEnvelope = pinProtectedUserKeyEnvelope,
+            )
+            authDiskSource.storePinProtectedUserKey(
+                userId = userId,
+                pinProtectedUserKey = pinProtectedUserKey,
+            )
+            authDiskSource.storeEncryptedPin(userId = userId, encryptedPin = encryptedPin)
+        }
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `softLogout when shouldClearOnSoftLogout is true should not restore the vault policy banner dismissed date`() {
+        val userId = USER_ID_1
+        setupSoftLogoutStubs(userId = userId)
+        every {
+            userNotificationPolicyManager.shouldClearOnSoftLogout(userId = userId)
+        } returns true
+        every {
+            settingsDiskSource.getVaultPolicyBannerDismissedDate(userId = userId)
+        } returns DISMISSAL_REVISION_DATE
+
+        userLogoutManager.softLogout(userId = userId, reason = LogoutReason.Timeout)
+
+        assertDataCleared(userId = userId)
+        verify(exactly = 0) {
+            settingsDiskSource.storeVaultPolicyBannerDismissedDate(
+                userId = any(),
+                dismissalRevisionDate = any(),
+            )
+        }
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `softLogout when shouldClearOnSoftLogout is false should restore the vault policy banner dismissed date`() {
+        val userId = USER_ID_1
+        setupSoftLogoutStubs(userId = userId)
+        every {
+            userNotificationPolicyManager.shouldClearOnSoftLogout(userId = userId)
+        } returns false
+        every {
+            settingsDiskSource.getVaultPolicyBannerDismissedDate(userId = userId)
+        } returns DISMISSAL_REVISION_DATE
+
+        userLogoutManager.softLogout(userId = userId, reason = LogoutReason.Timeout)
+
+        assertDataCleared(userId = userId)
+        verify(exactly = 1) {
+            userNotificationPolicyManager.shouldClearOnSoftLogout(userId = userId)
+            settingsDiskSource.storeVaultPolicyBannerDismissedDate(
+                userId = userId,
+                dismissalRevisionDate = DISMISSAL_REVISION_DATE,
+            )
+        }
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `softLogout when shouldClearOnSoftLogout is false and there is no dismissed date should restore a null vault policy banner dismissed date`() {
+        val userId = USER_ID_1
+        setupSoftLogoutStubs(userId = userId)
+        every {
+            userNotificationPolicyManager.shouldClearOnSoftLogout(userId = userId)
+        } returns false
+        every { settingsDiskSource.getVaultPolicyBannerDismissedDate(userId = userId) } returns null
+
+        userLogoutManager.softLogout(userId = userId, reason = LogoutReason.Timeout)
+
+        assertDataCleared(userId = userId)
+        verify(exactly = 1) {
+            settingsDiskSource.storeVaultPolicyBannerDismissedDate(
+                userId = userId,
+                dismissalRevisionDate = null,
+            )
+        }
+    }
+
+    @Test
+    fun `logout should not restore the vault policy banner dismissed date`() {
+        val userId = USER_ID_1
+        every { authDiskSource.userState } returns SINGLE_USER_STATE_1
+
+        userLogoutManager.logout(userId = userId, reason = LogoutReason.Timeout)
+
+        assertDataCleared(userId = userId)
+        verify(exactly = 0) {
+            userNotificationPolicyManager.shouldClearOnSoftLogout(userId = any())
+            settingsDiskSource.getVaultPolicyBannerDismissedDate(userId = any())
+            settingsDiskSource.storeVaultPolicyBannerDismissedDate(
+                userId = any(),
+                dismissalRevisionDate = any(),
+            )
+        }
+    }
+
+    private fun setupSoftLogoutStubs(userId: String) {
+        every { settingsDiskSource.getVaultTimeoutInMinutes(userId = userId) } returns 360
+        every {
+            settingsDiskSource.getVaultTimeoutAction(userId = userId)
+        } returns VaultTimeoutAction.LOGOUT
+        every { authDiskSource.getEncryptedPin(userId = userId) } returns "encryptedPin"
+        every {
+            authDiskSource.getPinProtectedUserKey(userId = userId)
+        } returns "pinProtectedUserKey"
+        every {
+            authDiskSource.getEphemeralPinProtectedUserKeyEnvelope(userId = userId)
+        } returns "pinProtectedUserKeyEnvelope"
+        every {
+            authDiskSource.getPersistentPinProtectedUserKeyEnvelope(userId = userId)
+        } returns "pinProtectedUserKeyEnvelope"
+        every { authDiskSource.storeEncryptedPin(userId = userId, encryptedPin = any()) } just runs
+        every {
+            authDiskSource.storePinProtectedUserKey(userId = userId, pinProtectedUserKey = any())
+        } just runs
+        every {
+            authDiskSource.storeEphemeralPinProtectedUserKeyEnvelope(
+                userId = userId,
+                pinProtectedUserKeyEnvelope = any(),
+            )
+        } just runs
+        every {
+            authDiskSource.storePersistentPinProtectedUserKeyEnvelope(
+                userId = userId,
+                pinProtectedUserKeyEnvelope = any(),
+            )
+        } just runs
+    }
+
+    private fun assertDataCleared(userId: String) {
+        verify { vaultSdkSource.clearCrypto(userId = userId) }
+        verify { authDiskSource.clearData(userId = userId) }
+        verify { generatorDiskSource.clearData(userId = userId) }
+        verify { pushDiskSource.clearData(userId = userId) }
+        verify { settingsDiskSource.clearData(userId = userId) }
+        coVerify { passwordHistoryDiskSource.clearPasswordHistories(userId = userId) }
+        coVerify {
+            vaultDiskSource.deleteVaultData(userId = userId)
+        }
+    }
+}
+
+private val DISMISSAL_REVISION_DATE: Instant = Instant.parse("2024-09-13T01:00:00.00Z")
+private const val EMAIL_2 = "test2@bitwarden.com"
+private const val ACCESS_TOKEN = "accessToken"
+private const val ACCESS_TOKEN_2 = "accessToken2"
+private const val REFRESH_TOKEN = "refreshToken"
+private const val USER_ID_1 = "2a135b23-e1fb-42c9-bec3-573857bc8181"
+private const val USER_ID_2 = "b9d32ec0-6497-4582-9798-b350f53bfa02"
+private val ACCOUNT_1 = AccountJson(
+    profile = AccountJson.Profile(
+        userId = USER_ID_1,
+        email = "test@bitwarden.com",
+        isEmailVerified = true,
+        name = "Bitwarden Tester",
+        hasPremiumPersonally = false,
+        hasPremiumFromOrganization = null,
+        stamp = null,
+        organizationId = null,
+        avatarColorHex = null,
+        forcePasswordResetReason = null,
+        kdfType = KdfTypeJson.ARGON2_ID,
+        kdfIterations = 600000,
+        kdfMemory = 16,
+        kdfParallelism = 4,
+        userDecryptionOptions = null,
+        isTwoFactorEnabled = false,
+        creationDate = Instant.parse("2024-09-13T01:00:00.00Z"),
+    ),
+    tokens = AccountTokensJson(
+        accessToken = ACCESS_TOKEN,
+        refreshToken = REFRESH_TOKEN,
+    ),
+    settings = AccountJson.Settings(
+        environmentUrlData = null,
+    ),
+)
+private val ACCOUNT_2 = AccountJson(
+    profile = AccountJson.Profile(
+        userId = USER_ID_2,
+        email = EMAIL_2,
+        isEmailVerified = true,
+        name = "Bitwarden Tester 2",
+        hasPremiumPersonally = false,
+        hasPremiumFromOrganization = null,
+        stamp = null,
+        organizationId = null,
+        avatarColorHex = null,
+        forcePasswordResetReason = null,
+        kdfType = KdfTypeJson.PBKDF2_SHA256,
+        kdfIterations = 400000,
+        kdfMemory = null,
+        kdfParallelism = null,
+        userDecryptionOptions = null,
+        isTwoFactorEnabled = false,
+        creationDate = Instant.parse("2024-09-13T01:00:00.00Z"),
+    ),
+    tokens = AccountTokensJson(
+        accessToken = ACCESS_TOKEN_2,
+        refreshToken = "refreshToken",
+    ),
+    settings = AccountJson.Settings(
+        environmentUrlData = null,
+    ),
+)
+private val SINGLE_USER_STATE_1 = UserStateJson(
+    activeUserId = USER_ID_1,
+    accounts = mapOf(
+        USER_ID_1 to ACCOUNT_1,
+    ),
+)
+private val SINGLE_USER_STATE_2 = UserStateJson(
+    activeUserId = USER_ID_2,
+    accounts = mapOf(
+        USER_ID_2 to ACCOUNT_2,
+    ),
+)
+private val MULTI_USER_STATE = UserStateJson(
+    activeUserId = USER_ID_1,
+    accounts = mapOf(
+        USER_ID_1 to ACCOUNT_1,
+        USER_ID_2 to ACCOUNT_2,
+    ),
+)

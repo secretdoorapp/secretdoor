@@ -1,0 +1,1059 @@
+package com.x8bit.bitwarden.data.platform.manager
+
+import app.cash.turbine.test
+import com.bitwarden.core.data.manager.model.FlagKey
+import com.bitwarden.core.data.util.asSuccess
+import com.bitwarden.network.model.OrganizationType
+import com.bitwarden.network.model.PolicyTypeJson
+import com.bitwarden.network.model.SendAccessTypeJson
+import com.bitwarden.network.model.SyncResponseJson
+import com.bitwarden.network.model.createMockOrganizationNetwork
+import com.bitwarden.network.model.createMockPolicy
+import com.bitwarden.policies.Policy
+import com.bitwarden.policies.PolicyType
+import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
+import com.x8bit.bitwarden.data.auth.datasource.disk.model.UserStateJson
+import com.x8bit.bitwarden.data.auth.datasource.sdk.AuthSdkSource
+import com.x8bit.bitwarden.data.platform.manager.model.EffectiveSendPolicy
+import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkPolicy
+import io.mockk.every
+import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+import java.time.Instant
+
+@Suppress("LargeClass")
+class PolicyManagerTest {
+    private val mutableUserStateFlow = MutableStateFlow<UserStateJson?>(null)
+    private val mutablePolicyFlow = MutableStateFlow<List<SyncResponseJson.Policy>?>(null)
+    private val mutableOrganizationsFlow =
+        MutableStateFlow<List<SyncResponseJson.Profile.Organization>?>(null)
+    private val authDiskSource: AuthDiskSource = mockk {
+        every { userStateFlow } returns mutableUserStateFlow
+        every { getPoliciesFlow(USER_ID) } returns mutablePolicyFlow
+        every { getOrganizationsFlow(USER_ID) } returns mutableOrganizationsFlow
+    }
+    private val authSdkSource: AuthSdkSource = mockk()
+    private val mutableSendControlsFlagFlow = MutableStateFlow(false)
+    private val featureFlagManager: FeatureFlagManager = mockk {
+        every {
+            getFeatureFlagFlow(key = FlagKey.SendControls)
+        } returns mutableSendControlsFlagFlow
+        every { getFeatureFlag(key = FlagKey.SendControls) } answers {
+            mutableSendControlsFlagFlow.value
+        }
+    }
+
+    private val policyManager: PolicyManager = PolicyManagerImpl(
+        authDiskSource = authDiskSource,
+        authSdkSource = authSdkSource,
+        featureFlagManager = featureFlagManager,
+    )
+
+    @Test
+    fun `getActivePoliciesFlow should emit changes to current user's policy data`() =
+        runTest {
+            val userStateJson = mockk<UserStateJson> {
+                every { activeUserId } returns USER_ID
+            }
+            val organizations = createMockOrganizationNetwork(
+                number = 1,
+                isEnabled = true,
+                shouldUsePolicies = true,
+            )
+            val storedPolicyOne = createMockPolicy(
+                isEnabled = true,
+                number = 1,
+                organizationId = organizations.id,
+                type = PolicyTypeJson.MAXIMUM_VAULT_TIMEOUT,
+            )
+            val storedPolicyTwo = createMockPolicy(
+                isEnabled = true,
+                number = 2,
+                organizationId = organizations.id,
+                type = PolicyTypeJson.MAXIMUM_VAULT_TIMEOUT,
+            )
+            val expectedPolicyOne = createMockSdkPolicy(
+                enabled = true,
+                number = 1,
+                organizationId = organizations.id,
+                type = PolicyType.MAXIMUM_VAULT_TIMEOUT,
+            )
+            val expectedPolicyTwo = createMockSdkPolicy(
+                enabled = true,
+                number = 2,
+                organizationId = organizations.id,
+                type = PolicyType.MAXIMUM_VAULT_TIMEOUT,
+            )
+            every {
+                authSdkSource.filterPolicies(
+                    policies = any(),
+                    organizations = any(),
+                    policyType = any(),
+                )
+            } returnsMany listOf(
+                listOf(expectedPolicyOne).asSuccess(),
+                listOf(expectedPolicyTwo).asSuccess(),
+            )
+
+            mutableUserStateFlow.value = userStateJson
+            mutableOrganizationsFlow.value = listOf(organizations)
+            mutablePolicyFlow.value = listOf(storedPolicyOne)
+
+            policyManager
+                .getActivePoliciesFlow(type = PolicyType.MAXIMUM_VAULT_TIMEOUT)
+                .test {
+                    assertEquals(listOf(expectedPolicyOne), awaitItem())
+
+                    mutablePolicyFlow.value = listOf(storedPolicyTwo)
+
+                    assertEquals(listOf(expectedPolicyTwo), awaitItem())
+                }
+        }
+
+    @Test
+    fun `getActivePolicies returns empty list if user id is null`() {
+        every { authDiskSource.userState } returns null
+
+        assertTrue(policyManager.getActivePolicies(type = PolicyType.MASTER_PASSWORD).isEmpty())
+    }
+
+    @Test
+    fun `getActivePolicies returns empty list if the policies are not active`() {
+        val userState: UserStateJson = mockk {
+            every { activeUserId } returns USER_ID
+        }
+        every { authDiskSource.userState } returns userState
+        every {
+            authDiskSource.getOrganizations(USER_ID)
+        } returns listOf(
+            createMockOrganizationNetwork(
+                number = 3,
+                isEnabled = true,
+            ),
+        )
+        every {
+            authDiskSource.getPolicies(USER_ID)
+        } returns listOf(
+            createMockPolicy(
+                organizationId = "mockId-3",
+                isEnabled = true,
+            ),
+        )
+        every {
+            authSdkSource.filterPolicies(
+                policies = any(),
+                organizations = any(),
+                policyType = any(),
+            )
+        } returns emptyList<Policy>().asSuccess()
+
+        assertTrue(policyManager.getActivePolicies(type = PolicyType.MASTER_PASSWORD).isEmpty())
+    }
+
+    @Test
+    fun `getActivePolicies returns active and applied policies`() {
+        val userState: UserStateJson = mockk {
+            every { activeUserId } returns USER_ID
+        }
+        every { authDiskSource.userState } returns userState
+        every {
+            authDiskSource.getOrganizations(USER_ID)
+        } returns listOf(
+            createMockOrganizationNetwork(
+                number = 3,
+                isEnabled = false,
+            ),
+        )
+        every {
+            authDiskSource.getPolicies(USER_ID)
+        } returns listOf(
+            createMockPolicy(
+                organizationId = "mockId-3",
+                isEnabled = true,
+            ),
+        )
+        every {
+            authSdkSource.filterPolicies(
+                policies = any(),
+                organizations = any(),
+                policyType = any(),
+            )
+        } returns emptyList<Policy>().asSuccess()
+
+        assertTrue(policyManager.getActivePolicies(type = PolicyType.MASTER_PASSWORD).isEmpty())
+    }
+
+    @Test
+    fun `getActivePolicies returns active and applied policies for disabled organizations`() {
+        val userState: UserStateJson = mockk {
+            every { activeUserId } returns USER_ID
+        }
+        val storedPolicy = createMockPolicy(organizationId = "mockId-3", isEnabled = true)
+        val expectedPolicy = createMockSdkPolicy(organizationId = "mockId-3", enabled = true)
+        every { authDiskSource.userState } returns userState
+        every {
+            authDiskSource.getOrganizations(USER_ID)
+        } returns listOf(
+            createMockOrganizationNetwork(
+                number = 3,
+                isEnabled = false,
+                shouldUsePolicies = true,
+                type = OrganizationType.USER,
+            ),
+        )
+        every { authDiskSource.getPolicies(USER_ID) } returns listOf(storedPolicy)
+        every {
+            authSdkSource.filterPolicies(any(), any(), any())
+        } returns listOf(expectedPolicy).asSuccess()
+
+        assertEquals(
+            listOf(expectedPolicy),
+            policyManager.getActivePolicies(type = PolicyType.MASTER_PASSWORD),
+        )
+    }
+
+    @Test
+    fun `getActivePolicies returns active and applied PasswordGenerator policies`() {
+        val userState: UserStateJson = mockk {
+            every { activeUserId } returns USER_ID
+        }
+        every { authDiskSource.userState } returns userState
+        every {
+            authDiskSource.getOrganizations(USER_ID)
+        } returns listOf(
+            createMockOrganizationNetwork(
+                number = 3,
+                isEnabled = true,
+                shouldUsePolicies = true,
+            ),
+        )
+        every {
+            authDiskSource.getPolicies(USER_ID)
+        } returns listOf(
+            createMockPolicy(
+                organizationId = "mockId-3",
+                isEnabled = true,
+                type = PolicyTypeJson.PASSWORD_GENERATOR,
+            ),
+        )
+        every {
+            authSdkSource.filterPolicies(any(), any(), any())
+        } returns listOf(
+            createMockSdkPolicy(
+                organizationId = "mockId-3",
+                enabled = true,
+                type = PolicyType.PASSWORD_GENERATOR,
+            ),
+        )
+            .asSuccess()
+
+        assertTrue(policyManager.getActivePolicies(type = PolicyType.PASSWORD_GENERATOR).any())
+    }
+
+    @Test
+    fun `getActivePolicies returns active and applied restrict item types policies`() {
+        val userState: UserStateJson = mockk {
+            every { activeUserId } returns USER_ID
+        }
+        every { authDiskSource.userState } returns userState
+        every {
+            authDiskSource.getOrganizations(USER_ID)
+        } returns listOf(
+            createMockOrganizationNetwork(
+                number = 3,
+                isEnabled = true,
+                shouldUsePolicies = true,
+            ),
+        )
+        every {
+            authDiskSource.getPolicies(USER_ID)
+        } returns listOf(
+            createMockPolicy(
+                organizationId = "mockId-3",
+                isEnabled = true,
+                type = PolicyTypeJson.RESTRICT_ITEM_TYPES,
+            ),
+        )
+        every {
+            authSdkSource.filterPolicies(any(), any(), any())
+        } returns listOf(
+            createMockSdkPolicy(
+                organizationId = "mockId-3",
+                enabled = true,
+                type = PolicyType.RESTRICTED_ITEM_TYPES,
+            ),
+        )
+            .asSuccess()
+
+        assertTrue(
+            policyManager.getActivePolicies(type = PolicyType.RESTRICTED_ITEM_TYPES).any(),
+        )
+    }
+
+    @Test
+    fun `getUserPolicies returns empty list if policies is null`() {
+        every { authDiskSource.userState } returns null
+        every { authDiskSource.getPolicies(USER_ID) } returns null
+        every { authDiskSource.getOrganizations(USER_ID) } returns null
+
+        assertEquals(
+            emptyList<Policy>(),
+            policyManager.getUserPolicies(
+                userId = USER_ID,
+                type = PolicyType.ORGANIZATION_DATA_OWNERSHIP,
+            ),
+        )
+    }
+
+    @Test
+    fun `getUserPolicies returns active and applied Disabled personal vault export policies`() {
+        val userState: UserStateJson = mockk {
+            every { activeUserId } returns USER_ID
+        }
+        every { authDiskSource.userState } returns userState
+        every {
+            authDiskSource.getOrganizations(USER_ID)
+        } returns listOf(
+            createMockOrganizationNetwork(
+                number = 3,
+                isEnabled = true,
+                shouldUsePolicies = true,
+                type = OrganizationType.USER,
+            ),
+        )
+
+        val storedListOfPolicies = listOf(
+            createMockPolicy(
+                organizationId = "mockId-3",
+                isEnabled = true,
+                type = PolicyTypeJson.DISABLE_PERSONAL_VAULT_EXPORT,
+            ),
+        )
+        val expectedListOfPolicies = listOf(
+            createMockSdkPolicy(
+                organizationId = "mockId-3",
+                enabled = true,
+                type = PolicyType.DISABLE_PERSONAL_VAULT_EXPORT,
+            ),
+        )
+        every {
+            authDiskSource.getPolicies(USER_ID)
+        } returns storedListOfPolicies
+        every {
+            authSdkSource.filterPolicies(any(), any(), any())
+        } returns expectedListOfPolicies.asSuccess()
+
+        assertEquals(
+            expectedListOfPolicies,
+            policyManager.getUserPolicies(
+                userId = USER_ID,
+                type = PolicyType.DISABLE_PERSONAL_VAULT_EXPORT,
+            ),
+        )
+    }
+
+    @Test
+    fun `getPersonalOwnershipPolicyOrganizationId returns null when no active user`() {
+        every { authDiskSource.userState } returns null
+
+        assertNull(policyManager.getPersonalOwnershipPolicyOrganizationId())
+    }
+
+    @Test
+    fun `getPersonalOwnershipPolicyOrganizationId returns null when no policies exist`() {
+        val userState: UserStateJson = mockk {
+            every { activeUserId } returns USER_ID
+        }
+        every { authDiskSource.userState } returns userState
+        every { authDiskSource.getOrganizations(USER_ID) } returns emptyList()
+        every { authDiskSource.getPolicies(USER_ID) } returns emptyList()
+
+        assertNull(policyManager.getPersonalOwnershipPolicyOrganizationId())
+    }
+
+    @Test
+    fun `getPersonalOwnershipPolicyOrganizationId returns null when policy is disabled`() {
+        val userState: UserStateJson = mockk {
+            every { activeUserId } returns USER_ID
+        }
+        every { authDiskSource.userState } returns userState
+        every {
+            authDiskSource.getOrganizations(USER_ID)
+        } returns listOf(
+            createMockOrganizationNetwork(
+                number = 1,
+                isEnabled = true,
+                shouldUsePolicies = true,
+                type = OrganizationType.USER,
+            ),
+        )
+        every {
+            authDiskSource.getPolicies(USER_ID)
+        } returns listOf(
+            createMockPolicy(
+                organizationId = "mockId-1",
+                isEnabled = false,
+                type = PolicyTypeJson.PERSONAL_OWNERSHIP,
+            ),
+        )
+        every {
+            authSdkSource.filterPolicies(
+                policies = any(),
+                organizations = any(),
+                policyType = any(),
+            )
+        } returns emptyList<Policy>().asSuccess()
+
+        assertNull(policyManager.getPersonalOwnershipPolicyOrganizationId())
+    }
+
+    @Test
+    fun `getPersonalOwnershipPolicyOrganizationId returns organization id for single policy`() {
+        val userState: UserStateJson = mockk {
+            every { activeUserId } returns USER_ID
+        }
+        val expectedOrganizationId = "mockId-1"
+        every { authDiskSource.userState } returns userState
+        every {
+            authDiskSource.getOrganizations(USER_ID)
+        } returns listOf(
+            createMockOrganizationNetwork(
+                number = 1,
+                isEnabled = true,
+                shouldUsePolicies = true,
+                type = OrganizationType.USER,
+            ),
+        )
+        every {
+            authDiskSource.getPolicies(USER_ID)
+        } returns listOf(
+            createMockPolicy(
+                organizationId = expectedOrganizationId,
+                isEnabled = true,
+                type = PolicyTypeJson.PERSONAL_OWNERSHIP,
+            ),
+        )
+        every {
+            authSdkSource.filterPolicies(any(), any(), any())
+        } returns listOf(
+            createMockSdkPolicy(
+                organizationId = expectedOrganizationId,
+                enabled = true,
+            ),
+        )
+            .asSuccess()
+
+        assertEquals(
+            expectedOrganizationId,
+            policyManager.getPersonalOwnershipPolicyOrganizationId(),
+        )
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `getPersonalOwnershipPolicyOrganizationId returns earliest policy when multiple orgs have policy`() {
+        val userState: UserStateJson = mockk {
+            every { activeUserId } returns USER_ID
+        }
+        val earliestRevisionDate = Instant.parse("2024-01-01T00:00:00Z")
+        val middleRevisionDate = Instant.parse("2024-06-01T00:00:00Z")
+        val latestRevisionDate = Instant.parse("2024-12-01T00:00:00Z")
+
+        val expectedOrganizationId = "mockId-1"
+
+        every { authDiskSource.userState } returns userState
+        every {
+            authDiskSource.getOrganizations(USER_ID)
+        } returns listOf(
+            createMockOrganizationNetwork(
+                number = 1,
+                isEnabled = true,
+                shouldUsePolicies = true,
+                type = OrganizationType.USER,
+            ),
+            createMockOrganizationNetwork(
+                number = 2,
+                isEnabled = true,
+                shouldUsePolicies = true,
+                type = OrganizationType.USER,
+            ),
+            createMockOrganizationNetwork(
+                number = 3,
+                isEnabled = true,
+                shouldUsePolicies = true,
+                type = OrganizationType.USER,
+            ),
+        )
+        every {
+            authDiskSource.getPolicies(USER_ID)
+        } returns listOf(
+            createMockPolicy(
+                number = 3,
+                organizationId = "mockId-3",
+                isEnabled = true,
+                type = PolicyTypeJson.PERSONAL_OWNERSHIP,
+                revisionDate = latestRevisionDate,
+            ),
+            createMockPolicy(
+                number = 1,
+                organizationId = expectedOrganizationId,
+                isEnabled = true,
+                type = PolicyTypeJson.PERSONAL_OWNERSHIP,
+                revisionDate = earliestRevisionDate,
+            ),
+            createMockPolicy(
+                number = 2,
+                organizationId = "mockId-2",
+                isEnabled = true,
+                type = PolicyTypeJson.PERSONAL_OWNERSHIP,
+                revisionDate = middleRevisionDate,
+            ),
+        )
+        every {
+            authSdkSource.filterPolicies(any(), any(), any())
+        } returns listOf(
+            createMockSdkPolicy(
+                number = 3,
+                organizationId = "mockId-3",
+                enabled = true,
+                revisionDate = latestRevisionDate,
+            ),
+            createMockSdkPolicy(
+                number = 1,
+                organizationId = expectedOrganizationId,
+                enabled = true,
+                revisionDate = earliestRevisionDate,
+            ),
+            createMockSdkPolicy(
+                number = 2,
+                organizationId = "mockId-2",
+                enabled = true,
+                revisionDate = middleRevisionDate,
+            ),
+        )
+            .asSuccess()
+
+        assertEquals(
+            expectedOrganizationId,
+            policyManager.getPersonalOwnershipPolicyOrganizationId(),
+        )
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `getPersonalOwnershipPolicyOrganizationId filters out policies from organizations not using policies`() {
+        val userState: UserStateJson = mockk {
+            every { activeUserId } returns USER_ID
+        }
+        val earlierRevisionDate = Instant.parse("2024-01-01T00:00:00Z")
+        val laterRevisionDate = Instant.parse("2024-06-01T00:00:00Z")
+        val expectedOrganizationId = "mockId-2"
+
+        every { authDiskSource.userState } returns userState
+        every {
+            authDiskSource.getOrganizations(USER_ID)
+        } returns listOf(
+            createMockOrganizationNetwork(
+                number = 1,
+                isEnabled = true,
+                shouldUsePolicies = false, // This org does NOT use policies
+                type = OrganizationType.USER,
+            ),
+            createMockOrganizationNetwork(
+                number = 2,
+                isEnabled = true,
+                shouldUsePolicies = true, // This org uses policies
+                type = OrganizationType.USER,
+            ),
+        )
+        every {
+            authDiskSource.getPolicies(USER_ID)
+        } returns listOf(
+            createMockPolicy(
+                number = 1,
+                organizationId = "mockId-1",
+                isEnabled = true,
+                type = PolicyTypeJson.PERSONAL_OWNERSHIP,
+                revisionDate = earlierRevisionDate, // Earlier but org doesn't enforce
+            ),
+            createMockPolicy(
+                number = 2,
+                organizationId = expectedOrganizationId,
+                isEnabled = true,
+                type = PolicyTypeJson.PERSONAL_OWNERSHIP,
+                revisionDate = laterRevisionDate,
+            ),
+        )
+        every {
+            authSdkSource.filterPolicies(any(), any(), any())
+        } returns listOf(
+            createMockSdkPolicy(
+                number = 2,
+                organizationId = expectedOrganizationId,
+                enabled = true,
+                revisionDate = laterRevisionDate,
+            ),
+        )
+            .asSuccess()
+
+        // Should return mockId-2 because mockId-1's organization doesn't enforce policies
+        assertEquals(
+            expectedOrganizationId,
+            policyManager.getPersonalOwnershipPolicyOrganizationId(),
+        )
+    }
+
+    @Test
+    fun `getEffectiveSendPolicy should mirror legacy DisableSend policy when flag is off`() {
+        setUpSendPolicies(
+            disableSendPolicies = listOf(
+                createMockSdkPolicy(organizationId = "mockId-1", enabled = true),
+            ),
+        )
+
+        assertEquals(
+            EffectiveSendPolicy(
+                allowedDomains = null,
+                allowedSendTypes = null,
+                deletionHours = null,
+                disableHideEmail = false,
+                disableSend = true,
+                whoCanAccess = null,
+            ),
+            policyManager.getEffectiveSendPolicy(),
+        )
+    }
+
+    @Test
+    fun `getEffectiveSendPolicy should mirror legacy SendOptions policy when flag is off`() {
+        setUpSendPolicies(
+            sendOptionsPolicies = listOf(
+                createMockSdkPolicy(
+                    organizationId = "mockId-1",
+                    enabled = true,
+                    type = PolicyType.SEND_OPTIONS,
+                    data = """{"disableHideEmail":true}""",
+                ),
+            ),
+        )
+
+        assertEquals(
+            EffectiveSendPolicy(
+                allowedDomains = null,
+                allowedSendTypes = null,
+                deletionHours = null,
+                disableHideEmail = true,
+                disableSend = false,
+                whoCanAccess = null,
+            ),
+            policyManager.getEffectiveSendPolicy(),
+        )
+    }
+
+    @Test
+    fun `getEffectiveSendPolicy should ignore an active SendControls policy when flag is off`() {
+        setUpSendPolicies(
+            sendControlsPolicies = listOf(
+                createMockSdkPolicy(
+                    organizationId = "mockId-1",
+                    enabled = true,
+                    type = PolicyType.SEND_CONTROLS,
+                    data = """{"disableSend":false}""",
+                ),
+            ),
+            disableSendPolicies = listOf(
+                createMockSdkPolicy(organizationId = "mockId-1", enabled = true),
+            ),
+        )
+
+        assertEquals(
+            EffectiveSendPolicy(
+                allowedDomains = null,
+                allowedSendTypes = null,
+                deletionHours = null,
+                disableHideEmail = false,
+                disableSend = true,
+                whoCanAccess = null,
+            ),
+            policyManager.getEffectiveSendPolicy(),
+        )
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `getEffectiveSendPolicy should use SendControls for an org that has both policy types when flag is on`() {
+        mutableSendControlsFlagFlow.value = true
+        setUpSendPolicies(
+            sendControlsPolicies = listOf(
+                createMockSdkPolicy(
+                    organizationId = "mockId-1",
+                    enabled = true,
+                    type = PolicyType.SEND_CONTROLS,
+                    data = """{"disableSend":false}""",
+                ),
+            ),
+            disableSendPolicies = listOf(
+                createMockSdkPolicy(organizationId = "mockId-1", enabled = true),
+            ),
+        )
+
+        assertEquals(
+            EffectiveSendPolicy(
+                allowedDomains = null,
+                allowedSendTypes = null,
+                deletionHours = null,
+                disableHideEmail = false,
+                disableSend = false,
+                whoCanAccess = null,
+            ),
+            policyManager.getEffectiveSendPolicy(),
+        )
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `getEffectiveSendPolicy should still apply legacy DisableSend for an org without SendControls when flag is on`() {
+        mutableSendControlsFlagFlow.value = true
+        setUpSendPolicies(
+            sendControlsPolicies = listOf(
+                createMockSdkPolicy(
+                    organizationId = "mockId-1",
+                    enabled = true,
+                    type = PolicyType.SEND_CONTROLS,
+                    data = """{"disableSend":false}""",
+                ),
+            ),
+            disableSendPolicies = listOf(
+                // mockId-1 has SendControls (exclusion applies), mockId-2 does not.
+                createMockSdkPolicy(organizationId = "mockId-1", enabled = true),
+                createMockSdkPolicy(organizationId = "mockId-2", enabled = true),
+            ),
+        )
+
+        assertEquals(
+            EffectiveSendPolicy(
+                allowedDomains = null,
+                allowedSendTypes = null,
+                deletionHours = null,
+                disableHideEmail = false,
+                disableSend = true,
+                whoCanAccess = null,
+            ),
+            policyManager.getEffectiveSendPolicy(),
+        )
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `getEffectiveSendPolicy should OR disableHideEmail across SendControls and remaining legacy orgs`() {
+        mutableSendControlsFlagFlow.value = true
+        setUpSendPolicies(
+            sendControlsPolicies = listOf(
+                createMockSdkPolicy(
+                    organizationId = "mockId-1",
+                    enabled = true,
+                    type = PolicyType.SEND_CONTROLS,
+                    data = """{"disableHideEmail":false}""",
+                ),
+            ),
+            sendOptionsPolicies = listOf(
+                createMockSdkPolicy(
+                    organizationId = "mockId-2",
+                    enabled = true,
+                    type = PolicyType.SEND_OPTIONS,
+                    data = """{"disableHideEmail":true}""",
+                ),
+            ),
+        )
+
+        assertEquals(
+            EffectiveSendPolicy(
+                allowedDomains = null,
+                allowedSendTypes = null,
+                deletionHours = null,
+                disableHideEmail = true,
+                disableSend = false,
+                whoCanAccess = null,
+            ),
+            policyManager.getEffectiveSendPolicy(),
+        )
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `getEffectiveSendPolicy should source new fields from the earliest active SendControls policy`() {
+        mutableSendControlsFlagFlow.value = true
+        setUpSendPolicies(
+            sendControlsPolicies = listOf(
+                createMockSdkPolicy(
+                    organizationId = "mockId-1",
+                    enabled = true,
+                    type = PolicyType.SEND_CONTROLS,
+                    data = """
+                        {
+                            "whoCanAccess":2,
+                            "allowedDomains":"bitwarden.com",
+                            "deletionHours":24
+                        }
+                    """.trimIndent(),
+                ),
+            ),
+        )
+
+        assertEquals(
+            EffectiveSendPolicy(
+                allowedDomains = "bitwarden.com",
+                allowedSendTypes = null,
+                deletionHours = 24,
+                disableHideEmail = false,
+                disableSend = false,
+                whoCanAccess = SendAccessTypeJson.SPECIFIC_PEOPLE,
+            ),
+            policyManager.getEffectiveSendPolicy(),
+        )
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `getEffectiveSendPolicy should source new fields by revision date rather than list order`() {
+        mutableSendControlsFlagFlow.value = true
+        setUpSendPolicies(
+            sendControlsPolicies = listOf(
+                // Listed first, but revised later, so it should lose to the policy below.
+                createMockSdkPolicy(
+                    number = 2,
+                    organizationId = "mockId-2",
+                    enabled = true,
+                    type = PolicyType.SEND_CONTROLS,
+                    data = """{"allowedDomains":"later.example.com"}""",
+                    revisionDate = Instant.parse("2026-06-01T00:00:00Z"),
+                ),
+                createMockSdkPolicy(
+                    number = 1,
+                    organizationId = "mockId-1",
+                    enabled = true,
+                    type = PolicyType.SEND_CONTROLS,
+                    data = """{"allowedDomains":"earlier.example.com"}""",
+                    revisionDate = Instant.parse("2026-01-01T00:00:00Z"),
+                ),
+            ),
+        )
+
+        assertEquals(
+            "earlier.example.com",
+            policyManager.getEffectiveSendPolicy().allowedDomains,
+        )
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `getEffectiveSendPolicy should return safe defaults when no org has any Send-related policy`() {
+        mutableSendControlsFlagFlow.value = true
+        setUpSendPolicies()
+
+        assertEquals(
+            EffectiveSendPolicy(
+                allowedDomains = null,
+                allowedSendTypes = null,
+                deletionHours = null,
+                disableHideEmail = false,
+                disableSend = false,
+                whoCanAccess = null,
+            ),
+            policyManager.getEffectiveSendPolicy(),
+        )
+    }
+
+    @Test
+    fun `getEffectiveSendPolicyFlow should re-emit when the underlying policies change`() =
+        runTest {
+            val userStateJson = mockk<UserStateJson> {
+                every { activeUserId } returns USER_ID
+            }
+            val organizations = createMockOrganizationNetwork(
+                number = 1,
+                isEnabled = true,
+                shouldUsePolicies = true,
+            )
+            every {
+                authSdkSource.filterPolicies(
+                    policies = any(),
+                    organizations = any(),
+                    policyType = PolicyType.SEND_CONTROLS,
+                )
+            } returns emptyList<Policy>().asSuccess()
+            every {
+                authSdkSource.filterPolicies(
+                    policies = any(),
+                    organizations = any(),
+                    policyType = PolicyType.SEND_OPTIONS,
+                )
+            } returns emptyList<Policy>().asSuccess()
+            every {
+                authSdkSource.filterPolicies(
+                    policies = any(),
+                    organizations = any(),
+                    policyType = PolicyType.DISABLE_SEND,
+                )
+            } returnsMany listOf(
+                emptyList<Policy>().asSuccess(),
+                listOf(createMockSdkPolicy(organizationId = organizations.id, enabled = true))
+                    .asSuccess(),
+            )
+
+            mutableUserStateFlow.value = userStateJson
+            mutableOrganizationsFlow.value = listOf(organizations)
+            mutablePolicyFlow.value = listOf(
+                createMockPolicy(organizationId = organizations.id, isEnabled = true),
+            )
+
+            val expectedPolicy = EffectiveSendPolicy(
+                allowedDomains = null,
+                allowedSendTypes = null,
+                deletionHours = null,
+                disableHideEmail = false,
+                disableSend = false,
+                whoCanAccess = null,
+            )
+
+            policyManager
+                .getEffectiveSendPolicyFlow()
+                .test {
+                    assertEquals(expectedPolicy, awaitItem())
+
+                    mutablePolicyFlow.value = listOf(
+                        createMockPolicy(
+                            number = 2,
+                            organizationId = organizations.id,
+                            isEnabled = true,
+                        ),
+                    )
+
+                    assertEquals(expectedPolicy.copy(disableSend = true), awaitItem())
+                }
+        }
+
+    @Test
+    fun `getEffectiveSendPolicyFlow should re-emit when the SendControls feature flag changes`() =
+        runTest {
+            val userStateJson = mockk<UserStateJson> {
+                every { activeUserId } returns USER_ID
+            }
+            val organizations = createMockOrganizationNetwork(
+                number = 1,
+                isEnabled = true,
+                shouldUsePolicies = true,
+            )
+            every {
+                authSdkSource.filterPolicies(
+                    policies = any(),
+                    organizations = any(),
+                    policyType = PolicyType.SEND_CONTROLS,
+                )
+            } returns listOf(
+                createMockSdkPolicy(
+                    organizationId = organizations.id,
+                    enabled = true,
+                    type = PolicyType.SEND_CONTROLS,
+                    data = """{"disableSend":false}""",
+                ),
+            )
+                .asSuccess()
+            every {
+                authSdkSource.filterPolicies(
+                    policies = any(),
+                    organizations = any(),
+                    policyType = PolicyType.DISABLE_SEND,
+                )
+            } returns listOf(
+                createMockSdkPolicy(organizationId = organizations.id, enabled = true),
+            )
+                .asSuccess()
+            every {
+                authSdkSource.filterPolicies(
+                    policies = any(),
+                    organizations = any(),
+                    policyType = PolicyType.SEND_OPTIONS,
+                )
+            } returns emptyList<Policy>().asSuccess()
+
+            mutableUserStateFlow.value = userStateJson
+            mutableOrganizationsFlow.value = listOf(organizations)
+            mutablePolicyFlow.value = listOf(
+                createMockPolicy(organizationId = organizations.id, isEnabled = true),
+            )
+
+            val expectedPolicy = EffectiveSendPolicy(
+                allowedDomains = null,
+                allowedSendTypes = null,
+                deletionHours = null,
+                disableHideEmail = false,
+                disableSend = true,
+                whoCanAccess = null,
+            )
+
+            policyManager
+                .getEffectiveSendPolicyFlow()
+                .test {
+                    // Flag off, so the organization's legacy DisableSend policy applies.
+                    assertEquals(expectedPolicy, awaitItem())
+
+                    mutableSendControlsFlagFlow.value = true
+
+                    // Flag on, so the organization's SendControls policy supersedes its legacy one.
+                    assertEquals(expectedPolicy.copy(disableSend = false), awaitItem())
+                }
+        }
+
+    /**
+     * Sets up the mocks required for [PolicyManagerImpl.getEffectiveSendPolicy] /
+     * [PolicyManagerImpl.getEffectiveSendPolicyFlow] to return, per policy type, the given lists
+     * of already-decoded [Policy]s.
+     */
+    private fun setUpSendPolicies(
+        disableSendPolicies: List<Policy> = emptyList(),
+        sendControlsPolicies: List<Policy> = emptyList(),
+        sendOptionsPolicies: List<Policy> = emptyList(),
+    ) {
+        val userState: UserStateJson = mockk {
+            every { activeUserId } returns USER_ID
+        }
+        every { authDiskSource.userState } returns userState
+        every {
+            authDiskSource.getOrganizations(USER_ID)
+        } returns listOf(
+            createMockOrganizationNetwork(number = 1, isEnabled = true, shouldUsePolicies = true),
+        )
+        every {
+            authDiskSource.getPolicies(USER_ID)
+        } returns listOf(createMockPolicy(organizationId = "mockId-1", isEnabled = true))
+        every {
+            authSdkSource.filterPolicies(
+                policies = any(),
+                organizations = any(),
+                policyType = PolicyType.SEND_CONTROLS,
+            )
+        } returns sendControlsPolicies.asSuccess()
+        every {
+            authSdkSource.filterPolicies(
+                policies = any(),
+                organizations = any(),
+                policyType = PolicyType.DISABLE_SEND,
+            )
+        } returns disableSendPolicies.asSuccess()
+        every {
+            authSdkSource.filterPolicies(
+                policies = any(),
+                organizations = any(),
+                policyType = PolicyType.SEND_OPTIONS,
+            )
+        } returns sendOptionsPolicies.asSuccess()
+    }
+}
+
+private const val USER_ID = "userId"

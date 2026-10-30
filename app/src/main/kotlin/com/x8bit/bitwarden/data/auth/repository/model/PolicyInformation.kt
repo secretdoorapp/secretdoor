@@ -1,0 +1,228 @@
+package com.x8bit.bitwarden.data.auth.repository.model
+
+import com.bitwarden.network.model.SendAccessTypeJson
+import com.bitwarden.network.model.SendTypeJson
+import com.bitwarden.network.model.SyncResponseJson
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+/**
+ * The policy information decoded from the `data` parameter of the [SyncResponseJson.Policy] object.
+ */
+@Serializable
+sealed class PolicyInformation {
+    /**
+     * Represents a policy enforcing rules on the user's master password.
+     *
+     * @property minLength The minimum length of the password.
+     * @property minComplexity The minimum complexity of the password.
+     * @property requireUpper Whether the password requires upper case letters.
+     * @property requireLower Whether the password requires lower case letters.
+     * @property requireNumbers Whether the password requires numbers.
+     * @property requireSpecial Whether the password requires special characters.
+     * @property enforceOnLogin Whether the password should be enforced on login.
+     */
+    @Serializable
+    data class MasterPassword(
+        @SerialName("minLength")
+        val minLength: Int?,
+
+        @SerialName("minComplexity")
+        val minComplexity: Int?,
+
+        @SerialName("requireUpper")
+        val requireUpper: Boolean?,
+
+        @SerialName("requireLower")
+        val requireLower: Boolean?,
+
+        @SerialName("requireNumbers")
+        val requireNumbers: Boolean?,
+
+        @SerialName("requireSpecial")
+        val requireSpecial: Boolean?,
+
+        @SerialName("enforceOnLogin")
+        val enforceOnLogin: Boolean?,
+    ) : PolicyInformation()
+
+    /**
+     * Represents a policy enforcing rules on the password generator.
+     *
+     * @property overridePasswordType The default type of password to be generated.
+     * @property minLength The minimum length of the password.
+     * @property useUpper Whether the password requires upper case letters.
+     * @property useLower Whether the password requires lower case letters.
+     * @property useNumbers Whether the password requires numbers.
+     * @property useSpecial Whether the password requires special characters.
+     * @property minNumbers The minimum number of digits in the password.
+     * @property minSpecial The minimum number of special characters in the password.
+     * @property minNumberWords The minimum number of words in a passphrase.
+     * @property capitalize Whether to capitalize the first character of each word in a passphrase.
+     * @property includeNumber Whether to include a number at the end of a passphrase.
+     */
+    @Serializable
+    data class PasswordGenerator(
+        @SerialName("overridePasswordType")
+        val overridePasswordType: String?,
+
+        @SerialName("minLength")
+        val minLength: Int?,
+
+        @SerialName("useUpper")
+        val useUpper: Boolean?,
+
+        @SerialName("useLower")
+        val useLower: Boolean?,
+
+        @SerialName("useNumbers")
+        val useNumbers: Boolean?,
+
+        @SerialName("useSpecial")
+        val useSpecial: Boolean?,
+
+        @SerialName("minNumbers")
+        val minNumbers: Int?,
+
+        @SerialName("minSpecial")
+        val minSpecial: Int?,
+
+        @SerialName("minNumberWords")
+        val minNumberWords: Int?,
+
+        @SerialName("capitalize")
+        val capitalize: Boolean?,
+
+        @SerialName("includeNumber")
+        val includeNumber: Boolean?,
+    ) : PolicyInformation() {
+        @Suppress("UndocumentedPublicClass")
+        companion object {
+            const val TYPE_PASSWORD: String = "password"
+            const val TYPE_PASSPHRASE: String = "passphrase"
+        }
+    }
+
+    /**
+     * Represents a policy enforcing rules on the user's add & edit send options.
+     *
+     * @property shouldDisableHideEmail Indicates whether the user should have the ability to hide
+     * their email address from send recipients.
+     */
+    @Serializable
+    data class SendOptions(
+        @SerialName("disableHideEmail")
+        val shouldDisableHideEmail: Boolean?,
+    ) : PolicyInformation()
+
+    /**
+     * Represents a policy enforcing rules on the creation and sharing of Sends. Supersedes the
+     * disable-send policy and [SendOptions] when the `pm-31885-send-controls` feature flag is
+     * active.
+     *
+     * @property disableSend Whether the ability to create and edit Sends is disabled.
+     * @property disableHideEmail Whether the user should have the ability to hide their email
+     * address from Send recipients.
+     * @property whoCanAccess The access type Sends are restricted to, if any.
+     * @property allowedDomains A comma-separated list of email domains recipients must belong to
+     * when [whoCanAccess] is [SendAccessTypeJson.SPECIFIC_PEOPLE].
+     * @property deletionHours The number of hours until a Send is deleted, if enforced.
+     * @property allowedSendTypes The types of Sends that are allowed to be created, if
+     * restricted. Send types unknown to this client are dropped rather than failing the decode of
+     * the whole policy.
+     */
+    @Serializable
+    data class SendControls(
+        @SerialName("disableSend")
+        val disableSend: Boolean?,
+
+        @SerialName("disableHideEmail")
+        val disableHideEmail: Boolean?,
+
+        @SerialName("whoCanAccess")
+        val whoCanAccess: SendAccessTypeJson?,
+
+        @SerialName("allowedDomains")
+        val allowedDomains: String?,
+
+        @SerialName("deletionHours")
+        val deletionHours: Int?,
+
+        @Contextual
+        @SerialName("allowedSendTypes")
+        val allowedSendTypes: List<SendTypeJson>?,
+    ) : PolicyInformation()
+
+    /**
+     * Represents a policy enforcing rules on the user's vault timeout settings.
+     */
+    @Serializable
+    data class VaultTimeout(
+        @SerialName("minutes")
+        val minutes: Int?,
+
+        @SerialName("action")
+        val action: Action?,
+
+        @SerialName("type")
+        val type: Type?,
+    ) : PolicyInformation() {
+        /**
+         * The action to take when the vault timeout is reached.
+         */
+        @Serializable
+        enum class Action {
+            @SerialName("lock")
+            LOCK,
+
+            @SerialName("logOut")
+            LOGOUT,
+        }
+
+        /**
+         * The type of vault timeout.
+         */
+        @Serializable
+        enum class Type {
+            @SerialName("never")
+            NEVER,
+
+            @SerialName("onAppRestart")
+            ON_APP_RESTART,
+
+            @SerialName("onSystemLock")
+            ON_SYSTEM_LOCK,
+
+            @SerialName("immediately")
+            IMMEDIATELY,
+
+            @SerialName("custom")
+            CUSTOM,
+        }
+    }
+
+    /**
+     * Represents a policy to display a user notification banner on the main vault screen.
+     *
+     * @property headerText The text to be displayed on the banner header.
+     * @property descriptionText The text to be displayed on the banner description.
+     * @property buttonText The text to be displayed in the banner button.
+     * @property showAfterEveryLogin Indicates if the dismissed status of the banner should persist
+     * after a soft-logout. When `true` the dismissal is not persisted, otherwise, it is persisted.
+     */
+    @Serializable
+    data class OrganizationUserNotification(
+        @SerialName("header")
+        val headerText: String?,
+
+        @SerialName("description")
+        val descriptionText: String,
+
+        @SerialName("buttonText")
+        val buttonText: String?,
+
+        @SerialName("showAfterEveryLogin")
+        val showAfterEveryLogin: Boolean,
+    ) : PolicyInformation()
+}
