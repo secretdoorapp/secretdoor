@@ -8,19 +8,16 @@ import androidx.lifecycle.viewModelScope
 import com.bitwarden.core.data.repository.model.DataState
 import com.bitwarden.cxf.manager.model.ExportCredentialsResult
 import com.bitwarden.cxf.model.ImportCredentialsRequestData
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.Text
 import com.bitwarden.ui.util.asText
-import com.bitwarden.vault.CipherListView
 import com.bitwarden.vault.CipherListViewType
 import com.bitwarden.vault.DecryptCipherListResult
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.autofill.util.card
 import com.x8bit.bitwarden.data.autofill.util.isActiveWithCopyablePassword
 import com.x8bit.bitwarden.data.autofill.util.isActiveWithFido2Credentials
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.util.toImportCredentialsRequestDataOrNull
 import com.x8bit.bitwarden.data.platform.util.isActive
@@ -47,7 +44,6 @@ import javax.inject.Inject
 class ReviewExportViewModel @Inject constructor(
     private val vaultRepository: VaultRepository,
     private val authRepository: AuthRepository,
-    private val policyManager: PolicyManager,
     specialCircumstanceManager: SpecialCircumstanceManager,
 ) : BaseViewModel<ReviewExportState, ReviewExportEvent, ReviewExportAction>(
     initialState = ReviewExportState(
@@ -96,7 +92,7 @@ class ReviewExportViewModel @Inject constructor(
                                 .data
                                 ?.successes
                                 ?.filter { it.isActive }
-                                .filterRestrictedItemsIfNecessary(),
+                                .orEmpty(),
                         )
                         .fold(
                             onSuccess = { payload ->
@@ -211,26 +207,6 @@ class ReviewExportViewModel @Inject constructor(
                     message = message,
                 ),
             )
-        }
-    }
-
-    private fun List<CipherListView>?.filterRestrictedItemsIfNecessary(): List<CipherListView> {
-        this ?: return emptyList()
-        val activeUserOrgIds = authRepository.userStateFlow
-            .value
-            ?.activeAccount
-            ?.organizations
-            ?.map { it.id }
-            ?: return this
-        val itemRestrictedOrgIds = policyManager
-            .getActivePolicies(PolicyType.RESTRICTED_ITEM_TYPES)
-            .filter { it.enabled }
-            .map { it.organizationId }
-
-        return if (activeUserOrgIds.any { itemRestrictedOrgIds.contains(it) }) {
-            this.filter { it.card == null }
-        } else {
-            this
         }
     }
 

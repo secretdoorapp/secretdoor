@@ -391,7 +391,6 @@ private val DEFAULT_ACCOUNT_SELECTION_LIST_ITEM = AccountSelectionListItem(
     userId = DEFAULT_USER_ID,
     email = DEFAULT_USER_STATE.activeAccount.email,
     avatarColorHex = DEFAULT_USER_STATE.activeAccount.avatarColorHex,
-    isItemRestricted = false,
     initials = DEFAULT_USER_STATE.activeAccount.initials,
 )
 private val DEFAULT_CONTENT_VIEW_STATE = VerifyPasswordState.ViewState.Content(

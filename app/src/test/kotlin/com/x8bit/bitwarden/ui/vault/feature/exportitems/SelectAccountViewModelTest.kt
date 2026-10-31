@@ -1,11 +1,8 @@
 package com.x8bit.bitwarden.ui.vault.feature.exportitems
 
 import app.cash.turbine.test
-import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
 import com.bitwarden.cxf.model.ImportCredentialsRequestData
 import com.bitwarden.data.repository.model.Environment
-import com.bitwarden.policies.Policy
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.asText
@@ -13,17 +10,14 @@ import com.x8bit.bitwarden.data.auth.datasource.disk.model.OnboardingStatus
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.UserState
 import com.x8bit.bitwarden.data.auth.repository.model.createMockOrganization
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkPolicy
 import com.x8bit.bitwarden.ui.vault.feature.exportitems.model.AccountSelectionListItem
 import com.x8bit.bitwarden.ui.vault.feature.exportitems.selectaccount.SelectAccountAction
 import com.x8bit.bitwarden.ui.vault.feature.exportitems.selectaccount.SelectAccountEvent
 import com.x8bit.bitwarden.ui.vault.feature.exportitems.selectaccount.SelectAccountState
 import com.x8bit.bitwarden.ui.vault.feature.exportitems.selectaccount.SelectAccountViewModel
-import io.mockk.Ordering
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -36,19 +30,9 @@ import org.junit.jupiter.api.Test
 class SelectAccountViewModelTest : BaseViewModelTest() {
 
     private val mutableUserUserStateFlow = MutableStateFlow(DEFAULT_USER_STATE)
-    private val mutableRestrictItemTypesFlow = bufferedMutableSharedFlow<List<Policy>>()
-    private val mutablePersonalOwnershipPolicyFlow = bufferedMutableSharedFlow<List<Policy>>()
 
     private val authRepository = mockk<AuthRepository> {
         every { userStateFlow } returns mutableUserUserStateFlow
-    }
-    private val policyManager = mockk<PolicyManager> {
-        every {
-            getActivePoliciesFlow(PolicyType.RESTRICTED_ITEM_TYPES)
-        } returns mutableRestrictItemTypesFlow
-        every {
-            getActivePoliciesFlow(PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-        } returns mutablePersonalOwnershipPolicyFlow
     }
     private val specialCircumstanceManager = mockk<SpecialCircumstanceManager> {
         every { specialCircumstance } returns SpecialCircumstance.CredentialExchangeExport(
@@ -82,8 +66,6 @@ class SelectAccountViewModelTest : BaseViewModelTest() {
 
                 verify(exactly = 0) {
                     authRepository.userStateFlow
-                    policyManager.getActivePoliciesFlow(PolicyType.RESTRICTED_ITEM_TYPES)
-                    policyManager.getActivePoliciesFlow(PolicyType.ORGANIZATION_DATA_OWNERSHIP)
                 }
             }
         }
@@ -121,10 +103,7 @@ class SelectAccountViewModelTest : BaseViewModelTest() {
                 ),
             )
 
-            verify(Ordering.ORDERED) {
-                authRepository.userStateFlow
-                policyManager.getActivePoliciesFlow(PolicyType.RESTRICTED_ITEM_TYPES)
-            }
+            verify { authRepository.userStateFlow }
         }
 
     @Test
@@ -135,13 +114,11 @@ class SelectAccountViewModelTest : BaseViewModelTest() {
             email = DEFAULT_ACCOUNT.email,
             initials = "AU",
             avatarColorHex = "#FF00FF00",
-            isItemRestricted = false,
         )
 
         viewModel.trySendAction(
             SelectAccountAction.Internal.SelectionDataReceive(
                 userState = DEFAULT_USER_STATE,
-                itemRestrictedOrgs = emptyList(),
             ),
         )
 
@@ -157,7 +134,7 @@ class SelectAccountViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `accounts in organization with PERSONAL_VAULT policy are filtered out`() = runTest {
+    fun `accounts that are not exportable are filtered out`() = runTest {
         val viewModel = createViewModel()
         val organizationId = "mockOrganizationId-1"
         val accountInOrg = DEFAULT_ACCOUNT.copy(
@@ -176,7 +153,6 @@ class SelectAccountViewModelTest : BaseViewModelTest() {
         viewModel.trySendAction(
             SelectAccountAction.Internal.SelectionDataReceive(
                 userState = DEFAULT_USER_STATE.copy(accounts = listOf(accountInOrg)),
-                itemRestrictedOrgs = emptyList(),
             ),
         )
         assertEquals(
@@ -187,51 +163,6 @@ class SelectAccountViewModelTest : BaseViewModelTest() {
             viewModel.stateFlow.value,
         )
     }
-
-    @Test
-    fun `accounts in organization with RESTRICT_ITEM_TYPE policy are marked as restricted`() =
-        runTest {
-            val viewModel = createViewModel()
-            val organizationId = "mockOrganizationId-1"
-            val accountInOrg = DEFAULT_ACCOUNT.copy(
-                organizations = listOf(
-                    createMockOrganization(
-                        number = 1,
-                        id = organizationId,
-                        name = "organizationName",
-                        keyConnectorUrl = null,
-                    ),
-                ),
-            )
-            val expectedItem = AccountSelectionListItem(
-                userId = accountInOrg.userId,
-                email = accountInOrg.email,
-                initials = "AU",
-                avatarColorHex = "#FF00FF00",
-                isItemRestricted = true,
-            )
-
-            viewModel.trySendAction(
-                SelectAccountAction.Internal.SelectionDataReceive(
-                    userState = DEFAULT_USER_STATE.copy(accounts = listOf(accountInOrg)),
-                    itemRestrictedOrgs = listOf(
-                        createMockSdkPolicy(
-                            id = organizationId,
-                            enabled = true,
-                        ),
-                    ),
-                ),
-            )
-            assertEquals(
-                SelectAccountState(
-                    importRequest = DEFAULT_IMPORT_REQUEST,
-                    viewState = SelectAccountState.ViewState.Content(
-                        accountSelectionListItems = persistentListOf(expectedItem),
-                    ),
-                ),
-                viewModel.stateFlow.value,
-            )
-        }
 
     @Test
     fun `when CloseClick action is sent, CancelExport event is emitted`() = runTest {
@@ -268,7 +199,6 @@ class SelectAccountViewModelTest : BaseViewModelTest() {
 
     private fun createViewModel(): SelectAccountViewModel = SelectAccountViewModel(
         authRepository = authRepository,
-        policyManager = policyManager,
         specialCircumstanceManager = specialCircumstanceManager,
     )
 }

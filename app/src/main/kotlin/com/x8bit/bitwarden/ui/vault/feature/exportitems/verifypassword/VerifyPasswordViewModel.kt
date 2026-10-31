@@ -4,7 +4,6 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.bitwarden.cxf.model.ImportCredentialsRequestData
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BackgroundEvent
 import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarData
@@ -16,7 +15,6 @@ import com.x8bit.bitwarden.data.auth.repository.model.RequestOtpResult
 import com.x8bit.bitwarden.data.auth.repository.model.SwitchAccountResult
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.VerifyOtpResult
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.util.toImportCredentialsRequestDataOrNull
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
@@ -47,7 +45,6 @@ private const val KEY_STATE = "state"
 class VerifyPasswordViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val vaultRepository: VaultRepository,
-    private val policyManager: PolicyManager,
     specialCircumstanceManager: SpecialCircumstanceManager,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel<VerifyPasswordState, VerifyPasswordEvent, VerifyPasswordAction>(
@@ -66,11 +63,6 @@ class VerifyPasswordViewModel @Inject constructor(
                 ?.firstOrNull { it.userId == args.userId }
                 ?: throw IllegalStateException("Account not found")
 
-            val restrictedItemPolicyOrgIds = policyManager
-                .getActivePolicies(PolicyType.RESTRICTED_ITEM_TYPES)
-                .filter { it.enabled }
-                .map { it.organizationId }
-
             VerifyPasswordState(
                 importRequest = importRequest,
                 viewState = VerifyPasswordState.ViewState.Loading,
@@ -80,9 +72,6 @@ class VerifyPasswordViewModel @Inject constructor(
                     avatarColorHex = account.avatarColorHex,
                     email = account.email,
                     initials = account.initials,
-                    isItemRestricted = account
-                        .organizations
-                        .any { it.id in restrictedItemPolicyOrgIds },
                 ),
                 hasMasterPassword = account.hasMasterPassword,
                 hasOtherAccounts = args.hasOtherAccounts,

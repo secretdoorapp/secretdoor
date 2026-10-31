@@ -7,7 +7,6 @@ import app.cash.turbine.test
 import com.bitwarden.cxf.model.ImportCredentialsRequestData
 import com.bitwarden.data.repository.model.Environment
 import com.bitwarden.network.model.OrganizationType
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.asText
@@ -19,11 +18,9 @@ import com.x8bit.bitwarden.data.auth.repository.model.UserState
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.VerifyOtpResult
 import com.x8bit.bitwarden.data.auth.repository.model.createMockOrganization
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkPolicy
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.VaultUnlockResult
 import com.x8bit.bitwarden.ui.vault.feature.exportitems.model.AccountSelectionListItem
@@ -58,14 +55,6 @@ class VerifyPasswordViewModelTest : BaseViewModelTest() {
         coEvery {
             unlockVaultWithMasterPassword(masterPassword = any())
         } returns VaultUnlockResult.Success
-    }
-    private val policyManager = mockk<PolicyManager> {
-        every { getActivePolicies(PolicyType.RESTRICTED_ITEM_TYPES) } returns listOf(
-            createMockSdkPolicy(
-                organizationId = DEFAULT_ORGANIZATION_ID,
-                enabled = false,
-            ),
-        )
     }
     private val specialCircumstanceManager = mockk<SpecialCircumstanceManager> {
         every {
@@ -129,29 +118,6 @@ class VerifyPasswordViewModelTest : BaseViewModelTest() {
                         it.stateFlow.value,
                     )
                     coVerify(exactly = 0) { authRepository.requestOneTimePasscode() }
-                }
-        }
-
-        @Test
-        fun `initial state should be correct when account has item restrictions`() = runTest {
-            every {
-                policyManager.getActivePolicies(PolicyType.RESTRICTED_ITEM_TYPES)
-            } returns listOf(
-                createMockSdkPolicy(
-                    organizationId = DEFAULT_ORGANIZATION_ID,
-                    enabled = true,
-                ),
-            )
-
-            createViewModel()
-                .also {
-                    assertEquals(
-                        DEFAULT_LOADING_STATE.copy(
-                            accountSummaryListItem = DEFAULT_ACCOUNT_SELECTION_LIST_ITEM
-                                .copy(isItemRestricted = true),
-                        ),
-                        it.stateFlow.value,
-                    )
                 }
         }
 
@@ -925,7 +891,6 @@ class VerifyPasswordViewModelTest : BaseViewModelTest() {
     ): VerifyPasswordViewModel = VerifyPasswordViewModel(
         authRepository = authRepository,
         vaultRepository = vaultRepository,
-        policyManager = policyManager,
         specialCircumstanceManager = specialCircumstanceManager,
         savedStateHandle = SavedStateHandle().apply {
             set("state", state)
@@ -1017,7 +982,6 @@ private val DEFAULT_ACCOUNT_SELECTION_LIST_ITEM = AccountSelectionListItem(
     userId = DEFAULT_USER_ID,
     email = DEFAULT_USER_STATE.activeAccount.email,
     avatarColorHex = DEFAULT_USER_STATE.activeAccount.avatarColorHex,
-    isItemRestricted = false,
     initials = DEFAULT_USER_STATE.activeAccount.initials,
 )
 private val DEFAULT_CONTENT_VIEW_STATE = VerifyPasswordState.ViewState.Content(

@@ -3,8 +3,6 @@ package com.x8bit.bitwarden.ui.vault.feature.exportitems.selectaccount
 import android.os.Parcelable
 import androidx.lifecycle.viewModelScope
 import com.bitwarden.cxf.model.ImportCredentialsRequestData
-import com.bitwarden.policies.Policy
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BackgroundEvent
 import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.resource.BitwardenString
@@ -12,7 +10,6 @@ import com.bitwarden.ui.util.Text
 import com.bitwarden.ui.util.asText
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.UserState
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.util.toImportCredentialsRequestDataOrNull
 import com.x8bit.bitwarden.ui.vault.feature.exportitems.model.AccountSelectionListItem
@@ -20,8 +17,8 @@ import com.x8bit.bitwarden.ui.vault.feature.vault.util.initials
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.parcelize.Parcelize
@@ -33,7 +30,6 @@ import javax.inject.Inject
 @HiltViewModel
 class SelectAccountViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val policyManager: PolicyManager,
     specialCircumstanceManager: SpecialCircumstanceManager,
 ) : BaseViewModel<SelectAccountState, SelectAccountEvent, SelectAccountAction>(
     initialState = run {
@@ -119,10 +115,6 @@ class SelectAccountViewModel @Inject constructor(
     private fun handleSelectionDataReceive(
         action: SelectAccountAction.Internal.SelectionDataReceive,
     ) {
-        val itemRestrictedOrgIds = action.itemRestrictedOrgs
-            .filter { it.enabled }
-            .map { it.organizationId }
-
         val accountSelectionListItems = action.userState
             ?.accounts
             .orEmpty()
@@ -137,10 +129,6 @@ class SelectAccountViewModel @Inject constructor(
                     email = account.email,
                     initials = account.initials,
                     avatarColorHex = account.avatarColorHex,
-                    // Indicate which accounts have item restrictions applied.
-                    isItemRestricted = account
-                        .organizations
-                        .any { org -> org.id in itemRestrictedOrgIds },
                 )
             }
             .toImmutableList()
@@ -159,15 +147,11 @@ class SelectAccountViewModel @Inject constructor(
     }
 
     private fun observeSelectionData() {
-        combine(
-            authRepository.userStateFlow,
-            policyManager.getActivePoliciesFlow(PolicyType.RESTRICTED_ITEM_TYPES),
-        ) { userState, itemRestrictedOrgs ->
-            SelectAccountAction.Internal.SelectionDataReceive(
-                userState = userState,
-                itemRestrictedOrgs = itemRestrictedOrgs,
-            )
-        }
+        authRepository
+            .userStateFlow
+            .map { userState ->
+                SelectAccountAction.Internal.SelectionDataReceive(userState = userState)
+            }
             .onEach(::handleAction)
             .launchIn(viewModelScope)
     }
@@ -250,7 +234,6 @@ sealed class SelectAccountAction {
          */
         data class SelectionDataReceive(
             val userState: UserState?,
-            val itemRestrictedOrgs: List<Policy>,
         ) : Internal()
     }
 }

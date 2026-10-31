@@ -8,7 +8,6 @@ import com.bitwarden.cxf.manager.model.ExportCredentialsResult
 import com.bitwarden.cxf.model.ImportCredentialsRequestData
 import com.bitwarden.data.repository.model.Environment
 import com.bitwarden.network.model.OrganizationType
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.asText
@@ -18,14 +17,12 @@ import com.x8bit.bitwarden.data.auth.datasource.disk.model.OnboardingStatus
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.UserState
 import com.x8bit.bitwarden.data.auth.repository.model.createMockOrganization
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockCardListView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockCipherListView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockDecryptCipherListResult
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkPolicy
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import io.mockk.awaits
 import io.mockk.coEvery
@@ -57,9 +54,6 @@ class ReviewExportViewModelTest : BaseViewModelTest() {
         } returns SpecialCircumstance.CredentialExchangeExport(
             data = DEFAULT_REQUEST_DATA,
         )
-    }
-    private val policyManager = mockk<PolicyManager> {
-        every { getActivePolicies(PolicyType.RESTRICTED_ITEM_TYPES) } returns emptyList()
     }
 
     @Nested
@@ -171,42 +165,6 @@ class ReviewExportViewModelTest : BaseViewModelTest() {
                             mockActiveCardCipherListView,
                         ),
                     )
-                }
-            }
-
-        @Suppress("MaxLineLength")
-        @Test
-        fun `ImportItemsClick shows loading, and calls exportVaultDataToCxf without restricted items if there are item restrictions`() =
-            runTest {
-                val mockCipherListView = createMockCipherListView(
-                    number = 1,
-                    type = CipherListViewType.Card(
-                        createMockCardListView(number = 1),
-                    ),
-                )
-                every {
-                    policyManager.getActivePolicies(PolicyType.RESTRICTED_ITEM_TYPES)
-                } returns listOf(
-                    createMockSdkPolicy(
-                        type = PolicyType.RESTRICTED_ITEM_TYPES,
-                        enabled = true,
-                    ),
-                )
-                coEvery { vaultRepository.exportVaultDataToCxf(any()) } just awaits
-                decryptCipherListResultFlow.tryEmit(
-                    DataState.Loaded(
-                        createMockDecryptCipherListResult(
-                            number = 1,
-                            successes = listOf(mockCipherListView),
-                        ),
-                    ),
-                )
-
-                val viewModel = createViewModel()
-                viewModel.trySendAction(ReviewExportAction.ImportItemsClick)
-
-                coVerify {
-                    vaultRepository.exportVaultDataToCxf(ciphers = emptyList())
                 }
             }
 
@@ -412,7 +370,6 @@ class ReviewExportViewModelTest : BaseViewModelTest() {
         authRepository = authRepository,
         vaultRepository = vaultRepository,
         specialCircumstanceManager = specialCircumstanceManager,
-        policyManager = policyManager,
     )
 }
 
