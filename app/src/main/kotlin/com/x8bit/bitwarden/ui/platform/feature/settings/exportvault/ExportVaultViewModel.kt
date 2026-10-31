@@ -6,7 +6,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.bitwarden.core.data.util.toFormattedPattern
 import com.bitwarden.data.manager.file.FileManager
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarData
 import com.bitwarden.ui.platform.resource.BitwardenString
@@ -19,10 +18,8 @@ import com.x8bit.bitwarden.data.auth.repository.model.PasswordStrengthResult
 import com.x8bit.bitwarden.data.auth.repository.model.RequestOtpResult
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.VerifyOtpResult
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
 import com.x8bit.bitwarden.data.platform.manager.model.OrganizationEvent
-import com.x8bit.bitwarden.data.platform.manager.util.hasRestrictItemTypes
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.ExportVaultDataResult
 import com.x8bit.bitwarden.ui.auth.feature.completeregistration.PasswordStrengthState
@@ -49,7 +46,6 @@ private const val KEY_STATE = "state"
 @HiltViewModel
 class ExportVaultViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val policyManager: PolicyManager,
     savedStateHandle: SavedStateHandle,
     private val vaultRepository: VaultRepository,
     private val fileManager: FileManager,
@@ -65,9 +61,6 @@ class ExportVaultViewModel @Inject constructor(
             filePasswordInput = "",
             passwordInput = "",
             passwordStrengthState = PasswordStrengthState.NONE,
-            policyPreventsExport = policyManager
-                .getActivePolicies(type = PolicyType.DISABLE_PERSONAL_VAULT_EXPORT)
-                .any(),
             showSendCodeButton = authRepository
                 .userStateFlow
                 .value
@@ -464,13 +457,7 @@ class ExportVaultViewModel @Inject constructor(
         }
     }
 
-    private fun getRestrictedItemTypes(): List<CipherType> {
-        return if (!policyManager.hasRestrictItemTypes()) {
-            emptyList()
-        } else {
-            listOf(CipherType.CARD)
-        }
-    }
+    private fun getRestrictedItemTypes(): List<CipherType> = emptyList()
 }
 
 /**
@@ -486,7 +473,6 @@ data class ExportVaultState(
     val filePasswordInput: String,
     val passwordInput: String,
     val passwordStrengthState: PasswordStrengthState,
-    val policyPreventsExport: Boolean,
     val showSendCodeButton: Boolean,
 ) : Parcelable {
     /**

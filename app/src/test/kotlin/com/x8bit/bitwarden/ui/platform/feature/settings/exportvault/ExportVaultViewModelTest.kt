@@ -6,7 +6,6 @@ import app.cash.turbine.test
 import com.bitwarden.data.manager.file.FileManager
 import com.bitwarden.data.repository.model.Environment
 import com.bitwarden.exporters.ExportFormat
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.asText
@@ -19,11 +18,9 @@ import com.x8bit.bitwarden.data.auth.repository.model.RequestOtpResult
 import com.x8bit.bitwarden.data.auth.repository.model.UserState
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.VerifyOtpResult
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
 import com.x8bit.bitwarden.data.platform.manager.model.OrganizationEvent
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkPolicy
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.ExportVaultDataResult
 import com.x8bit.bitwarden.ui.auth.feature.completeregistration.PasswordStrengthState
@@ -50,14 +47,6 @@ class ExportVaultViewModelTest : BaseViewModelTest() {
         every { userStateFlow } returns mutableUserStateFlow
     }
 
-    private val policyManager: PolicyManager = mockk {
-        every {
-            getActivePolicies(type = PolicyType.DISABLE_PERSONAL_VAULT_EXPORT)
-        } returns emptyList()
-        every {
-            getActivePolicies(type = PolicyType.RESTRICTED_ITEM_TYPES)
-        } returns emptyList()
-    }
 
     private val clock: Clock = Clock.fixed(
         Instant.parse("2023-10-27T12:00:00Z"),
@@ -85,16 +74,10 @@ class ExportVaultViewModelTest : BaseViewModelTest() {
 
     @Test
     fun `initial state should be correct`() = runTest {
-        every {
-            policyManager.getActivePolicies(type = PolicyType.DISABLE_PERSONAL_VAULT_EXPORT)
-        } returns listOf(createMockSdkPolicy())
-
         val viewModel = createViewModel()
         viewModel.stateFlow.test {
             assertEquals(
-                DEFAULT_STATE.copy(
-                    policyPreventsExport = true,
-                ),
+                DEFAULT_STATE,
                 awaitItem(),
             )
         }
@@ -129,32 +112,6 @@ class ExportVaultViewModelTest : BaseViewModelTest() {
 
         coVerify {
             vaultRepository.exportVaultDataToString(any(), emptyList())
-        }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `ConfirmExportVaultClicked correct password should call exportVaultDataToString with restricted item types when policy`() {
-        val password = "password"
-        coEvery {
-            authRepository.validatePassword(
-                password = password,
-            )
-        } returns ValidatePasswordResult.Success(isValid = true)
-        every {
-            policyManager.getActivePolicies(type = PolicyType.RESTRICTED_ITEM_TYPES)
-        } returns listOf(createMockSdkPolicy(enabled = true))
-
-        val viewModel = createViewModel()
-        viewModel.trySendAction(ExportVaultAction.PasswordInputChanged(password))
-
-        viewModel.trySendAction(ExportVaultAction.ConfirmExportVaultClicked)
-
-        coVerify {
-            vaultRepository.exportVaultDataToString(
-                format = any(),
-                restrictedTypes = listOf(CipherType.CARD),
-            )
         }
     }
 
@@ -823,7 +780,6 @@ class ExportVaultViewModelTest : BaseViewModelTest() {
         initialState: ExportVaultState? = null,
     ): ExportVaultViewModel = ExportVaultViewModel(
         authRepository = authRepository,
-        policyManager = policyManager,
         savedStateHandle = SavedStateHandle(
             initialState = mapOf("state" to initialState),
         ),
@@ -870,6 +826,5 @@ private val DEFAULT_STATE = ExportVaultState(
     passwordInput = "",
     exportData = null,
     passwordStrengthState = PasswordStrengthState.NONE,
-    policyPreventsExport = false,
     showSendCodeButton = false,
 )

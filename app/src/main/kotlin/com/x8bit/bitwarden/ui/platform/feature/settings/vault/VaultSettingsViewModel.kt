@@ -2,13 +2,11 @@ package com.x8bit.bitwarden.ui.platform.feature.settings.vault
 
 import androidx.lifecycle.viewModelScope
 import com.bitwarden.core.data.manager.BuildInfoManager
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BackgroundEvent
 import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarData
 import com.bitwarden.ui.platform.manager.snackbar.SnackbarRelayManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.ui.platform.model.SnackbarRelay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -26,7 +24,6 @@ class VaultSettingsViewModel @Inject constructor(
     snackbarRelayManager: SnackbarRelayManager<SnackbarRelay>,
     private val buildInfoManager: BuildInfoManager,
     private val firstTimeActionManager: FirstTimeActionManager,
-    private val policyManager: PolicyManager,
 ) : BaseViewModel<VaultSettingsState, VaultSettingsEvent, VaultSettingsAction>(
     initialState = run {
         val firstTimeState = firstTimeActionManager.currentOrDefaultUserFirstTimeState
@@ -53,15 +50,11 @@ class VaultSettingsViewModel @Inject constructor(
             .onEach(::sendAction)
             .launchIn(viewModelScope)
 
-        policyManager
-            .getActivePoliciesFlow(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-            .map { policies ->
-                VaultSettingsAction.Internal.CredentialExchangeAvailabilityChanged(
-                    isEnabled = !buildInfoManager.isFdroid && policies.isEmpty(),
-                )
-            }
-            .onEach(::sendAction)
-            .launchIn(viewModelScope)
+        trySendAction(
+            VaultSettingsAction.Internal.CredentialExchangeAvailabilityChanged(
+                isEnabled = !buildInfoManager.isFdroid,
+            ),
+        )
     }
 
     override fun handleAction(action: VaultSettingsAction): Unit = when (action) {
@@ -133,9 +126,7 @@ class VaultSettingsViewModel @Inject constructor(
     }
 
     private fun handleImportItemsClicked() {
-        if (!buildInfoManager.isFdroid &&
-            policyManager.getActivePolicies(PolicyType.ORGANIZATION_DATA_OWNERSHIP).isEmpty()
-        ) {
+        if (!buildInfoManager.isFdroid) {
             sendEvent(VaultSettingsEvent.NavigateToImportItems)
         } else {
             sendEvent(VaultSettingsEvent.NavigateToImportVault)

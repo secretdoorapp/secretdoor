@@ -159,19 +159,6 @@ class ExportVaultScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `policy text should update according to state`() {
-        val text =
-            "One or more organization policies prevents your from exporting your individual vault."
-        composeTestRule.onNodeWithText(text).assertDoesNotExist()
-
-        mutableStateFlow.update {
-            it.copy(policyPreventsExport = true)
-        }
-
-        composeTestRule.onNodeWithText(text).assertIsDisplayed()
-    }
-
-    @Test
     fun `file format selection button should send ExportFormatOptionSelect action`() {
         // Open the menu.
         composeTestRule
@@ -318,6 +305,5 @@ private val DEFAULT_STATE = ExportVaultState(
     passwordInput = "",
     exportData = "",
     passwordStrengthState = PasswordStrengthState.NONE,
-    policyPreventsExport = false,
     showSendCodeButton = false,
 )

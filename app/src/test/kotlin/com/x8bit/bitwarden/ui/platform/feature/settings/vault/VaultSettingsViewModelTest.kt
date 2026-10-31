@@ -3,14 +3,11 @@ package com.x8bit.bitwarden.ui.platform.feature.settings.vault
 import app.cash.turbine.test
 import com.bitwarden.core.data.manager.BuildInfoManager
 import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
-import com.bitwarden.policies.Policy
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarData
 import com.bitwarden.ui.platform.manager.snackbar.SnackbarRelayManager
 import com.bitwarden.ui.util.asText
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
 import com.x8bit.bitwarden.ui.platform.model.SnackbarRelay
 import io.mockk.every
@@ -36,11 +33,6 @@ class VaultSettingsViewModelTest : BaseViewModelTest() {
         every { firstTimeStateFlow } returns mutableFirstTimeStateFlow
         every { storeShowImportLoginsSettingsBadge(any()) } just runs
     }
-    private val mutablePoliciesFlow = bufferedMutableSharedFlow<List<Policy>>()
-    private val policyManager = mockk<PolicyManager> {
-        every { getActivePolicies(any()) } returns emptyList()
-        every { getActivePoliciesFlow(any()) } returns mutablePoliciesFlow
-    }
 
     private val mutableSnackbarSharedFlow = bufferedMutableSharedFlow<BitwardenSnackbarData>()
     private val snackbarRelayManager = mockk<SnackbarRelayManager<SnackbarRelay>> {
@@ -65,22 +57,6 @@ class VaultSettingsViewModelTest : BaseViewModelTest() {
             viewModel.trySendAction(VaultSettingsAction.ExportVaultClick)
             assertEquals(
                 VaultSettingsEvent.NavigateToExportVault,
-                awaitItem(),
-            )
-        }
-    }
-
-    @Test
-    fun `ImportItemsClick should emit NavigateToImportVault when policy is not empty`() = runTest {
-        every {
-            policyManager.getActivePolicies(PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-        } returns listOf(mockk())
-
-        val viewModel = createViewModel()
-        viewModel.eventFlow.test {
-            viewModel.trySendAction(VaultSettingsAction.ImportItemsClick)
-            assertEquals(
-                VaultSettingsEvent.NavigateToImportVault,
                 awaitItem(),
             )
         }
@@ -157,42 +133,6 @@ class VaultSettingsViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `showImportItemsChevron should display based on policies`() = runTest {
-        val viewModel = createViewModel()
-        viewModel.stateFlow.test {
-            // Verify chevron is shown when there are no policies (default state)
-            assertEquals(
-                VaultSettingsState(showImportActionCard = true, showImportItemsChevron = true),
-                awaitItem(),
-            )
-
-            // Verify chevron is hidden when policies exist
-            mutablePoliciesFlow.tryEmit(listOf(mockk()))
-            assertEquals(
-                VaultSettingsState(showImportActionCard = true, showImportItemsChevron = false),
-                awaitItem(),
-            )
-
-            // Verify chevron is hidden when there are no policies
-            mutablePoliciesFlow.tryEmit(emptyList())
-            assertEquals(
-                VaultSettingsState(showImportActionCard = true, showImportItemsChevron = true),
-                awaitItem(),
-            )
-        }
-    }
-
-    @Test
-    fun `showImportItemsChevron should be false when policy exists`() {
-        val viewModel = createViewModel()
-        mutablePoliciesFlow.tryEmit(listOf(mockk()))
-        assertEquals(
-            VaultSettingsState(showImportActionCard = true, showImportItemsChevron = false),
-            viewModel.stateFlow.value,
-        )
-    }
-
-    @Test
     fun `showImportItemsChevron should be false when isFdroid is true`() {
         every { buildInfoManager.isFdroid } returns true
         val viewModel = createViewModel()
@@ -223,7 +163,6 @@ class VaultSettingsViewModelTest : BaseViewModelTest() {
         buildInfoManager = buildInfoManager,
         firstTimeActionManager = firstTimeActionManager,
         snackbarRelayManager = snackbarRelayManager,
-        policyManager = policyManager,
     )
 }
 

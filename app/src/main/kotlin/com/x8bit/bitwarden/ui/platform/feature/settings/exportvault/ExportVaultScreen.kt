@@ -33,7 +33,6 @@ import com.bitwarden.ui.platform.base.util.EventsEffect
 import com.bitwarden.ui.platform.base.util.standardHorizontalMargin
 import com.bitwarden.ui.platform.components.appbar.BitwardenTopAppBar
 import com.bitwarden.ui.platform.components.button.BitwardenOutlinedButton
-import com.bitwarden.ui.platform.components.card.BitwardenInfoCalloutCard
 import com.bitwarden.ui.platform.components.dialog.BitwardenBasicDialog
 import com.bitwarden.ui.platform.components.dialog.BitwardenLoadingDialog
 import com.bitwarden.ui.platform.components.dialog.BitwardenTwoButtonDialog
@@ -190,20 +189,6 @@ private fun ExportVaultScreenContent(
             .verticalScroll(rememberScrollState()),
     ) {
         Spacer(modifier = Modifier.height(height = 12.dp))
-        if (state.policyPreventsExport) {
-            BitwardenInfoCalloutCard(
-                text = stringResource(
-                    id = BitwardenString.disable_personal_vault_export_policy_in_effect,
-                ),
-                modifier = Modifier
-                    .testTag("DisablePrivateVaultPolicyLabel")
-                    .standardHorizontalMargin()
-                    .fillMaxWidth(),
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
         val resources = LocalResources.current
         BitwardenMultiSelectButton(
             label = stringResource(id = BitwardenString.file_format),
@@ -215,7 +200,6 @@ private fun ExportVaultScreenContent(
                     .first { it.displayLabel(resources) == selectedOptionLabel }
                 onExportFormatOptionSelected(selectedOption)
             },
-            isEnabled = !state.policyPreventsExport,
             cardStyle = CardStyle.Full,
             modifier = Modifier
                 .testTag("FileFormatPicker")
@@ -286,7 +270,6 @@ private fun ExportVaultScreenContent(
             BitwardenOutlinedButton(
                 label = stringResource(BitwardenString.send_code),
                 onClick = onSendCodeClicked,
-                isEnabled = !state.policyPreventsExport,
                 modifier = Modifier
                     .testTag("SendTOTPCodeButton")
                     .standardHorizontalMargin()
@@ -298,7 +281,6 @@ private fun ExportVaultScreenContent(
             BitwardenPasswordField(
                 label = stringResource(id = BitwardenString.verification_code),
                 value = state.passwordInput,
-                readOnly = state.policyPreventsExport,
                 supportingText = stringResource(id = BitwardenString.confirm_your_identity),
                 onValueChange = onPasswordInputChanged,
                 keyboardType = KeyboardType.Number,
@@ -315,7 +297,6 @@ private fun ExportVaultScreenContent(
                     id = BitwardenString.export_vault_master_password_description,
                 ),
                 value = state.passwordInput,
-                readOnly = state.policyPreventsExport,
                 onValueChange = onPasswordInputChanged,
                 passwordFieldTestTag = "MasterPasswordEntry",
                 cardStyle = CardStyle.Full,
@@ -329,7 +310,6 @@ private fun ExportVaultScreenContent(
         BitwardenOutlinedButton(
             label = stringResource(id = BitwardenString.export_vault),
             onClick = onExportVaultClick,
-            isEnabled = !state.policyPreventsExport,
             modifier = Modifier
                 .testTag("ExportVaultButton")
                 .standardHorizontalMargin()

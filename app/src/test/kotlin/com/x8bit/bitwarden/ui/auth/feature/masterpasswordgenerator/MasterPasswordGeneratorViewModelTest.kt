@@ -2,16 +2,11 @@ package com.x8bit.bitwarden.ui.auth.feature.masterpasswordgenerator
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.asText
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratedPassphraseResult
 import com.x8bit.bitwarden.data.tools.generator.repository.util.FakeGeneratorRepository
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
@@ -20,9 +15,6 @@ import org.junit.jupiter.api.Test
 
 class MasterPasswordGeneratorViewModelTest : BaseViewModelTest() {
     private val fakeGeneratorRepository = FakeGeneratorRepository()
-    private val mockPolicyManager = mockk<PolicyManager>(relaxed = true) {
-        every { getActivePolicies(type = PolicyType.MASTER_PASSWORD) } returns emptyList()
-    }
 
     @BeforeEach
     fun setup() {
@@ -58,13 +50,6 @@ class MasterPasswordGeneratorViewModelTest : BaseViewModelTest() {
             MasterPasswordGeneratorState(generatedPassword = savedPassword),
             viewModel.stateFlow.value,
         )
-    }
-
-    @Test
-    fun `Verify passphrase request is created and attempts to check for policy constraints`() {
-        createViewModel()
-
-        verify { mockPolicyManager.getActivePolicies(type = PolicyType.MASTER_PASSWORD) }
     }
 
     @Test
@@ -148,7 +133,6 @@ class MasterPasswordGeneratorViewModelTest : BaseViewModelTest() {
     ): MasterPasswordGeneratorViewModel = MasterPasswordGeneratorViewModel(
         savedStateHandle = SavedStateHandle().apply { this["state"] = initialState },
         generatorRepository = fakeGeneratorRepository,
-        policyManager = mockPolicyManager,
     )
 
     // endregion helpers

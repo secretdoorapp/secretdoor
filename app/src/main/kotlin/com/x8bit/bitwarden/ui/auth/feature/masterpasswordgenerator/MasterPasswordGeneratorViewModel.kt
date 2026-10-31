@@ -9,13 +9,9 @@ import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.Text
 import com.bitwarden.ui.util.asText
-import com.x8bit.bitwarden.data.auth.repository.model.PolicyInformation
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
-import com.x8bit.bitwarden.data.platform.manager.util.getActivePolicies
 import com.x8bit.bitwarden.data.tools.generator.repository.GeneratorRepository
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratedPassphraseResult
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratorResult
-import com.x8bit.bitwarden.ui.tools.feature.generator.util.toStrictestPolicy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -38,7 +34,6 @@ private const val DEFAULT_WORD_COUNT = 3
 class MasterPasswordGeneratorViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val generatorRepository: GeneratorRepository,
-    private val policyManager: PolicyManager,
 ) : BaseViewModel<MasterPasswordGeneratorState, MasterPasswordGeneratorEvent, MasterPasswordGeneratorAction>(
     initialState = savedStateHandle[KEY_STATE]
         ?: MasterPasswordGeneratorState(generatedPassword = DEFAULT_SEPARATOR),
@@ -124,16 +119,13 @@ class MasterPasswordGeneratorViewModel @Inject constructor(
     }
 
     private fun getPolicyBasedPassphraseRequest(): PassphraseGeneratorRequest {
-        val policy = policyManager
-            .getActivePolicies<PolicyInformation.MasterPassword>()
-            .toStrictestPolicy()
         val options = generatorRepository.getPasscodeGenerationOptions()
         val optionsWordCount = options?.numWords ?: DEFAULT_WORD_COUNT
         return PassphraseGeneratorRequest(
             numWords = max(optionsWordCount, DEFAULT_WORD_COUNT).toUByte(),
             wordSeparator = options?.wordSeparator ?: DEFAULT_SEPARATOR,
-            capitalize = policy.requireUpper == true,
-            includeNumber = policy.requireNumbers == true,
+            capitalize = false,
+            includeNumber = false,
         )
     }
 }
