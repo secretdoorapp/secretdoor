@@ -1,5 +1,6 @@
 package com.x8bit.bitwarden.ui.vault.feature.addedit
 
+import android.net.Uri
 import android.os.Parcelable
 import androidx.credentials.CreatePublicKeyCredentialRequest
 import androidx.credentials.provider.CallingAppInfo
@@ -11,7 +12,6 @@ import com.bitwarden.core.data.manager.toast.ToastManager
 import com.bitwarden.core.data.repository.model.DataState
 import com.bitwarden.core.data.repository.util.takeUntilLoaded
 import com.bitwarden.data.repository.util.baseWebVaultUrlOrDefault
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BackgroundEvent
 import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.base.DeferredBackgroundEvent
@@ -19,6 +19,7 @@ import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarData
 import com.bitwarden.ui.platform.feature.cardscanner.manager.CardScanManager
 import com.bitwarden.ui.platform.feature.cardscanner.util.CardScanResult
 import com.bitwarden.ui.platform.manager.snackbar.SnackbarRelayManager
+import com.bitwarden.ui.platform.model.FileData
 import com.bitwarden.ui.platform.model.TotpData
 import com.bitwarden.ui.platform.resource.BitwardenPlurals
 import com.bitwarden.ui.platform.resource.BitwardenString
@@ -41,7 +42,6 @@ import com.x8bit.bitwarden.data.credentials.model.Fido2RegisterCredentialResult
 import com.x8bit.bitwarden.data.credentials.model.UserVerificationRequirement
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
 import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
@@ -59,6 +59,7 @@ import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratorResult
 import com.x8bit.bitwarden.data.vault.manager.model.GetCipherResult
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.ArchiveCipherResult
+import com.x8bit.bitwarden.data.vault.repository.model.CreateAttachmentResult
 import com.x8bit.bitwarden.data.vault.repository.model.CreateCipherResult
 import com.x8bit.bitwarden.data.vault.repository.model.CreateFolderResult
 import com.x8bit.bitwarden.data.vault.repository.model.DeleteCipherResult
@@ -135,7 +136,6 @@ class VaultAddEditViewModel @Inject constructor(
     private val toastManager: ToastManager,
     private val authRepository: AuthRepository,
     private val clipboardManager: BitwardenClipboardManager,
-    private val policyManager: PolicyManager,
     private val vaultRepository: VaultRepository,
     private val bitwardenCredentialManager: BitwardenCredentialManager,
     private val settingsRepository: SettingsRepository,
@@ -155,9 +155,8 @@ class VaultAddEditViewModel @Inject constructor(
             val vaultCipherType = args.vaultItemCipherType
             val selectedFolderId = args.selectedFolderId
             val selectedCollectionId = args.selectedCollectionId
-            val isIndividualVaultDisabled = policyManager
-                .getActivePolicies(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-                .any()
+            // Organizations do not exist in SecretDoor, so the personal vault is never disabled.
+            val isIndividualVaultDisabled = false
 
             val specialCircumstance = specialCircumstanceManager.specialCircumstance
             // Check for autofill data to pre-populate
@@ -341,6 +340,29 @@ class VaultAddEditViewModel @Inject constructor(
     //region Common Handlers
 
     @Suppress("LongMethod")
+    private fun handleAttachmentFileReceive(action: VaultAddEditAction.Common.AttachmentFileReceive) {
+        val fileData = action.fileData
+        if (fileData.sizeBytes > MAX_ATTACHMENT_SIZE_BYTES) {
+            showDialog(
+                dialogState = VaultAddEditState.DialogState.Generic(
+                    title = BitwardenString.an_error_has_occurred.asText(),
+                    message = BitwardenString.max_file_size.asText(),
+                ),
+            )
+            return
+        }
+        updateCommonContent { common ->
+            common.copy(
+                pendingAttachments = common.pendingAttachments +
+                    VaultAddEditState.PendingAttachment(
+                        fileName = fileData.fileName,
+                        uri = fileData.uri,
+                        sizeBytes = fileData.sizeBytes,
+                    ),
+            )
+        }
+    }
+
     private fun handleCommonActions(action: VaultAddEditAction.Common) {
         when (action) {
             is VaultAddEditAction.Common.CustomFieldValueChange -> {
@@ -348,6 +370,20 @@ class VaultAddEditViewModel @Inject constructor(
             }
 
             is VaultAddEditAction.Common.NameTextChange -> handleNameTextInputChange(action)
+            VaultAddEditAction.Common.AddAttachmentClick -> {
+                sendEvent(VaultAddEditEvent.NavigateToChooseAttachmentFile)
+            }
+
+            is VaultAddEditAction.Common.AttachmentFileReceive -> {
+                handleAttachmentFileReceive(action)
+            }
+
+            is VaultAddEditAction.Common.RemovePendingAttachmentClick -> {
+                updateCommonContent { common ->
+                    common.copy(pendingAttachments = common.pendingAttachments - action.attachment)
+                }
+            }
+
             is VaultAddEditAction.Common.NotesTextChange -> handleNotesTextInputChange(action)
             is VaultAddEditAction.Common.ToggleFavorite -> handleToggleFavorite(action)
             is VaultAddEditAction.Common.ToggleMasterPasswordReprompt -> {
@@ -479,9 +515,19 @@ class VaultAddEditViewModel @Inject constructor(
 
         viewModelScope.launch {
             when (val vaultAddEditType = state.vaultAddEditType) {
-                is VaultAddEditType.AddItem -> {
+                is VaultAddEditType.AddItem,
+                is VaultAddEditType.CloneItem,
+                -> {
                     val result = content.createCipherForAddAndCloneItemStates()
-                    sendAction(VaultAddEditAction.Internal.CreateCipherResultReceive(result))
+                    val failedAttachments = (result as? CreateCipherResult.Success)
+                        ?.let { attachPendingFiles(cipherId = it.cipherId, content = content) }
+                        .orEmpty()
+                    sendAction(
+                        VaultAddEditAction.Internal.CreateCipherResultReceive(
+                            createCipherResult = result,
+                            failedAttachmentNames = failedAttachments,
+                        ),
+                    )
                 }
 
                 is VaultAddEditType.EditItem -> {
@@ -492,12 +538,17 @@ class VaultAddEditViewModel @Inject constructor(
                             isPremiumUser = state.hasPremium,
                         ),
                     )
-                    sendAction(VaultAddEditAction.Internal.UpdateCipherResultReceive(result))
-                }
-
-                is VaultAddEditType.CloneItem -> {
-                    val result = content.createCipherForAddAndCloneItemStates()
-                    sendAction(VaultAddEditAction.Internal.CreateCipherResultReceive(result))
+                    val failedAttachments = if (result is UpdateCipherResult.Success) {
+                        attachPendingFiles(cipherId = vaultAddEditType.vaultItemId, content = content)
+                    } else {
+                        emptyList()
+                    }
+                    sendAction(
+                        VaultAddEditAction.Internal.UpdateCipherResultReceive(
+                            updateCipherResult = result,
+                            failedAttachmentNames = failedAttachments,
+                        ),
+                    )
                 }
             }
         }
@@ -1959,6 +2010,7 @@ class VaultAddEditViewModel @Inject constructor(
             }
 
             is CreateCipherResult.Success -> {
+                relayFailedAttachments(action.failedAttachmentNames)
                 if (state.shouldClearSpecialCircumstance) {
                     specialCircumstanceManager.specialCircumstance = null
                 }
@@ -2011,6 +2063,7 @@ class VaultAddEditViewModel @Inject constructor(
             }
 
             is UpdateCipherResult.Success -> {
+                relayFailedAttachments(action.failedAttachmentNames)
                 if (state.shouldClearSpecialCircumstance) {
                     specialCircumstanceManager.specialCircumstance = null
                 }
@@ -2220,9 +2273,7 @@ class VaultAddEditViewModel @Inject constructor(
                 collectionViewList = emptyList(),
                 folderViewList = emptyList(),
             )
-        val isIndividualVaultDisabled = policyManager
-            .getActivePolicies(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-            .any()
+        val isIndividualVaultDisabled = false
         return copy(
             viewState = internalVaultData.decryptCipherListResult.successes
                 .find { it.id == vaultAddEditType.vaultItemId }
@@ -2644,8 +2695,59 @@ class VaultAddEditViewModel @Inject constructor(
             cipherView = toCipherView(clock = clock, isPremiumUser = state.hasPremium),
         )
 
+    /**
+     * Encrypts and attaches the files picked on this screen to the saved item [cipherId]. Returns
+     * the names of the files that could not be attached; the item itself is already saved.
+     */
+    private suspend fun attachPendingFiles(
+        cipherId: String,
+        content: VaultAddEditState.ViewState.Content,
+    ): List<String> {
+        val pendingAttachments = content.common.pendingAttachments
+        if (pendingAttachments.isEmpty()) return emptyList()
+        var cipherView = (vaultRepository.getCipher(cipherId) as? GetCipherResult.Success)
+            ?.cipherView
+            ?: return pendingAttachments.map { it.fileName }
+        return pendingAttachments.mapNotNull { attachment ->
+            val result = vaultRepository.createAttachment(
+                cipherId = cipherId,
+                cipherView = cipherView,
+                fileSizeBytes = attachment.sizeBytes.toString(),
+                fileName = attachment.fileName,
+                fileUri = attachment.uri,
+            )
+            when (result) {
+                is CreateAttachmentResult.Success -> {
+                    cipherView = result.cipherView
+                    null
+                }
+
+                is CreateAttachmentResult.Error -> attachment.fileName
+            }
+        }
+    }
+
+    /**
+     * Tells the screen shown after saving which picked files could not be attached.
+     */
+    private fun relayFailedAttachments(failedAttachmentNames: List<String>) {
+        if (failedAttachmentNames.isEmpty()) return
+        snackbarRelayManager.sendSnackbarData(
+            data = BitwardenSnackbarData(
+                message = BitwardenString.item_saved_but_these_files_could_not_be_attached_x
+                    .asText(failedAttachmentNames.joinToString()),
+            ),
+            relay = SnackbarRelay.CIPHER_UPDATED,
+        )
+    }
+
     //endregion Utility Functions
 }
+
+/**
+ * Attachments must be under 100 MiB, the same limit as the attachments screen.
+ */
+private const val MAX_ATTACHMENT_SIZE_BYTES: Long = 100 * 1024 * 1024
 
 @Suppress("MagicNumber")
 private fun String.toExpirationMonth(): VaultCardExpirationMonth =
@@ -2889,6 +2991,7 @@ data class VaultAddEditState(
                 val canDelete: Boolean = true,
                 val canAssignToCollections: Boolean = true,
                 val archiveCalloutText: Text? = null,
+                val pendingAttachments: List<PendingAttachment> = emptyList(),
             ) : Parcelable {
 
                 /**
@@ -3286,6 +3389,20 @@ data class VaultAddEditState(
     }
 
     /**
+     * A file picked on the add/edit screen that is attached when the item is saved.
+     *
+     * @property fileName The file's name.
+     * @property uri Where the file is read from.
+     * @property sizeBytes The file's size.
+     */
+    @Parcelize
+    data class PendingAttachment(
+        val fileName: String,
+        val uri: Uri,
+        val sizeBytes: Long,
+    ) : Parcelable
+
+    /**
      * Displays a dialog.
      */
     @Parcelize
@@ -3417,6 +3534,11 @@ sealed class VaultAddEditEvent {
     data object NavigateBack : VaultAddEditEvent()
 
     /**
+     * Asks the user to pick a file to attach to the item.
+     */
+    data object NavigateToChooseAttachmentFile : VaultAddEditEvent()
+
+    /**
      * Navigate to attachments screen.
      */
     data class NavigateToAttachments(
@@ -3525,6 +3647,23 @@ sealed class VaultAddEditAction {
      * Represents actions common across all item types.
      */
     sealed class Common : VaultAddEditAction() {
+
+        /**
+         * The user clicked "Add file" in the attachments section.
+         */
+        data object AddAttachmentClick : Common()
+
+        /**
+         * The user picked a file to attach when the item is saved.
+         */
+        data class AttachmentFileReceive(val fileData: FileData) : Common()
+
+        /**
+         * The user removed a picked file before saving.
+         */
+        data class RemovePendingAttachmentClick(
+            val attachment: VaultAddEditState.PendingAttachment,
+        ) : Common()
 
         /**
          * Represents the action when the save button is clicked.
@@ -4313,6 +4452,7 @@ sealed class VaultAddEditAction {
          */
         data class CreateCipherResultReceive(
             val createCipherResult: CreateCipherResult,
+            val failedAttachmentNames: List<String> = emptyList(),
         ) : Internal()
 
         /**
@@ -4320,6 +4460,7 @@ sealed class VaultAddEditAction {
          */
         data class UpdateCipherResultReceive(
             val updateCipherResult: UpdateCipherResult,
+            val failedAttachmentNames: List<String> = emptyList(),
         ) : Internal()
 
         /**

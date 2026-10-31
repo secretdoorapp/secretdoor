@@ -3,12 +3,9 @@ package com.x8bit.bitwarden.ui.tools.feature.generator
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import app.cash.turbine.turbineScope
-import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
 import com.bitwarden.data.repository.model.Environment
 import com.bitwarden.generators.PassphraseGeneratorRequest
 import com.bitwarden.generators.PasswordGeneratorRequest
-import com.bitwarden.policies.Policy
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.asText
@@ -17,7 +14,6 @@ import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.UserState
 import com.x8bit.bitwarden.data.billing.manager.PremiumStateManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.ReviewPromptManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
 import com.x8bit.bitwarden.data.platform.manager.model.CoachMarkTourType
@@ -31,7 +27,6 @@ import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratorResult
 import com.x8bit.bitwarden.data.tools.generator.repository.model.PasscodeGenerationOptions
 import com.x8bit.bitwarden.data.tools.generator.repository.model.UsernameGenerationOptions
 import com.x8bit.bitwarden.data.tools.generator.repository.util.FakeGeneratorRepository
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkPolicy
 import com.x8bit.bitwarden.ui.tools.feature.generator.GeneratorState.MainType.Username.UsernameType.ForwardedEmailAlias.ServiceType
 import com.x8bit.bitwarden.ui.tools.feature.generator.GeneratorState.MainType.Username.UsernameType.ForwardedEmailAlias.ServiceTypeOption
 import com.x8bit.bitwarden.ui.tools.feature.generator.model.GeneratorMode
@@ -107,11 +102,6 @@ class GeneratorViewModelTest : BaseViewModelTest() {
         )
     }
 
-    private val mutablePolicyFlow = bufferedMutableSharedFlow<List<Policy>>()
-    private val policyManager: PolicyManager = mockk {
-        every { getActivePolicies(PolicyType.PASSWORD_GENERATOR) } returns emptyList()
-        every { getActivePoliciesFlow(PolicyType.PASSWORD_GENERATOR) } returns mutablePolicyFlow
-    }
 
     private val reviewPromptManager: ReviewPromptManager = mockk {
         every { registerGeneratedResultAction() } just runs
@@ -211,103 +201,6 @@ class GeneratorViewModelTest : BaseViewModelTest() {
             type = GeneratorMode.Modal.Password,
         )
         assertEquals(expected, viewModel.stateFlow.value)
-    }
-
-    @Test
-    fun `activePolicyFlow changes should update state`() = runTest {
-        val payload = """
-            {
-              "overridePasswordType":null,
-              "minLength":10,
-              "useUpper":true,
-              "useNumbers":true,
-              "useSpecial":true,
-              "minNumbers":3,
-              "minSpecial":3,
-              "minNumberWords":5,
-              "capitalize":true,
-              "includeNumber":true,
-              "useLower":true
-            }
-        """
-        val policies = listOf(
-            createMockSdkPolicy(
-                organizationId = "organizationId",
-                id = "id",
-                type = PolicyType.PASSWORD_GENERATOR,
-                enabled = true,
-                data = payload,
-            ),
-        )
-        val viewModel = createViewModel(state = initialPasscodeState)
-
-        viewModel.stateFlow.test {
-            assertEquals(initialPasscodeState, awaitItem())
-            every {
-                policyManager.getActivePolicies(type = PolicyType.PASSWORD_GENERATOR)
-            } returns policies
-            mutablePolicyFlow.tryEmit(value = policies)
-            assertEquals(
-                initialPasscodeState.copy(
-                    selectedType = GeneratorState.MainType.Password(
-                        length = 14,
-                        minLength = 10,
-                        maxLength = 128,
-                        useCapitals = true,
-                        capitalsEnabled = false,
-                        useLowercase = true,
-                        lowercaseEnabled = false,
-                        useNumbers = true,
-                        numbersEnabled = false,
-                        useSpecialChars = true,
-                        specialCharsEnabled = false,
-                        minNumbers = 3,
-                        minNumbersAllowed = 3,
-                        maxNumbersAllowed = 9,
-                        minSpecial = 3,
-                        minSpecialAllowed = 3,
-                        maxSpecialAllowed = 9,
-                        avoidAmbiguousChars = false,
-                        ambiguousCharsEnabled = true,
-                        isUserInteracting = false,
-                    ),
-                    isUnderPolicy = true,
-                ),
-                awaitItem(),
-            )
-            every {
-                policyManager.getActivePolicies(type = PolicyType.PASSWORD_GENERATOR)
-            } returns emptyList()
-            mutablePolicyFlow.tryEmit(value = emptyList())
-            assertEquals(
-                initialPasscodeState.copy(
-                    selectedType = GeneratorState.MainType.Password(
-                        length = 14,
-                        minLength = 5,
-                        maxLength = 128,
-                        useCapitals = true,
-                        capitalsEnabled = true,
-                        useLowercase = true,
-                        lowercaseEnabled = true,
-                        useNumbers = true,
-                        numbersEnabled = true,
-                        useSpecialChars = true,
-                        specialCharsEnabled = true,
-                        minNumbers = 3,
-                        minNumbersAllowed = 0,
-                        maxNumbersAllowed = 9,
-                        minSpecial = 3,
-                        minSpecialAllowed = 0,
-                        maxSpecialAllowed = 9,
-                        avoidAmbiguousChars = false,
-                        ambiguousCharsEnabled = true,
-                        isUserInteracting = false,
-                    ),
-                    isUnderPolicy = false,
-                ),
-                awaitItem(),
-            )
-        }
     }
 
     @Test
@@ -640,172 +533,6 @@ class GeneratorViewModelTest : BaseViewModelTest() {
         }
 
     @Test
-    fun `Policy should overwrite password options if stricter`() {
-        val policy = createMockSdkPolicy(
-            type = PolicyType.PASSWORD_GENERATOR,
-            enabled = true,
-            data = """
-              {
-                "overridePasswordType":null,
-                "minLength":10,
-                "useUpper":true,
-                "useNumbers":true,
-                "useSpecial":true,
-                "minNumbers":3,
-                "minSpecial":3,
-                "minNumberWords":5,
-                "capitalize":true,
-                "includeNumber":true,
-                "useLower":true
-              }
-            """,
-        )
-        every {
-            policyManager.getActivePolicies(any())
-        } returns listOf(policy)
-
-        val viewModel = createViewModel()
-        assertEquals(
-            initialPasscodeState.copy(
-                selectedType = GeneratorState.MainType.Password(
-                    length = 14,
-                    minLength = 10,
-                    useCapitals = true,
-                    capitalsEnabled = false,
-                    useLowercase = true,
-                    lowercaseEnabled = false,
-                    useNumbers = true,
-                    numbersEnabled = false,
-                    useSpecialChars = true,
-                    specialCharsEnabled = false,
-                    minNumbers = 3,
-                    minNumbersAllowed = 3,
-                    minSpecial = 3,
-                    minSpecialAllowed = 3,
-                    avoidAmbiguousChars = false,
-                ),
-            ),
-            viewModel.stateFlow.value,
-        )
-    }
-
-    @Test
-    fun `Policy should overwrite passphrase options if stricter`() {
-        val policy = createMockSdkPolicy(
-            type = PolicyType.PASSWORD_GENERATOR,
-            enabled = true,
-            data = """
-              {
-                "overridePasswordType":null,
-                "minLength":10,
-                "useUpper":true,
-                "useNumbers":true,
-                "useSpecial":true,
-                "minNumbers":3,
-                "minSpecial":3,
-                "minNumberWords":5,
-                "capitalize":true,
-                "includeNumber":true,
-                "useLower":true
-              }
-            """,
-        )
-        every {
-            policyManager.getActivePolicies(any())
-        } returns listOf(policy)
-
-        val viewModel = createViewModel()
-        val action = GeneratorAction.MainTypeOptionSelect(
-            mainTypeOption = GeneratorState.MainTypeOption.PASSPHRASE,
-        )
-
-        viewModel.trySendAction(action)
-
-        assertEquals(
-            initialPasscodeState.copy(
-                generatedText = "updatedPassphrase",
-                selectedType = GeneratorState.MainType.Passphrase(
-                    numWords = 5,
-                    minNumWords = 5,
-                    maxNumWords = 20,
-                    capitalize = true,
-                    capitalizeEnabled = false,
-                    includeNumber = true,
-                    includeNumberEnabled = false,
-                ),
-            ),
-            viewModel.stateFlow.value,
-        )
-    }
-
-    @Test
-    fun `Policy should overwrite passwordType if has overridePasswordType`() {
-        val policy = createMockSdkPolicy(
-            type = PolicyType.PASSWORD_GENERATOR,
-            enabled = true,
-            data = """
-              {
-                "overridePasswordType":"passphrase"
-              }
-            """,
-        )
-        every {
-            policyManager.getActivePolicies(any())
-        } returns listOf(policy)
-
-        val viewModel = createViewModel()
-
-        assertEquals(
-            initialPasscodeState.copy(
-                generatedText = "updatedPassphrase",
-                selectedType = GeneratorState.MainType.Passphrase(),
-                passcodePolicyOverride = GeneratorState.PasscodePolicyOverride.PASSPHRASE,
-            ),
-            viewModel.stateFlow.value,
-        )
-    }
-
-    @Test
-    fun `Policy should should prioritize password if multiple have OverridePasswordType`() {
-        val policies = listOf(
-            createMockSdkPolicy(
-                number = 1,
-                type = PolicyType.PASSWORD_GENERATOR,
-                enabled = true,
-                data = """
-                  {
-                    "overridePasswordType":"passphrase"
-                  }
-                """,
-            ),
-            createMockSdkPolicy(
-                number = 1,
-                type = PolicyType.PASSWORD_GENERATOR,
-                enabled = true,
-                data = """
-                  {
-                    "overridePasswordType":"password"
-                  }
-                """,
-            ),
-        )
-        every {
-            policyManager.getActivePolicies(any())
-        } returns policies
-
-        val viewModel = createViewModel()
-
-        assertEquals(
-            initialPasscodeState.copy(
-                generatedText = "defaultPassword",
-                selectedType = GeneratorState.MainType.Password(),
-                passcodePolicyOverride = GeneratorState.PasscodePolicyOverride.PASSWORD,
-            ),
-            viewModel.stateFlow.value,
-        )
-    }
-
-    @Test
     fun `MainTypeOptionSelect shouldn't update the state if its already selected`() = runTest {
         val viewModel = createViewModel()
         fakeGeneratorRepository.setMockGeneratePassphraseResult(
@@ -1094,12 +821,6 @@ class GeneratorViewModelTest : BaseViewModelTest() {
                         type = UsernameGenerationOptions.UsernameType.RANDOM_WORD,
                         simpleLoginSelfHostServerUrl = "",
                     ),
-                )
-                // When this action is handled there will be another call to `loadOptions()`
-                // since we are using the default arguments with `shouldUseStorageOptions` set to
-                // false we should not expect a state update.
-                viewModel.trySendAction(
-                    GeneratorAction.Internal.PasswordGeneratorPolicyReceive(policies = emptyList()),
                 )
                 expectNoEvents()
             }
@@ -2719,7 +2440,6 @@ class GeneratorViewModelTest : BaseViewModelTest() {
         clipboardManager = clipboardManager,
         generatorRepository = fakeGeneratorRepository,
         authRepository = authRepository,
-        policyManager = policyManager,
         reviewPromptManager = reviewPromptManager,
         firstTimeActionManager = firstTimeActionManager,
         premiumStateManager = premiumStateManager,

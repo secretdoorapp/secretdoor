@@ -18,7 +18,6 @@ import com.bitwarden.core.data.repository.util.map
 import com.bitwarden.core.util.persistentListOfNotNull
 import com.bitwarden.data.repository.util.baseIconUrl
 import com.bitwarden.data.repository.util.baseWebVaultUrlOrDefault
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BackgroundEvent
 import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.base.util.toAndroidAppUriString
@@ -59,7 +58,6 @@ import com.x8bit.bitwarden.data.credentials.parser.RelyingPartyParser
 import com.x8bit.bitwarden.data.credentials.repository.PrivilegedAppRepository
 import com.x8bit.bitwarden.data.credentials.util.getCreatePasskeyCredentialRequestOrNull
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.ciphermatching.CipherMatchingManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
@@ -107,8 +105,6 @@ import com.x8bit.bitwarden.ui.vault.model.VaultItemCipherType
 import com.x8bit.bitwarden.ui.vault.util.toVaultItemCipherType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -140,7 +136,6 @@ class VaultItemListingViewModel @Inject constructor(
     private val autofillSelectionManager: AutofillSelectionManager,
     private val cipherMatchingManager: CipherMatchingManager,
     private val specialCircumstanceManager: SpecialCircumstanceManager,
-    private val policyManager: PolicyManager,
     private val originManager: OriginManager,
     private val bitwardenCredentialManager: BitwardenCredentialManager,
     private val organizationEventManager: OrganizationEventManager,
@@ -177,7 +172,6 @@ class VaultItemListingViewModel @Inject constructor(
                 ?.let {
                     VaultItemListingState.DialogState.Loading(BitwardenString.loading.asText())
                 },
-            restrictItemTypesPolicyOrgIds = persistentListOf(),
             autofillSelectionData = specialCircumstance?.toAutofillSelectionDataOrNull(),
             hasMasterPassword = userState.activeAccount.hasMasterPassword,
             totpData = specialCircumstance?.toTotpDataOrNull(),
@@ -201,13 +195,6 @@ class VaultItemListingViewModel @Inject constructor(
         settingsRepository
             .isIconLoadingDisabledFlow
             .onEach { sendAction(VaultItemListingsAction.Internal.IconLoadingSettingReceive(it)) }
-            .launchIn(viewModelScope)
-
-        policyManager
-            .getActivePoliciesFlow(type = PolicyType.RESTRICTED_ITEM_TYPES)
-            .map { policies -> policies.map { it.organizationId } }
-            .map { VaultItemListingsAction.Internal.RestrictItemTypesPolicyUpdateReceive(it) }
-            .onEach(::sendAction)
             .launchIn(viewModelScope)
 
         featureFlagManager
@@ -786,7 +773,6 @@ class VaultItemListingViewModel @Inject constructor(
         val isNewItemTypesEnabled = featureFlagManager
             .getFeatureFlag(FlagKey.NewItemTypes)
         return persistentListOfNotNull(
-            CreateVaultItemType.CARD.takeIf { state.restrictItemTypesPolicyOrgIds.isNotEmpty() },
             CreateVaultItemType.FOLDER,
             CreateVaultItemType.SSH_KEY,
             CreateVaultItemType.BANK_ACCOUNT.takeUnless { isNewItemTypesEnabled },
@@ -1600,9 +1586,6 @@ class VaultItemListingViewModel @Inject constructor(
                 handleGetCredentialEntriesResultReceive(action)
             }
 
-            is VaultItemListingsAction.Internal.RestrictItemTypesPolicyUpdateReceive -> {
-                handleRestrictItemTypesPolicyUpdateReceive(action)
-            }
 
             is VaultItemListingsAction.Internal.Vfo1FoundationFlagUpdateReceive -> {
                 handleVfo1FoundationFlagUpdateReceive(action)
@@ -1707,22 +1690,6 @@ class VaultItemListingViewModel @Inject constructor(
                     throwable = action.error,
                 ),
             )
-        }
-    }
-
-    private fun handleRestrictItemTypesPolicyUpdateReceive(
-        action: VaultItemListingsAction.Internal.RestrictItemTypesPolicyUpdateReceive,
-    ) {
-        mutableStateFlow.update {
-            it.copy(
-                restrictItemTypesPolicyOrgIds = action
-                    .restrictItemTypesPolicyOrdIds
-                    .toImmutableList(),
-            )
-        }
-
-        vaultRepository.vaultDataStateFlow.value.data?.let { vaultData ->
-            updateStateWithVaultData(vaultData, clearDialogState = false)
         }
     }
 
@@ -2535,7 +2502,6 @@ class VaultItemListingViewModel @Inject constructor(
                             createCredentialRequestData = state.createCredentialRequest,
                             totpData = state.totpData,
                             isPremiumUser = state.isPremium,
-                            restrictItemTypesPolicyOrgIds = state.restrictItemTypesPolicyOrgIds,
                             isVfo1FoundationEnabled = state.isVfo1FoundationEnabled,
                         )
                     }
@@ -2732,7 +2698,6 @@ data class VaultItemListingState(
     val baseIconUrl: String,
     val isIconLoadingDisabled: Boolean,
     val dialogState: DialogState?,
-    val restrictItemTypesPolicyOrgIds: ImmutableList<String>,
     // Internal
     private val isPullToRefreshSettingEnabled: Boolean,
     val totpData: TotpData? = null,
@@ -2778,14 +2743,8 @@ data class VaultItemListingState(
      * Whether the add FAB should be shown.
      */
     val hasAddItemFabButton: Boolean
-        get() = if (restrictItemTypesPolicyOrgIds.isNotEmpty() &&
-            itemListingType == ItemListingType.Vault.Card
-        ) {
-            false
-        } else {
-            itemListingType.hasFab ||
-                (viewState as? ViewState.NoItems)?.shouldShowAddButton == true
-        }
+        get() = itemListingType.hasFab ||
+            (viewState as? ViewState.NoItems)?.shouldShowAddButton == true
 
     /**
      * Whether this represents a listing screen for autofill.
@@ -3700,13 +3659,6 @@ sealed class VaultItemListingsAction {
         data class ValidateUserVerificationPinResultReceive(
             val result: ValidatePinResult,
             val selectedCipherId: String,
-        ) : Internal()
-
-        /**
-         * Indicates that a restrict item types policy update has been received.
-         */
-        data class RestrictItemTypesPolicyUpdateReceive(
-            val restrictItemTypesPolicyOrdIds: List<String>,
         ) : Internal()
 
         /**

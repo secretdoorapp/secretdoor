@@ -25,7 +25,6 @@ import com.bitwarden.core.data.util.asSuccess
 import com.bitwarden.data.repository.model.Environment
 import com.bitwarden.data.repository.util.baseIconUrl
 import com.bitwarden.policies.Policy
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.components.account.model.AccountSummary
 import com.bitwarden.ui.platform.components.icon.model.IconData
@@ -70,7 +69,6 @@ import com.x8bit.bitwarden.data.credentials.model.createMockProviderGetPasswordC
 import com.x8bit.bitwarden.data.credentials.parser.RelyingPartyParser
 import com.x8bit.bitwarden.data.credentials.repository.PrivilegedAppRepository
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.ciphermatching.CipherMatchingManager
@@ -94,7 +92,6 @@ import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockFolderView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockLoginListView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockPassportView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkFido2CredentialList
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkPolicy
 import com.x8bit.bitwarden.data.vault.manager.model.GetCipherResult
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.ArchiveCipherResult
@@ -214,11 +211,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
         )
     private val mutableActivePoliciesFlow: MutableStateFlow<List<Policy>> =
         MutableStateFlow(emptyList())
-    private val policyManager: PolicyManager = mockk {
-        every {
-            getActivePoliciesFlow(type = PolicyType.RESTRICTED_ITEM_TYPES)
-        } returns mutableActivePoliciesFlow
-    }
     private val bitwardenCredentialManager: BitwardenCredentialManager = mockk {
         every { isUserVerified } returns false
         every { isUserVerified = any() } just runs
@@ -375,34 +367,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     awaitItem(),
                 )
             }
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `RESTRICT_ITEM_TYPES policy changes should update restrictItemTypesPolicyOrgIds accordingly`() =
-        runTest {
-            val viewModel = createVaultItemListingViewModel()
-            assertEquals(
-                initialState.copy(restrictItemTypesPolicyOrgIds = persistentListOf()),
-                viewModel.stateFlow.value,
-            )
-            mutableActivePoliciesFlow.emit(
-                listOf(
-                    createMockSdkPolicy(
-                        organizationId = "Test Organization",
-                        id = "testId",
-                        type = PolicyType.RESTRICTED_ITEM_TYPES,
-                        enabled = true,
-                    ),
-                ),
-            )
-
-            assertEquals(
-                initialState.copy(
-                    restrictItemTypesPolicyOrgIds = persistentListOf("Test Organization"),
-                ),
-                viewModel.stateFlow.value,
-            )
         }
 
     @Test
@@ -1600,46 +1564,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
             viewModel.stateFlow.value,
         )
     }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `AddVaultItemClick inside a folder should hide card item selection dialog state when RESTRICT_ITEM_TYPES policy is enabled`() =
-        runTest {
-            val viewModel = createVaultItemListingViewModel(
-                savedStateHandle = createSavedStateHandleWithVaultItemListingType(
-                    vaultItemListingType = VaultItemListingType.Folder(folderId = "id"),
-                ),
-            )
-            mutableActivePoliciesFlow.emit(
-                listOf(
-                    createMockSdkPolicy(
-                        organizationId = "Test Organization",
-                        id = "testId",
-                        type = PolicyType.RESTRICTED_ITEM_TYPES,
-                        enabled = true,
-                    ),
-                ),
-            )
-            viewModel.trySendAction(VaultItemListingsAction.AddVaultItemClick)
-            assertEquals(
-                createVaultItemListingState(
-                    itemListingType = VaultItemListingState.ItemListingType.Vault.Folder(
-                        folderId = "id",
-                    ),
-                    dialogState = VaultItemListingState.DialogState.VaultItemTypeSelection(
-                        excludedOptions = persistentListOf(
-                            CreateVaultItemType.CARD,
-                            CreateVaultItemType.FOLDER,
-                            CreateVaultItemType.SSH_KEY,
-                            CreateVaultItemType.BANK_ACCOUNT,
-                            CreateVaultItemType.LICENSE,
-                            CreateVaultItemType.PASSPORT,
-                        ),
-                    ),
-                ).copy(restrictItemTypesPolicyOrgIds = persistentListOf("Test Organization")),
-                viewModel.stateFlow.value,
-            )
-        }
 
     @Suppress("MaxLineLength")
     @Test
@@ -6258,7 +6182,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
             autofillSelectionManager = autofillSelectionManager,
             cipherMatchingManager = cipherMatchingManager,
             specialCircumstanceManager = specialCircumstanceManager,
-            policyManager = policyManager,
             bitwardenCredentialManager = bitwardenCredentialManager,
             organizationEventManager = organizationEventManager,
             originManager = originManager,
@@ -6295,7 +6218,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
             createCredentialRequest = null,
             isPremium = isPremium,
             isRefreshing = false,
-            restrictItemTypesPolicyOrgIds = persistentListOf(),
             isVfo1FoundationEnabled = isVfo1FoundationEnabled,
         )
 }

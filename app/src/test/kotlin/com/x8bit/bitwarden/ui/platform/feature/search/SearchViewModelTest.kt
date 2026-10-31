@@ -10,7 +10,6 @@ import com.bitwarden.core.data.repository.model.DataState
 import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
 import com.bitwarden.data.repository.model.Environment
 import com.bitwarden.policies.Policy
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarData
 import com.bitwarden.ui.platform.manager.snackbar.SnackbarRelayManager
@@ -33,7 +32,6 @@ import com.x8bit.bitwarden.data.autofill.manager.AutofillSelectionManagerImpl
 import com.x8bit.bitwarden.data.autofill.model.AutofillSelectionData
 import com.x8bit.bitwarden.data.billing.manager.PremiumStateManager
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
@@ -54,7 +52,6 @@ import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockFolderView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockLoginView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockPassportView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkFido2CredentialList
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkPolicy
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockUriView
 import com.x8bit.bitwarden.data.vault.manager.model.GetCipherResult
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
@@ -115,14 +112,6 @@ class SearchViewModelTest : BaseViewModelTest() {
 
     private val mutableActivePoliciesFlow: MutableStateFlow<List<Policy>> =
         MutableStateFlow(emptyList())
-    private val policyManager: PolicyManager = mockk<PolicyManager> {
-        every {
-            getActivePolicies(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-        } returns emptyList()
-        every {
-            getActivePoliciesFlow(type = PolicyType.RESTRICTED_ITEM_TYPES)
-        } returns mutableActivePoliciesFlow
-    }
     private val mutableVaultDataStateFlow =
         MutableStateFlow<DataState<VaultData>>(DataState.Loading)
     private val vaultRepository: VaultRepository = mockk {
@@ -194,25 +183,6 @@ class SearchViewModelTest : BaseViewModelTest() {
         val state = DEFAULT_STATE
         val viewModel = createViewModel(initialState = state)
         assertEquals(state, viewModel.stateFlow.value)
-    }
-
-    @Test
-    fun `initial state should be correct when user has PERSONAL_OWNERSHIP policy`() {
-        every {
-            policyManager.getActivePolicies(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-        } returns listOf(
-            createMockSdkPolicy(
-                organizationId = "Test Org",
-                id = "testId",
-                type = PolicyType.ORGANIZATION_DATA_OWNERSHIP,
-                enabled = true,
-            ),
-        )
-        val viewModel = createViewModel()
-        assertEquals(DEFAULT_STATE, viewModel.stateFlow.value)
-        verify {
-            policyManager.getActivePolicies(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-        }
     }
 
     @Test
@@ -2058,34 +2028,6 @@ class SearchViewModelTest : BaseViewModelTest() {
         }
     }
 
-    @Suppress("MaxLineLength")
-    @Test
-    fun `RESTRICT_ITEM_TYPES policy changes should update restrictItemTypesPolicyOrgIds accordingly`() =
-        runTest {
-            val viewModel = createViewModel()
-            assertEquals(
-                DEFAULT_STATE.copy(restrictItemTypesPolicyOrgIds = persistentListOf()),
-                viewModel.stateFlow.value,
-            )
-            mutableActivePoliciesFlow.emit(
-                listOf(
-                    createMockSdkPolicy(
-                        organizationId = "Test Organization",
-                        id = "testId",
-                        type = PolicyType.RESTRICTED_ITEM_TYPES,
-                        enabled = true,
-                    ),
-                ),
-            )
-
-            assertEquals(
-                DEFAULT_STATE.copy(
-                    restrictItemTypesPolicyOrgIds = persistentListOf("Test Organization"),
-                ),
-                viewModel.stateFlow.value,
-            )
-        }
-
     @Test
     fun `DecryptCipherErrorReceive should display error dialog`() = runTest {
         val viewModel = createViewModel()
@@ -2145,7 +2087,6 @@ class SearchViewModelTest : BaseViewModelTest() {
         environmentRepo = environmentRepository,
         settingsRepo = settingsRepository,
         clipboardManager = clipboardManager,
-        policyManager = policyManager,
         specialCircumstanceManager = specialCircumstanceManager,
         accessibilitySelectionManager = accessibilitySelectionManager,
         autofillSelectionManager = autofillSelectionManager,
@@ -2230,7 +2171,6 @@ private val DEFAULT_STATE: SearchState = SearchState(
     totpData = null,
     autofillSelectionData = null,
     isPremium = true,
-    restrictItemTypesPolicyOrgIds = persistentListOf(),
     isVfo1FoundationEnabled = true,
 )
 

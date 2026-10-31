@@ -10,7 +10,6 @@ import com.bitwarden.data.repository.model.Environment
 import com.bitwarden.data.repository.util.baseIconUrl
 import com.bitwarden.network.exception.CookieRedirectException
 import com.bitwarden.policies.Policy
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.components.account.model.AccountSummary
 import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarData
@@ -35,7 +34,6 @@ import com.x8bit.bitwarden.data.billing.model.PremiumCard
 import com.x8bit.bitwarden.data.platform.manager.CredentialExchangeRegistryManager
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.ReviewPromptManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
@@ -64,7 +62,6 @@ import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockLoginListVi
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockLoginView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockPassportView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkCipher
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkPolicy
 import com.x8bit.bitwarden.data.vault.manager.model.GetCipherResult
 import com.x8bit.bitwarden.data.vault.manager.model.SyncVaultDataResult
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
@@ -135,14 +132,6 @@ class VaultViewModelTest : BaseViewModelTest() {
 
     private val mutableActivePoliciesFlow: MutableStateFlow<List<Policy>> =
         MutableStateFlow(emptyList())
-    private val policyManager: PolicyManager = mockk {
-        every {
-            getActivePolicies(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-        } returns emptyList()
-        every {
-            getActivePoliciesFlow(type = PolicyType.RESTRICTED_ITEM_TYPES)
-        } returns mutableActivePoliciesFlow
-    }
 
     private val mutablePullToRefreshEnabledFlow = MutableStateFlow(false)
     private val mutableIsIconLoadingDisabledFlow = MutableStateFlow(false)
@@ -294,10 +283,7 @@ class VaultViewModelTest : BaseViewModelTest() {
     fun `initial state should be correct and should trigger a syncIfNecessary call`() {
         val viewModel = createViewModel()
         assertEquals(DEFAULT_STATE, viewModel.stateFlow.value)
-        verify {
-            vaultRepository.syncIfNecessary()
-            policyManager.getActivePolicies(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-        }
+        verify { vaultRepository.syncIfNecessary() }
     }
 
     @Test
@@ -867,114 +853,6 @@ class VaultViewModelTest : BaseViewModelTest() {
             viewModel.stateFlow.value,
         )
     }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `UserState updates with a non-null value when not switching accounts should update the account information in the state when personal ownership disabled`() {
-        every {
-            policyManager.getActivePolicies(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-        } returns listOf(
-            createMockSdkPolicy(
-                organizationId = "Test Organization",
-                id = "testId",
-                type = PolicyType.ORGANIZATION_DATA_OWNERSHIP,
-                enabled = true,
-            ),
-        )
-        val viewModel = createViewModel()
-        assertEquals(
-            DEFAULT_STATE,
-            viewModel.stateFlow.value,
-        )
-
-        mutableUserStateFlow.value =
-            DEFAULT_USER_STATE.copy(
-                accounts = listOf(
-                    UserState.Account(
-                        userId = "activeUserId",
-                        name = "Other User",
-                        email = "active@bitwarden.com",
-                        avatarColorHex = "#00aaaa",
-                        environment = Environment.Prod.Us,
-                        isPremium = true,
-                        isPremiumFromSelf = true,
-                        isLoggedIn = true,
-                        isVaultUnlocked = true,
-                        needsPasswordReset = false,
-                        isBiometricsEnabled = false,
-                        needsMasterPassword = false,
-                        organizations = listOf(
-                            createMockOrganization(
-                                number = 1,
-                                id = "organizationId",
-                                name = "Test Organization",
-                                keyConnectorUrl = null,
-                            ),
-                        ),
-                        trustedDevice = null,
-                        hasMasterPassword = true,
-                        isUsingKeyConnector = false,
-                        onboardingStatus = OnboardingStatus.COMPLETE,
-                        firstTimeState = DEFAULT_FIRST_TIME_STATE,
-                        isExportable = true,
-                        creationDate = null,
-                    ),
-                ),
-            )
-
-        assertEquals(
-            DEFAULT_STATE.copy(
-                appBarTitle = BitwardenString.vaults.asText(),
-                avatarColorString = "#00aaaa",
-                initials = "OU",
-                accountSummaries = persistentListOf(
-                    AccountSummary(
-                        userId = "activeUserId",
-                        name = "Other User",
-                        email = "active@bitwarden.com",
-                        avatarColorHex = "#00aaaa",
-                        environmentLabel = "bitwarden.com",
-                        isActive = true,
-                        isLoggedIn = true,
-                        isVaultUnlocked = true,
-                    ),
-                ),
-                vaultFilterData = VaultFilterData(
-                    selectedVaultFilterType = VaultFilterType.AllVaults,
-                    vaultFilterTypes = listOf(
-                        VaultFilterType.AllVaults,
-                    ),
-                ),
-            ),
-            viewModel.stateFlow.value,
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `RESTRICT_ITEM_TYPES policy changes should update restrictItemTypesPolicyOrgIds accordingly`() =
-        runTest {
-            val viewModel = createViewModel()
-            assertEquals(
-                DEFAULT_STATE,
-                viewModel.stateFlow.value,
-            )
-            mutableActivePoliciesFlow.emit(
-                listOf(
-                    createMockSdkPolicy(
-                        organizationId = "Test Organization",
-                        id = "testId",
-                        type = PolicyType.RESTRICTED_ITEM_TYPES,
-                        enabled = true,
-                    ),
-                ),
-            )
-
-            assertEquals(
-                DEFAULT_STATE.copy(restrictItemTypesPolicyOrgIds = listOf("Test Organization")),
-                viewModel.stateFlow.value,
-            )
-        }
 
     @Test
     fun `Flight Recorder changes should update flightRecorderSnackbar accordingly`() = runTest {
@@ -1559,7 +1437,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                 isIconLoadingDisabled = viewModel.stateFlow.value.isIconLoadingDisabled,
                 baseIconUrl = viewModel.stateFlow.value.baseIconUrl,
                 hasMasterPassword = true,
-                restrictItemTypesPolicyOrgIds = emptyList(),
                 validTotpIds = emptySet(),
                 isNewItemTypesEnabled = false,
             ),
@@ -1586,7 +1463,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                     isIconLoadingDisabled = viewModel.stateFlow.value.isIconLoadingDisabled,
                     baseIconUrl = viewModel.stateFlow.value.baseIconUrl,
                     hasMasterPassword = true,
-                    restrictItemTypesPolicyOrgIds = emptyList(),
                     validTotpIds = emptySet(),
                     isNewItemTypesEnabled = false,
                 ),
@@ -4330,41 +4206,6 @@ class VaultViewModelTest : BaseViewModelTest() {
 
     @Suppress("MaxLineLength")
     @Test
-    fun `SelectAddItemType action should set dialog state to SelectVaultAddItemType accordingly when RESTRICT_ITEM_TYPES is enabled`() =
-        runTest {
-            val viewModel = createViewModel()
-            mutableActivePoliciesFlow.emit(
-                listOf(
-                    createMockSdkPolicy(
-                        organizationId = "Test Organization",
-                        id = "testId",
-                        type = PolicyType.RESTRICTED_ITEM_TYPES,
-                        enabled = true,
-                    ),
-                ),
-            )
-
-            viewModel.trySendAction(VaultAction.SelectAddItemType)
-            val expectedState = DEFAULT_STATE.copy(
-                dialog = VaultState.DialogState.SelectVaultAddItemType(
-                    excludedOptions = persistentListOf(
-                        CreateVaultItemType.SSH_KEY,
-                        CreateVaultItemType.CARD,
-                        CreateVaultItemType.BANK_ACCOUNT,
-                        CreateVaultItemType.LICENSE,
-                        CreateVaultItemType.PASSPORT,
-                    ),
-                ),
-                restrictItemTypesPolicyOrgIds = listOf("Test Organization"),
-            )
-            assertEquals(
-                expectedState,
-                viewModel.stateFlow.value,
-            )
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
     fun `SelectAddItemType action should not exclude bank account, license, or passport when NewItemTypes flag is enabled`() {
         mutableNewItemTypesFlagFlow.value = true
         val viewModel = createViewModel()
@@ -4764,7 +4605,6 @@ class VaultViewModelTest : BaseViewModelTest() {
             authRepository = authRepository,
             environmentRepository = environmentRepository,
             clipboardManager = clipboardManager,
-            policyManager = policyManager,
             premiumStateManager = premiumStateManager,
             clock = clock,
             settingsRepository = settingsRepository,
@@ -4919,7 +4759,6 @@ private fun createMockVaultState(
         flightRecorderSnackBar = null,
         cipherDecryptionFailureIds = persistentListOf(),
         hasShownDecryptionFailureAlert = false,
-        restrictItemTypesPolicyOrgIds = emptyList(),
         isIntroducingArchiveActionCardDismissed = false,
         premiumCard = PremiumCard.NONE,
         validTotpIds = validTotpIds.toImmutableSet(),

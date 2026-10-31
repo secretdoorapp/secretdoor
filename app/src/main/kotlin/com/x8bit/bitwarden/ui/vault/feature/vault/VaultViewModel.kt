@@ -11,7 +11,6 @@ import com.bitwarden.core.util.persistentListOfNotNull
 import com.bitwarden.data.datasource.disk.model.FlightRecorderDataSet
 import com.bitwarden.data.repository.util.baseIconUrl
 import com.bitwarden.data.repository.util.baseWebVaultUrlOrDefault
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BackgroundEvent
 import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.base.util.hexToColor
@@ -40,7 +39,6 @@ import com.x8bit.bitwarden.data.billing.model.PremiumCard
 import com.x8bit.bitwarden.data.platform.manager.CredentialExchangeRegistryManager
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.ReviewPromptManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
@@ -116,7 +114,6 @@ class VaultViewModel @Inject constructor(
     private val clipboardManager: BitwardenClipboardManager,
     private val organizationEventManager: OrganizationEventManager,
     private val clock: Clock,
-    private val policyManager: PolicyManager,
     private val premiumStateManager: PremiumStateManager,
     private val settingsRepository: SettingsRepository,
     private val vaultRepository: VaultRepository,
@@ -143,9 +140,7 @@ class VaultViewModel @Inject constructor(
         }
         val activeAccountSummary = activeAccount.toAccountSummary(isActive = true)
         val vaultFilterData = activeAccount.toVaultFilterData(
-            isIndividualVaultDisabled = policyManager
-                .getActivePolicies(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-                .any(),
+            isIndividualVaultDisabled = false,
         )
         VaultState(
             appBarTitle = vaultFilterData.toAppBarTitle(),
@@ -164,7 +159,6 @@ class VaultViewModel @Inject constructor(
             flightRecorderSnackBar = settingsRepository
                 .flightRecorderData
                 .toSnackbarData(clock = clock),
-            restrictItemTypesPolicyOrgIds = emptyList(),
             cipherDecryptionFailureIds = persistentListOf(),
             hasShownDecryptionFailureAlert = false,
             isIntroducingArchiveActionCardDismissed = settingsRepository
@@ -309,13 +303,6 @@ class VaultViewModel @Inject constructor(
             .map {
                 VaultAction.Internal.UpgradedToPremiumCardEligibilityReceive(isEligible = it)
             }
-            .onEach(::sendAction)
-            .launchIn(viewModelScope)
-
-        policyManager
-            .getActivePoliciesFlow(type = PolicyType.RESTRICTED_ITEM_TYPES)
-            .map { policies -> policies.map { it.organizationId } }
-            .map { VaultAction.Internal.PolicyUpdateReceive(it) }
             .onEach(::sendAction)
             .launchIn(viewModelScope)
 
@@ -539,12 +526,8 @@ class VaultViewModel @Inject constructor(
 
     private fun handleSelectAddItemType() {
         val isNewItemTypesEnabled = state.isNewItemTypesEnabled
-        // If policy is enable for any organization, exclude the card option
         val excludedOptions = persistentListOfNotNull(
             CreateVaultItemType.SSH_KEY,
-            CreateVaultItemType.CARD.takeUnless {
-                state.restrictItemTypesPolicyOrgIds.isEmpty()
-            },
             CreateVaultItemType.BANK_ACCOUNT.takeUnless { isNewItemTypesEnabled },
             CreateVaultItemType.LICENSE.takeUnless { isNewItemTypesEnabled },
             CreateVaultItemType.PASSPORT.takeUnless { isNewItemTypesEnabled },
@@ -1184,10 +1167,6 @@ class VaultViewModel @Inject constructor(
                 handleFlightRecorderDataReceive(action)
             }
 
-            is VaultAction.Internal.PolicyUpdateReceive -> {
-                handlePolicyUpdateReceive(action)
-            }
-
             is VaultAction.Internal.DecryptionErrorReceive -> {
                 handleDecryptionErrorReceive(action)
             }
@@ -1460,20 +1439,6 @@ class VaultViewModel @Inject constructor(
         }
     }
 
-    private fun handlePolicyUpdateReceive(action: VaultAction.Internal.PolicyUpdateReceive) {
-        mutableStateFlow.update {
-            it.copy(restrictItemTypesPolicyOrgIds = action.restrictItemTypesPolicyOrdIds)
-        }
-
-        vaultRepository.vaultDataStateFlow.value.data?.let { vaultData ->
-            updateVaultState(
-                vaultData = vaultData,
-                dialog = state.dialog,
-                validTotpIds = state.validTotpIds,
-            )
-        }
-    }
-
     private fun handleInternetConnectionErrorReceived() {
         mutableStateFlow.update {
             it.copy(
@@ -1531,9 +1496,7 @@ class VaultViewModel @Inject constructor(
         if (state.isSwitchingAccounts) return
 
         val vaultFilterData = userState.activeAccount.toVaultFilterData(
-            isIndividualVaultDisabled = policyManager
-                .getActivePolicies(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-                .any(),
+            isIndividualVaultDisabled = false,
         )
         val appBarTitle = vaultFilterData.toAppBarTitle()
         val previousIsPremium = state.isPremium
@@ -1620,7 +1583,6 @@ class VaultViewModel @Inject constructor(
                             hasMasterPassword = state.hasMasterPassword,
                             vaultFilterType = vaultFilterTypeOrDefault,
                             isIconLoadingDisabled = state.isIconLoadingDisabled,
-                            restrictItemTypesPolicyOrgIds = state.restrictItemTypesPolicyOrgIds,
                             validTotpIds = validTotpIds,
                             isNewItemTypesEnabled = state.isNewItemTypesEnabled,
                             isVfo1FoundationEnabled = state.isVfo1FoundationEnabled,
@@ -1705,7 +1667,6 @@ class VaultViewModel @Inject constructor(
                     isPremium = state.isPremium,
                     hasMasterPassword = state.hasMasterPassword,
                     vaultFilterType = vaultFilterTypeOrDefault,
-                    restrictItemTypesPolicyOrgIds = state.restrictItemTypesPolicyOrgIds,
                     validTotpIds = validTotpIds,
                     isNewItemTypesEnabled = state.isNewItemTypesEnabled,
                     isVfo1FoundationEnabled = state.isVfo1FoundationEnabled,
@@ -1764,7 +1725,6 @@ class VaultViewModel @Inject constructor(
                     isPremium = state.isPremium,
                     hasMasterPassword = state.hasMasterPassword,
                     vaultFilterType = vaultFilterTypeOrDefault,
-                    restrictItemTypesPolicyOrgIds = state.restrictItemTypesPolicyOrgIds,
                     validTotpIds = validTotpIds,
                     isNewItemTypesEnabled = state.isNewItemTypesEnabled,
                     isVfo1FoundationEnabled = state.isVfo1FoundationEnabled,
@@ -1927,7 +1887,6 @@ data class VaultState(
     val isIconLoadingDisabled: Boolean,
     val cipherDecryptionFailureIds: ImmutableList<String>,
     val hasShownDecryptionFailureAlert: Boolean,
-    val restrictItemTypesPolicyOrgIds: List<String>,
     val isIntroducingArchiveActionCardDismissed: Boolean,
     val premiumCard: PremiumCard = PremiumCard.NONE,
     val isUpgradedToPremiumCardEligible: Boolean = false,
@@ -2945,13 +2904,6 @@ sealed class VaultAction {
          */
         data class FlightRecorderDataReceive(
             val data: FlightRecorderDataSet,
-        ) : Internal()
-
-        /**
-         * Indicates that a policy update has been received.
-         */
-        data class PolicyUpdateReceive(
-            val restrictItemTypesPolicyOrdIds: List<String>,
         ) : Internal()
 
         /**

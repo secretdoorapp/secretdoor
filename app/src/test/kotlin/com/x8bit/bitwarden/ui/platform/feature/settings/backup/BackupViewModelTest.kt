@@ -7,6 +7,8 @@ import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarData
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.asText
+import com.x8bit.bitwarden.data.auth.repository.AuthRepository
+import com.x8bit.bitwarden.data.auth.repository.model.UserState
 import com.x8bit.bitwarden.data.vault.manager.AutoBackupManager
 import com.x8bit.bitwarden.data.vault.manager.VaultBackupManager
 import com.x8bit.bitwarden.data.vault.manager.model.AutoBackupFrequency
@@ -39,6 +41,11 @@ import java.time.ZoneOffset
 class BackupViewModelTest : BaseViewModelTest() {
     private val uri: Uri = mockk()
     private val vaultBackupManager: VaultBackupManager = mockk()
+    private val authRepository: AuthRepository = mockk {
+        every { userStateFlow } returns MutableStateFlow(
+            mockk<UserState> { every { activeAccount.name } returns "Work Vault" },
+        )
+    }
     private val mutableAutoBackupStateFlow = MutableStateFlow(DEFAULT_AUTO_BACKUP_STATE)
     private val autoBackupManager: AutoBackupManager = mockk {
         every { isAutoBackupAvailable } returns true
@@ -80,7 +87,7 @@ class BackupViewModelTest : BaseViewModelTest() {
             viewModel.trySendAction(BackupAction.SaveBackupClick)
             assertEquals(
                 BackupEvent.NavigateToSelectBackupLocation(
-                    fileName = "secretdoor-backup-20261030-1200.secretdoor",
+                    fileName = "Work-Vault_2026-10-30_12-00.secretdoor",
                 ),
                 awaitItem(),
             )
@@ -165,6 +172,20 @@ class BackupViewModelTest : BaseViewModelTest() {
         val viewModel = createViewModel(isImport = true)
         viewModel.eventFlow.test {
             assertEquals(BackupEvent.NavigateToSelectImportFile, awaitItem())
+        }
+    }
+
+    @Test
+    fun `AutoBackupLocationClick should suggest a file named after the vault`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(BackupAction.AutoBackupLocationClick)
+            assertEquals(
+                BackupEvent.NavigateToSelectAutoBackupLocation(
+                    fileName = "Work-Vault_auto-backup.secretdoor",
+                ),
+                awaitItem(),
+            )
         }
     }
 
@@ -369,6 +390,7 @@ class BackupViewModelTest : BaseViewModelTest() {
     private fun createViewModel(isImport: Boolean = false): BackupViewModel =
         BackupViewModel(
             vaultBackupManager = vaultBackupManager,
+            authRepository = authRepository,
             autoBackupManager = autoBackupManager,
             clock = FIXED_CLOCK,
             savedStateHandle = SavedStateHandle().apply {

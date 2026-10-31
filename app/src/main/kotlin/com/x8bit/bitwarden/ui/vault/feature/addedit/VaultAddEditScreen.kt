@@ -137,8 +137,19 @@ fun VaultAddEditScreen(
     val cardHolderNameFocusRequester = remember { FocusRequester() }
     val scope = rememberCoroutineScope()
     val snackbarHostState = rememberBitwardenSnackbarHostState()
+    val attachmentFileLauncher = intentManager.getActivityResultLauncher { activityResult ->
+        intentManager.getFileDataFromActivityResult(activityResult)?.let {
+            viewModel.trySendAction(VaultAddEditAction.Common.AttachmentFileReceive(fileData = it))
+        }
+    }
     EventsEffect(viewModel = viewModel) { event ->
         when (event) {
+            VaultAddEditEvent.NavigateToChooseAttachmentFile -> {
+                attachmentFileLauncher.launch(
+                    intentManager.createFileChooserIntent(withCameraIntents = false),
+                )
+            }
+
             is VaultAddEditEvent.NavigateToQrCodeScan -> {
                 onNavigateToQrCodeScanScreen()
             }

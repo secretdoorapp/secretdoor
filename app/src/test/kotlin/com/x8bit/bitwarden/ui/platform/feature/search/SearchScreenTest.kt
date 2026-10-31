@@ -888,7 +888,6 @@ private val DEFAULT_STATE: SearchState = SearchState(
     totpData = null,
     autofillSelectionData = null,
     isPremium = true,
-    restrictItemTypesPolicyOrgIds = persistentListOf(),
 )
 
 private fun createStateForAutofill(

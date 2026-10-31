@@ -289,6 +289,11 @@ fun CoachMarkScope<AddEditItemCoachMark>.VaultAddEditContent(
             }
         }
 
+        vaultAddEditAttachments(
+            commonState = state.common,
+            commonTypeHandlers = commonTypeHandlers,
+        )
+
         vaultAddEditAdditionalOptions(
             itemType = state.type,
             commonState = state.common,

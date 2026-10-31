@@ -2904,7 +2904,6 @@ private val DEFAULT_STATE: VaultState = VaultState(
     flightRecorderSnackBar = null,
     cipherDecryptionFailureIds = persistentListOf(),
     hasShownDecryptionFailureAlert = false,
-    restrictItemTypesPolicyOrgIds = emptyList(),
     isIntroducingArchiveActionCardDismissed = false,
     validTotpIds = persistentSetOf(),
     policyBanner = null,

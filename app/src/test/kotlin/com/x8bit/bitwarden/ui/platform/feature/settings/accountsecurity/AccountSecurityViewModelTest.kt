@@ -8,22 +8,18 @@ import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
 import com.bitwarden.core.util.isBuildVersionAtLeast
 import com.bitwarden.data.repository.model.Environment
 import com.bitwarden.network.model.OrganizationType
-import com.bitwarden.policies.Policy
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.asText
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.OnboardingStatus
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.LogoutReason
-import com.x8bit.bitwarden.data.auth.repository.model.PolicyInformation
 import com.x8bit.bitwarden.data.auth.repository.model.UserFingerprintResult
 import com.x8bit.bitwarden.data.auth.repository.model.UserState
 import com.x8bit.bitwarden.data.auth.repository.model.createMockOrganization
 import com.x8bit.bitwarden.data.platform.error.NoActiveUserException
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
@@ -31,7 +27,6 @@ import com.x8bit.bitwarden.data.platform.repository.model.BiometricsKeyResult
 import com.x8bit.bitwarden.data.platform.repository.model.VaultTimeout
 import com.x8bit.bitwarden.data.platform.repository.model.VaultTimeoutAction
 import com.x8bit.bitwarden.data.platform.repository.util.FakeEnvironmentRepository
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkPolicy
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.ui.platform.components.toggle.UnlockWithPinState
 import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.AccountSecurityAction.AuthenticatorSyncToggle
@@ -47,7 +42,6 @@ import io.mockk.verify
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -93,16 +87,6 @@ class AccountSecurityViewModelTest : BaseViewModelTest() {
         every { firstTimeStateFlow } returns mutableFirstTimeStateFlow
         every { storeShowUnlockSettingBadge(any()) } just runs
     }
-    private val mutableActivePolicyFlow = bufferedMutableSharedFlow<List<Policy>>()
-    private val mutableRemovePinPolicyFlow = bufferedMutableSharedFlow<List<Policy>>()
-    private val policyManager: PolicyManager = mockk {
-        every {
-            getActivePoliciesFlow(type = PolicyType.MAXIMUM_VAULT_TIMEOUT)
-        } returns mutableActivePolicyFlow
-        every {
-            getActivePoliciesFlow(type = PolicyType.REMOVE_UNLOCK_WITH_PIN)
-        } returns mutableRemovePinPolicyFlow
-    }
 
     @BeforeEach
     fun setup() {
@@ -129,135 +113,6 @@ class AccountSecurityViewModelTest : BaseViewModelTest() {
             settingsRepository.isUnlockWithBiometricsEnabled
         }
         coVerify { settingsRepository.getUserFingerprint() }
-    }
-
-    @Test
-    fun `state updates when policies change`() = runTest {
-        val viewModel = createViewModel()
-
-        val policyInformation = PolicyInformation.VaultTimeout(
-            minutes = 10,
-            action = PolicyInformation.VaultTimeout.Action.LOCK,
-            type = PolicyInformation.VaultTimeout.Type.CUSTOM,
-        )
-        mutableActivePolicyFlow.emit(
-            listOf(
-                createMockSdkPolicy(
-                    enabled = true,
-                    type = PolicyType.MAXIMUM_VAULT_TIMEOUT,
-                    data = Json.encodeToString(policyInformation),
-                ),
-            ),
-        )
-
-        viewModel.stateFlow.test {
-            assertEquals(
-                DEFAULT_STATE.copy(
-                    vaultTimeoutPolicy = VaultTimeoutPolicy(
-                        minutes = 10,
-                        action = PolicyInformation.VaultTimeout.Action.LOCK,
-                        type = PolicyInformation.VaultTimeout.Type.CUSTOM,
-                    ),
-                ),
-                awaitItem(),
-            )
-        }
-    }
-
-    @Test
-    fun `state updates when remove pin policies change`() = runTest {
-        val viewModel = createViewModel()
-
-        mutableRemovePinPolicyFlow.emit(
-            listOf(
-                createMockSdkPolicy(
-                    enabled = true,
-                    type = PolicyType.REMOVE_UNLOCK_WITH_PIN,
-                    organizationId = "organizationUser",
-                ),
-            ),
-        )
-
-        viewModel.stateFlow.test {
-            assertEquals(
-                DEFAULT_STATE.copy(
-                    removeUnlockWithPinPolicyEnabled = true,
-                ),
-                awaitItem(),
-            )
-        }
-    }
-
-    @Test
-    fun `remove pin policy is true when user role is ADMIN`() = runTest {
-        val viewModel = createViewModel()
-
-        mutableRemovePinPolicyFlow.emit(
-            listOf(
-                createMockSdkPolicy(
-                    organizationId = "organizationAdmin",
-                    enabled = true,
-                    type = PolicyType.REMOVE_UNLOCK_WITH_PIN,
-                ),
-            ),
-        )
-
-        viewModel.stateFlow.test {
-            assertEquals(
-                DEFAULT_STATE.copy(
-                    removeUnlockWithPinPolicyEnabled = true,
-                ),
-                awaitItem(),
-            )
-        }
-    }
-
-    @Test
-    fun `remove pin policy is true when user role is OWNER`() = runTest {
-        val viewModel = createViewModel()
-
-        mutableRemovePinPolicyFlow.emit(
-            listOf(
-                createMockSdkPolicy(
-                    organizationId = "organizationOwner",
-                    enabled = true,
-                    type = PolicyType.REMOVE_UNLOCK_WITH_PIN,
-                ),
-            ),
-        )
-
-        viewModel.stateFlow.test {
-            assertEquals(
-                DEFAULT_STATE.copy(
-                    removeUnlockWithPinPolicyEnabled = true,
-                ),
-                awaitItem(),
-            )
-        }
-    }
-
-    @Test
-    fun `remove pin policy is true when user role is CUSTOM with manage policies`() = runTest {
-        val viewModel = createViewModel()
-
-        mutableRemovePinPolicyFlow.emit(
-            listOf(
-                createMockSdkPolicy(
-                    organizationId = "organizationCustom",
-                    enabled = true,
-                    type = PolicyType.REMOVE_UNLOCK_WITH_PIN,
-                ),
-            ),
-        )
-
-        viewModel.stateFlow.test {
-            assertEquals(
-                DEFAULT_STATE.copy(
-                    removeUnlockWithPinPolicyEnabled = true,
-                ),
-                awaitItem(),
-            )
-        }
     }
 
     @Suppress("MaxLineLength")
@@ -897,14 +752,12 @@ class AccountSecurityViewModelTest : BaseViewModelTest() {
         environmentRepository: EnvironmentRepository = this.fakeEnvironmentRepository,
         settingsRepository: SettingsRepository = this.settingsRepository,
         featureFlagManager: FeatureFlagManager = this.featureFlagManager,
-        policyManager: PolicyManager = this.policyManager,
     ): AccountSecurityViewModel = AccountSecurityViewModel(
         authRepository = authRepository,
         vaultRepository = vaultRepository,
         settingsRepository = settingsRepository,
         environmentRepository = environmentRepository,
         featureFlagManager = featureFlagManager,
-        policyManager = policyManager,
         savedStateHandle = SavedStateHandle().apply {
             set("state", initialState)
         },

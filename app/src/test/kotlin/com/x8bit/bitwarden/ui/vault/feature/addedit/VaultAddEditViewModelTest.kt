@@ -1,5 +1,6 @@
 package com.x8bit.bitwarden.ui.vault.feature.addedit
 
+import android.net.Uri
 import androidx.core.os.bundleOf
 import androidx.credentials.CreatePublicKeyCredentialRequest
 import androidx.credentials.provider.CallingAppInfo
@@ -14,13 +15,13 @@ import com.bitwarden.core.data.manager.toast.ToastManager
 import com.bitwarden.core.data.repository.model.DataState
 import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
 import com.bitwarden.data.repository.model.Environment
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarData
 import com.bitwarden.ui.platform.feature.cardscanner.manager.CardScanManager
 import com.bitwarden.ui.platform.feature.cardscanner.util.CardScanData
 import com.bitwarden.ui.platform.feature.cardscanner.util.CardScanResult
 import com.bitwarden.ui.platform.manager.snackbar.SnackbarRelayManager
+import com.bitwarden.ui.platform.model.FileData
 import com.bitwarden.ui.platform.model.TotpData
 import com.bitwarden.ui.platform.resource.BitwardenPlurals
 import com.bitwarden.ui.platform.resource.BitwardenString
@@ -49,7 +50,6 @@ import com.x8bit.bitwarden.data.credentials.model.UserVerificationRequirement
 import com.x8bit.bitwarden.data.credentials.model.createMockCreateCredentialRequest
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
@@ -59,6 +59,7 @@ import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
 import com.x8bit.bitwarden.data.platform.manager.model.OrganizationEvent
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
+import com.x8bit.bitwarden.data.platform.repository.model.UriMatchType as UriMatchTypeModel
 import com.x8bit.bitwarden.data.platform.repository.util.FakeEnvironmentRepository
 import com.x8bit.bitwarden.data.tools.generator.repository.GeneratorRepository
 import com.x8bit.bitwarden.data.tools.generator.repository.util.FakeGeneratorRepository
@@ -70,12 +71,12 @@ import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockCipherView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockDecryptCipherListResult
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkCipherPermissions
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkFido2CredentialList
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkPolicy
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createViewCollectionView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createViewExceptPasswordsCollectionView
 import com.x8bit.bitwarden.data.vault.manager.model.GetCipherResult
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.ArchiveCipherResult
+import com.x8bit.bitwarden.data.vault.repository.model.CreateAttachmentResult
 import com.x8bit.bitwarden.data.vault.repository.model.CreateCipherResult
 import com.x8bit.bitwarden.data.vault.repository.model.CreateFolderResult
 import com.x8bit.bitwarden.data.vault.repository.model.DeleteCipherResult
@@ -131,7 +132,6 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.util.UUID
-import com.x8bit.bitwarden.data.platform.repository.model.UriMatchType as UriMatchTypeModel
 
 @Suppress("LargeClass")
 class VaultAddEditViewModelTest : BaseViewModelTest() {
@@ -173,11 +173,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
     private val clipboardManager: BitwardenClipboardManager = mockk {
         every { setText(text = any<String>(), toastDescriptorOverride = any<Text>()) } just runs
     }
-    private val policyManager: PolicyManager = mockk {
-        every {
-            getActivePolicies(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-        } returns emptyList()
-    }
     private val bitwardenCredentialManager = mockk<BitwardenCredentialManager> {
         every { isUserVerified } returns false
         every { isUserVerified = any() } just runs
@@ -215,6 +210,7 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
     }
     private val mutableSnackbarDataFlow: MutableSharedFlow<BitwardenSnackbarData> =
         bufferedMutableSharedFlow()
+    private val attachmentUri: Uri = mockk()
     private val snackbarRelayManager: SnackbarRelayManager<SnackbarRelay> = mockk {
         every {
             getSnackbarDataFlow(relay = any(), relays = anyVararg())
@@ -300,9 +296,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
                 awaitItem(),
             )
         }
-        verify {
-            policyManager.getActivePolicies(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-        }
     }
 
     @Test
@@ -324,65 +317,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
         }
         verify(exactly = 0) {
             organizationEventManager.trackEvent(event = any())
-        }
-    }
-
-    @Test
-    fun `initial add state should be correct with individual vault disabled`() = runTest {
-        every {
-            policyManager.getActivePolicies(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-        } returns listOf(
-            createMockSdkPolicy(
-                organizationId = "Test Org",
-                id = "testId",
-                type = PolicyType.ORGANIZATION_DATA_OWNERSHIP,
-                enabled = true,
-            ),
-        )
-        val vaultAddEditType = VaultAddEditType.AddItem()
-        val vaultItemCipherType = VaultItemCipherType.LOGIN
-        mutableVaultDataFlow.value = DataState.Loaded(
-            data = createVaultData(),
-        )
-        val viewModel = createAddVaultItemViewModel(
-            savedStateHandle = createSavedStateHandleWithState(
-                state = null,
-                vaultAddEditType = vaultAddEditType,
-                vaultItemCipherType = vaultItemCipherType,
-            ),
-        )
-        assertEquals(
-            VaultAddEditState(
-                vaultAddEditType = vaultAddEditType,
-                cipherType = vaultItemCipherType,
-                viewState = VaultAddEditState.ViewState.Content(
-                    common = createCommonContentViewState(
-                        availableOwners = listOf(
-                            VaultAddEditState.Owner(
-                                id = "organizationId",
-                                name = "organizationName".asText(),
-                                collections = emptyList(),
-                            ),
-                        ),
-                    ),
-                    isIndividualVaultDisabled = true,
-                    type = VaultAddEditState.ViewState.Content.ItemType.Login(),
-                ),
-                dialog = null,
-                bottomSheetState = null,
-                shouldShowCoachMarkTour = false,
-                defaultUriMatchType = UriMatchTypeModel.EXACT,
-                hasPremium = true,
-                isCardScannerEnabled = false,
-                isVfo1FoundationEnabled = true,
-            ),
-            viewModel.stateFlow.value,
-        )
-        verify(exactly = 1) {
-            vaultRepository.vaultDataStateFlow
-        }
-        verify {
-            policyManager.getActivePolicies(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)
         }
     }
 
@@ -919,6 +853,124 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
             }
             coVerify(exactly = 1) {
                 vaultRepository.createCipher(any())
+            }
+        }
+
+    @Test
+    fun `AddAttachmentClick should ask for a file`() = runTest {
+        val viewModel = createAddVaultItemViewModel()
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(VaultAddEditAction.Common.AddAttachmentClick)
+            assertEquals(VaultAddEditEvent.NavigateToChooseAttachmentFile, awaitItem())
+        }
+    }
+
+    @Test
+    fun `AttachmentFileReceive and RemovePendingAttachmentClick should update the picked files`() {
+        val viewModel = createAddVaultItemViewModel()
+        val fileData = FileData(fileName = "scan.png", uri = attachmentUri, sizeBytes = 42L)
+
+        viewModel.trySendAction(VaultAddEditAction.Common.AttachmentFileReceive(fileData))
+
+        val attachment = VaultAddEditState.PendingAttachment(
+            fileName = "scan.png",
+            uri = attachmentUri,
+            sizeBytes = 42L,
+        )
+        assertEquals(listOf(attachment), viewModel.pendingAttachments())
+
+        viewModel.trySendAction(VaultAddEditAction.Common.RemovePendingAttachmentClick(attachment))
+
+        assertEquals(emptyList<VaultAddEditState.PendingAttachment>(), viewModel.pendingAttachments())
+    }
+
+    @Test
+    fun `AttachmentFileReceive with a file over 100 MB should show an error`() {
+        val viewModel = createAddVaultItemViewModel()
+        val fileData = FileData(
+            fileName = "movie.mp4",
+            uri = attachmentUri,
+            sizeBytes = 100L * 1024 * 1024 + 1,
+        )
+
+        viewModel.trySendAction(VaultAddEditAction.Common.AttachmentFileReceive(fileData))
+
+        assertEquals(emptyList<VaultAddEditState.PendingAttachment>(), viewModel.pendingAttachments())
+        assertEquals(
+            VaultAddEditState.DialogState.Generic(
+                title = BitwardenString.an_error_has_occurred.asText(),
+                message = BitwardenString.max_file_size.asText(),
+            ),
+            viewModel.stateFlow.value.dialog,
+        )
+    }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `in add mode, SaveClick should attach the picked files to the new item and relay the ones that failed`() =
+        runTest {
+            val attachments = listOf(
+                VaultAddEditState.PendingAttachment("a.png", attachmentUri, 1L),
+                VaultAddEditState.PendingAttachment("b.pdf", attachmentUri, 2L),
+            )
+            val stateWithAttachments = createVaultAddItemState(
+                commonContentViewState = createCommonContentViewState(name = "mockName-1")
+                    .copy(pendingAttachments = attachments),
+            )
+            mutableVaultDataFlow.value = DataState.Loaded(createVaultData())
+            val viewModel = createAddVaultItemViewModel(
+                createSavedStateHandleWithState(
+                    state = stateWithAttachments,
+                    vaultAddEditType = VaultAddEditType.AddItem(),
+                    vaultItemCipherType = VaultItemCipherType.LOGIN,
+                ),
+            )
+            val savedCipherView = createMockCipherView(number = 1)
+            val cipherViewWithFirstFile = createMockCipherView(number = 2)
+            coEvery {
+                vaultRepository.createCipher(any())
+            } returns CreateCipherResult.Success(cipherId = DEFAULT_ITEM_ID)
+            coEvery {
+                vaultRepository.getCipher(DEFAULT_ITEM_ID)
+            } returns GetCipherResult.Success(cipherView = savedCipherView)
+            coEvery {
+                vaultRepository.createAttachment(
+                    cipherId = DEFAULT_ITEM_ID,
+                    cipherView = savedCipherView,
+                    fileSizeBytes = "1",
+                    fileName = "a.png",
+                    fileUri = attachmentUri,
+                )
+            } returns CreateAttachmentResult.Success(cipherView = cipherViewWithFirstFile)
+            coEvery {
+                vaultRepository.createAttachment(
+                    cipherId = DEFAULT_ITEM_ID,
+                    cipherView = cipherViewWithFirstFile,
+                    fileSizeBytes = "2",
+                    fileName = "b.pdf",
+                    fileUri = attachmentUri,
+                )
+            } returns CreateAttachmentResult.Error(error = Throwable("Fail"))
+
+            viewModel.eventFlow.test {
+                viewModel.trySendAction(VaultAddEditAction.Common.SaveClick)
+                assertEquals(
+                    VaultAddEditEvent.CloseAndNavigateToVaultItem(
+                        cipherId = DEFAULT_ITEM_ID,
+                        cipherType = VaultItemCipherType.LOGIN,
+                    ),
+                    awaitItem(),
+                )
+            }
+            verify {
+                snackbarRelayManager.sendSnackbarData(
+                    data = BitwardenSnackbarData(
+                        message = BitwardenString
+                            .item_saved_but_these_files_could_not_be_attached_x
+                            .asText("b.pdf"),
+                    ),
+                    relay = SnackbarRelay.CIPHER_UPDATED,
+                )
             }
         }
 
@@ -6423,7 +6475,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
             buildInfoManager = buildInfoManager,
             clipboardManager = bitwardenClipboardManager,
             cardScanManager = cardScanManager,
-            policyManager = policyManager,
             vaultRepository = vaultRepo,
             bitwardenCredentialManager = bitwardenCredentialManager,
             generatorRepository = generatorRepo,
@@ -6673,3 +6724,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
 private const val TEST_ID = "testId"
 
 private const val DEFAULT_ITEM_ID: String = "mockId-1"
+
+private fun VaultAddEditViewModel.pendingAttachments(): List<VaultAddEditState.PendingAttachment> =
+    (stateFlow.value.viewState as VaultAddEditState.ViewState.Content).common.pendingAttachments

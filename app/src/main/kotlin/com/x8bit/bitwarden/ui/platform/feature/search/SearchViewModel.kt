@@ -8,7 +8,6 @@ import com.bitwarden.core.data.manager.model.FlagKey
 import com.bitwarden.core.data.repository.model.DataState
 import com.bitwarden.data.repository.util.baseIconUrl
 import com.bitwarden.data.repository.util.baseWebVaultUrlOrDefault
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BackgroundEvent
 import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.components.icon.model.IconData
@@ -30,7 +29,6 @@ import com.x8bit.bitwarden.data.autofill.model.AutofillSelectionData
 import com.x8bit.bitwarden.data.autofill.util.login
 import com.x8bit.bitwarden.data.billing.manager.PremiumStateManager
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
 import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
@@ -57,15 +55,12 @@ import com.x8bit.bitwarden.ui.platform.model.SnackbarRelay
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.model.ListingItemOverflowAction
 import com.x8bit.bitwarden.ui.vault.feature.vault.model.VaultFilterData
 import com.x8bit.bitwarden.ui.vault.feature.vault.model.VaultFilterType
-import com.x8bit.bitwarden.ui.vault.feature.vault.util.applyRestrictItemTypesPolicy
 import com.x8bit.bitwarden.ui.vault.feature.vault.util.toFilteredList
 import com.x8bit.bitwarden.ui.vault.feature.vault.util.toVaultFilterData
 import com.x8bit.bitwarden.ui.vault.model.VaultItemCipherType
 import com.x8bit.bitwarden.ui.vault.util.toVaultItemCipherType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -89,7 +84,6 @@ class SearchViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val clock: Clock,
     private val clipboardManager: BitwardenClipboardManager,
-    private val policyManager: PolicyManager,
     private val accessibilitySelectionManager: AccessibilitySelectionManager,
     private val autofillSelectionManager: AutofillSelectionManager,
     private val organizationEventManager: OrganizationEventManager,
@@ -121,9 +115,7 @@ class SearchViewModel @Inject constructor(
                 viewState = SearchState.ViewState.Loading,
                 dialogState = null,
                 vaultFilterData = userState.activeAccount.toVaultFilterData(
-                    isIndividualVaultDisabled = policyManager
-                        .getActivePolicies(type = PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-                        .any(),
+                    isIndividualVaultDisabled = false,
                 ),
                 baseIconUrl = environmentRepo.environment.baseIconUrl,
                 isIconLoadingDisabled = settingsRepo.isIconLoadingDisabled,
@@ -131,7 +123,6 @@ class SearchViewModel @Inject constructor(
                 totpData = specialCircumstance?.toTotpDataOrNull(),
                 hasMasterPassword = userState.activeAccount.hasMasterPassword,
                 isPremium = userState.activeAccount.isPremium,
-                restrictItemTypesPolicyOrgIds = persistentListOf(),
             )
         },
 ) {
@@ -145,13 +136,6 @@ class SearchViewModel @Inject constructor(
         vaultRepo
             .vaultDataStateFlow
             .map { SearchAction.Internal.VaultDataReceive(it) }
-            .onEach(::sendAction)
-            .launchIn(viewModelScope)
-
-        policyManager
-            .getActivePoliciesFlow(type = PolicyType.RESTRICTED_ITEM_TYPES)
-            .map { policies -> policies.map { it.organizationId } }
-            .map { SearchAction.Internal.RestrictItemTypesPolicyUpdateReceive(it) }
             .onEach(::sendAction)
             .launchIn(viewModelScope)
 
@@ -622,9 +606,6 @@ class SearchViewModel @Inject constructor(
 
             is SearchAction.Internal.VaultDataReceive -> handleVaultDataReceive(action)
 
-            is SearchAction.Internal.RestrictItemTypesPolicyUpdateReceive -> {
-                handleRestrictItemTypesPolicyUpdateReceive(action)
-            }
 
             is SearchAction.Internal.Vfo1FoundationFlagUpdateReceive -> {
                 handleVfo1FoundationFlagUpdateReceive(action)
@@ -833,22 +814,6 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private fun handleRestrictItemTypesPolicyUpdateReceive(
-        action: SearchAction.Internal.RestrictItemTypesPolicyUpdateReceive,
-    ) {
-        mutableStateFlow.update {
-            it.copy(
-                restrictItemTypesPolicyOrgIds = action
-                    .restrictItemTypesPolicyOrdIds
-                    .toImmutableList(),
-            )
-        }
-
-        vaultRepo.vaultDataStateFlow.value.data?.let { vaultData ->
-            updateStateWithVaultData(vaultData = vaultData, clearDialogState = false)
-        }
-    }
-
     private fun handleVfo1FoundationFlagUpdateReceive(
         action: SearchAction.Internal.Vfo1FoundationFlagUpdateReceive,
     ) {
@@ -944,9 +909,6 @@ class SearchViewModel @Inject constructor(
                             .decryptCipherListResult
                             .successes
                             .filterAndOrganize(searchType, state.searchTerm)
-                            .applyRestrictItemTypesPolicy(
-                                restrictItemTypesPolicyOrgIds = state.restrictItemTypesPolicyOrgIds,
-                            )
                             .toFilteredList(
                                 vaultFilterType = state
                                     .vaultFilterData
@@ -1015,7 +977,6 @@ data class SearchState(
     val totpData: TotpData?,
     val hasMasterPassword: Boolean,
     val isPremium: Boolean,
-    val restrictItemTypesPolicyOrgIds: ImmutableList<String>,
     val isVfo1FoundationEnabled: Boolean = false,
 ) : Parcelable {
 
@@ -1375,13 +1336,6 @@ sealed class SearchAction {
          */
         data class UnarchiveCipherReceive(
             val result: UnarchiveCipherResult,
-        ) : Internal()
-
-        /**
-         * Indicates that a restrict item types policy update has been received.
-         */
-        data class RestrictItemTypesPolicyUpdateReceive(
-            val restrictItemTypesPolicyOrdIds: List<String>,
         ) : Internal()
 
         /**

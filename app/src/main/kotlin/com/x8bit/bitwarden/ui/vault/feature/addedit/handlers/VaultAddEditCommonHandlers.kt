@@ -41,6 +41,8 @@ data class VaultAddEditCommonHandlers(
     val onChangeToExistingFolder: (String?) -> Unit,
     val onOnAddFolder: (String) -> Unit,
     val onDismissBottomSheet: () -> Unit,
+    val onAddAttachmentClick: () -> Unit,
+    val onRemovePendingAttachmentClick: (VaultAddEditState.PendingAttachment) -> Unit,
 ) {
     @Suppress("UndocumentedPublicClass")
     companion object {
@@ -52,6 +54,14 @@ data class VaultAddEditCommonHandlers(
         @Suppress("LongMethod")
         fun create(viewModel: VaultAddEditViewModel): VaultAddEditCommonHandlers {
             return VaultAddEditCommonHandlers(
+                onAddAttachmentClick = {
+                    viewModel.trySendAction(VaultAddEditAction.Common.AddAttachmentClick)
+                },
+                onRemovePendingAttachmentClick = {
+                    viewModel.trySendAction(
+                        VaultAddEditAction.Common.RemovePendingAttachmentClick(attachment = it),
+                    )
+                },
                 onNameTextChange = { newName ->
                     viewModel.trySendAction(
                         VaultAddEditAction.Common.NameTextChange(newName),

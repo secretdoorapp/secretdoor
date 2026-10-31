@@ -11,6 +11,7 @@ import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarData
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.Text
 import com.bitwarden.ui.util.asText
+import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.vault.manager.AutoBackupManager
 import com.x8bit.bitwarden.data.vault.manager.VaultBackupManager
 import com.x8bit.bitwarden.data.vault.manager.model.AutoBackupFrequency
@@ -37,6 +38,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BackupViewModel @Inject constructor(
     private val vaultBackupManager: VaultBackupManager,
+    private val authRepository: AuthRepository,
     private val autoBackupManager: AutoBackupManager,
     private val clock: Clock,
     savedStateHandle: SavedStateHandle,
@@ -105,7 +107,11 @@ class BackupViewModel @Inject constructor(
     }
 
     private fun handleAutoBackupLocationClick() {
-        sendEvent(BackupEvent.NavigateToSelectAutoBackupLocation(fileName = AUTO_BACKUP_FILE_NAME))
+        sendEvent(
+            BackupEvent.NavigateToSelectAutoBackupLocation(
+                fileName = "${vaultFileNamePrefix()}_auto-backup$BACKUP_FILE_EXTENSION",
+            ),
+        )
     }
 
     private fun handleAutoBackupLocationReceive(action: BackupAction.AutoBackupLocationReceive) {
@@ -330,12 +336,24 @@ class BackupViewModel @Inject constructor(
     }
 
     private fun backupFileName(): String =
-        "secretdoor-backup-${clock.instant().toFormattedPattern("yyyyMMdd-HHmm", clock = clock)}" +
+        vaultFileNamePrefix() + "_" +
+            clock.instant().toFormattedPattern("yyyy-MM-dd_HH-mm", clock = clock) +
             BACKUP_FILE_EXTENSION
+
+    /**
+     * The active vault's name made safe for a file name, e.g. "My vault" -> "My-vault".
+     */
+    private fun vaultFileNamePrefix(): String =
+        (authRepository.userStateFlow.value?.activeAccount?.name ?: DEFAULT_VAULT_NAME)
+            .trim()
+            .replace(UNSAFE_FILE_NAME_CHARACTERS, "-")
+            .trim('-')
+            .ifEmpty { "SecretDoor" }
 }
 
 private const val BACKUP_FILE_EXTENSION: String = ".secretdoor"
-private const val AUTO_BACKUP_FILE_NAME: String = "secretdoor-auto-backup$BACKUP_FILE_EXTENSION"
+private const val DEFAULT_VAULT_NAME: String = "My vault"
+private val UNSAFE_FILE_NAME_CHARACTERS: Regex = Regex("[^\\p{L}\\p{N}._-]+")
 
 /**
  * Models the state of the backup screen.

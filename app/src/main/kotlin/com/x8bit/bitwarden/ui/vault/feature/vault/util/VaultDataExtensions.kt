@@ -44,7 +44,6 @@ fun VaultData.toViewState(
     isIconLoadingDisabled: Boolean,
     baseIconUrl: String,
     vaultFilterType: VaultFilterType,
-    restrictItemTypesPolicyOrgIds: List<String>,
     validTotpIds: Set<String>,
     isNewItemTypesEnabled: Boolean,
     isVfo1FoundationEnabled: Boolean = false,
@@ -61,7 +60,6 @@ fun VaultData.toViewState(
             )
             .applyFilters(
                 vaultFilterType = vaultFilterType,
-                restrictItemTypesPolicyOrgIds = restrictItemTypesPolicyOrgIds,
                 excludeArchived = false,
                 excludeDeleted = false,
             )
@@ -71,7 +69,6 @@ fun VaultData.toViewState(
         .successes
         .applyFilters(
             vaultFilterType = vaultFilterType,
-            restrictItemTypesPolicyOrgIds = restrictItemTypesPolicyOrgIds,
             excludeArchived = true,
             excludeDeleted = true,
         )
@@ -83,7 +80,6 @@ fun VaultData.toViewState(
         }
         .applyFilters(
             vaultFilterType = vaultFilterType,
-            restrictItemTypesPolicyOrgIds = restrictItemTypesPolicyOrgIds,
             excludeArchived = true,
             excludeDeleted = true,
         )
@@ -210,7 +206,7 @@ fun VaultData.toViewState(
                 .premium_subscription_required
                 .asText()
                 .takeIf { !isPremium && archiveCount == 0 },
-            showCardGroup = cardCount != 0 || restrictItemTypesPolicyOrgIds.isEmpty(),
+            showCardGroup = true,
             showBankAccountGroup = isNewItemTypesEnabled,
             showLicenseGroup = isNewItemTypesEnabled,
             showPassportGroup = isNewItemTypesEnabled,
@@ -450,32 +446,8 @@ fun List<CollectionView>.toFilteredList(
             }
         }
 
-/**
- * Filters out [CipherType.CARD] [CipherListView]s that are in [restrictItemTypesPolicyOrgIds] list.
- * When [restrictItemTypesPolicyOrgIds] is not empty, individual vault items are also removed.
- */
-fun List<CipherListView>.applyRestrictItemTypesPolicy(
-    restrictItemTypesPolicyOrgIds: List<String>,
-): List<CipherListView> =
-    this
-        .filterNot { cipherListView ->
-            if (restrictItemTypesPolicyOrgIds.isEmpty()) {
-                // No policy, so don't apply removal
-                false
-            } else if (cipherListView.type !is CipherListViewType.Card) {
-                // Policy only for cards
-                false
-            } else {
-                // If a policy is enable for a given organization then
-                // also hide cards from individual vault
-                cipherListView.organizationId.isNullOrEmpty() ||
-                    restrictItemTypesPolicyOrgIds.contains(cipherListView.organizationId)
-            }
-        }
-
 private fun List<CipherListView>.applyFilters(
     vaultFilterType: VaultFilterType,
-    restrictItemTypesPolicyOrgIds: List<String>,
     excludeArchived: Boolean,
     excludeDeleted: Boolean,
 ): List<CipherListView> = this
@@ -493,5 +465,4 @@ private fun List<CipherListView>.applyFilters(
             it
         }
     }
-    .applyRestrictItemTypesPolicy(restrictItemTypesPolicyOrgIds)
     .toFilteredList(vaultFilterType)

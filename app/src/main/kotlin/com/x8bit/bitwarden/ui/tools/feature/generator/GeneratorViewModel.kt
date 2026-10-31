@@ -15,16 +15,12 @@ import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.Text
 import com.bitwarden.ui.util.asText
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
-import com.x8bit.bitwarden.data.auth.repository.model.PolicyInformation
 import com.x8bit.bitwarden.data.billing.manager.PremiumStateManager
 import com.x8bit.bitwarden.data.billing.manager.UPGRADED_TO_PREMIUM_LEARN_MORE_URL
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.ReviewPromptManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
 import com.x8bit.bitwarden.data.platform.manager.model.CoachMarkTourType
-import com.x8bit.bitwarden.data.platform.manager.util.getActivePolicies
-import com.x8bit.bitwarden.data.platform.manager.util.getActivePoliciesFlow
 import com.x8bit.bitwarden.data.tools.generator.repository.GeneratorRepository
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratedCatchAllUsernameResult
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratedForwardedServiceUsernameResult
@@ -48,7 +44,6 @@ import com.x8bit.bitwarden.ui.tools.feature.generator.GeneratorState.MainType.Us
 import com.x8bit.bitwarden.ui.tools.feature.generator.model.GeneratorMode
 import com.x8bit.bitwarden.ui.tools.feature.generator.util.GeneratorRequestResult
 import com.x8bit.bitwarden.ui.tools.feature.generator.util.toServiceType
-import com.x8bit.bitwarden.ui.tools.feature.generator.util.toStrictestPolicy
 import com.x8bit.bitwarden.ui.tools.feature.generator.util.toUsernameGeneratorRequest
 import com.x8bit.bitwarden.ui.vault.model.VaultAddEditType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -81,7 +76,6 @@ class GeneratorViewModel @Inject constructor(
     private val clipboardManager: BitwardenClipboardManager,
     private val generatorRepository: GeneratorRepository,
     private val authRepository: AuthRepository,
-    private val policyManager: PolicyManager,
     private val reviewPromptManager: ReviewPromptManager,
     private val firstTimeActionManager: FirstTimeActionManager,
     private val premiumStateManager: PremiumStateManager,
@@ -109,9 +103,6 @@ class GeneratorViewModel @Inject constructor(
             currentEmailAddress = requireNotNull(
                 authRepository.userStateFlow.value?.activeAccount?.email,
             ),
-            isUnderPolicy = policyManager
-                .getActivePolicies<PolicyInformation.PasswordGenerator>()
-                .any(),
             website = (generatorMode as? GeneratorMode.Modal.Username)?.website,
             shouldShowCoachMarkTour = false,
             isUpgradedToPremiumCardEligible = false,
@@ -126,12 +117,6 @@ class GeneratorViewModel @Inject constructor(
     init {
         stateFlow.onEach { savedStateHandle[KEY_STATE] = it }.launchIn(viewModelScope)
         loadOptions()
-        policyManager
-            .getActivePoliciesFlow<PolicyInformation.PasswordGenerator>()
-            .map { GeneratorAction.Internal.PasswordGeneratorPolicyReceive(it) }
-            .onEach(::sendAction)
-            .launchIn(viewModelScope)
-
         firstTimeActionManager
             .shouldShowGeneratorCoachMarkFlow
             .map { shouldShowCoachMarkTour ->
@@ -291,9 +276,6 @@ class GeneratorViewModel @Inject constructor(
                 handleUpdateForwardedServiceGeneratedUsernameResult(action)
             }
 
-            is GeneratorAction.Internal.PasswordGeneratorPolicyReceive -> {
-                handlePasswordGeneratorPolicyReceive(action)
-            }
 
             is GeneratorAction.Internal.ShouldShowGeneratorCoachMarkValueChangeReceive -> {
                 handleShouldShowCoachMarkValueChange(action)
@@ -392,73 +374,32 @@ class GeneratorViewModel @Inject constructor(
             .getPasscodeGenerationOptions()
             ?: generatePasscodeDefaultOptions()
 
-        val policy = policyManager
-            .getActivePolicies<PolicyInformation.PasswordGenerator>()
-            .toStrictestPolicy()
-
-        val passwordType = when (policy.overridePasswordType.toPasscodePolicyOverride()) {
-            GeneratorState.PasscodePolicyOverride.PASSWORD -> {
-                mutableStateFlow.update {
-                    it.copy(
-                        passcodePolicyOverride = GeneratorState.PasscodePolicyOverride.PASSWORD,
-                    )
-                }
-                GeneratorState.MainType.Password()
-            }
-
-            GeneratorState.PasscodePolicyOverride.PASSPHRASE -> {
-                mutableStateFlow.update {
-                    it.copy(
-                        passcodePolicyOverride = GeneratorState.PasscodePolicyOverride.PASSPHRASE,
-                    )
-                }
-                GeneratorState.MainType.Passphrase()
-            }
-
-            null -> {
-                mutableStateFlow.update { it.copy(passcodePolicyOverride = null) }
-                selectedType
-            }
-        }
-
-        when (passwordType) {
+        when (selectedType) {
             is GeneratorState.MainType.Passphrase -> {
-                val minNumWords = policy
-                    .minNumberWords
-                    ?: GeneratorState.MainType.Passphrase.PASSPHRASE_MIN_NUMBER_OF_WORDS
+                val minNumWords = GeneratorState.MainType.Passphrase.PASSPHRASE_MIN_NUMBER_OF_WORDS
                 updateGeneratorMainType {
                     GeneratorState.MainType.Passphrase(
                         numWords = max(options.numWords, minNumWords),
                         minNumWords = minNumWords,
                         wordSeparator = options.wordSeparator.toCharArray().firstOrNull(),
-                        capitalize = options.allowCapitalize || policy.capitalize == true,
-                        capitalizeEnabled = policy.capitalize != true,
-                        includeNumber = options.allowIncludeNumber || policy.includeNumber == true,
-                        includeNumberEnabled = policy.includeNumber != true,
+                        capitalize = options.allowCapitalize,
+                        includeNumber = options.allowIncludeNumber,
                     )
                 }
             }
 
             is GeneratorState.MainType.Password -> {
-                val minLength = policy
-                    .minLength
-                    ?: GeneratorState.MainType.Password.PASSWORD_LENGTH_SLIDER_MIN
+                val minLength = GeneratorState.MainType.Password.PASSWORD_LENGTH_SLIDER_MIN
                 updateGeneratorMainType {
                     GeneratorState.MainType.Password(
                         length = max(options.length, minLength),
                         minLength = minLength,
-                        useCapitals = options.hasUppercase || policy.useUpper == true,
-                        capitalsEnabled = policy.useUpper != true,
-                        useLowercase = options.hasLowercase || policy.useLower == true,
-                        lowercaseEnabled = policy.useLower != true,
-                        useNumbers = options.hasNumbers || policy.useNumbers == true,
-                        numbersEnabled = policy.useNumbers != true,
-                        useSpecialChars = options.allowSpecial || policy.useSpecial == true,
-                        specialCharsEnabled = policy.useSpecial != true,
-                        minNumbers = max(options.minNumber, policy.minNumbers ?: 0),
-                        minNumbersAllowed = policy.minNumbers ?: 0,
-                        minSpecial = max(options.minSpecial, policy.minSpecial ?: 0),
-                        minSpecialAllowed = policy.minSpecial ?: 0,
+                        useCapitals = options.hasUppercase,
+                        useLowercase = options.hasLowercase,
+                        useNumbers = options.hasNumbers,
+                        useSpecialChars = options.allowSpecial,
+                        minNumbers = options.minNumber,
+                        minSpecial = options.minSpecial,
                         avoidAmbiguousChars = options.allowAmbiguousChar,
                     )
                 }
@@ -874,13 +815,6 @@ class GeneratorViewModel @Inject constructor(
         mutableStateFlow.update {
             it.copy(shouldShowCoachMarkTour = action.shouldShowCoachMarkTour)
         }
-    }
-
-    private fun handlePasswordGeneratorPolicyReceive(
-        action: GeneratorAction.Internal.PasswordGeneratorPolicyReceive,
-    ) {
-        mutableStateFlow.update { it.copy(isUnderPolicy = action.policies.any()) }
-        loadOptions()
     }
 
     //endregion Generated Field Handlers
@@ -2780,13 +2714,6 @@ sealed class GeneratorAction {
      */
     sealed class Internal : GeneratorAction() {
         /**
-         * Indicates that updated policies have been received.
-         */
-        data class PasswordGeneratorPolicyReceive(
-            val policies: List<PolicyInformation.PasswordGenerator>,
-        ) : Internal()
-
-        /**
          * Indicates a generated text update is received.
          */
         data class UpdateGeneratedPasswordResult(
@@ -2921,17 +2848,4 @@ private val UsernameGenerationOptions?.usernameType: GeneratorState.MainType.Use
         UsernameGenerationOptions.UsernameType.FORWARDED_EMAIL_ALIAS -> ForwardedEmailAlias()
         UsernameGenerationOptions.UsernameType.RANDOM_WORD -> RandomWord()
         else -> PlusAddressedEmail()
-    }
-
-private fun String?.toPasscodePolicyOverride(): GeneratorState.PasscodePolicyOverride? =
-    if (this.isNullOrBlank()) {
-        null
-    } else {
-        when (this) {
-            PolicyInformation.PasswordGenerator.TYPE_PASSPHRASE -> {
-                GeneratorState.PasscodePolicyOverride.PASSPHRASE
-            }
-
-            else -> GeneratorState.PasscodePolicyOverride.PASSWORD
-        }
     }

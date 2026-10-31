@@ -29,7 +29,6 @@ import com.x8bit.bitwarden.ui.vault.feature.util.toFolderDisplayName
 import com.x8bit.bitwarden.ui.vault.feature.util.toLabelIcons
 import com.x8bit.bitwarden.ui.vault.feature.util.toOverflowActions
 import com.x8bit.bitwarden.ui.vault.feature.vault.model.VaultFilterType
-import com.x8bit.bitwarden.ui.vault.feature.vault.util.applyRestrictItemTypesPolicy
 import com.x8bit.bitwarden.ui.vault.feature.vault.util.toFilteredList
 import com.x8bit.bitwarden.ui.vault.feature.vault.util.toLoginIconData
 import com.x8bit.bitwarden.ui.vault.util.toSdkCipherType
@@ -104,7 +103,6 @@ fun VaultData.toViewState(
     createCredentialRequestData: CreateCredentialRequest?,
     totpData: TotpData?,
     isPremiumUser: Boolean,
-    restrictItemTypesPolicyOrgIds: List<String>,
     isVfo1FoundationEnabled: Boolean = false,
 ): VaultItemListingState.ViewState {
     val filteredCipherViewList = decryptCipherListResult
@@ -112,7 +110,6 @@ fun VaultData.toViewState(
         .applyFilters(
             itemListingType = itemListingType,
             vaultFilterType = vaultFilterType,
-            restrictItemTypesPolicyOrgIds = restrictItemTypesPolicyOrgIds,
         )
 
     val failuresCipherViewList = decryptCipherListResult
@@ -125,7 +122,6 @@ fun VaultData.toViewState(
         .applyFilters(
             itemListingType = itemListingType,
             vaultFilterType = vaultFilterType,
-            restrictItemTypesPolicyOrgIds = restrictItemTypesPolicyOrgIds,
         )
 
     val allFilteredCipherViewList = filteredFailuresCipherViewList
@@ -228,10 +224,7 @@ fun VaultData.toViewState(
                     .asText()
             }
 
-        val restrictItemTypePolicyEnabled = restrictItemTypesPolicyOrgIds.isNotEmpty() &&
-            itemListingType == VaultItemListingState.ItemListingType.Vault.Card
-
-        val shouldShowAddButton = !restrictItemTypePolicyEnabled && itemListingType.hasFab
+        val shouldShowAddButton = itemListingType.hasFab
 
         VaultItemListingState.ViewState.NoItems(
             header = totpData
@@ -520,8 +513,6 @@ private val CipherListViewType.iconRes: Int
 private fun List<CipherListView>.applyFilters(
     itemListingType: VaultItemListingState.ItemListingType.Vault,
     vaultFilterType: VaultFilterType,
-    restrictItemTypesPolicyOrgIds: List<String>,
 ): List<CipherListView> = this
     .filter { it.determineListingPredicate(itemListingType) }
-    .applyRestrictItemTypesPolicy(restrictItemTypesPolicyOrgIds)
     .toFilteredList(vaultFilterType)

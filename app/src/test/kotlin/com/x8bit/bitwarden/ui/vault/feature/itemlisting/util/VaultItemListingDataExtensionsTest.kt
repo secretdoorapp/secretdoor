@@ -627,7 +627,6 @@ class VaultItemListingDataExtensionsTest {
             createCredentialRequestData = null,
             totpData = null,
             isPremiumUser = true,
-            restrictItemTypesPolicyOrgIds = emptyList(),
             isVfo1FoundationEnabled = true,
         )
 
@@ -722,7 +721,6 @@ class VaultItemListingDataExtensionsTest {
             createCredentialRequestData = null,
             totpData = null,
             isPremiumUser = true,
-            restrictItemTypesPolicyOrgIds = emptyList(),
             isVfo1FoundationEnabled = true,
         )
 
@@ -807,7 +805,6 @@ class VaultItemListingDataExtensionsTest {
             createCredentialRequestData = null,
             totpData = null,
             isPremiumUser = true,
-            restrictItemTypesPolicyOrgIds = emptyList(),
             isVfo1FoundationEnabled = true,
         )
 
@@ -875,7 +872,6 @@ class VaultItemListingDataExtensionsTest {
                 createCredentialRequestData = null,
                 totpData = null,
                 isPremiumUser = true,
-                restrictItemTypesPolicyOrgIds = emptyList(),
             ),
         )
 
@@ -898,7 +894,6 @@ class VaultItemListingDataExtensionsTest {
                 createCredentialRequestData = null,
                 totpData = null,
                 isPremiumUser = true,
-                restrictItemTypesPolicyOrgIds = emptyList(),
             ),
         )
 
@@ -919,7 +914,6 @@ class VaultItemListingDataExtensionsTest {
                 createCredentialRequestData = null,
                 totpData = null,
                 isPremiumUser = true,
-                restrictItemTypesPolicyOrgIds = emptyList(),
             ),
         )
 
@@ -940,7 +934,6 @@ class VaultItemListingDataExtensionsTest {
                 createCredentialRequestData = null,
                 totpData = null,
                 isPremiumUser = true,
-                restrictItemTypesPolicyOrgIds = emptyList(),
             ),
         )
 
@@ -961,7 +954,6 @@ class VaultItemListingDataExtensionsTest {
                 createCredentialRequestData = null,
                 totpData = null,
                 isPremiumUser = true,
-                restrictItemTypesPolicyOrgIds = emptyList(),
             ),
         )
 
@@ -982,7 +974,6 @@ class VaultItemListingDataExtensionsTest {
                 createCredentialRequestData = null,
                 totpData = null,
                 isPremiumUser = true,
-                restrictItemTypesPolicyOrgIds = emptyList(),
             ),
         )
 
@@ -1004,7 +995,6 @@ class VaultItemListingDataExtensionsTest {
                 createCredentialRequestData = null,
                 totpData = null,
                 isPremiumUser = true,
-                restrictItemTypesPolicyOrgIds = emptyList(),
             ),
         )
 
@@ -1025,7 +1015,6 @@ class VaultItemListingDataExtensionsTest {
                 createCredentialRequestData = null,
                 totpData = null,
                 isPremiumUser = true,
-                restrictItemTypesPolicyOrgIds = emptyList(),
             ),
         )
 
@@ -1046,7 +1035,6 @@ class VaultItemListingDataExtensionsTest {
                 createCredentialRequestData = null,
                 totpData = null,
                 isPremiumUser = true,
-                restrictItemTypesPolicyOrgIds = emptyList(),
             ),
         )
 
@@ -1067,7 +1055,6 @@ class VaultItemListingDataExtensionsTest {
                 createCredentialRequestData = null,
                 totpData = null,
                 isPremiumUser = true,
-                restrictItemTypesPolicyOrgIds = emptyList(),
             ),
         )
 
@@ -1090,7 +1077,6 @@ class VaultItemListingDataExtensionsTest {
                 createCredentialRequestData = null,
                 totpData = null,
                 isPremiumUser = true,
-                restrictItemTypesPolicyOrgIds = emptyList(),
             ),
         )
 
@@ -1115,7 +1101,6 @@ class VaultItemListingDataExtensionsTest {
                 createCredentialRequestData = null,
                 totpData = null,
                 isPremiumUser = true,
-                restrictItemTypesPolicyOrgIds = emptyList(),
             ),
         )
 
@@ -1140,7 +1125,6 @@ class VaultItemListingDataExtensionsTest {
                 ),
                 totpData = null,
                 isPremiumUser = true,
-                restrictItemTypesPolicyOrgIds = emptyList(),
             ),
         )
 
@@ -1166,7 +1150,6 @@ class VaultItemListingDataExtensionsTest {
                     every { issuer } returns "issuer"
                 },
                 isPremiumUser = true,
-                restrictItemTypesPolicyOrgIds = emptyList(),
             ),
         )
     }
@@ -1230,7 +1213,6 @@ class VaultItemListingDataExtensionsTest {
             createCredentialRequestData = null,
             totpData = null,
             isPremiumUser = true,
-            restrictItemTypesPolicyOrgIds = emptyList(),
         )
 
         assertEquals(
@@ -1248,119 +1230,4 @@ class VaultItemListingDataExtensionsTest {
         )
     }
 
-    @Suppress("MaxLineLength")
-    @Test
-    fun `toViewState should properly filter cards when cipher have organizationId in restrictItemTypesPolicyOrgIds`() {
-        mockkStatic(CipherView::subtitle)
-        mockkStatic(Uri::class)
-        val uriMock = mockk<Uri>()
-        every { any<CipherView>().subtitle } returns null
-        every { Uri.parse(any()) } returns uriMock
-        every { uriMock.host } returns "www.mockuri.com"
-
-        val vaultData = VaultData(
-            decryptCipherListResult = createMockDecryptCipherListResult(
-                number = 1,
-                successes = listOf(
-                    createMockCipherListView(
-                        number = 1,
-                        organizationId = "restrict_item_type_policy_id",
-                        type = CipherListViewType.Login(v1 = createMockLoginListView(number = 1)),
-                    ),
-                    createMockCipherListView(
-                        number = 2,
-                        organizationId = "restrict_item_type_policy_id",
-                        type = CipherListViewType.Card(v1 = createMockCardListView(number = 2)),
-                    ),
-                    createMockCipherListView(
-                        number = 3,
-                        organizationId = null,
-                        type = CipherListViewType.Card(v1 = createMockCardListView(number = 3)),
-                    ),
-                    createMockCipherListView(
-                        number = 4,
-                        organizationId = "another_id",
-                        type = CipherListViewType.Card(v1 = createMockCardListView(number = 4)),
-                        copyableFields = listOf(
-                            CopyableCipherFields.CARD_NUMBER,
-                            CopyableCipherFields.CARD_SECURITY_CODE,
-                        ),
-                    ),
-                ),
-            ),
-            collectionViewList = listOf(),
-            folderViewList = listOf(),
-        )
-
-        val actual = vaultData.toViewState(
-            itemListingType = VaultItemListingState.ItemListingType.Vault.Card,
-            vaultFilterType = VaultFilterType.AllVaults,
-            hasMasterPassword = true,
-            baseIconUrl = Environment.Prod.Us.baseIconUrl,
-            isIconLoadingDisabled = false,
-            autofillSelectionData = null,
-            createCredentialRequestData = null,
-            totpData = null,
-            isPremiumUser = true,
-            restrictItemTypesPolicyOrgIds = listOf("restrict_item_type_policy_id"),
-            isVfo1FoundationEnabled = true,
-        )
-
-        assertEquals(
-            VaultItemListingState.ViewState.Content(
-                displayItemList = listOf(
-                    createMockDisplayItemForCipher(
-                        number = 4,
-                        cipherType = CipherType.CARD,
-                        subtitle = "mockSubtitle-4",
-                    ).copy(secondSubtitleTestTag = "PasskeySite"),
-                ),
-                displayFolderList = emptyList(),
-            ),
-            actual,
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `toViewState should set properly shouldShowAddButton false when restrictItemTypesPolicyOrgIds has values, vault type is card and there is an empty vault state`() {
-        mockkStatic(CipherView::subtitle)
-        mockkStatic(Uri::class)
-        val uriMock = mockk<Uri>()
-        every { any<CipherView>().subtitle } returns null
-        every { Uri.parse(any()) } returns uriMock
-        every { uriMock.host } returns "www.mockuri.com"
-
-        val vaultData = VaultData(
-            decryptCipherListResult = createMockDecryptCipherListResult(
-                number = 1,
-                successes = listOf(),
-            ),
-            collectionViewList = listOf(),
-            folderViewList = listOf(),
-        )
-
-        val actual = vaultData.toViewState(
-            itemListingType = VaultItemListingState.ItemListingType.Vault.Card,
-            vaultFilterType = VaultFilterType.AllVaults,
-            hasMasterPassword = true,
-            baseIconUrl = Environment.Prod.Us.baseIconUrl,
-            isIconLoadingDisabled = false,
-            autofillSelectionData = null,
-            createCredentialRequestData = null,
-            totpData = null,
-            isPremiumUser = true,
-            restrictItemTypesPolicyOrgIds = listOf("restrict_item_type_policy_id"),
-        )
-
-        // Card type
-        assertEquals(
-            VaultItemListingState.ViewState.NoItems(
-                message = BitwardenString.no_cards.asText(),
-                shouldShowAddButton = false,
-                buttonText = BitwardenString.add_card.asText(),
-            ),
-            actual,
-        )
-    }
 }

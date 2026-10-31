@@ -5,22 +5,18 @@ import androidx.credentials.providerevents.transfer.CredentialTypes
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.bitwarden.cxf.importer.model.ImportCredentialsSelectionResult
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarData
 import com.bitwarden.ui.platform.resource.BitwardenPlurals
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.asPluralsText
 import com.bitwarden.ui.util.asText
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkPolicy
 import com.x8bit.bitwarden.data.vault.manager.model.SyncVaultDataResult
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.ImportCredentialsResult
 import io.mockk.awaits
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -30,7 +26,6 @@ import org.junit.jupiter.api.Test
 class ImportItemsViewModelTest : BaseViewModelTest() {
 
     private val vaultRepository = mockk<VaultRepository>()
-    private val policyManager = mockk<PolicyManager>()
 
     @Test
     fun `BackClick sends NavigateBack event`() = runTest {
@@ -60,10 +55,6 @@ class ImportItemsViewModelTest : BaseViewModelTest() {
     @Test
     fun `ImportFromAnotherAppClick sends ShowRegisteredImportSources event`() {
         runTest {
-            every {
-                policyManager.getActivePolicies(PolicyType.RESTRICTED_ITEM_TYPES)
-            } returns emptyList()
-
             val viewModel = createViewModel()
             viewModel.trySendAction(ImportItemsAction.ImportFromAnotherAppClick)
             viewModel.eventFlow.test {
@@ -75,51 +66,6 @@ class ImportItemsViewModelTest : BaseViewModelTest() {
                             CredentialTypes.CREDENTIAL_TYPE_ADDRESS,
                             CredentialTypes.CREDENTIAL_TYPE_API_KEY,
                             CredentialTypes.CREDENTIAL_TYPE_CREDIT_CARD,
-                            CredentialTypes.CREDENTIAL_TYPE_CUSTOM_FIELDS,
-                            CredentialTypes.CREDENTIAL_TYPE_DRIVERS_LICENSE,
-                            CredentialTypes.CREDENTIAL_TYPE_IDENTITY_DOCUMENT,
-                            CredentialTypes.CREDENTIAL_TYPE_NOTE,
-                            CredentialTypes.CREDENTIAL_TYPE_PASSPORT,
-                            CredentialTypes.CREDENTIAL_TYPE_PERSON_NAME,
-                            CredentialTypes.CREDENTIAL_TYPE_SSH_KEY,
-                            CredentialTypes.CREDENTIAL_TYPE_TOTP,
-                            CredentialTypes.CREDENTIAL_TYPE_WIFI,
-                        ),
-                    ),
-                    awaitItem(),
-                )
-            }
-        }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `ImportFromAnotherAppClick sends ShowRegisteredImportSources event without CREDIT_CARD when policy enabled`() {
-        runTest {
-            // Policy is active and enabled
-            every {
-                policyManager.getActivePolicies(PolicyType.RESTRICTED_ITEM_TYPES)
-            } returns listOf(
-                createMockSdkPolicy(
-                    organizationId = "org-id",
-                    id = "policy-id",
-                    type = PolicyType.RESTRICTED_ITEM_TYPES,
-                    enabled = true,
-                    data = null,
-                ),
-            )
-
-            val viewModel = createViewModel()
-            viewModel.trySendAction(ImportItemsAction.ImportFromAnotherAppClick)
-            viewModel.eventFlow.test {
-                assertEquals(
-                    ImportItemsEvent.ShowRegisteredImportSources(
-                        listOf(
-                            CredentialTypes.CREDENTIAL_TYPE_BASIC_AUTH,
-                            CredentialTypes.CREDENTIAL_TYPE_PUBLIC_KEY,
-                            CredentialTypes.CREDENTIAL_TYPE_ADDRESS,
-                            CredentialTypes.CREDENTIAL_TYPE_API_KEY,
-                            // CREDENTIAL_TYPE_CREDIT_CARD is excluded
                             CredentialTypes.CREDENTIAL_TYPE_CUSTOM_FIELDS,
                             CredentialTypes.CREDENTIAL_TYPE_DRIVERS_LICENSE,
                             CredentialTypes.CREDENTIAL_TYPE_IDENTITY_DOCUMENT,
@@ -396,6 +342,5 @@ class ImportItemsViewModelTest : BaseViewModelTest() {
     private fun createViewModel(): ImportItemsViewModel = ImportItemsViewModel(
         vaultRepository = vaultRepository,
         savedStateHandle = SavedStateHandle(),
-        policyManager = policyManager,
     )
 }

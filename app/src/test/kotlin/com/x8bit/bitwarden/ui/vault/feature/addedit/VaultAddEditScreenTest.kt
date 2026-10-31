@@ -116,9 +116,7 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
     private val exitManager: ExitManager = mockk {
         every { exitApplication() } just runs
     }
-    private val intentManager: IntentManager = mockk {
-        every { launchUri(any()) } just runs
-    }
+    private val intentManager: IntentManager = mockk(relaxed = true)
     private val credentialProviderCompletionManager: CredentialProviderCompletionManager = mockk {
         every { completeCredentialRegistration(any()) } just runs
     }

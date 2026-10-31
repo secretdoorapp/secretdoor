@@ -5,7 +5,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.bitwarden.core.data.manager.model.FlagKey
 import com.bitwarden.data.repository.util.baseWebVaultUrlOrDefault
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.resource.BitwardenPlurals
 import com.bitwarden.ui.platform.resource.BitwardenString
@@ -16,10 +15,8 @@ import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.LogoutReason
 import com.x8bit.bitwarden.data.auth.repository.model.PolicyInformation
 import com.x8bit.bitwarden.data.auth.repository.model.UserFingerprintResult
-import com.x8bit.bitwarden.data.auth.repository.util.policyInformation
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.platform.repository.model.BiometricsKeyResult
@@ -52,7 +49,6 @@ class AccountSecurityViewModel @Inject constructor(
     private val environmentRepository: EnvironmentRepository,
     private val firstTimeActionManager: FirstTimeActionManager,
     featureFlagManager: FeatureFlagManager,
-    policyManager: PolicyManager,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel<AccountSecurityState, AccountSecurityEvent, AccountSecurityAction>(
     initialState = savedStateHandle[KEY_STATE] ?: run {
@@ -87,28 +83,6 @@ class AccountSecurityViewModel @Inject constructor(
     init {
         stateFlow
             .onEach { savedStateHandle[KEY_STATE] = it }
-            .launchIn(viewModelScope)
-
-        policyManager
-            .getActivePoliciesFlow(type = PolicyType.MAXIMUM_VAULT_TIMEOUT)
-            .map { policies ->
-                AccountSecurityAction.Internal.PolicyUpdateReceive(
-                    vaultTimeoutPolicies = policies.mapNotNull {
-                        it.policyInformation as? PolicyInformation.VaultTimeout
-                    },
-                )
-            }
-            .onEach(::sendAction)
-            .launchIn(viewModelScope)
-
-        policyManager
-            .getActivePoliciesFlow(type = PolicyType.REMOVE_UNLOCK_WITH_PIN)
-            .map { policies ->
-                AccountSecurityAction.Internal.RemovePinPolicyUpdateReceive(
-                    removeUnlockWithPinPolicyEnabled = policies.isNotEmpty(),
-                )
-            }
-            .onEach(::sendAction)
             .launchIn(viewModelScope)
 
         firstTimeActionManager
@@ -369,9 +343,6 @@ class AccountSecurityViewModel @Inject constructor(
                 handleFingerprintResultReceived(action)
             }
 
-            is AccountSecurityAction.Internal.PolicyUpdateReceive -> {
-                handlePolicyUpdateReceive(action)
-            }
 
             is AccountSecurityAction.Internal.ShowUnlockBadgeUpdated -> {
                 handleShowUnlockBadgeUpdated(action)
@@ -385,23 +356,10 @@ class AccountSecurityViewModel @Inject constructor(
                 handlePinProtectedLockUpdate(action)
             }
 
-            is AccountSecurityAction.Internal.RemovePinPolicyUpdateReceive -> {
-                handleRemovePinPolicyUpdate(action)
-            }
 
             is AccountSecurityAction.Internal.ManageDevicesFlagUpdateReceive -> {
                 handleManageDevicesFlagUpdateReceive(action)
             }
-        }
-    }
-
-    private fun handleRemovePinPolicyUpdate(
-        action: AccountSecurityAction.Internal.RemovePinPolicyUpdateReceive,
-    ) {
-        mutableStateFlow.update {
-            it.copy(
-                removeUnlockWithPinPolicyEnabled = action.removeUnlockWithPinPolicyEnabled,
-            )
         }
     }
 
@@ -468,26 +426,6 @@ class AccountSecurityViewModel @Inject constructor(
                     is UserFingerprintResult.Success -> result.fingerprint.asText()
                     // This should never fail for an unlocked account.
                     is UserFingerprintResult.Error -> "".asText()
-                },
-            )
-        }
-    }
-
-    private fun handlePolicyUpdateReceive(
-        action: AccountSecurityAction.Internal.PolicyUpdateReceive,
-    ) {
-        // The vault timeout policy can only be implemented in organizations that have
-        // the single organization policy, meaning that if this is enabled, the user is
-        // only in one organization and hence there is only one result in the list.
-        val vaultTimeoutPolicy = action.vaultTimeoutPolicies?.firstOrNull()
-        mutableStateFlow.update {
-            it.copy(
-                vaultTimeoutPolicy = vaultTimeoutPolicy?.let { policy ->
-                    VaultTimeoutPolicy(
-                        minutes = policy.minutes,
-                        action = policy.action,
-                        type = policy.type,
-                    )
                 },
             )
         }
@@ -855,20 +793,6 @@ sealed class AccountSecurityAction {
          */
         data class FingerprintResultReceive(
             val fingerprintResult: UserFingerprintResult,
-        ) : Internal()
-
-        /**
-         * A policy update has been received.
-         */
-        data class PolicyUpdateReceive(
-            val vaultTimeoutPolicies: List<PolicyInformation.VaultTimeout>?,
-        ) : Internal()
-
-        /**
-         * A remove pin policy update has been received.
-         */
-        data class RemovePinPolicyUpdateReceive(
-            val removeUnlockWithPinPolicyEnabled: Boolean,
         ) : Internal()
 
         /**

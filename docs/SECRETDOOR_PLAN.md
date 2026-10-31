@@ -96,6 +96,9 @@ stored key material.
     search types, `VaultFilterType.OrganizationVault`, `OrganizationManager`, and the unused
     `AuthRepository.removePassword` (Key Connector). `OrganizationEventManagerImpl` is now a
     no-op, so organization events are never stored or uploaded.
+  - [x] Policies removed from all screens (vault, item listing, search, add/edit, import,
+    generator, account security). Remaining: the policy managers themselves (`PolicyManager`,
+    `PasswordPolicyManager`, `UserNotificationPolicyManager`), which always return nothing.
   - [ ] Organizations/collections data layer, part 2: policies (`PolicyManager`, used in ~60
     files), `selectedCollectionId` / owner state in add/edit, collection permission helpers,
     org/collection SDK extensions. Do this with compiler feedback.
