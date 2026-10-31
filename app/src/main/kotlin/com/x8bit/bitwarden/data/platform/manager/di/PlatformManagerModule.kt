@@ -250,15 +250,7 @@ object PlatformManagerModule {
 
     @Provides
     @Singleton
-    fun providePolicyManager(
-        authDiskSource: AuthDiskSource,
-        authSdkSource: AuthSdkSource,
-        featureFlagManager: FeatureFlagManager,
-    ): PolicyManager = PolicyManagerImpl(
-        authDiskSource = authDiskSource,
-        authSdkSource = authSdkSource,
-        featureFlagManager = featureFlagManager,
-    )
+    fun providePolicyManager(): PolicyManager = PolicyManagerImpl()
 
     @Provides
     @Singleton
