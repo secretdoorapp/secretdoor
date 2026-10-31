@@ -156,7 +156,11 @@ stored key material.
 ### Phase 5: Branding cleanup
 - Replace remaining user-visible "Bitwarden" strings, icons, About screen, links, and README.
 - Progress:
-  - [x] Icons (option A, "door ajar with light and keyhole"): launcher foreground and
+  - [x] Icons, version 2 (`design/icon-tools/vault_icon.py`, preview
+    `design/icon-review/vault_icon_preview.png`): closed round steel vault door with a glowing
+    digital padlock; launcher foreground and themed icon, splash icon, autofill logo,
+    notification and shield glyphs.
+  - [x] Icons, version 1 (option A, "door ajar with light and keyhole", replaced): launcher foreground and
     monochrome (main/beta/release), navy launcher/splash background (beta purple, debug red),
     splash icon, autofill/suggestion logo, notification icon, Import logins shield glyph.
     Illustrations recolored to navy/tan/gold. Unused `logo_bitwarden` deleted.
