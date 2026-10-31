@@ -522,14 +522,16 @@ class VaultBackupManagerImpl(
         accountKeys: WrappedAccountCryptographicState,
         masterPassword: String,
     ): ByteArray? {
-        val temporaryUserId = "backup-${UUID.randomUUID()}"
+        // The SDK requires a UUID; the prefix only names the temporary client in VaultSdkSource.
+        val backupUserId = UUID.randomUUID().toString()
+        val temporaryUserId = "backup-$backupUserId"
         val sdkMasterPasswordUnlock = masterPasswordUnlock.toSdkMasterPasswordUnlock()
         return try {
             val result = vaultSdkSource
                 .initializeCrypto(
                     userId = temporaryUserId,
                     request = InitUserCryptoRequest(
-                        userId = temporaryUserId,
+                        userId = backupUserId,
                         kdfParams = sdkMasterPasswordUnlock.kdf,
                         email = masterPasswordUnlock.salt,
                         accountCryptographicState = accountKeys,

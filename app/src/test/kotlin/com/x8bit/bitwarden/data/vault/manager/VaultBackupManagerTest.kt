@@ -3,6 +3,7 @@ package com.x8bit.bitwarden.data.vault.manager
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
+import com.bitwarden.core.InitUserCryptoRequest
 import com.bitwarden.core.WrappedAccountCryptographicState
 import com.bitwarden.core.data.manager.dispatcher.FakeDispatcherManager
 import com.bitwarden.core.di.CoreModule
@@ -57,6 +58,7 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
 import java.util.Base64
+import java.util.UUID
 
 @Suppress("LargeClass")
 class VaultBackupManagerTest {
@@ -395,6 +397,23 @@ class VaultBackupManagerTest {
             assertEquals(savedFolder.captured.id, savedCipher.captured.folderId)
             assertEquals(backupCipher.id, savedCipher.captured.id)
         }
+
+    @Test
+    fun `mergeBackup unlocks the backup with a UUID as the SDK requires`() = runTest {
+        val backup = createBackup()
+        val request = slot<InitUserCryptoRequest>()
+        coEvery {
+            vaultSdkSource.initializeCrypto(
+                userId = match { it.startsWith("backup-") },
+                request = capture(request),
+            )
+        } returns Result.success(InitializeCryptoResult.Success)
+
+        vaultBackupManager.mergeBackup(backup = backup, masterPassword = PASSWORD)
+
+        // Throws if the user ID is not a UUID.
+        UUID.fromString(request.captured.userId)
+    }
 
     @Test
     fun `mergeBackup with the wrong password imports nothing`() = runTest {
