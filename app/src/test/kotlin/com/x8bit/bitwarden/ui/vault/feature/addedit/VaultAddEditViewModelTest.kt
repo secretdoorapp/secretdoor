@@ -899,7 +899,7 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
                 ),
             )
             coEvery {
-                vaultRepository.createCipherInOrganization(any(), any())
+                vaultRepository.createCipher(any())
             } returns CreateCipherResult.Success(cipherId = DEFAULT_ITEM_ID)
 
             viewModel.stateEventFlow(backgroundScope) { stateFlow, eventFlow ->
@@ -918,7 +918,7 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
                 )
             }
             coVerify(exactly = 1) {
-                vaultRepository.createCipherInOrganization(any(), any())
+                vaultRepository.createCipher(any())
             }
         }
 
@@ -961,7 +961,7 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
                 ),
             )
             coEvery {
-                vaultRepository.createCipherInOrganization(any(), any())
+                vaultRepository.createCipher(any())
             } returns CreateCipherResult.Success(cipherId = DEFAULT_ITEM_ID)
 
             viewModel.stateEventFlow(backgroundScope) { stateFlow, eventFlow ->
@@ -978,7 +978,7 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
             }
             assertNull(specialCircumstanceManager.specialCircumstance)
             coVerify(exactly = 1) {
-                vaultRepository.createCipherInOrganization(any(), any())
+                vaultRepository.createCipher(any())
             }
         }
 
@@ -1017,7 +1017,7 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
                 ),
             )
             coEvery {
-                vaultRepository.createCipherInOrganization(any(), any())
+                vaultRepository.createCipher(any())
             } returns CreateCipherResult.Success(cipherId = DEFAULT_ITEM_ID)
 
             viewModel.stateEventFlow(backgroundScope) { stateTurbine, eventTurbine ->
@@ -1031,7 +1031,7 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
             }
             assertNull(specialCircumstanceManager.specialCircumstance)
             coVerify(exactly = 1) {
-                vaultRepository.createCipherInOrganization(any(), any())
+                vaultRepository.createCipher(any())
             }
         }
 
@@ -1069,7 +1069,7 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
                 ),
             )
             coEvery {
-                vaultRepository.createCipherInOrganization(any(), any())
+                vaultRepository.createCipher(any())
             } returns CreateCipherResult.Success(cipherId = DEFAULT_ITEM_ID)
 
             viewModel.stateEventFlow(backgroundScope) { stateTurbine, eventTurbine ->
@@ -1091,7 +1091,7 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
                 )
             }
             coVerify(exactly = 1) {
-                vaultRepository.createCipherInOrganization(any(), any())
+                vaultRepository.createCipher(any())
             }
         }
 
@@ -1159,7 +1159,7 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
             } returns UserVerificationRequirement.REQUIRED
             every { authRepository.activeUserId } returns "mockUserId"
             coEvery {
-                vaultRepository.createCipherInOrganization(any(), any())
+                vaultRepository.createCipher(any())
             } returns CreateCipherResult.Success(cipherId = DEFAULT_ITEM_ID)
 
             viewModel.stateEventFlow(backgroundScope) { stateFlow, eventFlow ->
@@ -1228,7 +1228,7 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
             } returns Fido2RegisterCredentialResult.Success(responseJson = "mockResponse")
             every { authRepository.activeUserId } returns mockUserId
             coEvery {
-                vaultRepository.createCipherInOrganization(any(), any())
+                vaultRepository.createCipher(any())
             } returns CreateCipherResult.Success(cipherId = DEFAULT_ITEM_ID)
 
             mutableVaultDataFlow.value = DataState.Loaded(
@@ -1328,7 +1328,7 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
                 )
             } returns Fido2RegisterCredentialResult.Success(responseJson = "mockResponse")
             coEvery {
-                vaultRepository.createCipherInOrganization(any(), any())
+                vaultRepository.createCipher(any())
             } returns CreateCipherResult.Success(cipherId = DEFAULT_ITEM_ID)
 
             viewModel.trySendAction(VaultAddEditAction.Common.SaveClick)
@@ -1442,7 +1442,7 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
 
     @Suppress("MaxLineLength")
     @Test
-    fun `in add mode, createCipherInOrganization success should send CloseAndNavigateToVaultItem`() =
+    fun `in add mode, saving a new item should send CloseAndNavigateToVaultItem`() =
         runTest {
             val stateWithName = createVaultAddItemState(
                 commonContentViewState = createCommonContentViewState(
@@ -1461,7 +1461,7 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
             )
 
             coEvery {
-                vaultRepository.createCipherInOrganization(any(), any())
+                vaultRepository.createCipher(any())
             } returns CreateCipherResult.Success(cipherId = DEFAULT_ITEM_ID)
             viewModel.eventFlow.test {
                 viewModel.trySendAction(VaultAddEditAction.Common.SaveClick)
@@ -1477,7 +1477,7 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
 
     @Suppress("MaxLineLength")
     @Test
-    fun `in add mode with a card, createCipherInOrganization success should send CloseAndNavigateToVaultItem`() =
+    fun `in add mode with a card, saving a new item should send CloseAndNavigateToVaultItem`() =
         runTest {
             val stateWithName = createVaultAddItemState(
                 vaultItemCipherType = VaultItemCipherType.CARD,
@@ -1498,7 +1498,7 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
             )
 
             coEvery {
-                vaultRepository.createCipherInOrganization(any(), any())
+                vaultRepository.createCipher(any())
             } returns CreateCipherResult.Success(cipherId = DEFAULT_ITEM_ID)
             viewModel.eventFlow.test {
                 viewModel.trySendAction(VaultAddEditAction.Common.SaveClick)
@@ -1911,7 +1911,7 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
             )
 
             coEvery {
-                vaultRepository.createCipherInOrganization(any(), any())
+                vaultRepository.createCipher(any())
             } returns CreateCipherResult.Error(
                 errorMessage = "Network error message",
                 error = null,
@@ -1930,7 +1930,7 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
 
             // Verify default error message is shown when errorMessage is null
             coEvery {
-                vaultRepository.createCipherInOrganization(any(), any())
+                vaultRepository.createCipher(any())
             } returns CreateCipherResult.Error(
                 errorMessage = null,
                 error = null,

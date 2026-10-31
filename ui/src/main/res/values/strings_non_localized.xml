@@ -6,7 +6,7 @@
     <string name="duo_org_title" translatable="false">Duo (%1$s)</string>
     <string name="json_extension" translatable="false">.json</string>
     <string name="json_extension_formatted" translatable="false">.json (%1$s)</string>
-    <string name="bitwarden" translatable="false">Bitwarden</string>
+    <string name="bitwarden" translatable="false">SecretDoor</string>
     <string name="fido2_title" translatable="false">FIDO2 WebAuthn</string>
     <string name="addy_io" translatable="false">addy.io</string>
     <string name="firefox_relay" translatable="false">Firefox Relay</string>

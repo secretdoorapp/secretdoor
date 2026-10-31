@@ -2637,24 +2637,12 @@ class VaultAddEditViewModel @Inject constructor(
         }
     }
 
+    // SecretDoor vaults have no organizations, so new items always go into the personal vault.
     @Suppress("MaxLineLength")
-    private suspend fun VaultAddEditState.ViewState.Content.createCipherForAddAndCloneItemStates(): CreateCipherResult {
-        return common.selectedOwner?.collections
-            ?.filter { it.isSelected }
-            ?.map { it.id }
-            ?.let {
-                vaultRepository.createCipherInOrganization(
-                    cipherView = toCipherView(
-                        clock = clock,
-                        isPremiumUser = state.hasPremium,
-                    ),
-                    collectionIds = it,
-                )
-            }
-            ?: vaultRepository.createCipher(
-                cipherView = toCipherView(clock = clock, isPremiumUser = state.hasPremium),
-            )
-    }
+    private suspend fun VaultAddEditState.ViewState.Content.createCipherForAddAndCloneItemStates(): CreateCipherResult =
+        vaultRepository.createCipher(
+            cipherView = toCipherView(clock = clock, isPremiumUser = state.hasPremium),
+        )
 
     //endregion Utility Functions
 }
