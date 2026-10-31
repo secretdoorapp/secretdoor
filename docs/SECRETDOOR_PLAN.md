@@ -152,7 +152,9 @@ stored key material.
     keeps the newer copy; items with the same content are skipped; attachments are copied.
     Verified on a device for a backup of the same vault and of another vault (2026-10-31).
   - [ ] Import a backup as a separate vault (multiple vaults with a vault switcher).
-  - [ ] Move existing PBKDF2 vaults to Argon2id.
+  - [x] Existing PBKDF2 vaults move to Argon2id the next time they are unlocked with the master
+    password (`KdfManagerImpl`, stored locally only). The user key does not change; the SDK
+    client is restarted with the new settings before the vault is marked unlocked.
 
 ### Phase 5: Branding cleanup
 - Replace remaining user-visible "Bitwarden" strings, icons, About screen, links, and README.

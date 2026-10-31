@@ -1,103 +1,90 @@
 package com.x8bit.bitwarden.data.auth.manager
 
-import com.bitwarden.core.UpdateKdfResponse
-import com.bitwarden.core.data.manager.model.FlagKey
-import com.bitwarden.core.data.util.flatMap
 import com.bitwarden.crypto.Kdf
 import com.bitwarden.network.model.KdfTypeJson
-import com.bitwarden.network.model.MasterPasswordAuthenticationDataJson
 import com.bitwarden.network.model.MasterPasswordUnlockDataJson
-import com.bitwarden.network.model.UpdateKdfJsonRequest
-import com.bitwarden.network.service.AccountsService
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
 import com.x8bit.bitwarden.data.auth.datasource.sdk.util.toKdfRequestModel
 import com.x8bit.bitwarden.data.auth.repository.model.UpdateKdfMinimumsResult
-import com.x8bit.bitwarden.data.auth.repository.util.toUserStateJsonKdfUpdatedMinimums
-import com.x8bit.bitwarden.data.auth.util.KdfParamsConstants.DEFAULT_PBKDF2_ITERATIONS
-import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
+import com.x8bit.bitwarden.data.auth.repository.util.updateKdf
+import com.x8bit.bitwarden.data.auth.util.KdfParamsConstants.DEFAULT_ARGON2_ITERATIONS
+import com.x8bit.bitwarden.data.auth.util.KdfParamsConstants.DEFAULT_ARGON2_MEMORY
+import com.x8bit.bitwarden.data.auth.util.KdfParamsConstants.DEFAULT_ARGON2_PARALLELISM
 import com.x8bit.bitwarden.data.vault.datasource.sdk.VaultSdkSource
 import timber.log.Timber
 
 /**
  * Default implementation of [KdfManager].
+ *
+ * SecretDoor vaults are local, so a KDF change only has to be stored on the device: vaults that
+ * still use PBKDF2 are moved to Argon2id the next time they are unlocked with the master
+ * password. The user key itself does not change, so items, PIN and biometric unlock and backups
+ * are not affected.
  */
 class KdfManagerImpl(
     private val authDiskSource: AuthDiskSource,
     private val vaultSdkSource: VaultSdkSource,
-    private val accountsService: AccountsService,
-    private val featureFlagManager: FeatureFlagManager,
 ) : KdfManager {
 
     private val activeUserId: String? get() = authDiskSource.userState?.activeUserId
 
-    override fun needsKdfUpdateToMinimums(): Boolean {
-        if (!featureFlagManager.getFeatureFlag(FlagKey.ForceUpdateKdfSettings)) {
-            return false
-        }
-
-        val account = authDiskSource
-            .userState
-            ?.accounts
-            ?.get(activeUserId)
-            ?: return false
-
-        if (account.profile.userDecryptionOptions != null &&
-            !account.profile.userDecryptionOptions.hasMasterPassword
-        ) {
-            return false
-        }
-
-        return account.profile.kdfType == KdfTypeJson.PBKDF2_SHA256 &&
-            account.profile.kdfIterations != null &&
-            account.profile.kdfIterations < DEFAULT_PBKDF2_ITERATIONS
-    }
+    /**
+     * The upgrade happens silently while unlocking with the master password, so there is never a
+     * need to ask for the password separately.
+     */
+    override fun needsKdfUpdateToMinimums(): Boolean = false
 
     override suspend fun updateKdfToMinimumsIfNeeded(password: String): UpdateKdfMinimumsResult {
         val userId = activeUserId ?: return UpdateKdfMinimumsResult.ActiveAccountNotFound
-
-        if (!needsKdfUpdateToMinimums()) {
+        val account = authDiskSource.userState?.accounts?.get(userId)
+            ?: return UpdateKdfMinimumsResult.ActiveAccountNotFound
+        val decryptionOptions = account.profile.userDecryptionOptions
+        if (decryptionOptions?.hasMasterPassword != true ||
+            decryptionOptions.masterPasswordUnlock == null ||
+            account.profile.kdfType != KdfTypeJson.PBKDF2_SHA256
+        ) {
             return UpdateKdfMinimumsResult.Success
         }
         return vaultSdkSource
             .makeUpdateKdf(
                 userId = userId,
                 password = password,
-                kdf = Kdf.Pbkdf2(iterations = DEFAULT_PBKDF2_ITERATIONS.toUInt()),
+                kdf = Kdf.Argon2id(
+                    iterations = DEFAULT_ARGON2_ITERATIONS.toUInt(),
+                    memory = DEFAULT_ARGON2_MEMORY.toUInt(),
+                    parallelism = DEFAULT_ARGON2_PARALLELISM.toUInt(),
+                ),
             )
-            .flatMap {
-                accountsService.updateKdf(createUpdateKdfRequest(it))
-            }
             .fold(
-                onSuccess = {
+                onSuccess = { response ->
+                    val unlockData = response.masterPasswordUnlockData
+                    val kdfJson = unlockData.kdf.toKdfRequestModel()
+                    val masterPasswordUnlock = MasterPasswordUnlockDataJson(
+                        salt = unlockData.salt,
+                        kdf = kdfJson,
+                        masterKeyWrappedUserKey = unlockData.masterKeyWrappedUserKey,
+                        containedKeyId = unlockData.containedKeyId,
+                    )
+                    // The KDF settings and the re-wrapped user key are stored together, so the
+                    // vault always unlocks with one consistent set.
                     authDiskSource.userState = authDiskSource.userState
-                        ?.toUserStateJsonKdfUpdatedMinimums()
-                    Timber.d("[Auth] Upgraded user's KDF to minimums")
+                        ?.updateKdf(userId = userId, kdf = kdfJson)
+                        ?.let { userState ->
+                            val updatedAccount = userState.accounts.getValue(userId).let {
+                                it.copy(
+                                    profile = it.profile.copy(
+                                        userDecryptionOptions = decryptionOptions.copy(
+                                            masterPasswordUnlock = masterPasswordUnlock,
+                                        ),
+                                    ),
+                                )
+                            }
+                            userState.copy(accounts = userState.accounts + (userId to updatedAccount))
+                        }
+                    Timber.d("[Auth] Moved the vault's KDF to Argon2id")
                     UpdateKdfMinimumsResult.Success
                 },
                 onFailure = { UpdateKdfMinimumsResult.Error(error = it) },
             )
-    }
-
-    private fun createUpdateKdfRequest(response: UpdateKdfResponse): UpdateKdfJsonRequest {
-        val authData = response.masterPasswordAuthenticationData
-        val oldAuthData = response.oldMasterPasswordAuthenticationData
-        val unlockData = response.masterPasswordUnlockData
-
-        return UpdateKdfJsonRequest(
-            authenticationData = MasterPasswordAuthenticationDataJson(
-                kdf = authData.kdf.toKdfRequestModel(),
-                masterPasswordAuthenticationHash = authData.masterPasswordAuthenticationHash,
-                salt = authData.salt,
-            ),
-            key = unlockData.masterKeyWrappedUserKey,
-            masterPasswordHash = oldAuthData.masterPasswordAuthenticationHash,
-            newMasterPasswordHash = authData.masterPasswordAuthenticationHash,
-            unlockData = MasterPasswordUnlockDataJson(
-                kdf = unlockData.kdf.toKdfRequestModel(),
-                masterKeyWrappedUserKey = unlockData.masterKeyWrappedUserKey,
-                salt = unlockData.salt,
-                containedKeyId = unlockData.containedKeyId,
-            ),
-        )
     }
 }

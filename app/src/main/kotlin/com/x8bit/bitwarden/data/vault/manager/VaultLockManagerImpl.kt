@@ -20,6 +20,7 @@ import com.bitwarden.crypto.Kdf
 import com.bitwarden.data.manager.appstate.AppStateManager
 import com.bitwarden.data.manager.appstate.model.AppCreationState
 import com.bitwarden.data.manager.appstate.model.AppForegroundState
+import com.bitwarden.network.model.MasterPasswordUnlockDataJson
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.ForcePasswordResetReason
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.UserStateJson
@@ -50,6 +51,7 @@ import com.x8bit.bitwarden.data.vault.repository.model.onVaultUnlockSuccess
 import com.x8bit.bitwarden.data.vault.repository.util.logTag
 import com.x8bit.bitwarden.data.vault.repository.util.password
 import com.x8bit.bitwarden.data.vault.repository.util.statusFor
+import com.x8bit.bitwarden.data.vault.repository.util.toSdkMasterPasswordUnlock
 import com.x8bit.bitwarden.data.vault.repository.util.toV2UpgradeToken
 import com.x8bit.bitwarden.data.vault.repository.util.toVaultUnlockResult
 import com.x8bit.bitwarden.data.vault.repository.util.update
@@ -266,7 +268,7 @@ internal class VaultLockManagerImpl(
         processMasterPassword(initUserCryptoMethod = initUserCryptoMethod, userId = userId)
         clearInvalidUnlockCount(userId = userId)
         trustedDeviceManager.trustThisDeviceIfNecessary(userId = userId)
-        updateKdfIfNeeded(initUserCryptoMethod)
+        updateKdfIfNeeded(userId = userId, initUserCryptoMethod = initUserCryptoMethod)
         pinProtectedUserKeyManager.migratePinProtectedUserKeyIfNeeded(userId = userId)
         setVaultToUnlocked(userId = userId)
         keyRotationManager.rotateAutoUnlockKey(userId = userId)
@@ -730,18 +732,62 @@ internal class VaultLockManagerImpl(
         return (accounts.find { it.userId == userId }?.isLoggedIn) == false
     }
 
-    private suspend fun updateKdfIfNeeded(initUserCryptoMethod: InitUserCryptoMethod) {
+    private suspend fun updateKdfIfNeeded(
+        userId: String,
+        initUserCryptoMethod: InitUserCryptoMethod,
+    ) {
         val password = initUserCryptoMethod.password ?: return
-        kdfManager
-            .updateKdfToMinimumsIfNeeded(
-                password = password,
+        val previousUnlock = masterPasswordUnlock(userId = userId)
+        val result = kdfManager.updateKdfToMinimumsIfNeeded(password = password)
+        if (result is UpdateKdfMinimumsResult.Error) {
+            Timber.e(result.error, message = "Failed to silent update KDF settings.")
+            return
+        }
+        val newUnlock = masterPasswordUnlock(userId = userId) ?: return
+        if (newUnlock == previousUnlock) return
+        // The SDK client still derives keys with the old KDF settings. Start it again with the
+        // new ones (the vault is not marked unlocked yet) so password checks keep working.
+        val accountKeys = authDiskSource.getAccountCryptographicState(userId = userId) ?: return
+        val sdkUnlock = newUnlock.toSdkMasterPasswordUnlock()
+        vaultSdkSource.clearCrypto(userId = userId)
+        vaultSdkSource
+            .initializeCrypto(
+                userId = userId,
+                request = InitUserCryptoRequest(
+                    accountCryptographicState = accountKeys,
+                    kdfParams = sdkUnlock.kdf,
+                    email = newUnlock.salt,
+                    method = InitUserCryptoMethod.MasterPasswordUnlock(
+                        password = password,
+                        masterPasswordUnlock = sdkUnlock,
+                    ),
+                    userId = userId,
+                    upgradeToken = authDiskSource
+                        .getV2UpgradeToken(userId = userId)
+                        ?.toV2UpgradeToken(),
+                ),
             )
-            .also { result ->
-                if (result is UpdateKdfMinimumsResult.Error) {
-                    Timber.e(result.error, message = "Failed to silent update KDF settings.")
-                }
+            .onFailure { Timber.e(it, message = "Failed to restart the SDK after a KDF update.") }
+        authSdkSource
+            .hashPassword(
+                salt = newUnlock.salt,
+                password = password,
+                kdf = sdkUnlock.kdf,
+                purpose = HashPurpose.LOCAL_AUTHORIZATION,
+            )
+            .onSuccess {
+                authDiskSource.storeMasterPasswordHash(userId = userId, passwordHash = it)
             }
     }
+
+    private fun masterPasswordUnlock(userId: String): MasterPasswordUnlockDataJson? =
+        authDiskSource
+            .userState
+            ?.accounts
+            ?.get(userId)
+            ?.profile
+            ?.userDecryptionOptions
+            ?.masterPasswordUnlock
 
     /**
      * A custom [BroadcastReceiver] that listens for when the screen is powered on and restarts the

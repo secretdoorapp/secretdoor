@@ -16,9 +16,14 @@ import com.bitwarden.core.data.manager.realtime.RealtimeManager
 import com.bitwarden.core.data.util.asFailure
 import com.bitwarden.core.data.util.asSuccess
 import com.bitwarden.crypto.HashPurpose
+import com.bitwarden.crypto.Kdf
 import com.bitwarden.data.manager.appstate.FakeAppStateManager
 import com.bitwarden.data.manager.appstate.model.AppCreationState
 import com.bitwarden.data.manager.appstate.model.AppForegroundState
+import com.bitwarden.network.model.KdfJson
+import com.bitwarden.network.model.KdfTypeJson
+import com.bitwarden.network.model.MasterPasswordUnlockDataJson
+import com.bitwarden.network.model.UserDecryptionOptionsJson
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.AccountJson
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.AccountTokensJson
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.ForcePasswordResetReason
@@ -44,6 +49,7 @@ import com.x8bit.bitwarden.data.vault.manager.model.VaultStateEvent
 import com.x8bit.bitwarden.data.vault.repository.model.VaultUnlockData
 import com.x8bit.bitwarden.data.vault.repository.model.VaultUnlockResult
 import com.x8bit.bitwarden.data.vault.repository.util.toV2UpgradeTokenJson
+import io.mockk.Ordering
 import io.mockk.clearMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -953,6 +959,99 @@ class VaultLockManagerTest {
                 keyRotationManager.rotateAutoUnlockKey(userId = USER_ID)
                 keyRotationManager.rotateAuthenticatorSyncKey(userId = USER_ID)
             }
+        }
+
+    @Suppress("MaxLineLength")
+    @Test
+    fun `unlockVault with master password should restart the SDK with the new KDF after a KDF update`() =
+        runTest {
+            val masterPassword = "mockValue"
+            val argon2 = Kdf.Argon2id(iterations = 3u, memory = 64u, parallelism = 4u)
+            val newUnlock = MasterPasswordUnlockDataJson(
+                salt = "mockSalt",
+                kdf = KdfJson(
+                    kdfType = KdfTypeJson.ARGON2_ID,
+                    iterations = 3,
+                    memory = 64,
+                    parallelism = 4,
+                ),
+                masterKeyWrappedUserKey = "newWrappedUserKey",
+            )
+            fakeAuthDiskSource.userState = MOCK_USER_STATE
+            fakeAuthDiskSource.storeAccountCryptographicState(
+                userId = USER_ID,
+                accountCryptographicState = ACCOUNT_CRYPTOGRAPHIC_STATE,
+            )
+            coEvery {
+                vaultSdkSource.initializeCrypto(userId = USER_ID, request = any())
+            } returns InitializeCryptoResult.Success.asSuccess()
+            coEvery {
+                trustedDeviceManager.trustThisDeviceIfNecessary(userId = USER_ID)
+            } returns false.asSuccess()
+            coEvery { kdfManager.updateKdfToMinimumsIfNeeded(password = masterPassword) } answers {
+                val account = MOCK_ACCOUNT.copy(
+                    profile = MOCK_PROFILE.copy(
+                        userDecryptionOptions = UserDecryptionOptionsJson(
+                            hasMasterPassword = true,
+                            masterPasswordUnlock = newUnlock,
+                            trustedDeviceUserDecryptionOptions = null,
+                            keyConnectorUserDecryptionOptions = null,
+                        ),
+                    ),
+                )
+                fakeAuthDiskSource.userState = MOCK_USER_STATE.copy(
+                    accounts = mapOf(USER_ID to account),
+                )
+                UpdateKdfMinimumsResult.Success
+            }
+            coEvery {
+                authSdkSource.hashPassword(
+                    salt = "mockSalt",
+                    password = masterPassword,
+                    kdf = argon2,
+                    purpose = HashPurpose.LOCAL_AUTHORIZATION,
+                )
+            } returns "argon2Hash".asSuccess()
+
+            val result = vaultLockManager.unlockVault(
+                accountCryptographicState = ACCOUNT_CRYPTOGRAPHIC_STATE,
+                userId = USER_ID,
+                email = MOCK_PROFILE.email,
+                kdf = MOCK_PROFILE.toSdkParams(),
+                initUserCryptoMethod = InitUserCryptoMethod.MasterPasswordUnlock(
+                    password = masterPassword,
+                    masterPasswordUnlock = MOCK_MASTER_PASSWORD_UNLOCK_DATA,
+                ),
+                organizationKeys = null,
+            )
+
+            assertEquals(VaultUnlockResult.Success, result)
+            coVerify(ordering = Ordering.ORDERED) {
+                kdfManager.updateKdfToMinimumsIfNeeded(password = masterPassword)
+                vaultSdkSource.initializeCrypto(
+                    userId = USER_ID,
+                    request = InitUserCryptoRequest(
+                        accountCryptographicState = ACCOUNT_CRYPTOGRAPHIC_STATE,
+                        userId = USER_ID,
+                        kdfParams = argon2,
+                        email = "mockSalt",
+                        method = InitUserCryptoMethod.MasterPasswordUnlock(
+                            password = masterPassword,
+                            masterPasswordUnlock = MasterPasswordUnlockData(
+                                kdf = argon2,
+                                masterKeyWrappedUserKey = "newWrappedUserKey",
+                                salt = "mockSalt",
+                            ),
+                        ),
+                        upgradeToken = null,
+                    ),
+                )
+            }
+            verify { vaultSdkSource.clearCrypto(userId = USER_ID) }
+            fakeAuthDiskSource.assertMasterPasswordHash(
+                userId = USER_ID,
+                passwordHash = "argon2Hash",
+            )
         }
 
     @Suppress("MaxLineLength")
