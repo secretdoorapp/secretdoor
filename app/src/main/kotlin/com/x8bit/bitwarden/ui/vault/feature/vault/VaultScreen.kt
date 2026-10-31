@@ -97,6 +97,7 @@ fun VaultScreen(
     onNavigateToAddFolderScreen: (selectedFolderId: String?) -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToAutofillScreen: () -> Unit,
+    onNavigateToBackupScreen: (isImport: Boolean) -> Unit,
     onNavigateToPlan: () -> Unit,
     intentManager: IntentManager = LocalIntentManager.current,
     appReviewManager: AppReviewManager = LocalAppReviewManager.current,
@@ -179,6 +180,8 @@ fun VaultScreen(
 
             VaultEvent.NavigateToAutofillSettings -> onNavigateToAutofillScreen()
 
+            is VaultEvent.NavigateToBackup -> onNavigateToBackupScreen(event.isImport)
+
             VaultEvent.NavigateToUpgradePremium -> onNavigateToPlan()
         }
     }
@@ -229,13 +232,16 @@ private fun VaultScreenScaffold(
                     ?.let { TopAppBarDividerStyle.STATIC }
                     ?: TopAppBarDividerStyle.ON_SCROLL,
                 actions = {
-                    BitwardenAccountActionItem(
-                        initials = state.initials,
-                        color = state.avatarColor,
-                        onClick = {
-                            updateAccountMenuVisibility(!accountMenuVisible)
-                        },
-                    )
+                    // A single local vault has nothing to switch to.
+                    if (state.accountSummaries.size > 1) {
+                        BitwardenAccountActionItem(
+                            initials = state.initials,
+                            color = state.avatarColor,
+                            onClick = {
+                                updateAccountMenuVisibility(!accountMenuVisible)
+                            },
+                        )
+                    }
                     BitwardenSearchActionItem(
                         contentDescription = stringResource(id = BitwardenString.search_vault),
                         isDisplayed = state.shouldShowSearchIcon,
@@ -243,6 +249,14 @@ private fun VaultScreenScaffold(
                     )
                     BitwardenOverflowActionItem(
                         menuItemDataList = persistentListOf(
+                            OverflowMenuItemData(
+                                text = stringResource(id = BitwardenString.back_up),
+                                onClick = vaultHandlers.backupAction,
+                            ),
+                            OverflowMenuItemData(
+                                text = stringResource(id = BitwardenString.import_backup),
+                                onClick = vaultHandlers.importBackupAction,
+                            ),
                             OverflowMenuItemData(
                                 text = stringResource(id = BitwardenString.lock),
                                 onClick = vaultHandlers.lockAction,

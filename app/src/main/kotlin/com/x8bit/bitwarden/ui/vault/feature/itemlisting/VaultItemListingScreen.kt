@@ -414,7 +414,7 @@ private fun VaultItemListingScaffold(
                 )
                     .takeIf { state.shouldShowNavigationIcon },
                 actions = {
-                    if (state.shouldShowAccountSwitcher) {
+                    if (state.shouldShowAccountSwitcher && state.accountSummaries.size > 1) {
                         BitwardenAccountActionItem(
                             initials = state.activeAccountSummary.initials,
                             color = state.activeAccountSummary.avatarColor,

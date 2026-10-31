@@ -51,7 +51,6 @@ class AccountSecurityScreenTest : BitwardenComposeTest() {
 
     private var onNavigateBackCalled = false
     private var onNavigateToDeleteAccountCalled = false
-    private var onNavigateToPendingRequestsCalled = false
     private var onNavigateToUnlockSetupScreenCalled = false
     private var onNavigateToManageDevicesCalled = false
 
@@ -92,7 +91,6 @@ class AccountSecurityScreenTest : BitwardenComposeTest() {
             AccountSecurityScreen(
                 onNavigateBack = { onNavigateBackCalled = true },
                 onNavigateToDeleteAccount = { onNavigateToDeleteAccountCalled = true },
-                onNavigateToPendingRequests = { onNavigateToPendingRequestsCalled = true },
                 onNavigateToSetupUnlockScreen = { onNavigateToUnlockSetupScreenCalled = true },
                 onNavigateToManageDevices = { onNavigateToManageDevicesCalled = true },
                 viewModel = viewModel,
@@ -107,15 +105,6 @@ class AccountSecurityScreenTest : BitwardenComposeTest() {
             mutableEventFlow.tryEmit(AccountSecurityEvent.NavigateToApplicationDataSettings)
             verify(exactly = 1) { intentManager.startAppSettingsActivity() }
         }
-    }
-
-    @Test
-    fun `on pending login requests click should send PendingLoginRequestsClick`() {
-        composeTestRule
-            .onNodeWithText("Pending login requests")
-            .performScrollTo()
-            .performClick()
-        verify { viewModel.trySendAction(AccountSecurityAction.PendingLoginRequestsClick) }
     }
 
     @Suppress("MaxLineLength")
@@ -1354,12 +1343,6 @@ class AccountSecurityScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `on NavigateToPendingRequests should call onNavigateToPendingRequests`() {
-        mutableEventFlow.tryEmit(AccountSecurityEvent.NavigateToPendingRequests)
-        assertTrue(onNavigateToPendingRequestsCalled)
-    }
-
-    @Test
     fun `confirm dialog be shown or hidden according to the state`() {
         composeTestRule.onNode(isDialog()).assertDoesNotExist()
         mutableStateFlow.update { it.copy(dialog = AccountSecurityDialog.ConfirmLogout) }
@@ -1659,14 +1642,6 @@ class AccountSecurityScreenTest : BitwardenComposeTest() {
         composeTestRule
             .onNodeWithText("Devices")
             .assertDoesNotExist()
-    }
-
-    @Test
-    fun `pending login requests row should be visible when isManageDevicesEnabled is false`() {
-        composeTestRule
-            .onNodeWithText("Pending login requests")
-            .performScrollTo()
-            .assertIsDisplayed()
     }
 
     @Test

@@ -48,6 +48,7 @@ class FakeAuthDiskSource : AuthDiskSource {
     private val storedLocalUserDataKeys = mutableMapOf<String, String?>()
     private val storedTwoFactorTokens = mutableMapOf<String, String?>()
     private val storedUserAutoUnlockKeys = mutableMapOf<String, String?>()
+    private val storedBackupKeys = mutableMapOf<String, String?>()
     private val storedPinProtectedUserKeys = mutableMapOf<String, Pair<String?, Boolean>>()
     private val storedEncryptedPins = mutableMapOf<String, String?>()
     private val storedOrganizations =
@@ -92,6 +93,7 @@ class FakeAuthDiskSource : AuthDiskSource {
         storedAccountCryptographicState.remove(userId)
         storedTwoFactorTokens.clear()
         storedUserAutoUnlockKeys.remove(userId)
+        storedBackupKeys.remove(userId)
         storedOrganizations.remove(userId)
         storedPolicies.remove(userId)
         storedAccountTokens.remove(userId)
@@ -208,6 +210,12 @@ class FakeAuthDiskSource : AuthDiskSource {
 
     override fun storeUserAutoUnlockKey(userId: String, userAutoUnlockKey: String?) {
         storedUserAutoUnlockKeys[userId] = userAutoUnlockKey
+    }
+
+    override fun getBackupKey(userId: String): String? = storedBackupKeys[userId]
+
+    override fun storeBackupKey(userId: String, backupKey: String?) {
+        storedBackupKeys[userId] = backupKey
     }
 
     @Deprecated(

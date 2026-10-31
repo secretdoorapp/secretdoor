@@ -26,6 +26,7 @@ import com.x8bit.bitwarden.ui.platform.components.util.rememberBitwardenNavContr
 import com.x8bit.bitwarden.ui.platform.feature.search.model.SearchType
 import com.x8bit.bitwarden.ui.platform.feature.settings.about.navigateToAbout
 import com.x8bit.bitwarden.ui.platform.feature.settings.autofill.navigateToAutoFill
+import com.x8bit.bitwarden.ui.platform.feature.settings.backup.navigateToBackup
 import com.x8bit.bitwarden.ui.platform.feature.settings.navigateToSettingsGraphRoot
 import com.x8bit.bitwarden.ui.platform.feature.settings.settingsGraph
 import com.x8bit.bitwarden.ui.platform.feature.vaultunlockednavbar.model.VaultUnlockedNavBarTab
@@ -53,7 +54,6 @@ fun VaultUnlockedNavBarScreen(
     onNavigateToDeleteAccount: () -> Unit,
     onNavigateToExportVault: () -> Unit,
     onNavigateToFolders: () -> Unit,
-    onNavigateToPendingRequests: () -> Unit,
     onNavigateToPasswordHistory: () -> Unit,
     onNavigateToSetupUnlockScreen: () -> Unit,
     onNavigateToSetupAutoFillScreen: () -> Unit,
@@ -83,7 +83,6 @@ fun VaultUnlockedNavBarScreen(
         navigateToDeleteAccount = onNavigateToDeleteAccount,
         navigateToExportVault = onNavigateToExportVault,
         navigateToFolders = onNavigateToFolders,
-        navigateToPendingRequests = onNavigateToPendingRequests,
         navigateToPasswordHistory = onNavigateToPasswordHistory,
         generatorTabClickedAction = {
             viewModel.trySendAction(VaultUnlockedNavBarAction.GeneratorTabClick)
@@ -126,7 +125,6 @@ private fun VaultUnlockedNavBarScaffold(
     navigateToDeleteAccount: () -> Unit,
     navigateToExportVault: () -> Unit,
     navigateToFolders: () -> Unit,
-    navigateToPendingRequests: () -> Unit,
     navigateToPasswordHistory: () -> Unit,
     onNavigateToSetupUnlockScreen: () -> Unit,
     onNavigateToSetupAutoFillScreen: () -> Unit,
@@ -195,6 +193,10 @@ private fun VaultUnlockedNavBarScaffold(
                     navController.navigateToSettingsGraphRoot()
                     navController.navigateToAutoFill()
                 },
+                onNavigateToBackupScreen = { isImport ->
+                    navController.navigateToSettingsGraphRoot()
+                    navController.navigateToBackup(isImport = isImport)
+                },
                 onNavigateToPlan = onNavigateToPlan,
             )
             generatorGraph(
@@ -207,7 +209,6 @@ private fun VaultUnlockedNavBarScaffold(
                 onNavigateToDeleteAccount = navigateToDeleteAccount,
                 onNavigateToExportVault = navigateToExportVault,
                 onNavigateToFolders = navigateToFolders,
-                onNavigateToPendingRequests = navigateToPendingRequests,
                 onNavigateToSetupUnlockScreen = onNavigateToSetupUnlockScreen,
                 onNavigateToSetupAutoFillScreen = onNavigateToSetupAutoFillScreen,
                 onNavigateToSetupBrowserAutofill = onNavigateToSetupBrowserAutofill,

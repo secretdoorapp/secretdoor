@@ -49,3 +49,28 @@ sealed class RestoreBackupResult {
      */
     data class Error(val error: Throwable) : RestoreBackupResult()
 }
+
+/**
+ * Models the result of importing a backup into the current vault.
+ */
+sealed class MergeBackupResult {
+    /**
+     * The backup was imported: [addedCount] items were added, [updatedCount] existing items were
+     * replaced by a newer copy and [skippedCount] items were already in the vault.
+     */
+    data class Success(
+        val addedCount: Int,
+        val updatedCount: Int,
+        val skippedCount: Int,
+    ) : MergeBackupResult()
+
+    /**
+     * The master password does not match the backup. Nothing was imported.
+     */
+    data object WrongPassword : MergeBackupResult()
+
+    /**
+     * The backup could not be imported. Nothing was imported.
+     */
+    data class Error(val error: Throwable) : MergeBackupResult()
+}

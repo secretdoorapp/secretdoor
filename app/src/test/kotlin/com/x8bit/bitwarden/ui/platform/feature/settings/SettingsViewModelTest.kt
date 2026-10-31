@@ -39,15 +39,11 @@ class SettingsViewModelTest : BaseViewModelTest() {
         every { specialCircumstance } returns null
     }
 
-    private val mutablePlanRowEligibleFlow = MutableStateFlow(false)
     private val mutableUpgradedToPremiumCardEligibleFlow = MutableStateFlow(false)
-    private val mutableIsSelfHostedFlow = MutableStateFlow(false)
     private val premiumStateManager: PremiumStateManager = mockk(relaxed = true) {
-        every { isPlanRowEligibleFlow } returns mutablePlanRowEligibleFlow
         every {
             isUpgradedToPremiumCardEligibleFlow
         } returns mutableUpgradedToPremiumCardEligibleFlow
-        every { isSelfHostedFlow } returns mutableIsSelfHostedFlow
     }
 
     @BeforeEach
@@ -122,18 +118,6 @@ class SettingsViewModelTest : BaseViewModelTest() {
             assertEquals(SettingsEvent.NavigateVault, awaitItem())
         }
     }
-
-    @Test
-    fun `on SettingsClick with PLAN should emit NavigatePlan`() =
-        runTest {
-            val viewModel = createViewModel()
-            viewModel.eventFlow.test {
-                viewModel.trySendAction(
-                    SettingsAction.SettingsClick(Settings.PLAN),
-                )
-                assertEquals(SettingsEvent.NavigatePlan, awaitItem())
-            }
-        }
 
     @Test
     fun `initial state reflects the current state of the repository`() {
@@ -213,66 +197,6 @@ class SettingsViewModelTest : BaseViewModelTest() {
         }
 
     @Test
-    fun `Plan row should appear when plan row eligibility is true and not preAuth`() {
-        mutablePlanRowEligibleFlow.value = true
-        val viewModel = createViewModel()
-        assertTrue(
-            viewModel.stateFlow.value.settingRows
-                .contains(Settings.PLAN),
-        )
-    }
-
-    @Test
-    fun `Plan row should be hidden when plan row eligibility is false`() {
-        mutablePlanRowEligibleFlow.value = false
-        val viewModel = createViewModel()
-        assertFalse(
-            viewModel.stateFlow.value.settingRows
-                .contains(Settings.PLAN),
-        )
-    }
-
-    @Test
-    fun `Plan row should be hidden in preAuth mode`() {
-        mutablePlanRowEligibleFlow.value = true
-        val viewModel = createViewModel(isPreAuth = true)
-        assertFalse(
-            viewModel.stateFlow.value.settingRows
-                .contains(Settings.PLAN),
-        )
-    }
-
-    @Test
-    fun `Plan row should appear between Appearance and Other in settings rows`() {
-        mutablePlanRowEligibleFlow.value = true
-        val viewModel = createViewModel()
-        val rows = viewModel.stateFlow.value.settingRows
-        val planIndex = rows.indexOf(Settings.PLAN)
-        val appearanceIndex = rows.indexOf(Settings.APPEARANCE)
-        val otherIndex = rows.indexOf(Settings.OTHER)
-        assertTrue(planIndex > appearanceIndex)
-        assertTrue(planIndex < otherIndex)
-    }
-
-    @Test
-    fun `Plan row should update when plan row eligibility changes to true`() =
-        runTest {
-            mutablePlanRowEligibleFlow.value = false
-            val viewModel = createViewModel()
-            assertFalse(
-                viewModel.stateFlow.value.settingRows
-                    .contains(Settings.PLAN),
-            )
-
-            mutablePlanRowEligibleFlow.value = true
-            viewModel.stateFlow.test {
-                assertTrue(
-                    awaitItem().settingRows.contains(Settings.PLAN),
-                )
-            }
-        }
-
-    @Test
     fun `Upgraded to Premium card eligibility flow updates state`() = runTest {
         val viewModel = createViewModel()
         viewModel.stateFlow.test {
@@ -325,54 +249,6 @@ class SettingsViewModelTest : BaseViewModelTest() {
         }
     }
 
-    @Test
-    fun `Plan row should be hidden when self-hosted status flow emits true`() {
-        mutablePlanRowEligibleFlow.value = true
-        mutableIsSelfHostedFlow.value = true
-        val viewModel = createViewModel()
-        assertFalse(
-            viewModel.stateFlow.value.settingRows
-                .contains(Settings.PLAN),
-        )
-    }
-
-    @Test
-    fun `Plan row should update when self-hosted status flow flips to true`() = runTest {
-        mutablePlanRowEligibleFlow.value = true
-        val viewModel = createViewModel()
-        assertTrue(
-            viewModel.stateFlow.value.settingRows
-                .contains(Settings.PLAN),
-        )
-
-        mutableIsSelfHostedFlow.value = true
-        viewModel.stateFlow.test {
-            assertFalse(
-                awaitItem().settingRows.contains(Settings.PLAN),
-            )
-        }
-    }
-
-    @Test
-    fun `Plan row should re-appear when self-hosted status flow flips back to false`() = runTest {
-        // Simulates the debug-disable flag being toggled on while self-hosted: the flow emits
-        // false even though the environment is still self-hosted.
-        mutablePlanRowEligibleFlow.value = true
-        mutableIsSelfHostedFlow.value = true
-        val viewModel = createViewModel()
-        assertFalse(
-            viewModel.stateFlow.value.settingRows
-                .contains(Settings.PLAN),
-        )
-
-        mutableIsSelfHostedFlow.value = false
-        viewModel.stateFlow.test {
-            assertTrue(
-                awaitItem().settingRows.contains(Settings.PLAN),
-            )
-        }
-    }
-
     private fun createViewModel(isPreAuth: Boolean = false) = SettingsViewModel(
         firstTimeActionManager = firstTimeManager,
         specialCircumstanceManager = specialCircumstanceManager,
@@ -388,5 +264,4 @@ private val DEFAULT_STATE = SettingsState(
     autoFillCount = 0,
     securityCount = 0,
     vaultCount = 0,
-    isPlanRowEligible = false,
 )

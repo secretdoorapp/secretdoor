@@ -195,7 +195,7 @@ fun VaultUnlockScreen(
                 scrollBehavior = scrollBehavior,
                 navigationIcon = null,
                 actions = {
-                    if (state.showAccountMenu) {
+                    if (state.showAccountMenu && state.accountSummaries.size > 1) {
                         BitwardenAccountActionItem(
                             initials = state.initials,
                             color = state.avatarColor,

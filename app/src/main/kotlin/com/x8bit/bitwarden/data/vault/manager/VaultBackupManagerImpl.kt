@@ -2,13 +2,18 @@ package com.x8bit.bitwarden.data.vault.manager
 
 import android.content.Context
 import android.net.Uri
+import com.bitwarden.core.InitUserCryptoMethod
+import com.bitwarden.core.InitUserCryptoRequest
+import com.bitwarden.core.WrappedAccountCryptographicState
 import com.bitwarden.core.data.manager.dispatcher.DispatcherManager
 import com.bitwarden.core.data.repository.error.MissingPropertyException
 import com.bitwarden.data.manager.file.FileManager
 import com.bitwarden.network.model.SyncResponseJson
+import com.bitwarden.vault.CipherView
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.AccountJson
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.AccountTokensJson
+import com.bitwarden.network.model.MasterPasswordUnlockDataJson
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.UserStateJson
 import com.x8bit.bitwarden.data.auth.datasource.disk.serializer.WrappedAccountCryptographicStateSerializer
 import com.x8bit.bitwarden.data.auth.manager.UserStateManager
@@ -16,6 +21,9 @@ import com.x8bit.bitwarden.data.auth.repository.LOCAL_VAULT_ACCESS_TOKEN
 import com.x8bit.bitwarden.data.platform.error.NoActiveUserException
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.vault.datasource.disk.VaultDiskSource
+import com.x8bit.bitwarden.data.vault.datasource.sdk.VaultSdkSource
+import com.x8bit.bitwarden.data.vault.datasource.sdk.model.InitializeCryptoResult
+import com.x8bit.bitwarden.data.vault.manager.model.MergeBackupResult
 import com.x8bit.bitwarden.data.vault.manager.model.ReadBackupResult
 import com.x8bit.bitwarden.data.vault.manager.model.RestoreBackupResult
 import com.x8bit.bitwarden.data.vault.manager.model.VaultBackup
@@ -23,24 +31,36 @@ import com.x8bit.bitwarden.data.vault.manager.model.WriteBackupResult
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.VaultUnlockError
 import com.x8bit.bitwarden.data.vault.repository.model.VaultUnlockResult
+import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkCipher
+import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedSdkFolder
+import com.x8bit.bitwarden.data.vault.repository.util.toSdkMasterPasswordUnlock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import java.io.BufferedOutputStream
+import java.io.DataInputStream
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.io.InputStream
 import java.io.OutputStream
+import java.nio.ByteBuffer
 import java.time.Clock
 import java.time.Instant
+import java.util.Base64
+import java.util.UUID
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
 private const val BACKUP_FORMAT: String = "secretdoor-backup"
-private const val BACKUP_VERSION: Int = 1
+private const val BACKUP_VERSION: Int = 2
 private const val ENTRY_MANIFEST: String = "manifest.json"
 private const val ENTRY_ACCOUNT: String = "account.json"
 private const val ENTRY_ACCOUNT_KEYS: String = "account_keys.json"
@@ -49,6 +69,17 @@ private const val ENTRY_CIPHERS: String = "ciphers.json"
 private const val ENTRY_ATTACHMENTS_PREFIX: String = "attachments/"
 private const val ATTACHMENTS_DIRECTORY: String = "attachments"
 private const val RESTORE_CACHE_DIRECTORY: String = "backup-restore"
+private const val CACHED_BACKUP_FILE: String = "backup.bin"
+private const val BACKUP_KEY_SALT_BYTES: Int = 32
+private const val USER_KEY_BYTES: Int = 64
+private const val MAX_HEADER_BYTES: Int = 64 * 1024
+private const val CIPHER_DATA_FIELD: String = "data"
+
+/**
+ * Every backup file starts with these bytes, followed by the format version (one byte), the
+ * header length (four bytes) and the JSON header. The encrypted payload follows the header.
+ */
+private val FILE_MAGIC: ByteArray = "SECRETDOOR".toByteArray(Charsets.US_ASCII)
 
 /**
  * Attachment entries are stored as `attachments/<cipherId>/<attachmentId>`. Both IDs are
@@ -59,14 +90,20 @@ private val ATTACHMENT_ID_REGEX: Regex = Regex("[A-Za-z0-9_-]+")
 /**
  * Default implementation of [VaultBackupManager].
  *
- * The backup is a ZIP file containing JSON entries for the account and vault data plus the raw
- * encrypted attachment files. Only data that is already encrypted on the device is written.
+ * The payload is a ZIP file containing JSON entries for the account and vault data plus the raw
+ * encrypted attachment files, exactly as they are stored on the device. The whole payload is then
+ * encrypted again with a key derived from the vault's user key (see [BackupCrypto]), so without
+ * the master password the file reveals nothing about the vault, not even how many items it has.
+ * The plain header only holds what is needed to turn the master password into the user key.
+ *
+ * Version 1 backups (a plain ZIP file) can still be read.
  */
-@Suppress("LongParameterList")
+@Suppress("LongParameterList", "TooManyFunctions")
 class VaultBackupManagerImpl(
     private val context: Context,
     private val authDiskSource: AuthDiskSource,
     private val vaultDiskSource: VaultDiskSource,
+    private val vaultSdkSource: VaultSdkSource,
     private val vaultRepository: VaultRepository,
     private val userStateManager: UserStateManager,
     private val settingsRepository: SettingsRepository,
@@ -78,41 +115,60 @@ class VaultBackupManagerImpl(
     private val accountKeysSerializer = WrappedAccountCryptographicStateSerializer()
 
     override suspend fun writeBackup(uri: Uri): WriteBackupResult =
-        withContext(dispatcherManager.io) {
-            runCatching {
-                val userState = authDiskSource.userState ?: throw NoActiveUserException()
-                val userId = userState.activeUserId
-                val account = userState.accounts[userId] ?: throw NoActiveUserException()
-                val accountKeys = authDiskSource.getAccountCryptographicState(userId = userId)
-                    ?: throw MissingPropertyException("Account keys")
+        runCatching {
+            val userState = authDiskSource.userState ?: throw NoActiveUserException()
+            val userId = userState.activeUserId
+            val account = userState.accounts[userId] ?: throw NoActiveUserException()
+            val masterPasswordUnlock = account.profile.userDecryptionOptions?.masterPasswordUnlock
+                ?: throw MissingPropertyException("MasterPasswordUnlock data")
+            val accountKeys = authDiskSource.getAccountCryptographicState(userId = userId)
+                ?: throw MissingPropertyException("Account keys")
+            val fileKey = getBackupFileKey(userId = userId)
+            withContext(dispatcherManager.io) {
                 val folders = vaultDiskSource.getFolders(userId = userId)
                 val ciphers = vaultDiskSource.getCiphers(userId = userId)
+                val createdAt = clock.instant().toString()
+                val noncePrefix = BackupCrypto.newNoncePrefix()
+                val accountKeysJson = json.encodeToString(accountKeysSerializer, accountKeys)
+                val header = BackupHeaderJson(
+                    format = BACKUP_FORMAT,
+                    version = BACKUP_VERSION,
+                    createdAt = createdAt,
+                    masterPasswordUnlock = masterPasswordUnlock,
+                    accountKeys = accountKeysJson,
+                    keySalt = fileKey.salt.toBase64(),
+                    noncePrefix = noncePrefix.toBase64(),
+                )
+                val prefix = filePrefix(json.encodeToString(header).toByteArray(Charsets.UTF_8))
                 openOutputStream(uri).use { outputStream ->
-                    ZipOutputStream(BufferedOutputStream(outputStream)).use { zip ->
+                    val bufferedStream = BufferedOutputStream(outputStream)
+                    bufferedStream.write(prefix)
+                    val encryptedStream = BackupCrypto.encryptingStream(
+                        output = bufferedStream,
+                        key = fileKey.key,
+                        noncePrefix = noncePrefix,
+                        associatedData = prefix,
+                    )
+                    ZipOutputStream(encryptedStream).use { zip ->
                         zip.putJson(
                             name = ENTRY_MANIFEST,
                             value = json.encodeToString(
                                 BackupManifestJson(
                                     format = BACKUP_FORMAT,
                                     version = BACKUP_VERSION,
-                                    createdAt = clock.instant().toString(),
+                                    createdAt = createdAt,
                                 ),
                             ),
                         )
+                        // The master password hint is left out: it would only help someone
+                        // trying to guess the master password.
                         zip.putJson(
                             name = ENTRY_ACCOUNT,
                             value = json.encodeToString(
-                                BackupAccountJson(
-                                    account = account,
-                                    masterPasswordHint = authDiskSource
-                                        .getMasterPasswordHint(userId = userId),
-                                ),
+                                BackupAccountJson(account = account, masterPasswordHint = null),
                             ),
                         )
-                        zip.putJson(
-                            name = ENTRY_ACCOUNT_KEYS,
-                            value = json.encodeToString(accountKeysSerializer, accountKeys),
-                        )
+                        zip.putJson(name = ENTRY_ACCOUNT_KEYS, value = accountKeysJson)
                         zip.putJson(
                             name = ENTRY_FOLDERS,
                             value = json.encodeToString(
@@ -132,88 +188,31 @@ class VaultBackupManagerImpl(
                 }
                 ciphers.size
             }
-                .fold(
-                    onSuccess = { WriteBackupResult.Success(itemCount = it) },
-                    onFailure = { WriteBackupResult.Error(error = it) },
-                )
         }
+            .fold(
+                onSuccess = { WriteBackupResult.Success(itemCount = it) },
+                onFailure = { WriteBackupResult.Error(error = it) },
+            )
 
-    @Suppress("LongMethod", "CyclomaticComplexMethod")
     override suspend fun readBackup(uri: Uri): ReadBackupResult =
         withContext(dispatcherManager.io) {
             runCatching {
                 val restoreDirectory = File(context.cacheDir, RESTORE_CACHE_DIRECTORY)
                 restoreDirectory.deleteRecursively()
-                val attachmentsDirectory = File(restoreDirectory, ATTACHMENTS_DIRECTORY)
-                var manifest: BackupManifestJson? = null
-                var account: BackupAccountJson? = null
-                var accountKeysJson: String? = null
-                var folders: List<SyncResponseJson.Folder>? = null
-                var ciphers: List<SyncResponseJson.Cipher>? = null
+                restoreDirectory.mkdirs()
+                val file = File(restoreDirectory, CACHED_BACKUP_FILE)
                 val inputStream = context.contentResolver.openInputStream(uri)
                     ?: throw FileNotFoundException("Unable to open $uri")
-                ZipInputStream(inputStream.buffered()).use { zip ->
-                    generateSequence { zip.nextEntry }.forEach { entry ->
-                        when {
-                            entry.isDirectory -> Unit
-                            entry.name == ENTRY_MANIFEST -> {
-                                manifest = json.decodeFromString<BackupManifestJson>(zip.readText())
-                            }
-
-                            entry.name == ENTRY_ACCOUNT -> {
-                                account = json.decodeFromString<BackupAccountJson>(zip.readText())
-                            }
-
-                            entry.name == ENTRY_ACCOUNT_KEYS -> accountKeysJson = zip.readText()
-                            entry.name == ENTRY_FOLDERS -> {
-                                folders = json.decodeFromString(
-                                    ListSerializer(SyncResponseJson.Folder.serializer()),
-                                    zip.readText(),
-                                )
-                            }
-
-                            entry.name == ENTRY_CIPHERS -> {
-                                ciphers = json.decodeFromString(
-                                    ListSerializer(SyncResponseJson.Cipher.serializer()),
-                                    zip.readText(),
-                                )
-                            }
-
-                            entry.name.startsWith(ENTRY_ATTACHMENTS_PREFIX) -> {
-                                val ids = entry.name
-                                    .removePrefix(ENTRY_ATTACHMENTS_PREFIX)
-                                    .split('/')
-                                if (ids.size != 2 || ids.any { !ATTACHMENT_ID_REGEX.matches(it) }) {
-                                    throw IOException("Unexpected backup entry ${entry.name}")
-                                }
-                                val file = File(attachmentsDirectory, "${ids[0]}/${ids[1]}")
-                                file.parentFile?.mkdirs()
-                                file.outputStream().use { zip.copyTo(it) }
-                            }
-
-                            else -> Unit
-                        }
-                    }
-                }
-                val backupManifest = manifest ?: throw IOException("Not a SecretDoor backup")
-                if (backupManifest.format != BACKUP_FORMAT) {
-                    throw IOException("Not a SecretDoor backup")
-                }
-                if (backupManifest.version > BACKUP_VERSION) {
-                    throw IOException("Backup was made by a newer version of SecretDoor")
-                }
-                val backupAccount = account ?: throw MissingPropertyException("Account")
+                inputStream.use { input -> file.outputStream().use { input.copyTo(it) } }
+                val header = file.dataInputStream().use { readEncryptedHeader(it) }
+                val createdAt = header
+                    ?.header
+                    ?.createdAt
+                    ?: file.inputStream().buffered().use { readZipManifest(it).createdAt }
                 VaultBackup(
-                    createdAt = Instant.parse(backupManifest.createdAt),
-                    account = backupAccount.account,
-                    accountCryptographicState = json.decodeFromString(
-                        accountKeysSerializer,
-                        accountKeysJson ?: throw MissingPropertyException("Account keys"),
-                    ),
-                    masterPasswordHint = backupAccount.masterPasswordHint,
-                    folders = folders.orEmpty(),
-                    ciphers = ciphers.orEmpty(),
-                    attachmentsDirectory = attachmentsDirectory.takeIf { it.exists() },
+                    createdAt = Instant.parse(createdAt),
+                    file = file,
+                    isEncrypted = header != null,
                 )
             }
                 .fold(
@@ -222,6 +221,7 @@ class VaultBackupManagerImpl(
                 )
         }
 
+    @Suppress("LongMethod")
     override suspend fun restoreBackup(
         backup: VaultBackup,
         masterPassword: String,
@@ -231,24 +231,28 @@ class VaultBackupManagerImpl(
                 error = IllegalStateException("A vault already exists on this device"),
             )
         }
-        val userId = backup.account.profile.userId
+        val contents = runCatching { openBackup(backup = backup, masterPassword = masterPassword) }
+            .getOrElse { return RestoreBackupResult.Error(error = it) }
+            ?.contents
+            ?: return RestoreBackupResult.WrongPassword
+        val userId = contents.account.profile.userId
         // Store the vault data first so the vault is complete as soon as it unlocks.
         withContext(dispatcherManager.io) {
-            backup.attachmentsDirectory?.copyRecursively(
+            contents.attachmentsDirectory?.copyRecursively(
                 target = attachmentsDirectory(userId = userId),
                 overwrite = true,
             )
-            vaultDiskSource.saveFolders(userId = userId, folders = backup.folders)
-            vaultDiskSource.saveCiphers(userId = userId, ciphers = backup.ciphers)
+            vaultDiskSource.saveFolders(userId = userId, folders = contents.folders)
+            vaultDiskSource.saveCiphers(userId = userId, ciphers = contents.ciphers)
         }
         val unlockResult = userStateManager.userStateTransaction {
             authDiskSource.storeAccountCryptographicState(
                 userId = userId,
-                accountCryptographicState = backup.accountCryptographicState,
+                accountCryptographicState = contents.accountCryptographicState,
             )
             authDiskSource.storeMasterPasswordHint(
                 userId = userId,
-                hint = backup.masterPasswordHint,
+                hint = contents.masterPasswordHint,
             )
             // A local vault has no server session; this token only marks the account as active.
             authDiskSource.storeAccountTokens(
@@ -260,7 +264,7 @@ class VaultBackupManagerImpl(
             )
             authDiskSource.userState = UserStateJson(
                 activeUserId = userId,
-                accounts = mapOf(userId to backup.account),
+                accounts = mapOf(userId to contents.account),
             )
             vaultRepository.unlockVaultWithMasterPassword(masterPassword = masterPassword)
         }
@@ -282,10 +286,396 @@ class VaultBackupManagerImpl(
             }
         }
         settingsRepository.hasUserLoggedInOrCreatedAccount = true
-        withContext(dispatcherManager.io) {
-            File(context.cacheDir, RESTORE_CACHE_DIRECTORY).deleteRecursively()
+        clearRestoreCache()
+        return RestoreBackupResult.Success(itemCount = contents.ciphers.size)
+    }
+
+    override suspend fun mergeBackup(
+        backup: VaultBackup,
+        masterPassword: String,
+    ): MergeBackupResult {
+        val userId = authDiskSource.userState?.activeUserId
+            ?: return MergeBackupResult.Error(error = NoActiveUserException())
+        if (!vaultRepository.isVaultUnlocked(userId = userId)) {
+            return MergeBackupResult.Error(error = IllegalStateException("The vault is locked"))
         }
-        return RestoreBackupResult.Success(itemCount = backup.ciphers.size)
+        val openedBackup = runCatching {
+            openBackup(backup = backup, masterPassword = masterPassword)
+        }
+            .getOrElse { return MergeBackupResult.Error(error = it) }
+            ?: return MergeBackupResult.WrongPassword
+        return runCatching { mergeOpenedBackup(userId = userId, openedBackup = openedBackup) }
+            .getOrElse { MergeBackupResult.Error(error = it) }
+            .also { clearRestoreCache() }
+    }
+
+    /**
+     * Adds the folders and items of [openedBackup] to the vault of [userId]:
+     *
+     * - Everything is first re-encrypted with this vault's user key and checked by decrypting it,
+     *   so nothing is saved unless every item can be read afterwards.
+     * - A backup folder with the same name as an existing folder is merged into it.
+     * - An item that already exists (same ID, for example from an older backup of this vault) is
+     *   only replaced when the backup's copy is newer.
+     * - An item whose content matches an existing item is skipped.
+     */
+    @Suppress("LongMethod")
+    private suspend fun mergeOpenedBackup(
+        userId: String,
+        openedBackup: OpenedBackup,
+    ): MergeBackupResult.Success {
+        val contents = openedBackup.contents
+        val currentUserKey = vaultSdkSource
+            .getUserEncryptionKey(userId = userId)
+            .getOrThrow()
+            .toUserKey()
+        val isSameKey = openedBackup.userKey.contentEquals(currentUserKey)
+        val rewrap: (String) -> String = { value ->
+            if (isSameKey) {
+                value
+            } else {
+                BackupCrypto.rewrapEncString(
+                    value = value,
+                    from = openedBackup.userKey,
+                    to = currentUserKey,
+                )
+            }
+        }
+
+        // Folders: decide everything before saving anything.
+        val existingFolders = vaultDiskSource.getFolders(userId = userId)
+        val existingFolderIdsByName = existingFolders
+            .mapNotNull { folder ->
+                runCatching { decryptFolderName(userId = userId, folder = folder) }
+                    .getOrNull()
+                    ?.let { it to folder.id }
+            }
+            .toMap()
+        val existingFolderIds = existingFolders.map { it.id }.toSet()
+        val folderIds = mutableMapOf<String, String>()
+        val newFolders = mutableListOf<SyncResponseJson.Folder>()
+        contents.folders.forEach { folder ->
+            val rewrappedFolder = folder.copy(name = folder.name?.let(rewrap))
+            val name = decryptFolderName(userId = userId, folder = rewrappedFolder)
+            folderIds[folder.id] = existingFolderIdsByName[name] ?: run {
+                val id = folder.id
+                    .takeUnless { it in existingFolderIds }
+                    ?: UUID.randomUUID().toString()
+                newFolders.add(rewrappedFolder.copy(id = id))
+                id
+            }
+        }
+
+        // Items: decide everything before saving anything.
+        val existingCiphers = vaultDiskSource.getCiphers(userId = userId).associateBy { it.id }
+        val existingFingerprints = existingCiphers.values
+            .mapNotNull { cipher ->
+                vaultSdkSource
+                    .decryptCipher(userId = userId, cipher = cipher.toEncryptedSdkCipher())
+                    .getOrNull()
+                    ?.fingerprint()
+            }
+            .toMutableSet()
+        val ciphersToSave = mutableListOf<SyncResponseJson.Cipher>()
+        var addedCount = 0
+        var updatedCount = 0
+        var skippedCount = 0
+        contents.ciphers.forEach { cipher ->
+            val rewrappedCipher = cipher
+                .rewrap(isSameKey = isSameKey, rewrap = rewrap)
+                .copy(
+                    folderId = cipher.folderId?.let { folderId ->
+                        folderIds[folderId] ?: folderId.takeIf { it in existingFolderIds }
+                    },
+                )
+            // Throws if the item cannot be decrypted with this vault's key.
+            val cipherView = vaultSdkSource
+                .decryptCipher(userId = userId, cipher = rewrappedCipher.toEncryptedSdkCipher())
+                .getOrThrow()
+            val existingCipher = existingCiphers[cipher.id]
+            val fingerprint = cipherView.fingerprint()
+            when {
+                existingCipher != null -> {
+                    if (rewrappedCipher.revisionDate.isAfter(existingCipher.revisionDate)) {
+                        ciphersToSave.add(rewrappedCipher)
+                        updatedCount++
+                    } else {
+                        skippedCount++
+                    }
+                }
+
+                fingerprint in existingFingerprints -> skippedCount++
+
+                else -> {
+                    ciphersToSave.add(rewrappedCipher)
+                    existingFingerprints.add(fingerprint)
+                    addedCount++
+                }
+            }
+        }
+
+        withContext(dispatcherManager.io) {
+            newFolders.forEach { vaultDiskSource.saveFolder(userId = userId, folder = it) }
+            ciphersToSave.forEach { cipher ->
+                val target = File(attachmentsDirectory(userId = userId), cipher.id)
+                target.deleteRecursively()
+                contents.attachmentsDirectory
+                    ?.let { File(it, cipher.id) }
+                    ?.takeIf { it.isDirectory }
+                    ?.copyRecursively(target = target, overwrite = true)
+                vaultDiskSource.saveCipher(userId = userId, cipher = cipher)
+            }
+        }
+        return MergeBackupResult.Success(
+            addedCount = addedCount,
+            updatedCount = updatedCount,
+            skippedCount = skippedCount,
+        )
+    }
+
+    /**
+     * Returns the key that encrypts backup files of [userId]. While the vault is unlocked it is
+     * derived from the user key and remembered (Keystore-encrypted), so automatic backups also
+     * work while the vault is locked.
+     */
+    private suspend fun getBackupFileKey(userId: String): BackupFileKey {
+        val storedKey = authDiskSource
+            .getBackupKey(userId = userId)
+            ?.let { BackupFileKey.fromStorageString(it) }
+        if (!vaultRepository.isVaultUnlocked(userId = userId)) {
+            return storedKey
+                ?: throw IllegalStateException("Unlock SecretDoor once so backups can be made")
+        }
+        val userKey = vaultSdkSource.getUserEncryptionKey(userId = userId).getOrThrow().toUserKey()
+        val salt = storedKey?.salt ?: BackupCrypto.randomBytes(BACKUP_KEY_SALT_BYTES)
+        val fileKey = BackupFileKey(
+            salt = salt,
+            key = BackupCrypto.deriveBackupKey(userKey = userKey, salt = salt),
+        )
+        if (fileKey.toStorageString() != storedKey?.toStorageString()) {
+            authDiskSource.storeBackupKey(userId = userId, backupKey = fileKey.toStorageString())
+        }
+        return fileKey
+    }
+
+    /**
+     * Checks [masterPassword] and decrypts [backup]. Returns `null` if the password is wrong.
+     */
+    private suspend fun openBackup(
+        backup: VaultBackup,
+        masterPassword: String,
+    ): OpenedBackup? = withContext(dispatcherManager.io) {
+        val attachmentsDirectory = File(backup.file.parentFile, ATTACHMENTS_DIRECTORY)
+        attachmentsDirectory.deleteRecursively()
+        val encryptedHeader = backup.file.dataInputStream().use { readEncryptedHeader(it) }
+        if (encryptedHeader == null) {
+            // Version 1: a plain ZIP file, the password is checked against its account.
+            val contents = backup.file.inputStream().buffered().use {
+                readZip(input = it, attachmentsDirectory = attachmentsDirectory)
+            }
+            val masterPasswordUnlock = contents
+                .account
+                .profile
+                .userDecryptionOptions
+                ?.masterPasswordUnlock
+                ?: throw MissingPropertyException("MasterPasswordUnlock data")
+            val userKey = unlockUserKey(
+                masterPasswordUnlock = masterPasswordUnlock,
+                accountKeys = contents.accountCryptographicState,
+                masterPassword = masterPassword,
+            )
+                ?: return@withContext null
+            return@withContext OpenedBackup(contents = contents, userKey = userKey)
+        }
+        val header = encryptedHeader.header
+        val userKey = unlockUserKey(
+            masterPasswordUnlock = header.masterPasswordUnlock,
+            accountKeys = json.decodeFromString(accountKeysSerializer, header.accountKeys),
+            masterPassword = masterPassword,
+        )
+            ?: return@withContext null
+        val fileKey = BackupCrypto.deriveBackupKey(
+            userKey = userKey,
+            salt = header.keySalt.fromBase64(),
+        )
+        val contents = backup.file.dataInputStream().use { input ->
+            input.readFully(ByteArray(encryptedHeader.prefix.size))
+            readZip(
+                input = BackupCrypto.decryptingStream(
+                    input = input,
+                    key = fileKey,
+                    noncePrefix = header.noncePrefix.fromBase64(),
+                    associatedData = encryptedHeader.prefix,
+                ),
+                attachmentsDirectory = attachmentsDirectory,
+            )
+        }
+        OpenedBackup(contents = contents, userKey = userKey)
+    }
+
+    /**
+     * Unlocks the backup's user key with [masterPassword] in a temporary SDK client. Returns
+     * `null` if the password is wrong.
+     */
+    private suspend fun unlockUserKey(
+        masterPasswordUnlock: MasterPasswordUnlockDataJson,
+        accountKeys: WrappedAccountCryptographicState,
+        masterPassword: String,
+    ): ByteArray? {
+        val temporaryUserId = "backup-${UUID.randomUUID()}"
+        val sdkMasterPasswordUnlock = masterPasswordUnlock.toSdkMasterPasswordUnlock()
+        return try {
+            val result = vaultSdkSource
+                .initializeCrypto(
+                    userId = temporaryUserId,
+                    request = InitUserCryptoRequest(
+                        userId = temporaryUserId,
+                        kdfParams = sdkMasterPasswordUnlock.kdf,
+                        email = masterPasswordUnlock.salt,
+                        accountCryptographicState = accountKeys,
+                        method = InitUserCryptoMethod.MasterPasswordUnlock(
+                            password = masterPassword,
+                            masterPasswordUnlock = sdkMasterPasswordUnlock,
+                        ),
+                        upgradeToken = null,
+                    ),
+                )
+                .getOrThrow()
+            if (result is InitializeCryptoResult.AuthenticationError) {
+                null
+            } else {
+                vaultSdkSource
+                    .getUserEncryptionKey(userId = temporaryUserId)
+                    .getOrThrow()
+                    .toUserKey()
+            }
+        } finally {
+            vaultSdkSource.clearCrypto(userId = temporaryUserId)
+        }
+    }
+
+    private suspend fun decryptFolderName(userId: String, folder: SyncResponseJson.Folder): String =
+        vaultSdkSource
+            .decryptFolder(userId = userId, folder = folder.toEncryptedSdkFolder())
+            .getOrThrow()
+            .name
+
+    /**
+     * Re-encrypts this item for another user key. An item with its own key only needs that key
+     * re-encrypted; otherwise every encrypted string in it is.
+     */
+    private fun SyncResponseJson.Cipher.rewrap(
+        isSameKey: Boolean,
+        rewrap: (String) -> String,
+    ): SyncResponseJson.Cipher {
+        if (isSameKey) return this
+        key?.let { return copy(key = rewrap(it)) }
+        val serializer = SyncResponseJson.Cipher.serializer()
+        return json.decodeFromJsonElement(
+            serializer,
+            json.encodeToJsonElement(serializer, this).rewrapEncStrings(rewrap),
+        )
+    }
+
+    @Suppress("LongMethod", "CyclomaticComplexMethod")
+    private fun readZip(input: InputStream, attachmentsDirectory: File): BackupContents {
+        var manifest: BackupManifestJson? = null
+        var account: BackupAccountJson? = null
+        var accountKeysJson: String? = null
+        var folders: List<SyncResponseJson.Folder>? = null
+        var ciphers: List<SyncResponseJson.Cipher>? = null
+        ZipInputStream(input).use { zip ->
+            generateSequence { zip.nextEntry }.forEach { entry ->
+                when {
+                    entry.isDirectory -> Unit
+                    entry.name == ENTRY_MANIFEST -> {
+                        manifest = json.decodeFromString<BackupManifestJson>(zip.readText())
+                    }
+
+                    entry.name == ENTRY_ACCOUNT -> {
+                        account = json.decodeFromString<BackupAccountJson>(zip.readText())
+                    }
+
+                    entry.name == ENTRY_ACCOUNT_KEYS -> accountKeysJson = zip.readText()
+                    entry.name == ENTRY_FOLDERS -> {
+                        folders = json.decodeFromString(
+                            ListSerializer(SyncResponseJson.Folder.serializer()),
+                            zip.readText(),
+                        )
+                    }
+
+                    entry.name == ENTRY_CIPHERS -> {
+                        ciphers = json.decodeFromString(
+                            ListSerializer(SyncResponseJson.Cipher.serializer()),
+                            zip.readText(),
+                        )
+                    }
+
+                    entry.name.startsWith(ENTRY_ATTACHMENTS_PREFIX) -> {
+                        val ids = entry.name.removePrefix(ENTRY_ATTACHMENTS_PREFIX).split('/')
+                        if (ids.size != 2 || ids.any { !ATTACHMENT_ID_REGEX.matches(it) }) {
+                            throw IOException("Unexpected backup entry ${entry.name}")
+                        }
+                        val file = File(attachmentsDirectory, "${ids[0]}/${ids[1]}")
+                        file.parentFile?.mkdirs()
+                        file.outputStream().use { zip.copyTo(it) }
+                    }
+
+                    else -> Unit
+                }
+            }
+        }
+        (manifest ?: throw IOException("Not a SecretDoor backup")).validate()
+        val backupAccount = account ?: throw MissingPropertyException("Account")
+        return BackupContents(
+            account = backupAccount.account,
+            accountCryptographicState = json.decodeFromString(
+                accountKeysSerializer,
+                accountKeysJson ?: throw MissingPropertyException("Account keys"),
+            ),
+            masterPasswordHint = backupAccount.masterPasswordHint,
+            folders = folders.orEmpty(),
+            ciphers = ciphers.orEmpty(),
+            attachmentsDirectory = attachmentsDirectory.takeIf { it.exists() },
+        )
+    }
+
+    private fun readZipManifest(input: InputStream): BackupManifestJson =
+        ZipInputStream(input).use { zip ->
+            generateSequence { zip.nextEntry }
+                .firstOrNull { it.name == ENTRY_MANIFEST }
+                ?.let { json.decodeFromString<BackupManifestJson>(zip.readText()) }
+                ?: throw IOException("Not a SecretDoor backup")
+        }
+            .also { it.validate() }
+
+    /**
+     * Reads the header of an encrypted backup, leaving [input] at the start of the payload.
+     * Returns `null` if the file is not an encrypted backup (for example a version 1 ZIP file).
+     */
+    private fun readEncryptedHeader(input: DataInputStream): EncryptedHeader? {
+        val magic = ByteArray(FILE_MAGIC.size)
+        var magicLength = 0
+        while (magicLength < magic.size) {
+            val count = input.read(magic, magicLength, magic.size - magicLength)
+            if (count == -1) break
+            magicLength += count
+        }
+        if (magicLength != magic.size || !magic.contentEquals(FILE_MAGIC)) return null
+        val version = input.readUnsignedByte()
+        if (version > BACKUP_VERSION) {
+            throw IOException("Backup was made by a newer version of SecretDoor")
+        }
+        val headerLength = input.readInt()
+        if (headerLength !in 1..MAX_HEADER_BYTES) throw IOException("Backup file is damaged")
+        val headerBytes = ByteArray(headerLength).also { input.readFully(it) }
+        val header = json.decodeFromString<BackupHeaderJson>(headerBytes.toString(Charsets.UTF_8))
+        if (header.format != BACKUP_FORMAT) throw IOException("Not a SecretDoor backup")
+        return EncryptedHeader(header = header, prefix = filePrefix(headerBytes))
+    }
+
+    private fun clearRestoreCache() {
+        File(context.cacheDir, RESTORE_CACHE_DIRECTORY).deleteRecursively()
     }
 
     private fun attachmentsDirectory(userId: String): File =
@@ -304,6 +694,86 @@ class VaultBackupManagerImpl(
             ?: throw FileNotFoundException("Unable to open $uri")
     }
 }
+
+/**
+ * The bytes before the payload: magic, version, header length and header. They are
+ * authenticated as part of the payload encryption, so the header cannot be altered.
+ */
+private fun filePrefix(headerBytes: ByteArray): ByteArray =
+    ByteBuffer
+        .allocate(FILE_MAGIC.size + 1 + Int.SIZE_BYTES + headerBytes.size)
+        .put(FILE_MAGIC)
+        .put(BACKUP_VERSION.toByte())
+        .putInt(headerBytes.size)
+        .put(headerBytes)
+        .array()
+
+private fun BackupManifestJson.validate() {
+    if (format != BACKUP_FORMAT) throw IOException("Not a SecretDoor backup")
+    if (version > BACKUP_VERSION) {
+        throw IOException("Backup was made by a newer version of SecretDoor")
+    }
+}
+
+/**
+ * Re-encrypts every encrypted string in this JSON. The cipher's `data` field holds the item as a
+ * JSON string, so its content is re-encrypted too.
+ */
+private fun JsonElement.rewrapEncStrings(rewrap: (String) -> String): JsonElement =
+    when (this) {
+        is JsonObject -> JsonObject(
+            mapValues { (name, value) ->
+                if (name == CIPHER_DATA_FIELD && value is JsonPrimitive && value.isString) {
+                    value.rewrapEmbeddedJson(rewrap)
+                } else {
+                    value.rewrapEncStrings(rewrap)
+                }
+            },
+        )
+
+        is JsonArray -> JsonArray(map { it.rewrapEncStrings(rewrap) })
+        is JsonPrimitive -> {
+            if (isString && BackupCrypto.isEncString(content)) JsonPrimitive(rewrap(content)) else this
+        }
+    }
+
+private fun JsonPrimitive.rewrapEmbeddedJson(rewrap: (String) -> String): JsonPrimitive =
+    runCatching { Json.parseToJsonElement(content) }
+        .map { JsonPrimitive(it.rewrapEncStrings(rewrap).toString()) }
+        .getOrElse { rewrapEncStrings(rewrap) as JsonPrimitive }
+
+/**
+ * The decrypted content that identifies an item, used to skip items that already exist.
+ */
+private fun CipherView.fingerprint(): List<Any?> =
+    listOf(
+        type,
+        name,
+        notes,
+        login?.username,
+        login?.password,
+        login?.totp,
+        login?.uris?.map { it.uri },
+        card,
+        identity,
+        secureNote,
+        sshKey,
+        bankAccount,
+        driversLicense,
+        passport,
+        fields?.map { it.name to it.value },
+    )
+
+private fun String.toUserKey(): ByteArray =
+    fromBase64().also {
+        if (it.size != USER_KEY_BYTES) throw IOException("Unsupported vault key type")
+    }
+
+private fun ByteArray.toBase64(): String = Base64.getEncoder().encodeToString(this)
+
+private fun String.fromBase64(): ByteArray = Base64.getDecoder().decode(this)
+
+private fun File.dataInputStream(): DataInputStream = DataInputStream(inputStream().buffered())
 
 private fun ZipOutputStream.putJson(name: String, value: String) {
     putNextEntry(ZipEntry(name))
@@ -328,6 +798,69 @@ private fun ZipOutputStream.putAttachments(directory: File) {
 }
 
 private fun ZipInputStream.readText(): String = readBytes().toString(Charsets.UTF_8)
+
+/**
+ * The key that encrypts backup files, derived from the user key and [salt].
+ */
+private class BackupFileKey(val salt: ByteArray, val key: ByteArray) {
+    fun toStorageString(): String = "${salt.toBase64()}:${key.toBase64()}"
+
+    companion object {
+        fun fromStorageString(value: String): BackupFileKey? {
+            val parts = value.split(':')
+            if (parts.size != 2) return null
+            return runCatching {
+                BackupFileKey(salt = parts[0].fromBase64(), key = parts[1].fromBase64())
+            }
+                .getOrNull()
+        }
+    }
+}
+
+/**
+ * A decrypted backup and the user key of the vault it was made from.
+ */
+private class OpenedBackup(val contents: BackupContents, val userKey: ByteArray)
+
+/**
+ * The parsed header of an encrypted backup and the file bytes up to the payload.
+ */
+private class EncryptedHeader(val header: BackupHeaderJson, val prefix: ByteArray)
+
+/**
+ * The decrypted contents of a backup. Items, folders and attachments are still encrypted with
+ * the backup vault's user key.
+ */
+private data class BackupContents(
+    val account: AccountJson,
+    val accountCryptographicState: WrappedAccountCryptographicState,
+    val masterPasswordHint: String?,
+    val folders: List<SyncResponseJson.Folder>,
+    val ciphers: List<SyncResponseJson.Cipher>,
+    val attachmentsDirectory: File?,
+)
+
+/**
+ * The unencrypted header of a backup file: what is needed to turn the master password into the
+ * vault's user key, plus the parameters of the payload encryption.
+ */
+@Serializable
+private data class BackupHeaderJson(
+    @SerialName("format")
+    val format: String,
+    @SerialName("version")
+    val version: Int,
+    @SerialName("createdAt")
+    val createdAt: String,
+    @SerialName("masterPasswordUnlock")
+    val masterPasswordUnlock: MasterPasswordUnlockDataJson,
+    @SerialName("accountKeys")
+    val accountKeys: String,
+    @SerialName("keySalt")
+    val keySalt: String,
+    @SerialName("noncePrefix")
+    val noncePrefix: String,
+)
 
 /**
  * Identifies a SecretDoor backup and the version of its layout.

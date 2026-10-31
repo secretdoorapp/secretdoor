@@ -167,7 +167,6 @@ class AccountSecurityViewModel @Inject constructor(
         AccountSecurityAction.LockNowClick -> handleLockNowClick()
         AccountSecurityAction.LogoutClick -> handleLogoutClick()
         AccountSecurityAction.ManageDevicesClick -> handleManageDevicesClick()
-        AccountSecurityAction.PendingLoginRequestsClick -> handlePendingLoginRequestsClick()
         is AccountSecurityAction.VaultTimeoutTypeSelect -> handleVaultTimeoutTypeSelect(action)
         is AccountSecurityAction.CustomVaultTimeoutSelect -> handleCustomVaultTimeoutSelect(action)
         is AccountSecurityAction.VaultTimeoutActionSelect -> handleVaultTimeoutActionSelect(action)
@@ -265,10 +264,6 @@ class AccountSecurityViewModel @Inject constructor(
 
     private fun handleLogoutClick() {
         mutableStateFlow.update { it.copy(dialog = AccountSecurityDialog.ConfirmLogout) }
-    }
-
-    private fun handlePendingLoginRequestsClick() {
-        sendEvent(AccountSecurityEvent.NavigateToPendingRequests)
     }
 
     private fun handleVaultTimeoutTypeSelect(action: AccountSecurityAction.VaultTimeoutTypeSelect) {
@@ -689,11 +684,6 @@ sealed class AccountSecurityEvent {
     data object NavigateToFingerprintPhrase : AccountSecurityEvent()
 
     /**
-     * Navigate to the Pending Login Requests screen.
-     */
-    data object NavigateToPendingRequests : AccountSecurityEvent()
-
-    /**
      * Navigate to the two step login screen.
      */
     data class NavigateToTwoStepLogin(val url: String) : AccountSecurityEvent()
@@ -787,11 +777,6 @@ sealed class AccountSecurityAction {
      * User clicked manage devices.
      */
     data object ManageDevicesClick : AccountSecurityAction()
-
-    /**
-     * User clicked pending login requests.
-     */
-    data object PendingLoginRequestsClick : AccountSecurityAction()
 
     /**
      * User selected a [vaultTimeoutType].

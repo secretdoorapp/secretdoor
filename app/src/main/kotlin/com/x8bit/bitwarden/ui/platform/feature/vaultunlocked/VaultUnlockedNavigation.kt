@@ -30,8 +30,6 @@ import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.loginapp
 import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.loginapproval.navigateToLoginApproval
 import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.managedevices.manageDevicesDestination
 import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.managedevices.navigateToManageDevices
-import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.pendingrequests.navigateToPendingRequests
-import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.pendingrequests.pendingRequestsDestination
 import com.x8bit.bitwarden.ui.platform.feature.settings.autofill.privilegedapps.about.aboutPrivilegedAppsDestination
 import com.x8bit.bitwarden.ui.platform.feature.settings.autofill.privilegedapps.about.navigateToAboutPrivilegedAppsScreen
 import com.x8bit.bitwarden.ui.platform.feature.settings.exportvault.exportVaultDestination
@@ -118,7 +116,6 @@ fun NavGraphBuilder.vaultUnlockedGraph(
             onNavigateToVaultEditItem = { navController.navigateToVaultAddEdit(it) },
             onNavigateToSearchVault = { navController.navigateToSearch(searchType = it) },
             onNavigateToDeleteAccount = { navController.navigateToDeleteAccount() },
-            onNavigateToPendingRequests = { navController.navigateToPendingRequests() },
             onNavigateToManageDevices = { navController.navigateToManageDevices() },
             onNavigateToPasswordHistory = {
                 navController.navigateToPasswordHistory(
@@ -170,10 +167,6 @@ fun NavGraphBuilder.vaultUnlockedGraph(
             onNavigateBack = { navController.popBackStack() },
         )
         loginApprovalDestination(onNavigateBack = { navController.popBackStack() })
-        pendingRequestsDestination(
-            onNavigateBack = { navController.popBackStack() },
-            onNavigateToLoginApproval = { navController.navigateToLoginApproval(it) },
-        )
         manageDevicesDestination(
             onNavigateBack = { navController.popBackStack() },
             onNavigateToLoginApproval = { navController.navigateToLoginApproval(it) },

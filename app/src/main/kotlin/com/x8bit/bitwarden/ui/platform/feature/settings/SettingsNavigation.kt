@@ -37,7 +37,6 @@ import com.x8bit.bitwarden.ui.platform.feature.settings.other.navigateToOther
 import com.x8bit.bitwarden.ui.platform.feature.settings.other.otherDestination
 import com.x8bit.bitwarden.ui.platform.feature.settings.vault.navigateToVaultSettings
 import com.x8bit.bitwarden.ui.platform.feature.settings.vault.vaultSettingsDestination
-import com.x8bit.bitwarden.ui.platform.feature.premium.plan.navigateToPlan
 import com.x8bit.bitwarden.ui.platform.feature.premium.plan.planDestination
 import com.x8bit.bitwarden.ui.vault.feature.importitems.importItemsDestination
 import kotlinx.parcelize.Parcelize
@@ -118,7 +117,6 @@ fun NavGraphBuilder.settingsGraph(
     onNavigateToDeleteAccount: () -> Unit,
     onNavigateToExportVault: () -> Unit,
     onNavigateToFolders: () -> Unit,
-    onNavigateToPendingRequests: () -> Unit,
     onNavigateToSetupUnlockScreen: () -> Unit,
     onNavigateToSetupAutoFillScreen: () -> Unit,
     onNavigateToSetupBrowserAutofill: () -> Unit,
@@ -142,7 +140,6 @@ fun NavGraphBuilder.settingsGraph(
                 onNavigateToAutoFill = { navController.navigateToAutoFill() },
                 onNavigateToOther = { navController.navigateToOther(isPreAuth = false) },
                 onNavigateToVault = { navController.navigateToVaultSettings() },
-                onNavigateToPlan = { navController.navigateToPlan() },
             )
         }
         aboutDestination(
@@ -154,7 +151,6 @@ fun NavGraphBuilder.settingsGraph(
         accountSecurityDestination(
             onNavigateBack = { navController.popBackStack() },
             onNavigateToDeleteAccount = onNavigateToDeleteAccount,
-            onNavigateToPendingRequests = onNavigateToPendingRequests,
             onNavigateToSetupUnlockScreen = onNavigateToSetupUnlockScreen,
             onNavigateToManageDevices = onNavigateToManageDevices,
         )
@@ -211,7 +207,6 @@ fun NavGraphBuilder.preAuthSettingsDestinations(
             onNavigateToAccountSecurity = { /* no-op */ },
             onNavigateToAutoFill = { /* no-op */ },
             onNavigateToVault = { /* no-op */ },
-            onNavigateToPlan = { /* no-op */ },
         )
     }
     appearanceDestination(

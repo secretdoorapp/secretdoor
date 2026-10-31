@@ -107,6 +107,9 @@ import com.x8bit.bitwarden.data.auth.repository.util.toSdkParams
 import com.x8bit.bitwarden.data.auth.repository.util.toUserState
 import com.x8bit.bitwarden.data.auth.repository.util.updateForcePasswordReset
 import com.x8bit.bitwarden.data.auth.repository.util.updateMasterPasswordUnlock
+import com.x8bit.bitwarden.data.auth.util.KdfParamsConstants.DEFAULT_ARGON2_ITERATIONS
+import com.x8bit.bitwarden.data.auth.util.KdfParamsConstants.DEFAULT_ARGON2_MEMORY
+import com.x8bit.bitwarden.data.auth.util.KdfParamsConstants.DEFAULT_ARGON2_PARALLELISM
 import com.x8bit.bitwarden.data.auth.util.KdfParamsConstants.DEFAULT_PBKDF2_ITERATIONS
 import com.x8bit.bitwarden.data.auth.util.YubiKeyResult
 import com.x8bit.bitwarden.data.auth.util.toSdkParams
@@ -938,7 +941,13 @@ internal class AuthRepositoryImpl(
         val userId = UUID.randomUUID().toString()
         // The email is only used locally as the master key salt, so it is unique per vault.
         val email = "$userId$LOCAL_VAULT_EMAIL_SUFFIX"
-        val kdf = Kdf.Pbkdf2(iterations = DEFAULT_PBKDF2_ITERATIONS.toUInt())
+        // Argon2id makes guessing the master password far more expensive than PBKDF2, which
+        // matters because backups of the vault may be stored in the cloud.
+        val kdf = Kdf.Argon2id(
+            iterations = DEFAULT_ARGON2_ITERATIONS.toUInt(),
+            memory = DEFAULT_ARGON2_MEMORY.toUInt(),
+            parallelism = DEFAULT_ARGON2_PARALLELISM.toUInt(),
+        )
         val registerKeyResponse = authSdkSource
             .makeRegisterKeys(email = email, password = masterPassword, kdf = kdf)
             .getOrElse { return RegisterResult.Error(errorMessage = null, error = it) }

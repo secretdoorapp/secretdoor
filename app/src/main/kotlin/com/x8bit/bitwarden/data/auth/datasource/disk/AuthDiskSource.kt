@@ -159,6 +159,16 @@ interface AuthDiskSource : AppIdProvider {
     fun storeUserAutoUnlockKey(userId: String, userAutoUnlockKey: String?)
 
     /**
+     * Retrieves the key that encrypts backup files for the given [userId].
+     */
+    fun getBackupKey(userId: String): String?
+
+    /**
+     * Stores the key that encrypts backup files for the given [userId].
+     */
+    fun storeBackupKey(userId: String, backupKey: String?)
+
+    /**
      * Gets the device key for the given [userId].
      */
     fun getDeviceKey(userId: String): String?

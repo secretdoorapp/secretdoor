@@ -54,7 +54,6 @@ fun SettingsScreen(
     onNavigateToAutoFill: () -> Unit,
     onNavigateToOther: () -> Unit,
     onNavigateToVault: () -> Unit,
-    onNavigateToPlan: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
     intentManager: IntentManager = LocalIntentManager.current,
 ) {
@@ -69,7 +68,6 @@ fun SettingsScreen(
             SettingsEvent.NavigateOther -> onNavigateToOther()
             SettingsEvent.NavigateVault -> onNavigateToVault()
             SettingsEvent.NavigateAccountSecurityShortcut -> onNavigateToAccountSecurity()
-            SettingsEvent.NavigatePlan -> onNavigateToPlan()
             is SettingsEvent.NavigateToUrl -> intentManager.launchUri(event.url.toUri())
         }
     }

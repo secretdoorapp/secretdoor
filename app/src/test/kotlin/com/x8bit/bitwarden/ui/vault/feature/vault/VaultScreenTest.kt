@@ -77,6 +77,7 @@ import org.junit.Test
 class VaultScreenTest : BitwardenComposeTest() {
     private var onNavigateToAboutCalled = false
     private var onNavigateToAutofillCalled = false
+    private var onNavigateToBackupIsImport: Boolean? = null
     private var onNavigateToPlanCalled = false
     private var onNavigateToImportLoginsCalled = false
     private var onNavigateToVaultAddItemScreenCalled = false
@@ -122,6 +123,7 @@ class VaultScreenTest : BitwardenComposeTest() {
                 },
                 onNavigateToAboutScreen = { onNavigateToAboutCalled = true },
                 onNavigateToAutofillScreen = { onNavigateToAutofillCalled = true },
+                onNavigateToBackupScreen = { onNavigateToBackupIsImport = it },
                 onNavigateToPlan = { onNavigateToPlanCalled = true },
             )
         }
@@ -330,6 +332,36 @@ class VaultScreenTest : BitwardenComposeTest() {
             .performClick()
 
         verify { viewModel.trySendAction(VaultAction.LockClick) }
+    }
+
+    @Test
+    fun `back up click in the overflow menu should send BackupClick`() {
+        composeTestRule.onNodeWithContentDescription("More options").performClick()
+
+        composeTestRule
+            .onAllNodesWithText("Back up")
+            .filterToOne(hasAnyAncestor(isPopup()))
+            .performClick()
+
+        verify { viewModel.trySendAction(VaultAction.BackupClick) }
+    }
+
+    @Test
+    fun `import backup click in the overflow menu should send ImportBackupClick`() {
+        composeTestRule.onNodeWithContentDescription("More options").performClick()
+
+        composeTestRule
+            .onAllNodesWithText("Import backup")
+            .filterToOne(hasAnyAncestor(isPopup()))
+            .performClick()
+
+        verify { viewModel.trySendAction(VaultAction.ImportBackupClick) }
+    }
+
+    @Test
+    fun `when NavigateToBackup is sent, it should call onNavigateToBackupScreen`() {
+        mutableEventFlow.tryEmit(VaultEvent.NavigateToBackup(isImport = true))
+        assertEquals(true, onNavigateToBackupIsImport)
     }
 
     @Test

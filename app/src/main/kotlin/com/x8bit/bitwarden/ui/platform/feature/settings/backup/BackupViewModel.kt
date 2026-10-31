@@ -2,6 +2,7 @@ package com.x8bit.bitwarden.ui.platform.feature.settings.backup
 
 import android.net.Uri
 import android.os.Parcelable
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.bitwarden.core.data.util.toFormattedDateTimeStyle
 import com.bitwarden.core.data.util.toFormattedPattern
@@ -14,6 +15,9 @@ import com.x8bit.bitwarden.data.vault.manager.AutoBackupManager
 import com.x8bit.bitwarden.data.vault.manager.VaultBackupManager
 import com.x8bit.bitwarden.data.vault.manager.model.AutoBackupFrequency
 import com.x8bit.bitwarden.data.vault.manager.model.AutoBackupState
+import com.x8bit.bitwarden.data.vault.manager.model.MergeBackupResult
+import com.x8bit.bitwarden.data.vault.manager.model.ReadBackupResult
+import com.x8bit.bitwarden.data.vault.manager.model.VaultBackup
 import com.x8bit.bitwarden.data.vault.manager.model.WriteBackupResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -34,6 +38,7 @@ class BackupViewModel @Inject constructor(
     private val vaultBackupManager: VaultBackupManager,
     private val autoBackupManager: AutoBackupManager,
     private val clock: Clock,
+    savedStateHandle: SavedStateHandle,
 ) : BaseViewModel<BackupState, BackupEvent, BackupAction>(
     initialState = BackupState(
         isAutoBackupAvailable = autoBackupManager.isAutoBackupAvailable,
@@ -49,7 +54,16 @@ class BackupViewModel @Inject constructor(
             .map { BackupAction.Internal.AutoBackupStateReceive(it) }
             .onEach(::sendAction)
             .launchIn(viewModelScope)
+        if (savedStateHandle.toBackupArgs().isImport) {
+            sendEvent(BackupEvent.NavigateToSelectImportFile)
+        }
     }
+
+    /**
+     * The backup picked for importing. It is not saved state because it refers to files in the
+     * cache directory; after process death the user picks the file again.
+     */
+    private var pendingImport: VaultBackup? = null
 
     override fun handleAction(action: BackupAction) {
         when (action) {
@@ -60,6 +74,9 @@ class BackupViewModel @Inject constructor(
             is BackupAction.AutoBackupLocationReceive -> handleAutoBackupLocationReceive(action)
             is BackupAction.AutoBackupFrequencySelect -> handleAutoBackupFrequencySelect(action)
             BackupAction.BackUpNowClick -> handleBackUpNowClick()
+            BackupAction.ImportBackupClick -> sendEvent(BackupEvent.NavigateToSelectImportFile)
+            is BackupAction.ImportFileReceive -> handleImportFileReceive(action)
+            is BackupAction.ImportMasterPasswordSubmit -> handleImportMasterPasswordSubmit(action)
             BackupAction.DialogDismiss -> mutableStateFlow.update { it.copy(dialogState = null) }
             is BackupAction.Internal -> handleInternalAction(action)
         }
@@ -104,8 +121,44 @@ class BackupViewModel @Inject constructor(
         }
     }
 
+    private fun handleImportFileReceive(action: BackupAction.ImportFileReceive) {
+        showLoading(message = BitwardenString.importing_backup.asText())
+        viewModelScope.launch {
+            sendAction(
+                BackupAction.Internal.ReadBackupResultReceive(
+                    result = vaultBackupManager.readBackup(uri = action.uri),
+                ),
+            )
+        }
+    }
+
+    private fun handleImportMasterPasswordSubmit(
+        action: BackupAction.ImportMasterPasswordSubmit,
+    ) {
+        val backup = pendingImport ?: return mutableStateFlow.update { it.copy(dialogState = null) }
+        showLoading(message = BitwardenString.importing_backup.asText())
+        viewModelScope.launch {
+            sendAction(
+                BackupAction.Internal.MergeBackupResultReceive(
+                    result = vaultBackupManager.mergeBackup(
+                        backup = backup,
+                        masterPassword = action.password,
+                    ),
+                ),
+            )
+        }
+    }
+
     private fun handleInternalAction(action: BackupAction.Internal) {
         when (action) {
+            is BackupAction.Internal.ReadBackupResultReceive -> {
+                handleReadBackupResultReceive(action.result)
+            }
+
+            is BackupAction.Internal.MergeBackupResultReceive -> {
+                handleMergeBackupResultReceive(action.result)
+            }
+
             is BackupAction.Internal.AutoBackupStateReceive -> {
                 handleAutoBackupStateReceive(action.state)
             }
@@ -163,21 +216,75 @@ class BackupViewModel @Inject constructor(
         }
     }
 
-    private fun showLoading() {
+    private fun handleReadBackupResultReceive(result: ReadBackupResult) {
+        when (result) {
+            is ReadBackupResult.Success -> {
+                pendingImport = result.backup
+                mutableStateFlow.update {
+                    it.copy(dialogState = BackupState.DialogState.ImportMasterPassword)
+                }
+            }
+
+            is ReadBackupResult.Error -> {
+                showError(
+                    message = BitwardenString.this_file_is_not_a_secretdoor_backup.asText(),
+                    error = result.error,
+                )
+            }
+        }
+    }
+
+    private fun handleMergeBackupResultReceive(result: MergeBackupResult) {
+        when (result) {
+            is MergeBackupResult.Success -> {
+                pendingImport = null
+                mutableStateFlow.update { it.copy(dialogState = null) }
+                sendEvent(
+                    BackupEvent.ShowSnackbar(
+                        data = BitwardenSnackbarData(
+                            message = BitwardenString.items_imported_x_already_in_your_vault_y
+                                .asText(
+                                    result.addedCount + result.updatedCount,
+                                    result.skippedCount,
+                                ),
+                        ),
+                    ),
+                )
+            }
+
+            MergeBackupResult.WrongPassword -> {
+                showError(message = BitwardenString.invalid_master_password.asText())
+            }
+
+            is MergeBackupResult.Error -> {
+                pendingImport = null
+                showError(
+                    message = BitwardenString.the_backup_could_not_be_imported.asText(),
+                    error = result.error,
+                )
+            }
+        }
+    }
+
+    private fun showError(message: Text, error: Throwable? = null) {
         mutableStateFlow.update {
-            it.copy(
-                dialogState = BackupState.DialogState.Loading(
-                    message = BitwardenString.saving_backup.asText(),
-                ),
-            )
+            it.copy(dialogState = BackupState.DialogState.Error(message = message, error = error))
+        }
+    }
+
+    private fun showLoading(message: Text = BitwardenString.saving_backup.asText()) {
+        mutableStateFlow.update {
+            it.copy(dialogState = BackupState.DialogState.Loading(message = message))
         }
     }
 
     private fun backupFileName(): String =
-        "secretdoor-backup-${clock.instant().toFormattedPattern("yyyyMMdd-HHmm", clock = clock)}.zip"
+        "secretdoor-backup-${clock.instant().toFormattedPattern("yyyyMMdd-HHmm", clock = clock)}" +
+            BACKUP_FILE_EXTENSION
 }
 
-private const val AUTO_BACKUP_FILE_NAME: String = "secretdoor-auto-backup.zip"
+private const val BACKUP_FILE_EXTENSION: String = ".secretdoor"
+private const val AUTO_BACKUP_FILE_NAME: String = "secretdoor-auto-backup$BACKUP_FILE_EXTENSION"
 
 /**
  * Models the state of the backup screen.
@@ -211,6 +318,12 @@ data class BackupState(
          */
         @Parcelize
         data class Error(val message: Text, val error: Throwable? = null) : DialogState()
+
+        /**
+         * Asks for the master password of the backup being imported.
+         */
+        @Parcelize
+        data object ImportMasterPassword : DialogState()
     }
 }
 
@@ -232,6 +345,11 @@ sealed class BackupEvent {
      * Asks the user where automatic backups should be written, suggesting [fileName].
      */
     data class NavigateToSelectAutoBackupLocation(val fileName: String) : BackupEvent()
+
+    /**
+     * Asks the user to pick a backup file to import.
+     */
+    data object NavigateToSelectImportFile : BackupEvent()
 
     /**
      * Shows a snackbar with [data].
@@ -279,6 +397,21 @@ sealed class BackupAction {
     data object BackUpNowClick : BackupAction()
 
     /**
+     * The user clicked "Import backup".
+     */
+    data object ImportBackupClick : BackupAction()
+
+    /**
+     * The user picked the backup file at [uri] to import.
+     */
+    data class ImportFileReceive(val uri: Uri) : BackupAction()
+
+    /**
+     * The user entered the master [password] of the backup being imported.
+     */
+    data class ImportMasterPasswordSubmit(val password: String) : BackupAction()
+
+    /**
      * The user dismissed the dialog.
      */
     data object DialogDismiss : BackupAction()
@@ -296,5 +429,15 @@ sealed class BackupAction {
          * A backup finished writing.
          */
         data class WriteBackupResultReceive(val result: WriteBackupResult) : Internal()
+
+        /**
+         * A backup file picked for importing was read.
+         */
+        data class ReadBackupResultReceive(val result: ReadBackupResult) : Internal()
+
+        /**
+         * A backup finished importing.
+         */
+        data class MergeBackupResultReceive(val result: MergeBackupResult) : Internal()
     }
 }

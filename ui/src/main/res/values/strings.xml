@@ -587,6 +587,12 @@ Scanning will happen automatically.</string>
     <string name="daily">Daily</string>
     <string name="weekly">Weekly</string>
     <string name="back_up_now">Back up now</string>
+    <string name="back_up">Back up</string>
+    <string name="import_backup">Import backup</string>
+    <string name="importing_backup">Importing backup…</string>
+    <string name="adds_the_items_from_a_backup_to_this_vault">Adds the items from a backup file to this vault. Items you already have are kept. When an item is in both, the newer copy is kept.</string>
+    <string name="items_imported_x_already_in_your_vault_y">Items imported: %1$d. Already in your vault: %2$d.</string>
+    <string name="the_backup_could_not_be_imported">The backup could not be imported.</string>
     <string name="last_backup_x">Last backup: %1$s</string>
     <string name="last_backup_failed_x">Last backup failed: %1$s</string>
     <string name="automatic_backups_overwrite_the_chosen_file">Automatic backups replace the chosen file each time. Google Drive keeps earlier versions of a file, so you can go back to an older backup there.</string>

@@ -1503,6 +1503,24 @@ class VaultViewModelTest : BaseViewModelTest() {
         }
     }
 
+    @Test
+    fun `on BackupClick should emit NavigateToBackup`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(VaultAction.BackupClick)
+            assertEquals(VaultEvent.NavigateToBackup(isImport = false), awaitItem())
+        }
+    }
+
+    @Test
+    fun `on ImportBackupClick should emit NavigateToBackup for importing`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(VaultAction.ImportBackupClick)
+            assertEquals(VaultEvent.NavigateToBackup(isImport = true), awaitItem())
+        }
+    }
+
     @Suppress("MaxLineLength")
     @Test
     fun `on VaultFilterTypeSelect should update the selected filter type and re-filter any existing data`() {

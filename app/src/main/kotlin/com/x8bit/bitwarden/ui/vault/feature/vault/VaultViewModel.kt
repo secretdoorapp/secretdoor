@@ -366,6 +366,8 @@ class VaultViewModel @Inject constructor(
             is VaultAction.AddAccountClick -> handleAddAccountClick()
             is VaultAction.SyncClick -> handleSyncClick()
             is VaultAction.LockClick -> handleLockClick()
+            is VaultAction.BackupClick -> handleBackupClick()
+            is VaultAction.ImportBackupClick -> handleImportBackupClick()
             is VaultAction.VaultFilterTypeSelect -> handleVaultFilterTypeSelect(action)
             is VaultAction.SecureNoteGroupClick -> handleSecureNoteClick()
             is VaultAction.SshKeyGroupClick -> handleSshKeyClick()
@@ -700,6 +702,14 @@ class VaultViewModel @Inject constructor(
 
     private fun handleLockClick() {
         vaultRepository.lockVaultForCurrentUser(isUserInitiated = true)
+    }
+
+    private fun handleBackupClick() {
+        sendEvent(VaultEvent.NavigateToBackup(isImport = false))
+    }
+
+    private fun handleImportBackupClick() {
+        sendEvent(VaultEvent.NavigateToBackup(isImport = true))
     }
 
     private fun handleVaultFilterTypeSelect(action: VaultAction.VaultFilterTypeSelect) {
@@ -2591,6 +2601,11 @@ sealed class VaultEvent {
     data object NavigateToAutofillSettings : VaultEvent()
 
     /**
+     * Navigate to the Backup screen, starting with importing a backup if [isImport] is true.
+     */
+    data class NavigateToBackup(val isImport: Boolean) : VaultEvent()
+
+    /**
      * Navigate to the premium upgrade plan screen.
      */
     data object NavigateToUpgradePremium : VaultEvent()
@@ -2663,6 +2678,16 @@ sealed class VaultAction {
      * User clicked the Lock option in the overflow menu.
      */
     data object LockClick : VaultAction()
+
+    /**
+     * User clicked the Back up option in the overflow menu.
+     */
+    data object BackupClick : VaultAction()
+
+    /**
+     * User clicked the Import backup option in the overflow menu.
+     */
+    data object ImportBackupClick : VaultAction()
 
     /**
      * User selected a [VaultFilterType] from the Vault Filter menu.

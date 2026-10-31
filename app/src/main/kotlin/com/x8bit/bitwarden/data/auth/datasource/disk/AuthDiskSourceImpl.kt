@@ -32,6 +32,7 @@ private const val AUTHENTICATOR_SYNC_UNLOCK_KEY = "authenticatorSyncUnlock"
 private const val BIOMETRICS_INIT_VECTOR_KEY = "biometricInitializationVector"
 private const val BIOMETRICS_UNLOCK_KEY = "userKeyBiometricUnlock"
 private const val USER_AUTO_UNLOCK_KEY_KEY = "userKeyAutoUnlock"
+private const val BACKUP_KEY_KEY = "backupKey"
 private const val DEVICE_KEY_KEY = "deviceKey"
 private const val PENDING_ADMIN_AUTH_REQUEST_KEY = "pendingAdminAuthRequest"
 private const val ACCOUNT_CRYPTOGRAPHIC_STATE_KEY = "accountCryptographicState"
@@ -181,6 +182,7 @@ class AuthDiskSourceImpl(
         storeInvalidUnlockAttempts(userId = userId, invalidUnlockAttempts = null)
         storeLocalUserDataKey(userId = userId, wrappedKey = null)
         storeUserAutoUnlockKey(userId = userId, userAutoUnlockKey = null)
+        storeBackupKey(userId = userId, backupKey = null)
         storeAccountCryptographicState(userId = userId, accountCryptographicState = null)
         storeOrganizationKeys(userId = userId, organizationKeys = null)
         storeOrganizations(userId = userId, organizations = null)
@@ -315,6 +317,13 @@ class AuthDiskSourceImpl(
             key = USER_AUTO_UNLOCK_KEY_KEY.appendIdentifier(userId),
             value = userAutoUnlockKey,
         )
+    }
+
+    override fun getBackupKey(userId: String): String? =
+        getEncryptedString(key = BACKUP_KEY_KEY.appendIdentifier(userId))
+
+    override fun storeBackupKey(userId: String, backupKey: String?) {
+        putEncryptedString(key = BACKUP_KEY_KEY.appendIdentifier(userId), value = backupKey)
     }
 
     override fun getDeviceKey(

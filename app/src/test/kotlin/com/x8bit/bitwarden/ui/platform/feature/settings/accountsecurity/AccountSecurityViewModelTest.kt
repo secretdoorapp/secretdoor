@@ -383,18 +383,6 @@ class AccountSecurityViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `on PendingLoginRequestsClick should emit NavigateToPendingRequests`() = runTest {
-        val viewModel = createViewModel()
-        viewModel.eventFlow.test {
-            viewModel.trySendAction(AccountSecurityAction.PendingLoginRequestsClick)
-            assertEquals(
-                AccountSecurityEvent.NavigateToPendingRequests,
-                awaitItem(),
-            )
-        }
-    }
-
-    @Test
     fun `on VaultTimeoutTypeSelect should update the selection()`() = runTest {
         every { settingsRepository.vaultTimeout = any() } just runs
         val viewModel = createViewModel()

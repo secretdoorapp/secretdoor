@@ -29,9 +29,11 @@ import com.bitwarden.ui.platform.base.util.EventsEffect
 import com.bitwarden.ui.platform.base.util.standardHorizontalMargin
 import com.bitwarden.ui.platform.components.appbar.BitwardenTopAppBar
 import com.bitwarden.ui.platform.components.button.BitwardenFilledButton
+import com.bitwarden.ui.platform.components.button.BitwardenOutlinedButton
 import com.bitwarden.ui.platform.components.dialog.BitwardenBasicDialog
 import com.bitwarden.ui.platform.components.dialog.BitwardenLoadingDialog
 import com.bitwarden.ui.platform.components.dropdown.BitwardenMultiSelectButton
+import com.x8bit.bitwarden.ui.platform.components.dialog.BitwardenMasterPasswordDialog
 import com.bitwarden.ui.platform.components.header.BitwardenListHeaderText
 import com.bitwarden.ui.platform.components.model.CardStyle
 import com.bitwarden.ui.platform.components.row.BitwardenTextRow
@@ -76,6 +78,14 @@ fun BackupScreen(
             autoBackupLocationReceived(it.uri)
         }
     }
+    val importFileReceived: (Uri) -> Unit = remember {
+        { viewModel.trySendAction(BackupAction.ImportFileReceive(it)) }
+    }
+    val importLauncher = intentManager.getActivityResultLauncher { activityResult ->
+        intentManager.getFileDataFromActivityResult(activityResult)?.let {
+            importFileReceived(it.uri)
+        }
+    }
     val snackbarHostState = rememberBitwardenSnackbarHostState()
     EventsEffect(viewModel = viewModel) { event ->
         when (event) {
@@ -86,6 +96,12 @@ fun BackupScreen(
 
             is BackupEvent.NavigateToSelectAutoBackupLocation -> {
                 autoBackupLauncher.launch(intentManager.createDocumentIntent(event.fileName))
+            }
+
+            BackupEvent.NavigateToSelectImportFile -> {
+                importLauncher.launch(
+                    intentManager.createFileChooserIntent(withCameraIntents = false),
+                )
             }
 
             is BackupEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.data)
@@ -103,6 +119,20 @@ fun BackupScreen(
         }
 
         is BackupState.DialogState.Loading -> BitwardenLoadingDialog(text = dialog.message())
+        BackupState.DialogState.ImportMasterPassword -> {
+            BitwardenMasterPasswordDialog(
+                title = stringResource(id = BitwardenString.import_backup),
+                message = stringResource(
+                    id = BitwardenString.enter_the_master_password_of_the_vault_in_this_backup,
+                ),
+                confirmButtonText = stringResource(id = BitwardenString.import_vault),
+                onConfirmClick = {
+                    viewModel.trySendAction(BackupAction.ImportMasterPasswordSubmit(it))
+                },
+                onDismissRequest = { viewModel.trySendAction(BackupAction.DialogDismiss) },
+            )
+        }
+
         null -> Unit
     }
 
@@ -132,6 +162,7 @@ fun BackupScreen(
                 viewModel.trySendAction(BackupAction.AutoBackupFrequencySelect(it))
             },
             onBackUpNowClick = { viewModel.trySendAction(BackupAction.BackUpNowClick) },
+            onImportBackupClick = { viewModel.trySendAction(BackupAction.ImportBackupClick) },
         )
     }
 }
@@ -144,6 +175,7 @@ private fun BackupContent(
     onAutoBackupLocationClick: () -> Unit,
     onAutoBackupFrequencySelect: (AutoBackupFrequency) -> Unit,
     onBackUpNowClick: () -> Unit,
+    onImportBackupClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val resources = LocalResources.current
@@ -238,6 +270,31 @@ private fun BackupContent(
                     .padding(horizontal = 16.dp),
             )
         }
+        Spacer(modifier = Modifier.height(height = 24.dp))
+        BitwardenListHeaderText(
+            label = stringResource(id = BitwardenString.import_backup),
+            modifier = Modifier
+                .standardHorizontalMargin()
+                .padding(horizontal = 16.dp),
+        )
+        Spacer(modifier = Modifier.height(height = 8.dp))
+        Text(
+            text = stringResource(id = BitwardenString.adds_the_items_from_a_backup_to_this_vault),
+            style = BitwardenTheme.typography.bodyMedium,
+            color = BitwardenTheme.colorScheme.text.primary,
+            modifier = Modifier
+                .standardHorizontalMargin()
+                .fillMaxWidth(),
+        )
+        Spacer(modifier = Modifier.height(height = 16.dp))
+        BitwardenOutlinedButton(
+            label = stringResource(id = BitwardenString.import_backup),
+            onClick = onImportBackupClick,
+            modifier = Modifier
+                .testTag("ImportBackupButton")
+                .standardHorizontalMargin()
+                .fillMaxWidth(),
+        )
         Spacer(modifier = Modifier.height(height = 16.dp))
         Spacer(modifier = Modifier.navigationBarsPadding())
     }

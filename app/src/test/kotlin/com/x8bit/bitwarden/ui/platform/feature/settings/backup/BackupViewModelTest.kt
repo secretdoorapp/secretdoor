@@ -1,6 +1,7 @@
 package com.x8bit.bitwarden.ui.platform.feature.settings.backup
 
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarData
@@ -10,17 +11,25 @@ import com.x8bit.bitwarden.data.vault.manager.AutoBackupManager
 import com.x8bit.bitwarden.data.vault.manager.VaultBackupManager
 import com.x8bit.bitwarden.data.vault.manager.model.AutoBackupFrequency
 import com.x8bit.bitwarden.data.vault.manager.model.AutoBackupState
+import com.x8bit.bitwarden.data.vault.manager.model.MergeBackupResult
+import com.x8bit.bitwarden.data.vault.manager.model.ReadBackupResult
+import com.x8bit.bitwarden.data.vault.manager.model.VaultBackup
 import com.x8bit.bitwarden.data.vault.manager.model.WriteBackupResult
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.just
+import io.mockk.mockkStatic
 import io.mockk.mockk
 import io.mockk.runs
+import io.mockk.unmockkStatic
 import io.mockk.verify
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.io.File
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
@@ -34,6 +43,16 @@ class BackupViewModelTest : BaseViewModelTest() {
         every { autoBackupStateFlow } returns mutableAutoBackupStateFlow
         every { setBackupLocation(uri = any()) } just runs
         every { setFrequency(frequency = any()) } just runs
+    }
+
+    @BeforeEach
+    fun setup() {
+        mockkStatic(SavedStateHandle::toBackupArgs)
+    }
+
+    @AfterEach
+    fun tearDown() {
+        unmockkStatic(SavedStateHandle::toBackupArgs)
     }
 
     @Test
@@ -59,7 +78,7 @@ class BackupViewModelTest : BaseViewModelTest() {
             viewModel.trySendAction(BackupAction.SaveBackupClick)
             assertEquals(
                 BackupEvent.NavigateToSelectBackupLocation(
-                    fileName = "secretdoor-backup-20261030-1200.zip",
+                    fileName = "secretdoor-backup-20261030-1200.secretdoor",
                 ),
                 awaitItem(),
             )
@@ -139,13 +158,145 @@ class BackupViewModelTest : BaseViewModelTest() {
         )
     }
 
-    private fun createViewModel(): BackupViewModel =
+    @Test
+    fun `opening the screen for importing should ask for a backup file`() = runTest {
+        val viewModel = createViewModel(isImport = true)
+        viewModel.eventFlow.test {
+            assertEquals(BackupEvent.NavigateToSelectImportFile, awaitItem())
+        }
+    }
+
+    @Test
+    fun `ImportBackupClick should ask for a backup file`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(BackupAction.ImportBackupClick)
+            assertEquals(BackupEvent.NavigateToSelectImportFile, awaitItem())
+        }
+    }
+
+    @Test
+    fun `ImportFileReceive with a backup should ask for its master password`() {
+        coEvery { vaultBackupManager.readBackup(uri = uri) } returns
+            ReadBackupResult.Success(backup = BACKUP)
+        val viewModel = createViewModel()
+
+        viewModel.trySendAction(BackupAction.ImportFileReceive(uri = uri))
+
+        assertEquals(
+            DEFAULT_STATE.copy(dialogState = BackupState.DialogState.ImportMasterPassword),
+            viewModel.stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `ImportFileReceive with a file that is not a backup should show an error`() {
+        val error = Throwable("Not a backup")
+        coEvery { vaultBackupManager.readBackup(uri = uri) } returns
+            ReadBackupResult.Error(error = error)
+        val viewModel = createViewModel()
+
+        viewModel.trySendAction(BackupAction.ImportFileReceive(uri = uri))
+
+        assertEquals(
+            DEFAULT_STATE.copy(
+                dialogState = BackupState.DialogState.Error(
+                    message = BitwardenString.this_file_is_not_a_secretdoor_backup.asText(),
+                    error = error,
+                ),
+            ),
+            viewModel.stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `ImportMasterPasswordSubmit success should show how many items were imported`() =
+        runTest {
+            coEvery { vaultBackupManager.readBackup(uri = uri) } returns
+                ReadBackupResult.Success(backup = BACKUP)
+            coEvery {
+                vaultBackupManager.mergeBackup(backup = BACKUP, masterPassword = "password")
+            } returns MergeBackupResult.Success(addedCount = 3, updatedCount = 1, skippedCount = 2)
+            val viewModel = createViewModel()
+            viewModel.trySendAction(BackupAction.ImportFileReceive(uri = uri))
+
+            viewModel.eventFlow.test {
+                viewModel.trySendAction(BackupAction.ImportMasterPasswordSubmit("password"))
+                assertEquals(
+                    BackupEvent.ShowSnackbar(
+                        data = BitwardenSnackbarData(
+                            message = BitwardenString.items_imported_x_already_in_your_vault_y
+                                .asText(4, 2),
+                        ),
+                    ),
+                    awaitItem(),
+                )
+            }
+            assertEquals(DEFAULT_STATE, viewModel.stateFlow.value)
+        }
+
+    @Test
+    fun `ImportMasterPasswordSubmit with the wrong password should show an error`() {
+        coEvery { vaultBackupManager.readBackup(uri = uri) } returns
+            ReadBackupResult.Success(backup = BACKUP)
+        coEvery {
+            vaultBackupManager.mergeBackup(backup = BACKUP, masterPassword = "wrong")
+        } returns MergeBackupResult.WrongPassword
+        val viewModel = createViewModel()
+        viewModel.trySendAction(BackupAction.ImportFileReceive(uri = uri))
+
+        viewModel.trySendAction(BackupAction.ImportMasterPasswordSubmit("wrong"))
+
+        assertEquals(
+            DEFAULT_STATE.copy(
+                dialogState = BackupState.DialogState.Error(
+                    message = BitwardenString.invalid_master_password.asText(),
+                ),
+            ),
+            viewModel.stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `ImportMasterPasswordSubmit failure should show an error`() {
+        val error = Throwable("Fail")
+        coEvery { vaultBackupManager.readBackup(uri = uri) } returns
+            ReadBackupResult.Success(backup = BACKUP)
+        coEvery {
+            vaultBackupManager.mergeBackup(backup = BACKUP, masterPassword = "password")
+        } returns MergeBackupResult.Error(error = error)
+        val viewModel = createViewModel()
+        viewModel.trySendAction(BackupAction.ImportFileReceive(uri = uri))
+
+        viewModel.trySendAction(BackupAction.ImportMasterPasswordSubmit("password"))
+
+        assertEquals(
+            DEFAULT_STATE.copy(
+                dialogState = BackupState.DialogState.Error(
+                    message = BitwardenString.the_backup_could_not_be_imported.asText(),
+                    error = error,
+                ),
+            ),
+            viewModel.stateFlow.value,
+        )
+    }
+
+    private fun createViewModel(isImport: Boolean = false): BackupViewModel =
         BackupViewModel(
             vaultBackupManager = vaultBackupManager,
             autoBackupManager = autoBackupManager,
             clock = FIXED_CLOCK,
+            savedStateHandle = SavedStateHandle().apply {
+                every { toBackupArgs() } returns BackupArgs(isImport = isImport)
+            },
         )
 }
+
+private val BACKUP = VaultBackup(
+    createdAt = Instant.parse("2026-10-29T12:00:00Z"),
+    file = File("backup.bin"),
+    isEncrypted = true,
+)
 
 private val FIXED_CLOCK: Clock = Clock.fixed(
     Instant.parse("2026-10-30T12:00:00Z"),

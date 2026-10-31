@@ -5852,7 +5852,7 @@ class AuthRepositoryTest {
     fun `createLocalVault success should store local account, unlock vault and return Success`() =
         runTest {
             val emailSlot = slot<String>()
-            val kdf = Kdf.Pbkdf2(DEFAULT_KDF_ITERATIONS.toUInt())
+            val kdf = Kdf.Argon2id(iterations = 3u, memory = 64u, parallelism = 4u)
             coEvery {
                 authSdkSource.makeRegisterKeys(
                     email = capture(emailSlot),
@@ -5881,10 +5881,10 @@ class AuthRepositoryTest {
             val email = "$userId@secretdoor.local"
             assertEquals(email, emailSlot.captured)
             val kdfJson = KdfJson(
-                kdfType = KdfTypeJson.PBKDF2_SHA256,
-                iterations = DEFAULT_KDF_ITERATIONS,
-                memory = null,
-                parallelism = null,
+                kdfType = KdfTypeJson.ARGON2_ID,
+                iterations = 3,
+                memory = 64,
+                parallelism = 4,
             )
             fakeAuthDiskSource.assertUserState(
                 userState = UserStateJson(
@@ -5903,10 +5903,10 @@ class AuthRepositoryTest {
                                 hasPremiumPersonally = true,
                                 hasPremiumFromOrganization = null,
                                 forcePasswordResetReason = null,
-                                kdfType = KdfTypeJson.PBKDF2_SHA256,
-                                kdfIterations = DEFAULT_KDF_ITERATIONS,
-                                kdfMemory = null,
-                                kdfParallelism = null,
+                                kdfType = KdfTypeJson.ARGON2_ID,
+                                kdfIterations = 3,
+                                kdfMemory = 64,
+                                kdfParallelism = 4,
                                 userDecryptionOptions = UserDecryptionOptionsJson(
                                     hasMasterPassword = true,
                                     masterPasswordUnlock = MasterPasswordUnlockDataJson(
