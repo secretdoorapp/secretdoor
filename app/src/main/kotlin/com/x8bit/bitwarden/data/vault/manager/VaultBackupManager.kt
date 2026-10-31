@@ -33,6 +33,17 @@ interface VaultBackupManager {
     suspend fun restoreBackup(backup: VaultBackup, masterPassword: String): RestoreBackupResult
 
     /**
+     * Adds [backup] as a separate vault named [vaultName] next to the vaults already on the
+     * device, makes it the active vault and unlocks it with [masterPassword], the master password
+     * of the vault the backup was made from. If the password is wrong nothing is kept.
+     */
+    suspend fun addBackupAsVault(
+        backup: VaultBackup,
+        masterPassword: String,
+        vaultName: String,
+    ): RestoreBackupResult
+
+    /**
      * Adds the folders and items of [backup] to the unlocked active vault. [masterPassword] is the
      * master password of the vault the backup was made from. Items already in the vault are
      * kept; when the same item is in both, the newer copy is kept.

@@ -221,7 +221,6 @@ class VaultBackupManagerImpl(
                 )
         }
 
-    @Suppress("LongMethod")
     override suspend fun restoreBackup(
         backup: VaultBackup,
         masterPassword: String,
@@ -235,7 +234,48 @@ class VaultBackupManagerImpl(
             .getOrElse { return RestoreBackupResult.Error(error = it) }
             ?.contents
             ?: return RestoreBackupResult.WrongPassword
-        val userId = contents.account.profile.userId
+        return installVault(
+            contents = contents,
+            account = contents.account,
+            masterPassword = masterPassword,
+        )
+    }
+
+    override suspend fun addBackupAsVault(
+        backup: VaultBackup,
+        masterPassword: String,
+        vaultName: String,
+    ): RestoreBackupResult {
+        val contents = runCatching { openBackup(backup = backup, masterPassword = masterPassword) }
+            .getOrElse { return RestoreBackupResult.Error(error = it) }
+            ?.contents
+            ?: return RestoreBackupResult.WrongPassword
+        // A new ID keeps the vault apart from every other vault on the device, even one restored
+        // from the same backup. The email is the master key salt, so it must stay the same.
+        val profile = contents.account.profile.copy(
+            userId = UUID.randomUUID().toString(),
+            name = vaultName.trim().takeIf { it.isNotEmpty() },
+        )
+        return installVault(
+            contents = contents,
+            account = contents.account.copy(profile = profile),
+            masterPassword = masterPassword,
+        )
+    }
+
+    /**
+     * Stores [contents] as the vault of [account], makes it the active vault and unlocks it with
+     * [masterPassword]. Other vaults on the device are kept. If unlocking fails, everything
+     * stored for the new vault is removed again.
+     */
+    @Suppress("LongMethod")
+    private suspend fun installVault(
+        contents: BackupContents,
+        account: AccountJson,
+        masterPassword: String,
+    ): RestoreBackupResult {
+        val userId = account.profile.userId
+        val previousUserState = authDiskSource.userState
         // Store the vault data first so the vault is complete as soon as it unlocks.
         withContext(dispatcherManager.io) {
             contents.attachmentsDirectory?.copyRecursively(
@@ -264,13 +304,13 @@ class VaultBackupManagerImpl(
             )
             authDiskSource.userState = UserStateJson(
                 activeUserId = userId,
-                accounts = mapOf(userId to contents.account),
+                accounts = previousUserState?.accounts.orEmpty() + (userId to account),
             )
             vaultRepository.unlockVaultWithMasterPassword(masterPassword = masterPassword)
         }
         if (unlockResult !is VaultUnlockResult.Success) {
-            // Undo everything so the user can try again or create a new vault.
-            authDiskSource.userState = null
+            // Undo everything so the user can try again; other vaults are left untouched.
+            authDiskSource.userState = previousUserState
             authDiskSource.clearData(userId = userId)
             withContext(dispatcherManager.io) {
                 vaultDiskSource.deleteVaultData(userId = userId)

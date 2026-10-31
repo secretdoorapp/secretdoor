@@ -17,6 +17,7 @@ import com.x8bit.bitwarden.data.vault.manager.model.AutoBackupFrequency
 import com.x8bit.bitwarden.data.vault.manager.model.AutoBackupState
 import com.x8bit.bitwarden.data.vault.manager.model.MergeBackupResult
 import com.x8bit.bitwarden.data.vault.manager.model.ReadBackupResult
+import com.x8bit.bitwarden.data.vault.manager.model.RestoreBackupResult
 import com.x8bit.bitwarden.data.vault.manager.model.VaultBackup
 import com.x8bit.bitwarden.data.vault.manager.model.WriteBackupResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -76,6 +77,12 @@ class BackupViewModel @Inject constructor(
             BackupAction.BackUpNowClick -> handleBackUpNowClick()
             BackupAction.ImportBackupClick -> sendEvent(BackupEvent.NavigateToSelectImportFile)
             is BackupAction.ImportFileReceive -> handleImportFileReceive(action)
+            BackupAction.ImportIntoThisVaultClick -> showImportMasterPassword(vaultName = null)
+            BackupAction.ImportAsSeparateVaultClick -> {
+                mutableStateFlow.update { it.copy(dialogState = BackupState.DialogState.VaultName) }
+            }
+
+            is BackupAction.VaultNameSubmit -> showImportMasterPassword(vaultName = action.name)
             is BackupAction.ImportMasterPasswordSubmit -> handleImportMasterPasswordSubmit(action)
             BackupAction.DialogDismiss -> mutableStateFlow.update { it.copy(dialogState = null) }
             is BackupAction.Internal -> handleInternalAction(action)
@@ -132,19 +139,37 @@ class BackupViewModel @Inject constructor(
         }
     }
 
+    private fun showImportMasterPassword(vaultName: String?) {
+        mutableStateFlow.update {
+            it.copy(dialogState = BackupState.DialogState.ImportMasterPassword(vaultName = vaultName))
+        }
+    }
+
     private fun handleImportMasterPasswordSubmit(
         action: BackupAction.ImportMasterPasswordSubmit,
     ) {
         val backup = pendingImport ?: return mutableStateFlow.update { it.copy(dialogState = null) }
+        val vaultName = (state.dialogState as? BackupState.DialogState.ImportMasterPassword)
+            ?.vaultName
         showLoading(message = BitwardenString.importing_backup.asText())
         viewModelScope.launch {
             sendAction(
-                BackupAction.Internal.MergeBackupResultReceive(
-                    result = vaultBackupManager.mergeBackup(
-                        backup = backup,
-                        masterPassword = action.password,
-                    ),
-                ),
+                if (vaultName == null) {
+                    BackupAction.Internal.MergeBackupResultReceive(
+                        result = vaultBackupManager.mergeBackup(
+                            backup = backup,
+                            masterPassword = action.password,
+                        ),
+                    )
+                } else {
+                    BackupAction.Internal.AddVaultResultReceive(
+                        result = vaultBackupManager.addBackupAsVault(
+                            backup = backup,
+                            masterPassword = action.password,
+                            vaultName = vaultName,
+                        ),
+                    )
+                },
             )
         }
     }
@@ -157,6 +182,10 @@ class BackupViewModel @Inject constructor(
 
             is BackupAction.Internal.MergeBackupResultReceive -> {
                 handleMergeBackupResultReceive(action.result)
+            }
+
+            is BackupAction.Internal.AddVaultResultReceive -> {
+                handleAddVaultResultReceive(action.result)
             }
 
             is BackupAction.Internal.AutoBackupStateReceive -> {
@@ -221,7 +250,7 @@ class BackupViewModel @Inject constructor(
             is ReadBackupResult.Success -> {
                 pendingImport = result.backup
                 mutableStateFlow.update {
-                    it.copy(dialogState = BackupState.DialogState.ImportMasterPassword)
+                    it.copy(dialogState = BackupState.DialogState.ImportModeSelection)
                 }
             }
 
@@ -257,6 +286,28 @@ class BackupViewModel @Inject constructor(
             }
 
             is MergeBackupResult.Error -> {
+                pendingImport = null
+                showError(
+                    message = BitwardenString.the_backup_could_not_be_imported.asText(),
+                    error = result.error,
+                )
+            }
+        }
+    }
+
+    private fun handleAddVaultResultReceive(result: RestoreBackupResult) {
+        when (result) {
+            is RestoreBackupResult.Success -> {
+                // The new vault is now the active, unlocked vault; the app switches to it.
+                pendingImport = null
+                mutableStateFlow.update { it.copy(dialogState = null) }
+            }
+
+            RestoreBackupResult.WrongPassword -> {
+                showError(message = BitwardenString.invalid_master_password.asText())
+            }
+
+            is RestoreBackupResult.Error -> {
                 pendingImport = null
                 showError(
                     message = BitwardenString.the_backup_could_not_be_imported.asText(),
@@ -320,10 +371,23 @@ data class BackupState(
         data class Error(val message: Text, val error: Throwable? = null) : DialogState()
 
         /**
-         * Asks for the master password of the backup being imported.
+         * Asks whether to merge the picked backup into this vault or add it as a separate vault.
          */
         @Parcelize
-        data object ImportMasterPassword : DialogState()
+        data object ImportModeSelection : DialogState()
+
+        /**
+         * Asks for the name of the separate vault the backup is added as.
+         */
+        @Parcelize
+        data object VaultName : DialogState()
+
+        /**
+         * Asks for the master password of the backup being imported. The backup is added as a
+         * separate vault named [vaultName], or merged into this vault when it is `null`.
+         */
+        @Parcelize
+        data class ImportMasterPassword(val vaultName: String?) : DialogState()
     }
 }
 
@@ -407,6 +471,21 @@ sealed class BackupAction {
     data class ImportFileReceive(val uri: Uri) : BackupAction()
 
     /**
+     * The user chose to merge the picked backup into this vault.
+     */
+    data object ImportIntoThisVaultClick : BackupAction()
+
+    /**
+     * The user chose to add the picked backup as a separate vault.
+     */
+    data object ImportAsSeparateVaultClick : BackupAction()
+
+    /**
+     * The user entered the [name] of the separate vault.
+     */
+    data class VaultNameSubmit(val name: String) : BackupAction()
+
+    /**
      * The user entered the master [password] of the backup being imported.
      */
     data class ImportMasterPasswordSubmit(val password: String) : BackupAction()
@@ -439,5 +518,10 @@ sealed class BackupAction {
          * A backup finished importing.
          */
         data class MergeBackupResultReceive(val result: MergeBackupResult) : Internal()
+
+        /**
+         * A backup finished being added as a separate vault.
+         */
+        data class AddVaultResultReceive(val result: RestoreBackupResult) : Internal()
     }
 }

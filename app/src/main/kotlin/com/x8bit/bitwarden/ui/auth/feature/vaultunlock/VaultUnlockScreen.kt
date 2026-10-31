@@ -286,8 +286,9 @@ fun VaultUnlockScreen(
                 }
                 Text(
                     text = stringResource(
-                        id = BitwardenString.logged_in_as_on,
-                        formatArgs = arrayOf(state.email, state.environmentUrl),
+                        id = BitwardenString.vault_x,
+                        state.accountSummaries.firstOrNull { it.isActive }?.name
+                            ?: stringResource(id = BitwardenString.my_vault),
                     ),
                     style = BitwardenTheme.typography.bodySmall,
                     color = BitwardenTheme.colorScheme.text.secondary,

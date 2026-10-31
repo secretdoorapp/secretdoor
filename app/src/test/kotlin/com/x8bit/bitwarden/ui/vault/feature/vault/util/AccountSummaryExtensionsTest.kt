@@ -40,9 +40,9 @@ class AccountSummaryExtensionsTest {
 
     @Suppress("MaxLineLength")
     @Test
-    fun `initials should return the first two letters of the user's email if the name is not present`() {
+    fun `initials should be MV for a vault without a name, shown as My vault`() {
         assertEquals(
-            "TE",
+            "MV",
             mockk<AccountSummary> {
                 every { name } returns null
                 every { email } returns "test@bitwarden.com"

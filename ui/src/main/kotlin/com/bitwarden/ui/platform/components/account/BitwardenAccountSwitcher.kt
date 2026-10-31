@@ -335,19 +335,14 @@ private fun AccountSummaryItem(
         Column(
             modifier = Modifier.weight(1f),
         ) {
+            // SecretDoor vaults are local: show the vault's name instead of an email address and
+            // server.
             Text(
-                text = accountSummary.email,
+                text = accountSummary.name ?: stringResource(id = BitwardenString.my_vault),
                 style = BitwardenTheme.typography.bodyLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.testTag("AccountEmailLabel"),
-            )
-
-            Text(
-                text = accountSummary.environmentLabel,
-                style = BitwardenTheme.typography.bodyMedium,
-                color = BitwardenTheme.colorScheme.text.secondary,
-                modifier = Modifier.testTag("AccountEnvironmentLabel"),
             )
 
             accountSummary.supportingTextResOrNull?.let { supportingTextResId ->
@@ -388,7 +383,7 @@ private fun LockOrLogoutDialog(
     onRemoveAccountClick: (AccountSummary) -> Unit,
 ) {
     BitwardenSelectionDialog(
-        title = "${accountSummary.email}\n${accountSummary.environmentLabel}",
+        title = accountSummary.name ?: stringResource(id = BitwardenString.my_vault),
         onDismissRequest = onDismissRequest,
         selectionItems = {
             if (accountSummary.isVaultUnlocked) {

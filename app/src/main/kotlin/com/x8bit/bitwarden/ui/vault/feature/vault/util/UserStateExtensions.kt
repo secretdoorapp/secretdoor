@@ -71,17 +71,19 @@ fun UserState.Account.toVaultFilterData(
  * - "First Last" -> "FL"
  * - "First Second Last" -> "FS"
  * - "First" -> "FI"
- * - name is `null`, email is "test@bitwarden.com" -> "TE"
+ * - name is `null` -> "MV" (shown as "My vault")
  */
 val UserState.Account.initials: String
     get() {
-        val names = this.name.orEmpty().split(" ").filter { it.isNotBlank() }
+        // A vault without a name is shown as "My vault".
+        val label = this.name ?: "My vault"
+        val names = label.split(" ").filter { it.isNotBlank() }
         return if (names.size >= 2) {
             names
                 .take(2)
                 .joinToString(separator = "") { it.first().toString() }
         } else {
-            (this.name ?: this.email).take(2)
+            label.take(2)
         }
             .uppercase(Locale.getDefault())
     }

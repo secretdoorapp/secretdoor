@@ -133,7 +133,7 @@ class VaultUnlockViewModelTest : BaseViewModelTest() {
             DEFAULT_STATE.copy(
                 accountSummaries = persistentListOf(),
                 avatarColorString = "#ff000000",
-                initials = "",
+                initials = "MV",
                 email = "",
                 userId = "",
             ),

@@ -33,8 +33,7 @@ fun ComposeContentTestRule.assertSwitcherIsDisplayed(
         this.onNode(
             hasTextExactly(
                 *listOfNotNull(
-                    accountSummary.email,
-                    accountSummary.environmentLabel,
+                    accountSummary.label,
                     "locked".takeUnless { accountSummary.isVaultUnlocked },
                 )
                     .toTypedArray(),
@@ -58,7 +57,7 @@ fun ComposeContentTestRule.assertSwitcherIsNotDisplayed(
     accountSummaries: List<AccountSummary>,
 ) {
     accountSummaries.forEach { accountSummary ->
-        this.onNodeWithText(accountSummary.email).assertDoesNotExist()
+        this.onNodeWithText(accountSummary.label).assertDoesNotExist()
     }
     this.onNodeWithText(ADD_ACCOUNT).assertDoesNotExist()
 }
@@ -87,11 +86,7 @@ fun ComposeContentTestRule.assertLockOrLogoutDialogIsDisplayed(
         logoutNodes.assertCountEquals(0)
     }
     this
-        .onAllNodesWithText(accountSummary.email, substring = true)
-        .filterToOne(hasAnyAncestor(isDialog()))
-        .assertIsDisplayed()
-    this
-        .onAllNodesWithText(accountSummary.environmentLabel, substring = true)
+        .onAllNodesWithText(accountSummary.label)
         .filterToOne(hasAnyAncestor(isDialog()))
         .assertIsDisplayed()
 }
@@ -158,7 +153,7 @@ fun ComposeContentTestRule.assertRemovalConfirmationDialogIsDisplayed(
 fun ComposeContentTestRule.performAccountClick(
     accountSummary: AccountSummary,
 ) {
-    this.onNodeWithText(accountSummary.email).performClick()
+    this.onNodeWithText(accountSummary.label).performClick()
 }
 
 /**
@@ -167,7 +162,7 @@ fun ComposeContentTestRule.performAccountClick(
 fun ComposeContentTestRule.performAccountLongClick(
     accountSummary: AccountSummary,
 ) {
-    this.onNodeWithText(accountSummary.email).performTouchInput {
+    this.onNodeWithText(accountSummary.label).performTouchInput {
         this.longClick()
     }
 }
@@ -230,3 +225,9 @@ fun ComposeContentTestRule.performAccountIconClick(
 fun ComposeContentTestRule.performAddAccountClick() {
     this.onNodeWithText(ADD_ACCOUNT).performClick()
 }
+
+/**
+ * The text the account switcher shows for this vault.
+ */
+private val AccountSummary.label: String
+    get() = name ?: "My vault"

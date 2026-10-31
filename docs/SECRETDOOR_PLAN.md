@@ -151,7 +151,10 @@ stored key material.
     decrypting it before anything is saved. Folders merge by name; an item with the same ID
     keeps the newer copy; items with the same content are skipped; attachments are copied.
     Verified on a device for a backup of the same vault and of another vault (2026-10-31).
-  - [ ] Import a backup as a separate vault (multiple vaults with a vault switcher).
+  - [x] Import a backup as a separate vault: "Import backup" asks whether to merge or add it as a
+    separate, named vault (new user ID, same email/salt), which becomes the active vault. The
+    avatar and vault switcher appear with two or more vaults and show vault names ("My vault"
+    when unnamed) instead of email and server; the unlock screen shows "Vault: <name>".
   - [x] Existing PBKDF2 vaults move to Argon2id the next time they are unlocked with the master
     password (`KdfManagerImpl`, stored locally only). The user key does not change; the SDK
     client is restarted with the new settings before the vault is marked unlocked.

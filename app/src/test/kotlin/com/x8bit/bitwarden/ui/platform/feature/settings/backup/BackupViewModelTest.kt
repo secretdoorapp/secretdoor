@@ -13,9 +13,11 @@ import com.x8bit.bitwarden.data.vault.manager.model.AutoBackupFrequency
 import com.x8bit.bitwarden.data.vault.manager.model.AutoBackupState
 import com.x8bit.bitwarden.data.vault.manager.model.MergeBackupResult
 import com.x8bit.bitwarden.data.vault.manager.model.ReadBackupResult
+import com.x8bit.bitwarden.data.vault.manager.model.RestoreBackupResult
 import com.x8bit.bitwarden.data.vault.manager.model.VaultBackup
 import com.x8bit.bitwarden.data.vault.manager.model.WriteBackupResult
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockkStatic
@@ -176,7 +178,7 @@ class BackupViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `ImportFileReceive with a backup should ask for its master password`() {
+    fun `ImportFileReceive with a backup should ask how to import it`() {
         coEvery { vaultBackupManager.readBackup(uri = uri) } returns
             ReadBackupResult.Success(backup = BACKUP)
         val viewModel = createViewModel()
@@ -184,7 +186,90 @@ class BackupViewModelTest : BaseViewModelTest() {
         viewModel.trySendAction(BackupAction.ImportFileReceive(uri = uri))
 
         assertEquals(
-            DEFAULT_STATE.copy(dialogState = BackupState.DialogState.ImportMasterPassword),
+            DEFAULT_STATE.copy(dialogState = BackupState.DialogState.ImportModeSelection),
+            viewModel.stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `ImportIntoThisVaultClick should ask for the backup's master password`() {
+        val viewModel = createViewModel()
+
+        viewModel.trySendAction(BackupAction.ImportIntoThisVaultClick)
+
+        assertEquals(
+            DEFAULT_STATE.copy(
+                dialogState = BackupState.DialogState.ImportMasterPassword(vaultName = null),
+            ),
+            viewModel.stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `ImportAsSeparateVaultClick then VaultNameSubmit should ask for the master password`() {
+        val viewModel = createViewModel()
+
+        viewModel.trySendAction(BackupAction.ImportAsSeparateVaultClick)
+        assertEquals(
+            DEFAULT_STATE.copy(dialogState = BackupState.DialogState.VaultName),
+            viewModel.stateFlow.value,
+        )
+        viewModel.trySendAction(BackupAction.VaultNameSubmit(name = "Work"))
+
+        assertEquals(
+            DEFAULT_STATE.copy(
+                dialogState = BackupState.DialogState.ImportMasterPassword(vaultName = "Work"),
+            ),
+            viewModel.stateFlow.value,
+        )
+    }
+
+    @Test
+    fun `ImportMasterPasswordSubmit for a separate vault should add the vault`() {
+        coEvery { vaultBackupManager.readBackup(uri = uri) } returns
+            ReadBackupResult.Success(backup = BACKUP)
+        coEvery {
+            vaultBackupManager.addBackupAsVault(
+                backup = BACKUP,
+                masterPassword = "password",
+                vaultName = "Work",
+            )
+        } returns RestoreBackupResult.Success(itemCount = 3)
+        val viewModel = createViewModel()
+        viewModel.trySendAction(BackupAction.ImportFileReceive(uri = uri))
+        viewModel.trySendAction(BackupAction.ImportAsSeparateVaultClick)
+        viewModel.trySendAction(BackupAction.VaultNameSubmit(name = "Work"))
+
+        viewModel.trySendAction(BackupAction.ImportMasterPasswordSubmit("password"))
+
+        assertEquals(DEFAULT_STATE, viewModel.stateFlow.value)
+        coVerify(exactly = 0) { vaultBackupManager.mergeBackup(any(), any()) }
+    }
+
+    @Test
+    fun `ImportMasterPasswordSubmit for a separate vault with the wrong password shows an error`() {
+        coEvery { vaultBackupManager.readBackup(uri = uri) } returns
+            ReadBackupResult.Success(backup = BACKUP)
+        coEvery {
+            vaultBackupManager.addBackupAsVault(
+                backup = BACKUP,
+                masterPassword = "wrong",
+                vaultName = "Work",
+            )
+        } returns RestoreBackupResult.WrongPassword
+        val viewModel = createViewModel()
+        viewModel.trySendAction(BackupAction.ImportFileReceive(uri = uri))
+        viewModel.trySendAction(BackupAction.ImportAsSeparateVaultClick)
+        viewModel.trySendAction(BackupAction.VaultNameSubmit(name = "Work"))
+
+        viewModel.trySendAction(BackupAction.ImportMasterPasswordSubmit("wrong"))
+
+        assertEquals(
+            DEFAULT_STATE.copy(
+                dialogState = BackupState.DialogState.Error(
+                    message = BitwardenString.invalid_master_password.asText(),
+                ),
+            ),
             viewModel.stateFlow.value,
         )
     }

@@ -32,6 +32,9 @@ import com.bitwarden.ui.platform.components.button.BitwardenFilledButton
 import com.bitwarden.ui.platform.components.button.BitwardenOutlinedButton
 import com.bitwarden.ui.platform.components.dialog.BitwardenBasicDialog
 import com.bitwarden.ui.platform.components.dialog.BitwardenLoadingDialog
+import com.bitwarden.ui.platform.components.dialog.BitwardenSelectionDialog
+import com.bitwarden.ui.platform.components.dialog.BitwardenTextEntryDialog
+import com.bitwarden.ui.platform.components.dialog.row.BitwardenBasicDialogRow
 import com.bitwarden.ui.platform.components.dropdown.BitwardenMultiSelectButton
 import com.x8bit.bitwarden.ui.platform.components.dialog.BitwardenMasterPasswordDialog
 import com.bitwarden.ui.platform.components.header.BitwardenListHeaderText
@@ -119,7 +122,35 @@ fun BackupScreen(
         }
 
         is BackupState.DialogState.Loading -> BitwardenLoadingDialog(text = dialog.message())
-        BackupState.DialogState.ImportMasterPassword -> {
+        BackupState.DialogState.ImportModeSelection -> {
+            BitwardenSelectionDialog(
+                title = stringResource(id = BitwardenString.import_backup),
+                onDismissRequest = { viewModel.trySendAction(BackupAction.DialogDismiss) },
+            ) {
+                BitwardenBasicDialogRow(
+                    text = stringResource(id = BitwardenString.merge_into_this_vault),
+                    onClick = { viewModel.trySendAction(BackupAction.ImportIntoThisVaultClick) },
+                )
+                BitwardenBasicDialogRow(
+                    text = stringResource(id = BitwardenString.add_as_a_separate_vault),
+                    onClick = {
+                        viewModel.trySendAction(BackupAction.ImportAsSeparateVaultClick)
+                    },
+                )
+            }
+        }
+
+        BackupState.DialogState.VaultName -> {
+            BitwardenTextEntryDialog(
+                title = stringResource(id = BitwardenString.add_as_a_separate_vault),
+                textFieldLabel = stringResource(id = BitwardenString.vault_name),
+                onConfirmClick = { viewModel.trySendAction(BackupAction.VaultNameSubmit(it)) },
+                onDismissRequest = { viewModel.trySendAction(BackupAction.DialogDismiss) },
+                autoFocus = true,
+            )
+        }
+
+        is BackupState.DialogState.ImportMasterPassword -> {
             BitwardenMasterPasswordDialog(
                 title = stringResource(id = BitwardenString.import_backup),
                 message = stringResource(

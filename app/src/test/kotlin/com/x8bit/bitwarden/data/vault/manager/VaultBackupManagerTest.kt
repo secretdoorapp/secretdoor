@@ -317,6 +317,61 @@ class VaultBackupManagerTest {
     }
 
     @Test
+    fun `addBackupAsVault adds a new named vault next to the existing one and unlocks it`() =
+        runTest {
+            val backup = createBackup()
+            val existingUserState = fakeAuthDiskSource.userState!!
+            coEvery {
+                vaultRepository.unlockVaultWithMasterPassword(masterPassword = PASSWORD)
+            } returns VaultUnlockResult.Success
+
+            val result = vaultBackupManager.addBackupAsVault(
+                backup = backup,
+                masterPassword = PASSWORD,
+                vaultName = " Work ",
+            )
+
+            assertEquals(RestoreBackupResult.Success(itemCount = CIPHERS.size), result)
+            val userState = fakeAuthDiskSource.userState!!
+            val newUserId = userState.activeUserId
+            assertTrue(newUserId != USER_ID)
+            assertEquals(existingUserState.accounts.getValue(USER_ID), userState.accounts[USER_ID])
+            val newProfile = userState.accounts.getValue(newUserId).profile
+            assertEquals("Work", newProfile.name)
+            // The email is the master key salt and must not change.
+            assertEquals(ACCOUNT.profile.email, newProfile.email)
+            assertEquals(ACCOUNT_KEYS, fakeAuthDiskSource.getAccountCryptographicState(newUserId))
+            assertEquals(
+                ATTACHMENT_CONTENT,
+                File(filesDirectory, "attachments/$newUserId/$CIPHER_ID/$ATTACHMENT_ID")
+                    .readText(),
+            )
+            coVerify {
+                vaultDiskSource.saveFolders(userId = newUserId, folders = FOLDERS)
+                vaultDiskSource.saveCiphers(userId = newUserId, ciphers = CIPHERS)
+            }
+        }
+
+    @Test
+    fun `addBackupAsVault keeps the existing vault active when unlocking fails`() = runTest {
+        val backup = createBackup()
+        val existingUserState = fakeAuthDiskSource.userState
+        coEvery {
+            vaultRepository.unlockVaultWithMasterPassword(masterPassword = PASSWORD)
+        } returns VaultUnlockResult.AuthenticationError(error = null)
+
+        val result = vaultBackupManager.addBackupAsVault(
+            backup = backup,
+            masterPassword = PASSWORD,
+            vaultName = "Work",
+        )
+
+        assertEquals(RestoreBackupResult.WrongPassword, result)
+        assertEquals(existingUserState, fakeAuthDiskSource.userState)
+        assertEquals(ACCOUNT_KEYS, fakeAuthDiskSource.getAccountCryptographicState(USER_ID))
+    }
+
+    @Test
     fun `mergeBackup of this vault adds new items and replaces older copies`() = runTest {
         val backup = createBackup()
         val olderCipher = CIPHERS[0].copy(revisionDate = OLDER_INSTANT)

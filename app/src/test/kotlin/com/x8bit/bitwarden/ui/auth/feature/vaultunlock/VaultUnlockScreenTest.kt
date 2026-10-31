@@ -323,27 +323,12 @@ class VaultUnlockScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `email state change should update logged in as text`() {
-        val newEmail = "david@bitwarden.com"
-        val textBeforeUpdate = "Logged in as ${DEFAULT_STATE.email} on $DEFAULT_ENVIRONMENT_URL."
-        val textAfterUpdate = "Logged in as $newEmail on $DEFAULT_ENVIRONMENT_URL."
-        composeTestRule.onNodeWithText(textBeforeUpdate).assertExists()
-        composeTestRule.onNodeWithText(textAfterUpdate).assertDoesNotExist()
-        mutableStateFlow.update { it.copy(email = newEmail) }
-        composeTestRule.onNodeWithText(textBeforeUpdate).assertDoesNotExist()
-        composeTestRule.onNodeWithText(textAfterUpdate).assertExists()
-    }
-
-    @Test
-    fun `environment url state change should update logged in as text`() {
-        val newEnvironmentUrl = "eu.bitwarden.com"
-        val textBeforeUpdate = "Logged in as ${DEFAULT_STATE.email} on $DEFAULT_ENVIRONMENT_URL."
-        val textAfterUpdate = "Logged in as ${DEFAULT_STATE.email} on $newEnvironmentUrl."
-        composeTestRule.onNodeWithText(textBeforeUpdate).assertExists()
-        composeTestRule.onNodeWithText(textAfterUpdate).assertDoesNotExist()
-        mutableStateFlow.update { it.copy(environmentUrl = newEnvironmentUrl) }
-        composeTestRule.onNodeWithText(textBeforeUpdate).assertDoesNotExist()
-        composeTestRule.onNodeWithText(textAfterUpdate).assertExists()
+    fun `the active vault's name should be shown`() {
+        composeTestRule.onNodeWithText("Vault: Active User").assertExists()
+        mutableStateFlow.update {
+            it.copy(accountSummaries = persistentListOf(ACTIVE_ACCOUNT_SUMMARY.copy(name = null)))
+        }
+        composeTestRule.onNodeWithText("Vault: My vault").assertExists()
     }
 
     @Test

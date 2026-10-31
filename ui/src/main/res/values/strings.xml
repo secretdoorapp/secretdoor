@@ -589,6 +589,10 @@ Scanning will happen automatically.</string>
     <string name="back_up_now">Back up now</string>
     <string name="back_up">Back up</string>
     <string name="import_backup">Import backup</string>
+    <string name="merge_into_this_vault">Merge into this vault</string>
+    <string name="add_as_a_separate_vault">Add as a separate vault</string>
+    <string name="vault_name">Vault name</string>
+    <string name="vault_x">Vault: %1$s</string>
     <string name="importing_backup">Importing backup…</string>
     <string name="adds_the_items_from_a_backup_to_this_vault">Adds the items from a backup file to this vault. Items you already have are kept. When an item is in both, the newer copy is kept.</string>
     <string name="items_imported_x_already_in_your_vault_y">Items imported: %1$d. Already in your vault: %2$d.</string>
