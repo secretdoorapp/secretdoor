@@ -11,8 +11,6 @@ import android.service.autofill.SaveCallback
 import android.service.autofill.SaveInfo
 import android.service.autofill.SaveRequest
 import com.bitwarden.core.data.manager.dispatcher.FakeDispatcherManager
-import com.bitwarden.policies.Policy
-import com.bitwarden.policies.PolicyType
 import com.x8bit.bitwarden.data.autofill.builder.FillResponseBuilder
 import com.x8bit.bitwarden.data.autofill.builder.FilledDataBuilder
 import com.x8bit.bitwarden.data.autofill.builder.SaveInfoBuilder
@@ -24,7 +22,6 @@ import com.x8bit.bitwarden.data.autofill.model.FilledData
 import com.x8bit.bitwarden.data.autofill.parser.AutofillParser
 import com.x8bit.bitwarden.data.autofill.util.createAutofillSavedItemIntentSender
 import com.x8bit.bitwarden.data.autofill.util.toAutofillSaveItem
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import io.mockk.clearMocks
 import io.mockk.coEvery
@@ -53,7 +50,6 @@ class AutofillProcessorTest {
     private val filledDataBuilder: FilledDataBuilder = mockk()
     private val fillResponseBuilder: FillResponseBuilder = mockk()
     private val parser: AutofillParser = mockk()
-    private val policyManager: PolicyManager = mockk()
     private val saveInfoBuilder: SaveInfoBuilder = mockk()
     private val settingsRepository: SettingsRepository = mockk()
 
@@ -74,7 +70,6 @@ class AutofillProcessorTest {
             filledDataBuilder = filledDataBuilder,
             fillResponseBuilder = fillResponseBuilder,
             parser = parser,
-            policyManager = policyManager,
             saveInfoBuilder = saveInfoBuilder,
             settingsRepository = settingsRepository,
         )
@@ -300,34 +295,6 @@ class AutofillProcessorTest {
     }
 
     @Test
-    fun `processSaveRequest should invoke empty callback when personal ownership applies`() {
-        // Setup
-        val saveCallback: SaveCallback = mockk {
-            every { onSuccess() } just runs
-        }
-        val saveRequest: SaveRequest = mockk()
-        val policies: List<Policy> = listOf(mockk())
-        every { settingsRepository.isAutofillSavePromptDisabled } returns false
-        every {
-            policyManager.getActivePolicies(PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-        } returns policies
-
-        // Test
-        autofillProcessor.processSaveRequest(
-            autofillAppInfo = appInfo,
-            request = saveRequest,
-            saveCallback = saveCallback,
-        )
-
-        // Verify
-        verify(exactly = 1) {
-            settingsRepository.isAutofillSavePromptDisabled
-            policyManager.getActivePolicies(PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-            saveCallback.onSuccess()
-        }
-    }
-
-    @Test
     fun `processSaveRequest should invoke empty callback when no fill contexts`() {
         // Setup
         val saveCallback: SaveCallback = mockk {
@@ -337,9 +304,6 @@ class AutofillProcessorTest {
             every { fillContexts } returns emptyList()
         }
         every { settingsRepository.isAutofillSavePromptDisabled } returns false
-        every {
-            policyManager.getActivePolicies(PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-        } returns emptyList()
 
         // Test
         autofillProcessor.processSaveRequest(
@@ -351,7 +315,6 @@ class AutofillProcessorTest {
         // Verify
         verify(exactly = 1) {
             settingsRepository.isAutofillSavePromptDisabled
-            policyManager.getActivePolicies(PolicyType.ORGANIZATION_DATA_OWNERSHIP)
             saveCallback.onSuccess()
         }
     }
@@ -380,9 +343,6 @@ class AutofillProcessorTest {
         }
         every { settingsRepository.isAutofillSavePromptDisabled } returns false
         every {
-            policyManager.getActivePolicies(PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-        } returns emptyList()
-        every {
             parser.parse(
                 autofillAppInfo = appInfo,
                 assistStructure = assistStructure,
@@ -405,7 +365,6 @@ class AutofillProcessorTest {
         // Verify
         verify(exactly = 1) {
             settingsRepository.isAutofillSavePromptDisabled
-            policyManager.getActivePolicies(PolicyType.ORGANIZATION_DATA_OWNERSHIP)
             parser.parse(
                 autofillAppInfo = appInfo,
                 assistStructure = assistStructure,
@@ -440,9 +399,6 @@ class AutofillProcessorTest {
         }
         every { settingsRepository.isAutofillSavePromptDisabled } returns false
         every {
-            policyManager.getActivePolicies(PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-        } returns emptyList()
-        every {
             parser.parse(
                 autofillAppInfo = appInfo,
                 assistStructure = assistStructure,
@@ -459,7 +415,6 @@ class AutofillProcessorTest {
         // Verify
         verify(exactly = 1) {
             settingsRepository.isAutofillSavePromptDisabled
-            policyManager.getActivePolicies(PolicyType.ORGANIZATION_DATA_OWNERSHIP)
             parser.parse(
                 autofillAppInfo = appInfo,
                 assistStructure = assistStructure,
@@ -488,9 +443,6 @@ class AutofillProcessorTest {
         val autofillRequest = AutofillRequest.Unfillable
         every { settingsRepository.isAutofillSavePromptDisabled } returns false
         every {
-            policyManager.getActivePolicies(PolicyType.ORGANIZATION_DATA_OWNERSHIP)
-        } returns emptyList()
-        every {
             parser.parse(
                 autofillAppInfo = appInfo,
                 assistStructure = assistStructure,
@@ -507,7 +459,6 @@ class AutofillProcessorTest {
         // Verify
         verify(exactly = 1) {
             settingsRepository.isAutofillSavePromptDisabled
-            policyManager.getActivePolicies(PolicyType.ORGANIZATION_DATA_OWNERSHIP)
             parser.parse(
                 autofillAppInfo = appInfo,
                 assistStructure = assistStructure,

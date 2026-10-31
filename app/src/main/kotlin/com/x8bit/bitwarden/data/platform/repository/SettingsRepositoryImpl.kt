@@ -5,20 +5,15 @@ import com.bitwarden.authenticatorbridge.util.generateSecretKey
 import com.bitwarden.core.data.manager.BuildInfoManager
 import com.bitwarden.core.data.manager.dispatcher.DispatcherManager
 import com.bitwarden.data.manager.flightrecorder.FlightRecorderManager
-import com.bitwarden.policies.Policy
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.ui.platform.feature.settings.appearance.model.AppLanguage
 import com.bitwarden.ui.platform.feature.settings.appearance.model.AppTheme
 import com.x8bit.bitwarden.BuildConfig
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
-import com.x8bit.bitwarden.data.auth.repository.model.PolicyInformation
 import com.x8bit.bitwarden.data.auth.repository.model.UserFingerprintResult
-import com.x8bit.bitwarden.data.auth.repository.util.policyInformation
 import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilityEnabledManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillEnabledManager
 import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.data.platform.error.NoActiveUserException
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.repository.model.BiometricsKeyResult
 import com.x8bit.bitwarden.data.platform.repository.model.ClearClipboardFrequency
 import com.x8bit.bitwarden.data.platform.repository.model.UriMatchType
@@ -33,9 +28,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -58,7 +51,6 @@ class SettingsRepositoryImpl(
     private val vaultSdkSource: VaultSdkSource,
     flightRecorderManager: FlightRecorderManager,
     accessibilityEnabledManager: AccessibilityEnabledManager,
-    policyManager: PolicyManager,
     dispatcherManager: DispatcherManager,
 ) : SettingsRepository,
     FlightRecorderManager by flightRecorderManager {
@@ -404,13 +396,6 @@ class SettingsRepositoryImpl(
                     settingsDiskSource.hasShownAccessibilityDisclaimer ?: false,
             )
 
-    init {
-        policyManager
-            .getActivePoliciesFlow(type = PolicyType.MAXIMUM_VAULT_TIMEOUT)
-            .onEach { updateVaultUnlockSettingsIfNecessary(it) }
-            .launchIn(unconfinedScope)
-    }
-
     override fun accessibilityDisclaimerHasBeenShown() {
         settingsDiskSource.hasShownAccessibilityDisclaimer = true
     }
@@ -734,57 +719,6 @@ class SettingsRepositoryImpl(
         // Otherwise, generate and store a key:
         val secretKey = generateSecretKey().getOrNull() ?: return
         authDiskSource.authenticatorSyncSymmetricKey = secretKey.encoded
-    }
-
-    /**
-     * Check the parameters of the vault unlock policy against the user's
-     * settings to determine whether to update the user's settings.
-     */
-    private fun updateVaultUnlockSettingsIfNecessary(
-        policies: List<Policy>,
-    ) {
-        // The vault timeout policy can only be implemented in organizations that have
-        // the single organization policy, meaning that if this is enabled, the user is
-        // only in one organization and hence there is only one result in the list.
-        val vaultUnlockPolicy = policies
-            .firstOrNull()
-            ?.policyInformation as? PolicyInformation.VaultTimeout
-            ?: return
-
-        when (vaultUnlockPolicy.type) {
-            PolicyInformation.VaultTimeout.Type.NEVER -> {
-                vaultTimeout = VaultTimeout.Never
-            }
-
-            PolicyInformation.VaultTimeout.Type.ON_APP_RESTART,
-            PolicyInformation.VaultTimeout.Type.ON_SYSTEM_LOCK,
-                -> {
-                vaultTimeout = VaultTimeout.OnAppRestart
-            }
-
-            PolicyInformation.VaultTimeout.Type.IMMEDIATELY -> {
-                vaultTimeout = VaultTimeout.Immediately
-            }
-
-            PolicyInformation.VaultTimeout.Type.CUSTOM,
-            null,
-                -> {
-                // Null values are treated as CUSTOM for legacy servers that do no provide a type.
-                // Is there isn't a minutes value or if the current value is within range, we
-                // leave everything alone.
-                vaultUnlockPolicy.minutes?.let { maxMinutes ->
-                    if ((vaultTimeout.vaultTimeoutInMinutes ?: Int.MAX_VALUE) > maxMinutes) {
-                        vaultTimeout = VaultTimeout.Custom(maxMinutes)
-                    }
-                }
-            }
-        }
-        vaultUnlockPolicy.action?.let {
-            vaultTimeoutAction = when (it) {
-                PolicyInformation.VaultTimeout.Action.LOCK -> VaultTimeoutAction.LOCK
-                PolicyInformation.VaultTimeout.Action.LOGOUT -> VaultTimeoutAction.LOGOUT
-            }
-        }
     }
 }
 

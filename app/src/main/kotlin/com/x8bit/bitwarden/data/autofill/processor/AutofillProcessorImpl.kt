@@ -6,7 +6,6 @@ import android.service.autofill.FillRequest
 import android.service.autofill.SaveCallback
 import android.service.autofill.SaveRequest
 import com.bitwarden.core.data.manager.dispatcher.DispatcherManager
-import com.bitwarden.policies.PolicyType
 import com.x8bit.bitwarden.data.autofill.builder.FillResponseBuilder
 import com.x8bit.bitwarden.data.autofill.builder.FilledDataBuilder
 import com.x8bit.bitwarden.data.autofill.builder.SaveInfoBuilder
@@ -15,7 +14,6 @@ import com.x8bit.bitwarden.data.autofill.model.AutofillRequest
 import com.x8bit.bitwarden.data.autofill.parser.AutofillParser
 import com.x8bit.bitwarden.data.autofill.util.createAutofillSavedItemIntentSender
 import com.x8bit.bitwarden.data.autofill.util.toAutofillSaveItem
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -29,7 +27,6 @@ import timber.log.Timber
 @Suppress("LongParameterList")
 class AutofillProcessorImpl(
     dispatcherManager: DispatcherManager,
-    private val policyManager: PolicyManager,
     private val filledDataBuilder: FilledDataBuilder,
     private val fillResponseBuilder: FillResponseBuilder,
     private val parser: AutofillParser,
@@ -76,11 +73,6 @@ class AutofillProcessorImpl(
         saveCallback: SaveCallback,
     ) {
         if (settingsRepository.isAutofillSavePromptDisabled) {
-            saveCallback.onSuccess()
-            return
-        }
-
-        if (policyManager.getActivePolicies(PolicyType.ORGANIZATION_DATA_OWNERSHIP).any()) {
             saveCallback.onSuccess()
             return
         }

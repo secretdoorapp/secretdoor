@@ -1,7 +1,6 @@
 package com.x8bit.bitwarden.data.autofill.processor
 
 import com.bitwarden.core.data.repository.model.DataState
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.vault.CardListView
 import com.bitwarden.vault.CardView
 import com.bitwarden.vault.CipherListView
@@ -17,12 +16,10 @@ import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.autofill.model.AutofillCipher
 import com.x8bit.bitwarden.data.autofill.provider.AutofillCipherProvider
 import com.x8bit.bitwarden.data.autofill.provider.AutofillCipherProviderImpl
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.ciphermatching.CipherMatchingManager
 import com.x8bit.bitwarden.data.platform.util.identityAutofillAddress
 import com.x8bit.bitwarden.data.platform.util.identityAutofillName
 import com.x8bit.bitwarden.data.platform.util.subtitle
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkPolicy
 import com.x8bit.bitwarden.data.vault.manager.model.GetCipherResult
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.VaultUnlockData
@@ -184,11 +181,6 @@ class AutofillCipherProviderTest {
             mutableVaultStateFlow.value.statusFor(ACTIVE_USER_ID) == VaultUnlockData.Status.UNLOCKED
         }
     }
-    private val policyManager: PolicyManager = mockk {
-        every {
-            getActivePolicies(PolicyType.RESTRICTED_ITEM_TYPES)
-        } returns emptyList()
-    }
 
     private lateinit var autofillCipherProvider: AutofillCipherProvider
 
@@ -199,7 +191,6 @@ class AutofillCipherProviderTest {
             authRepository = authRepository,
             cipherMatchingManager = cipherMatchingManager,
             vaultRepository = vaultRepository,
-            policyManager = policyManager,
         )
     }
 
@@ -304,7 +295,7 @@ class AutofillCipherProviderTest {
 
     @Suppress("MaxLineLength")
     @Test
-    fun `getCardAutofillCiphers when unlocked should decrypt then return non-null, non-deleted, non-reprompt, and non-restricted card ciphers`() =
+    fun `getCardAutofillCiphers when unlocked should decrypt then return non-null, non-deleted, non-reprompt, and non-reprompt card ciphers`() =
         runTest {
             val archivedCardCipherView: CipherListView = mockk {
                 every { archivedDate } returns mockk()
@@ -322,39 +313,18 @@ class AutofillCipherProviderTest {
                 every { reprompt } returns CipherRepromptType.PASSWORD
                 every { type } returns CipherListViewType.Card(cardListView)
             }
-            val restrictedCardCipherView: CipherListView = mockk {
-                every { archivedDate } returns null
-                every { deletedDate } returns null
-                every { type } returns CipherListViewType.Card(cardListView)
-                every { reprompt } returns CipherRepromptType.NONE
-                every { organizationId } returns ORGANIZATION_ID_WITH_CARD_TYPE_RESTRICTIONS
-            }
-            val personalVaultCardCipherView: CipherListView = mockk {
-                every { archivedDate } returns null
-                every { deletedDate } returns null
-                every { type } returns CipherListViewType.Card(cardListView)
-                every { reprompt } returns CipherRepromptType.NONE
-                every { organizationId } returns null
-            }
             val decryptCipherListViewsResult = DecryptCipherListResult(
                 successes = listOf(
                     cardCipherListView,
                     archivedCardCipherView,
                     deletedCardCipherView,
                     repromptCardCipherView,
-                    restrictedCardCipherView,
-                    personalVaultCardCipherView,
                     loginCipherListViewWithTotp,
                     loginCipherListViewWithoutTotp,
                 ),
                 failures = emptyList(),
             )
 
-            every {
-                policyManager.getActivePolicies(PolicyType.RESTRICTED_ITEM_TYPES)
-            } returns listOf(
-                createMockSdkPolicy(organizationId = ORGANIZATION_ID_WITH_CARD_TYPE_RESTRICTIONS),
-            )
             coEvery {
                 vaultRepository.getCipher(CARD_CIPHER_ID)
             } returns GetCipherResult.Success(
@@ -722,8 +692,6 @@ class AutofillCipherProviderTest {
 
 private const val ACTIVE_USER_ID = "activeUserId"
 private const val ORGANIZATION_ID = "organizationId"
-private const val ORGANIZATION_ID_WITH_CARD_TYPE_RESTRICTIONS =
-    "organizationIdWithCardTypeRestrictions"
 private const val CARD_CARDHOLDER_NAME = "John Doe"
 private const val CARD_CODE = "123"
 private const val CARD_EXP_MONTH = "January"

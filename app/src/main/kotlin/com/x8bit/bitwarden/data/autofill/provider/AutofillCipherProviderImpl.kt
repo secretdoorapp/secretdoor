@@ -1,13 +1,11 @@
 package com.x8bit.bitwarden.data.autofill.provider
 
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.vault.CipherListView
 import com.bitwarden.vault.CipherListViewType
 import com.bitwarden.vault.CipherRepromptType
 import com.bitwarden.vault.CipherView
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.autofill.model.AutofillCipher
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.ciphermatching.CipherMatchingManager
 import com.x8bit.bitwarden.data.platform.util.firstWithTimeoutOrNull
 import com.x8bit.bitwarden.data.platform.util.identityAutofillAddress
@@ -39,7 +37,6 @@ class AutofillCipherProviderImpl(
     private val authRepository: AuthRepository,
     private val cipherMatchingManager: CipherMatchingManager,
     private val vaultRepository: VaultRepository,
-    private val policyManager: PolicyManager,
 ) : AutofillCipherProvider {
     private val activeUserId: String? get() = authRepository.activeUserId
 
@@ -59,9 +56,6 @@ class AutofillCipherProviderImpl(
 
     override suspend fun getCardAutofillCiphers(): List<AutofillCipher.Card> {
         val cipherListViews = getUnlockedCipherListViewsOrNull() ?: return emptyList()
-        val organizationIdsWithCardTypeRestrictions = policyManager
-            .getActivePolicies(PolicyType.RESTRICTED_ITEM_TYPES)
-            .map { it.organizationId }
         return cipherListViews
             .mapNotNull { cipherListView ->
                 cipherListView
@@ -72,11 +66,7 @@ class AutofillCipherProviderImpl(
                             // Must still be active.
                             it.isActive &&
                             // Must not require a reprompt.
-                            it.reprompt == CipherRepromptType.NONE &&
-                            // Must not be restricted by organization.
-                            !it.isExcludedByOrgCardRestrictions(
-                                organizationIdsWithCardTypeRestrictions,
-                            )
+                            it.reprompt == CipherRepromptType.NONE
                     }
                     ?.let { nonNullCipherListView ->
                         nonNullCipherListView.id?.let { cipherId ->
@@ -208,25 +198,4 @@ class AutofillCipherProviderImpl(
 
             is GetCipherResult.Success -> result.cipherView
         }
-
-    /**
-     * Checks if this [CipherListView] item should be excluded from autofill due to
-     * organization-based card type restrictions.
-     *
-     * It's considered restricted if:
-     * 1. There are organizations with card type restrictions AND this item is a personal vault item
-     * (organizationId is null).
-     * 2. OR this item belongs to an organization that has card type restrictions.
-     */
-    private fun CipherListView.isExcludedByOrgCardRestrictions(
-        restrictingOrgIds: List<String>,
-    ): Boolean {
-        if (restrictingOrgIds.isEmpty()) {
-            return false
-        }
-        // If personal vault (no orgId), restricted if any org has restrictions.
-        return organizationId == null ||
-            // If part of an org, restricted if that org is in the restricting list.
-            organizationId in restrictingOrgIds
-    }
 }

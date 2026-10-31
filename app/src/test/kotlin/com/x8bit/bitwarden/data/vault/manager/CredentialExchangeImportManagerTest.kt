@@ -6,14 +6,10 @@ import com.bitwarden.core.data.util.asSuccess
 import com.bitwarden.cxf.model.CredentialExchangePayload
 import com.bitwarden.cxf.parser.CredentialExchangePayloadParser
 import com.bitwarden.network.model.SyncResponseJson
-import com.bitwarden.policies.PolicyType
 import com.bitwarden.vault.EncryptionContext
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.vault.datasource.disk.VaultDiskSource
 import com.x8bit.bitwarden.data.vault.datasource.sdk.VaultSdkSource
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockEncryptionContext
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkCipher
-import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkPolicy
 import com.x8bit.bitwarden.data.vault.manager.model.ImportCxfPayloadResult
 import com.x8bit.bitwarden.data.vault.manager.model.SyncVaultDataResult
 import com.x8bit.bitwarden.data.vault.repository.util.toEncryptedNetworkCipherResponse
@@ -45,11 +41,6 @@ class CredentialExchangeImportManagerTest {
         coEvery { saveCiphers(userId = any(), ciphers = any()) } just runs
     }
     private val vaultSyncManager: VaultSyncManager = mockk()
-    private val policyManager: PolicyManager = mockk {
-        every {
-            getActivePolicies(any())
-        } returns emptyList()
-    }
     private val credentialExchangePayloadParser: CredentialExchangePayloadParser = mockk {
         every { parse(DEFAULT_PAYLOAD) } returns CredentialExchangePayload.Importable(
             accountsJsonList = listOf(DEFAULT_ACCOUNT_JSON),
@@ -61,7 +52,6 @@ class CredentialExchangeImportManagerTest {
         vaultDiskSource = vaultDiskSource,
         clock = FIXED_CLOCK,
         vaultSyncManager = vaultSyncManager,
-        policyManager = policyManager,
         credentialExchangePayloadParser = credentialExchangePayloadParser,
     )
 
@@ -306,207 +296,6 @@ class CredentialExchangeImportManagerTest {
 
     @Nested
     inner class PolicyFiltering {
-        @Test
-        fun `when user has restrict item types policy, card ciphers should be filtered out`() =
-            runTest {
-                every {
-                    policyManager.getActivePolicies(PolicyType.RESTRICTED_ITEM_TYPES)
-                } returns listOf(
-                    createMockSdkPolicy(
-                        organizationId = "mockId-1",
-                        type = PolicyType.RESTRICTED_ITEM_TYPES,
-                        enabled = true,
-                        data = null,
-                    ),
-                )
-
-                val loginCipher = createMockEncryptionContext(number = 1)
-                val cardCipher = createMockEncryptionContext(
-                    number = 2,
-                    cipher = createMockSdkCipher(number = 2).copy(
-                        type = com.bitwarden.vault.CipherType.CARD,
-                    ),
-                )
-                val mixedCipherList = listOf(loginCipher, cardCipher)
-
-                coEvery {
-                    vaultSdkSource.importCxf(
-                        userId = DEFAULT_USER_ID,
-                        payload = DEFAULT_ACCOUNT_JSON,
-                    )
-                } returns mixedCipherList.asSuccess()
-
-                val capturedCiphers = slot<List<SyncResponseJson.Cipher>>()
-                coEvery {
-                    vaultDiskSource.saveCiphers(
-                        userId = DEFAULT_USER_ID,
-                        ciphers = capture(capturedCiphers),
-                    )
-                } just runs
-
-                coEvery {
-                    vaultSyncManager.syncForResult(forced = true)
-                } returns SyncVaultDataResult.Success(itemsAvailable = true)
-
-                val result = importManager.importCxfPayload(DEFAULT_USER_ID, DEFAULT_PAYLOAD)
-
-                assertEquals(ImportCxfPayloadResult.Success(itemCount = 1), result)
-                // Verify only the login cipher was imported, card was filtered out
-                assertEquals(1, capturedCiphers.captured.size)
-                coVerify(exactly = 1) {
-                    vaultSdkSource.importCxf(DEFAULT_USER_ID, DEFAULT_ACCOUNT_JSON)
-                    vaultDiskSource.saveCiphers(userId = DEFAULT_USER_ID, ciphers = any())
-                    vaultSyncManager.syncForResult(forced = true)
-                }
-            }
-
-        @Test
-        fun `when user has no restrict item types policy, card ciphers should not be filtered`() =
-            runTest {
-                every {
-                    policyManager.getActivePolicies(PolicyType.RESTRICTED_ITEM_TYPES)
-                } returns emptyList()
-
-                val loginCipher = createMockEncryptionContext(number = 1)
-                val cardCipher = createMockEncryptionContext(
-                    number = 2,
-                    cipher = createMockSdkCipher(number = 2).copy(
-                        type = com.bitwarden.vault.CipherType.CARD,
-                    ),
-                )
-                val mixedCipherList = listOf(loginCipher, cardCipher)
-
-                coEvery {
-                    vaultSdkSource.importCxf(
-                        userId = DEFAULT_USER_ID,
-                        payload = DEFAULT_ACCOUNT_JSON,
-                    )
-                } returns mixedCipherList.asSuccess()
-
-                val capturedCiphers = slot<List<SyncResponseJson.Cipher>>()
-                coEvery {
-                    vaultDiskSource.saveCiphers(
-                        userId = DEFAULT_USER_ID,
-                        ciphers = capture(capturedCiphers),
-                    )
-                } just runs
-
-                coEvery {
-                    vaultSyncManager.syncForResult(forced = true)
-                } returns SyncVaultDataResult.Success(itemsAvailable = true)
-
-                val result = importManager.importCxfPayload(DEFAULT_USER_ID, DEFAULT_PAYLOAD)
-
-                assertEquals(ImportCxfPayloadResult.Success(itemCount = 2), result)
-                // Verify both ciphers were imported
-                assertEquals(2, capturedCiphers.captured.size)
-                coVerify(exactly = 1) {
-                    vaultSdkSource.importCxf(DEFAULT_USER_ID, DEFAULT_ACCOUNT_JSON)
-                    vaultDiskSource.saveCiphers(userId = DEFAULT_USER_ID, ciphers = any())
-                    vaultSyncManager.syncForResult(forced = true)
-                }
-            }
-
-        @Test
-        fun `when user has restrict policy disabled, card ciphers should not be filtered`() =
-            runTest {
-                every {
-                    policyManager.getActivePolicies(PolicyType.RESTRICTED_ITEM_TYPES)
-                } returns listOf(
-                    createMockSdkPolicy(
-                        organizationId = "mockId-1",
-                        type = PolicyType.RESTRICTED_ITEM_TYPES,
-                        enabled = false,
-                        data = null,
-                    ),
-                )
-
-                val loginCipher = createMockEncryptionContext(number = 1)
-                val cardCipher = createMockEncryptionContext(
-                    number = 2,
-                    cipher = createMockSdkCipher(number = 2).copy(
-                        type = com.bitwarden.vault.CipherType.CARD,
-                    ),
-                )
-                val mixedCipherList = listOf(loginCipher, cardCipher)
-
-                coEvery {
-                    vaultSdkSource.importCxf(
-                        userId = DEFAULT_USER_ID,
-                        payload = DEFAULT_ACCOUNT_JSON,
-                    )
-                } returns mixedCipherList.asSuccess()
-
-                val capturedCiphers = slot<List<SyncResponseJson.Cipher>>()
-                coEvery {
-                    vaultDiskSource.saveCiphers(
-                        userId = DEFAULT_USER_ID,
-                        ciphers = capture(capturedCiphers),
-                    )
-                } just runs
-
-                coEvery {
-                    vaultSyncManager.syncForResult(forced = true)
-                } returns SyncVaultDataResult.Success(itemsAvailable = true)
-
-                val result = importManager.importCxfPayload(DEFAULT_USER_ID, DEFAULT_PAYLOAD)
-
-                assertEquals(ImportCxfPayloadResult.Success(itemCount = 2), result)
-                // Verify both ciphers were imported when policy is disabled
-                assertEquals(2, capturedCiphers.captured.size)
-                coVerify(exactly = 1) {
-                    vaultSdkSource.importCxf(DEFAULT_USER_ID, DEFAULT_ACCOUNT_JSON)
-                    vaultDiskSource.saveCiphers(userId = DEFAULT_USER_ID, ciphers = any())
-                    vaultSyncManager.syncForResult(forced = true)
-                }
-            }
-
-        @Test
-        fun `when user has restrict policy and all ciphers are cards, should return NoItems`() =
-            runTest {
-                every {
-                    policyManager.getActivePolicies(PolicyType.RESTRICTED_ITEM_TYPES)
-                } returns listOf(
-                    createMockSdkPolicy(
-                        organizationId = "mockId-1",
-                        type = PolicyType.RESTRICTED_ITEM_TYPES,
-                        enabled = true,
-                        data = null,
-                    ),
-                )
-
-                val cardCipher1 = createMockEncryptionContext(
-                    number = 1,
-                    cipher = createMockSdkCipher(number = 1).copy(
-                        type = com.bitwarden.vault.CipherType.CARD,
-                    ),
-                )
-                val cardCipher2 = createMockEncryptionContext(
-                    number = 2,
-                    cipher = createMockSdkCipher(number = 2).copy(
-                        type = com.bitwarden.vault.CipherType.CARD,
-                    ),
-                )
-                val allCardsList = listOf(cardCipher1, cardCipher2)
-
-                coEvery {
-                    vaultSdkSource.importCxf(
-                        userId = DEFAULT_USER_ID,
-                        payload = DEFAULT_ACCOUNT_JSON,
-                    )
-                } returns allCardsList.asSuccess()
-
-                val result = importManager.importCxfPayload(DEFAULT_USER_ID, DEFAULT_PAYLOAD)
-
-                assertEquals(ImportCxfPayloadResult.NoItems, result)
-                coVerify(exactly = 1) {
-                    vaultSdkSource.importCxf(DEFAULT_USER_ID, DEFAULT_ACCOUNT_JSON)
-                }
-                // Verify nothing was saved since all items were filtered
-                coVerify(exactly = 0) {
-                    vaultDiskSource.saveCiphers(userId = DEFAULT_USER_ID, ciphers = any())
-                }
-            }
     }
 }
 

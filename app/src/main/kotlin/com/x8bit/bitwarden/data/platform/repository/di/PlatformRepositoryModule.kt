@@ -12,7 +12,6 @@ import com.x8bit.bitwarden.data.platform.datasource.disk.CookieDiskSource
 import com.x8bit.bitwarden.data.platform.datasource.disk.EnvironmentDiskSource
 import com.x8bit.bitwarden.data.platform.datasource.disk.FeatureFlagOverrideDiskSource
 import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.repository.AuthenticatorBridgeRepository
 import com.x8bit.bitwarden.data.platform.repository.AuthenticatorBridgeRepositoryImpl
 import com.x8bit.bitwarden.data.platform.repository.DebugMenuRepository
@@ -73,7 +72,6 @@ object PlatformRepositoryModule {
         vaultSdkSource: VaultSdkSource,
         accessibilityEnabledManager: AccessibilityEnabledManager,
         dispatcherManager: DispatcherManager,
-        policyManager: PolicyManager,
         flightRecorderManager: FlightRecorderManager,
     ): SettingsRepository =
         SettingsRepositoryImpl(
@@ -85,7 +83,6 @@ object PlatformRepositoryModule {
             vaultSdkSource = vaultSdkSource,
             accessibilityEnabledManager = accessibilityEnabledManager,
             dispatcherManager = dispatcherManager,
-            policyManager = policyManager,
             flightRecorderManager = flightRecorderManager,
         )
 

@@ -2,10 +2,7 @@ package com.x8bit.bitwarden.data.vault.manager
 
 import com.bitwarden.cxf.model.CredentialExchangePayload
 import com.bitwarden.cxf.parser.CredentialExchangePayloadParser
-import com.bitwarden.vault.CipherType
 import com.bitwarden.vault.EncryptionContext
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
-import com.x8bit.bitwarden.data.platform.manager.util.hasRestrictItemTypes
 import com.x8bit.bitwarden.data.vault.datasource.disk.VaultDiskSource
 import com.x8bit.bitwarden.data.vault.datasource.sdk.VaultSdkSource
 import com.x8bit.bitwarden.data.vault.manager.model.ImportCxfPayloadResult
@@ -24,7 +21,6 @@ class CredentialExchangeImportManagerImpl(
     private val vaultDiskSource: VaultDiskSource,
     private val clock: Clock,
     private val vaultSyncManager: VaultSyncManager,
-    private val policyManager: PolicyManager,
     private val credentialExchangePayloadParser: CredentialExchangePayloadParser,
 ) : CredentialExchangeImportManager {
 
@@ -59,18 +55,11 @@ class CredentialExchangeImportManagerImpl(
                 .getOrElse { return ImportCxfPayloadResult.Error(error = it) }
         }
 
-        // Filter out card ciphers if RESTRICT_ITEM_TYPES policy is active
-        val filteredCipherList = if (policyManager.hasRestrictItemTypes()) {
-            allCiphers.filter { context -> context.cipher.type != CipherType.CARD }
-        } else {
-            allCiphers
-        }
-
-        if (filteredCipherList.isEmpty()) {
+        if (allCiphers.isEmpty()) {
             return ImportCxfPayloadResult.NoItems
         }
 
-        return syncVault(saveCiphers(userId = userId, ciphers = filteredCipherList))
+        return syncVault(saveCiphers(userId = userId, ciphers = allCiphers))
     }
 
     private suspend fun saveCiphers(
