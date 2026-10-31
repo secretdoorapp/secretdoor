@@ -150,6 +150,7 @@ stored key material.
     re-encrypted for this vault (only the item key for items that have one) and checked by
     decrypting it before anything is saved. Folders merge by name; an item with the same ID
     keeps the newer copy; items with the same content are skipped; attachments are copied.
+    Verified on a device for a backup of the same vault and of another vault (2026-10-31).
   - [ ] Import a backup as a separate vault (multiple vaults with a vault switcher).
   - [ ] Move existing PBKDF2 vaults to Argon2id.
 
