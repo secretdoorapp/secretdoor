@@ -4,6 +4,7 @@ import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
 import com.bitwarden.generators.PassphraseGeneratorRequest
 import com.bitwarden.generators.PasswordGeneratorRequest
 import com.bitwarden.generators.UsernameGeneratorRequest
+import com.bitwarden.ssh.KeyAlgorithm
 import com.bitwarden.vault.PasswordHistoryView
 import com.x8bit.bitwarden.data.platform.repository.model.LocalDataState
 import com.x8bit.bitwarden.data.tools.generator.repository.GeneratorRepository
@@ -15,6 +16,7 @@ import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratedPlusAd
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratedRandomWordUsernameResult
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratorResult
 import com.x8bit.bitwarden.data.tools.generator.repository.model.PasscodeGenerationOptions
+import com.x8bit.bitwarden.data.tools.generator.repository.model.SshKeyResult
 import com.x8bit.bitwarden.data.tools.generator.repository.model.UsernameGenerationOptions
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +36,13 @@ class FakeGeneratorRepository : GeneratorRepository {
         GeneratedPassphraseResult.Success(
             generatedString = "updatedPassphrase",
         )
+    private var generateSshKeyResult: SshKeyResult = SshKeyResult.InvalidKey
+    private val importSshKeyResults = ArrayDeque<SshKeyResult>()
+
+    /**
+     * The passwords passed to [importSshKey], in order.
+     */
+    val importedSshKeyPasswords: MutableList<String> = mutableListOf()
     private var passcodeGenerationOptions: PasscodeGenerationOptions? = null
 
     private var usernameGenerationOptions: UsernameGenerationOptions? = null
@@ -191,6 +200,29 @@ class FakeGeneratorRepository : GeneratorRepository {
      */
     fun setMockRandomWordResult(result: GeneratedRandomWordUsernameResult) {
         generateRandomWordUsernameResult = result
+    }
+
+    override suspend fun generateSshKey(algorithm: KeyAlgorithm): SshKeyResult =
+        generateSshKeyResult
+
+    override suspend fun importSshKey(encodedKey: String, password: String): SshKeyResult {
+        importedSshKeyPasswords += password
+        return importSshKeyResults.removeFirstOrNull() ?: SshKeyResult.InvalidKey
+    }
+
+    /**
+     * Sets the result of [generateSshKey].
+     */
+    fun setMockGenerateSshKeyResult(result: SshKeyResult) {
+        generateSshKeyResult = result
+    }
+
+    /**
+     * Queues the results of successive [importSshKey] calls.
+     */
+    fun setMockImportSshKeyResults(vararg results: SshKeyResult) {
+        importSshKeyResults.clear()
+        importSshKeyResults.addAll(results)
     }
 
     /**

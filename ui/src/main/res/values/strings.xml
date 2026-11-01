@@ -1513,4 +1513,11 @@ Do you want to switch to this account?</string>
     <string name="turn_off">Turn off</string>
     <string name="turn_off_biometric_question">Turn off biometrics?</string>
     <string name="unlocking_will_require_your_master_password">Unlocking will require your master password. You can turn biometrics back on in Settings.</string>
+    <string name="generate_a_key">Generate a key</string>
+    <string name="import_a_key">Import a key</string>
+    <string name="this_key_is_protected_by_a_passphrase">This key is protected by a passphrase. Enter it to import the key.</string>
+    <string name="that_passphrase_did_not_unlock_the_key">That passphrase didn’t unlock the key. Try again.</string>
+    <string name="that_is_not_a_valid_ssh_private_key">That isn’t a valid SSH private key.</string>
+    <string name="that_type_of_ssh_key_is_not_supported">That type of SSH key isn’t supported.</string>
+    <string name="generate_or_import_a_key_before_saving">Generate or import a key before saving.</string>
 </resources>

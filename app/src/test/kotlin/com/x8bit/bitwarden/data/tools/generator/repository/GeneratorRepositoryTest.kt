@@ -14,8 +14,12 @@ import com.bitwarden.network.model.KdfTypeJson
 import com.bitwarden.network.model.KeyConnectorUserDecryptionOptionsJson
 import com.bitwarden.network.model.TrustedDeviceUserDecryptionOptionsJson
 import com.bitwarden.network.model.UserDecryptionOptionsJson
+import com.bitwarden.sdk.BitwardenException
+import com.bitwarden.ssh.KeyAlgorithm
+import com.bitwarden.ssh.SshKeyImportException
 import com.bitwarden.vault.PasswordHistory
 import com.bitwarden.vault.PasswordHistoryView
+import com.bitwarden.vault.SshKeyView
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.AccountJson
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.AccountTokensJson
@@ -36,6 +40,7 @@ import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratedPlusAd
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratedRandomWordUsernameResult
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratorResult
 import com.x8bit.bitwarden.data.tools.generator.repository.model.PasscodeGenerationOptions
+import com.x8bit.bitwarden.data.tools.generator.repository.model.SshKeyResult
 import com.x8bit.bitwarden.data.tools.generator.repository.model.UsernameGenerationOptions
 import com.x8bit.bitwarden.data.vault.datasource.sdk.VaultSdkSource
 import io.mockk.coEvery
@@ -202,6 +207,41 @@ class GeneratorRepositoryTest {
             GeneratedPasswordResult.InvalidRequest(error = exception), result,
         )
         coVerify { generatorSdkSource.generatePassword(request) }
+    }
+
+    @Test
+    fun `importSshKey should map SDK import errors to results`() = runTest {
+        val cases = mapOf(
+            SshKeyImportException.PasswordRequired("") to SshKeyResult.PasswordRequired,
+            SshKeyImportException.WrongPassword("") to SshKeyResult.WrongPassword,
+            SshKeyImportException.UnsupportedKeyType("") to SshKeyResult.UnsupportedKeyType,
+            SshKeyImportException.Parsing("") to SshKeyResult.InvalidKey,
+        )
+        cases.forEach { (exception, expected) ->
+            coEvery {
+                generatorSdkSource.importSshKey("key", "pw")
+            } returns BitwardenException.SshImport(exception).asFailure()
+
+            assertEquals(expected, repository.importSshKey("key", "pw"))
+        }
+    }
+
+    @Test
+    fun `importSshKey and generateSshKey should return the key on success`() = runTest {
+        val key = SshKeyView(privateKey = "p", publicKey = "q", fingerprint = "f")
+        coEvery { generatorSdkSource.importSshKey("key", "") } returns key.asSuccess()
+        coEvery { generatorSdkSource.generateSshKey(KeyAlgorithm.ED25519) } returns key.asSuccess()
+
+        assertEquals(SshKeyResult.Success(key), repository.importSshKey("key", ""))
+        assertEquals(SshKeyResult.Success(key), repository.generateSshKey(KeyAlgorithm.ED25519))
+    }
+
+    @Test
+    fun `importSshKey with an unknown failure should return Error`() = runTest {
+        val exception = IllegalStateException("boom")
+        coEvery { generatorSdkSource.importSshKey("key", "") } returns exception.asFailure()
+
+        assertEquals(SshKeyResult.Error(exception), repository.importSshKey("key", ""))
     }
 
     @Test

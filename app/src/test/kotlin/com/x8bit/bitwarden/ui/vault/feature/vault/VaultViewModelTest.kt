@@ -4052,7 +4052,6 @@ class VaultViewModelTest : BaseViewModelTest() {
         val expectedState = DEFAULT_STATE.copy(
             dialog = VaultState.DialogState.SelectVaultAddItemType(
                 excludedOptions = persistentListOf(
-                    CreateVaultItemType.SSH_KEY,
                     CreateVaultItemType.BANK_ACCOUNT,
                     CreateVaultItemType.LICENSE,
                     CreateVaultItemType.PASSPORT,
@@ -4075,7 +4074,7 @@ class VaultViewModelTest : BaseViewModelTest() {
 
         val expectedState = DEFAULT_STATE.copy(
             dialog = VaultState.DialogState.SelectVaultAddItemType(
-                excludedOptions = persistentListOf(CreateVaultItemType.SSH_KEY),
+                excludedOptions = persistentListOf<CreateVaultItemType>(),
             ),
             isNewItemTypesEnabled = true,
         )

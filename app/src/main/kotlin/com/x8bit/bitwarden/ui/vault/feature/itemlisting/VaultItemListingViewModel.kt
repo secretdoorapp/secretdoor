@@ -771,7 +771,6 @@ class VaultItemListingViewModel @Inject constructor(
             .getFeatureFlag(FlagKey.NewItemTypes)
         return persistentListOfNotNull(
             CreateVaultItemType.FOLDER,
-            CreateVaultItemType.SSH_KEY,
             CreateVaultItemType.BANK_ACCOUNT.takeUnless { isNewItemTypesEnabled },
             CreateVaultItemType.LICENSE.takeUnless { isNewItemTypesEnabled },
             CreateVaultItemType.PASSPORT.takeUnless { isNewItemTypesEnabled },

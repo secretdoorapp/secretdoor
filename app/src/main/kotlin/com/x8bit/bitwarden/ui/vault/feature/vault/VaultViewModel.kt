@@ -494,7 +494,6 @@ class VaultViewModel @Inject constructor(
     private fun handleSelectAddItemType() {
         val isNewItemTypesEnabled = state.isNewItemTypesEnabled
         val excludedOptions = persistentListOfNotNull(
-            CreateVaultItemType.SSH_KEY,
             CreateVaultItemType.BANK_ACCOUNT.takeUnless { isNewItemTypesEnabled },
             CreateVaultItemType.LICENSE.takeUnless { isNewItemTypesEnabled },
             CreateVaultItemType.PASSPORT.takeUnless { isNewItemTypesEnabled },
