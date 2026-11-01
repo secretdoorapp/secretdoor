@@ -17,8 +17,6 @@ import com.x8bit.bitwarden.data.autofill.util.buildDataset
 import com.x8bit.bitwarden.data.autofill.util.createAutofillSelectionResultIntent
 import com.x8bit.bitwarden.data.autofill.util.getAutofillAssistStructureOrNull
 import com.x8bit.bitwarden.data.autofill.util.toAutofillAppInfo
-import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
-import com.x8bit.bitwarden.data.platform.manager.model.OrganizationEvent
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -53,9 +51,6 @@ class AutofillCompletionManagerTest {
     private val filledPartition: FilledPartition = mockk()
     private val mockIntent: Intent = mockk()
     private val resultIntent: Intent = mockk()
-    private val organizationEventManager = mockk<OrganizationEventManager> {
-        every { trackEvent(event = any()) } just runs
-    }
     private val totpManager: AutofillTotpManager = mockk {
         coEvery { tryCopyTotpToClipboard(cipherView = cipherView) } just runs
     }
@@ -65,7 +60,6 @@ class AutofillCompletionManagerTest {
             autofillParser = autofillParser,
             dispatcherManager = dispatcherManager,
             filledDataBuilderProvider = { filledDataBuilder },
-            organizationEventManager = organizationEventManager,
             totpManager = totpManager,
         )
 
@@ -234,9 +228,6 @@ class AutofillCompletionManagerTest {
                 autofillAppInfo = autofillAppInfo,
             )
             createAutofillSelectionResultIntent(dataset = dataset)
-            organizationEventManager.trackEvent(
-                event = OrganizationEvent.CipherClientAutoFilled(cipherId = "cipherId"),
-            )
         }
         coVerify {
             filledDataBuilder.build(autofillRequest = fillableRequest)

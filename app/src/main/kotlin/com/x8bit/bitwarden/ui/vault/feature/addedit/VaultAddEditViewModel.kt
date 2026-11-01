@@ -44,9 +44,7 @@ import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
-import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
 import com.x8bit.bitwarden.data.platform.manager.model.CoachMarkTourType
-import com.x8bit.bitwarden.data.platform.manager.model.OrganizationEvent
 import com.x8bit.bitwarden.data.platform.manager.util.toAutofillSaveItemOrNull
 import com.x8bit.bitwarden.data.platform.manager.util.toAutofillSelectionDataOrNull
 import com.x8bit.bitwarden.data.platform.manager.util.toCreateCredentialRequestOrNull
@@ -142,7 +140,6 @@ class VaultAddEditViewModel @Inject constructor(
     private val specialCircumstanceManager: SpecialCircumstanceManager,
     private val resourceManager: ResourceManager,
     private val clock: Clock,
-    private val organizationEventManager: OrganizationEventManager,
     private val firstTimeActionManager: FirstTimeActionManager,
     private val environmentRepository: EnvironmentRepository,
     private val premiumStateManager: PremiumStateManager,
@@ -236,11 +233,6 @@ class VaultAddEditViewModel @Inject constructor(
     //region Initialization and Overrides
 
     init {
-        onEdit {
-            organizationEventManager.trackEvent(
-                event = OrganizationEvent.CipherClientViewed(cipherId = it.vaultItemId),
-            )
-        }
         vaultRepository
             .vaultDataStateFlow
             .takeUntilLoaded()
@@ -762,15 +754,7 @@ class VaultAddEditViewModel @Inject constructor(
     private fun handleHiddenFieldVisibilityChange(
         action: VaultAddEditAction.Common.HiddenFieldVisibilityChange,
     ) {
-        onEdit {
-            if (action.isVisible) {
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientToggledHiddenFieldVisible(
-                        cipherId = it.vaultItemId,
-                    ),
-                )
-            }
-        }
+        // Visibility changes only fed organization event logs, which SecretDoor does not keep.
     }
 
     private fun handleConfirmOverwriteExistingPasskeyClick() {
@@ -1345,15 +1329,7 @@ class VaultAddEditViewModel @Inject constructor(
     private fun handlePasswordVisibilityChange(
         action: VaultAddEditAction.ItemType.LoginType.PasswordVisibilityChange,
     ) {
-        onEdit {
-            if (action.isVisible) {
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientToggledPasswordVisible(
-                        cipherId = it.vaultItemId,
-                    ),
-                )
-            }
-        }
+        // Visibility changes only fed organization event logs, which SecretDoor does not keep.
     }
 
     private fun handleLoginAddNewUriClick() {
@@ -1649,15 +1625,7 @@ class VaultAddEditViewModel @Inject constructor(
     private fun handleNumberVisibilityChange(
         action: VaultAddEditAction.ItemType.CardType.NumberVisibilityChange,
     ) {
-        onEdit {
-            if (action.isVisible) {
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientToggledCardNumberVisible(
-                        cipherId = it.vaultItemId,
-                    ),
-                )
-            }
-        }
+        // Visibility changes only fed organization event logs, which SecretDoor does not keep.
     }
 
     private fun handleCardSecurityCodeTextChange(
@@ -1669,15 +1637,7 @@ class VaultAddEditViewModel @Inject constructor(
     private fun handleSecurityCodeVisibilityChange(
         action: VaultAddEditAction.ItemType.CardType.SecurityCodeVisibilityChange,
     ) {
-        onEdit {
-            if (action.isVisible) {
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientToggledCardCodeVisible(
-                        cipherId = it.vaultItemId,
-                    ),
-                )
-            }
-        }
+        // Visibility changes only fed organization event logs, which SecretDoor does not keep.
     }
 
     //endregion Card Type Handlers

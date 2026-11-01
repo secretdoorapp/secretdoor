@@ -42,8 +42,6 @@ import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
 import com.x8bit.bitwarden.data.platform.manager.ReviewPromptManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
-import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
-import com.x8bit.bitwarden.data.platform.manager.model.OrganizationEvent
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
 import com.x8bit.bitwarden.data.platform.manager.network.NetworkConnectionManager
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
@@ -109,7 +107,6 @@ class VaultViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val environmentRepository: EnvironmentRepository,
     private val clipboardManager: BitwardenClipboardManager,
-    private val organizationEventManager: OrganizationEventManager,
     private val clock: Clock,
     private val premiumStateManager: PremiumStateManager,
     private val settingsRepository: SettingsRepository,
@@ -971,11 +968,6 @@ class VaultViewModel @Inject constructor(
                     text = it.login?.password.orEmpty(),
                     toastDescriptorOverride = BitwardenString.password.asText(),
                 )
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientCopiedPassword(
-                        cipherId = action.cipherId,
-                    ),
-                )
             }
         }
     }
@@ -988,11 +980,6 @@ class VaultViewModel @Inject constructor(
                 clipboardManager.setText(
                     text = it.card?.code.orEmpty(),
                     toastDescriptorOverride = BitwardenString.security_code.asText(),
-                )
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientCopiedCardCode(
-                        cipherId = action.cipherId,
-                    ),
                 )
             }
         }

@@ -18,9 +18,7 @@ import com.x8bit.bitwarden.data.auth.repository.model.RequestOtpResult
 import com.x8bit.bitwarden.data.auth.repository.model.UserState
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.VerifyOtpResult
-import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
-import com.x8bit.bitwarden.data.platform.manager.model.OrganizationEvent
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.ExportVaultDataResult
 import com.x8bit.bitwarden.ui.auth.feature.completeregistration.PasswordStrengthState
@@ -28,9 +26,7 @@ import com.x8bit.bitwarden.ui.platform.feature.settings.exportvault.model.Export
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
-import io.mockk.runs
 import io.mockk.verify
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -68,9 +64,6 @@ class ExportVaultViewModelTest : BaseViewModelTest() {
         } returns ExportVaultDataResult.Success("data")
     }
     private val fileManager: FileManager = mockk()
-    private val organizationEventManager = mockk<OrganizationEventManager> {
-        every { trackEvent(event = any()) } just runs
-    }
 
     @Test
     fun `initial state should be correct`() = runTest {
@@ -763,11 +756,6 @@ class ExportVaultViewModelTest : BaseViewModelTest() {
 
                 coVerify { fileManager.stringToUri(fileUri = any(), dataString = exportData) }
 
-                verify(exactly = 1) {
-                    organizationEventManager.trackEvent(
-                        event = OrganizationEvent.UserClientExportedVault,
-                    )
-                }
 
                 assertEquals(
                     ExportVaultEvent.ShowSnackbar(BitwardenString.export_vault_success.asText()),
@@ -786,7 +774,6 @@ class ExportVaultViewModelTest : BaseViewModelTest() {
         fileManager = fileManager,
         vaultRepository = vaultRepository,
         clock = clock,
-        organizationEventManager = organizationEventManager,
     )
 }
 

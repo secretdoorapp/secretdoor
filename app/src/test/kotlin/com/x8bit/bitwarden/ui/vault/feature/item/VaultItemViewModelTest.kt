@@ -32,9 +32,7 @@ import com.x8bit.bitwarden.data.auth.repository.model.createMockOrganization
 import com.x8bit.bitwarden.data.billing.manager.PremiumStateManager
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
-import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
-import com.x8bit.bitwarden.data.platform.manager.model.OrganizationEvent
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.platform.repository.util.FakeEnvironmentRepository
@@ -109,9 +107,6 @@ class VaultItemViewModelTest : BaseViewModelTest() {
 
     private val mockFileManager: FileManager = mockk()
 
-    private val organizationEventManager = mockk<OrganizationEventManager> {
-        every { trackEvent(event = any()) } just runs
-    }
     private val mockCipherView = mockk<CipherView> {
         every { collectionIds } returns emptyList()
         every { edit } returns true
@@ -163,11 +158,6 @@ class VaultItemViewModelTest : BaseViewModelTest() {
     fun `initial state should be correct when not set`() {
         val viewModel = createViewModel(state = null)
         assertEquals(DEFAULT_STATE, viewModel.stateFlow.value)
-        verify(exactly = 1) {
-            organizationEventManager.trackEvent(
-                event = OrganizationEvent.CipherClientViewed(cipherId = VAULT_ITEM_ID),
-            )
-        }
     }
 
     @Test
@@ -184,11 +174,6 @@ class VaultItemViewModelTest : BaseViewModelTest() {
         val state = DEFAULT_STATE.copy(vaultItemId = differentVaultItemId)
         val viewModel = createViewModel(state = state)
         assertEquals(state, viewModel.stateFlow.value)
-        verify(exactly = 1) {
-            organizationEventManager.trackEvent(
-                event = OrganizationEvent.CipherClientViewed(cipherId = differentVaultItemId),
-            )
-        }
     }
 
     @Test
@@ -243,7 +228,6 @@ class VaultItemViewModelTest : BaseViewModelTest() {
                 authRepository = authRepo,
                 vaultRepository = vaultRepo,
                 fileManager = mockFileManager,
-                organizationEventManager = organizationEventManager,
                 environmentRepository = mockEnvironmentRepository,
                 settingsRepository = mockSettingsRepository,
                 snackbarRelayManager = snackbarRelayManager,
@@ -1261,11 +1245,6 @@ class VaultItemViewModelTest : BaseViewModelTest() {
                     relatedLocations = persistentListOf(),
                     hasOrganizations = true,
                 )
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientCopiedHiddenField(
-                        cipherId = VAULT_ITEM_ID,
-                    ),
-                )
             }
         }
 
@@ -1352,11 +1331,6 @@ class VaultItemViewModelTest : BaseViewModelTest() {
                     isIconLoadingDisabled = false,
                     relatedLocations = persistentListOf(),
                     hasOrganizations = true,
-                )
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientToggledHiddenFieldVisible(
-                        cipherId = VAULT_ITEM_ID,
-                    ),
                 )
             }
         }
@@ -2114,11 +2088,6 @@ class VaultItemViewModelTest : BaseViewModelTest() {
                     relatedLocations = persistentListOf(),
                     hasOrganizations = true,
                 )
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientToggledPasswordVisible(
-                        cipherId = VAULT_ITEM_ID,
-                    ),
-                )
             }
         }
     }
@@ -2223,11 +2192,6 @@ class VaultItemViewModelTest : BaseViewModelTest() {
                 )
 
                 verify(exactly = 1) {
-                    organizationEventManager.trackEvent(
-                        event = OrganizationEvent.CipherClientToggledCardNumberVisible(
-                            cipherId = VAULT_ITEM_ID,
-                        ),
-                    )
                     mockCipherView.toViewState(
                         previousState = null,
                         isPremiumUser = true,
@@ -2317,11 +2281,6 @@ class VaultItemViewModelTest : BaseViewModelTest() {
             )
 
             verify(exactly = 1) {
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientToggledCardCodeVisible(
-                        cipherId = VAULT_ITEM_ID,
-                    ),
-                )
                 mockCipherView.toViewState(
                     previousState = null,
                     isPremiumUser = true,
@@ -3917,7 +3876,6 @@ class VaultItemViewModelTest : BaseViewModelTest() {
         authRepository: AuthRepository = authRepo,
         vaultRepository: VaultRepository = vaultRepo,
         fileManager: FileManager = mockFileManager,
-        eventManager: OrganizationEventManager = organizationEventManager,
         tempAttachmentFile: File? = null,
         environmentRepository: EnvironmentRepository = mockEnvironmentRepository,
         settingsRepository: SettingsRepository = mockSettingsRepository,
@@ -3937,7 +3895,6 @@ class VaultItemViewModelTest : BaseViewModelTest() {
         authRepository = authRepository,
         vaultRepository = vaultRepository,
         fileManager = fileManager,
-        organizationEventManager = eventManager,
         environmentRepository = environmentRepository,
         settingsRepository = settingsRepository,
         snackbarRelayManager = snackbarRelayManager,

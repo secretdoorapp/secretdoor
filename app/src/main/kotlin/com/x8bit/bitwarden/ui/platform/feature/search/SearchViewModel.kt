@@ -31,8 +31,6 @@ import com.x8bit.bitwarden.data.billing.manager.PremiumStateManager
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
-import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
-import com.x8bit.bitwarden.data.platform.manager.model.OrganizationEvent
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
 import com.x8bit.bitwarden.data.platform.manager.util.toAutofillSelectionDataOrNull
 import com.x8bit.bitwarden.data.platform.manager.util.toTotpDataOrNull
@@ -86,7 +84,6 @@ class SearchViewModel @Inject constructor(
     private val clipboardManager: BitwardenClipboardManager,
     private val accessibilitySelectionManager: AccessibilitySelectionManager,
     private val autofillSelectionManager: AutofillSelectionManager,
-    private val organizationEventManager: OrganizationEventManager,
     private val vaultRepo: VaultRepository,
     private val authRepo: AuthRepository,
     private val environmentRepo: EnvironmentRepository,
@@ -523,11 +520,6 @@ class SearchViewModel @Inject constructor(
                         text = cipherView.login?.password.orEmpty(),
                         toastDescriptorOverride = BitwardenString.password.asText(),
                     )
-                    organizationEventManager.trackEvent(
-                        event = OrganizationEvent.CipherClientCopiedPassword(
-                            cipherId = action.cipherId,
-                        ),
-                    )
                 }
         }
     }
@@ -541,11 +533,6 @@ class SearchViewModel @Inject constructor(
                     clipboardManager.setText(
                         text = cipherView.card?.code.orEmpty(),
                         toastDescriptorOverride = BitwardenString.security_code.asText(),
-                    )
-                    organizationEventManager.trackEvent(
-                        event = OrganizationEvent.CipherClientCopiedCardCode(
-                            cipherId = action.cipherId,
-                        ),
                     )
                 }
         }

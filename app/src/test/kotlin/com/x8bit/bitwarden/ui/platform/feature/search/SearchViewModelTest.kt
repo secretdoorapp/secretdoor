@@ -35,9 +35,7 @@ import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
-import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
-import com.x8bit.bitwarden.data.platform.manager.model.OrganizationEvent
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
@@ -140,9 +138,6 @@ class SearchViewModelTest : BaseViewModelTest() {
             authRepository = mockAuthRepository,
             dispatcherManager = FakeDispatcherManager(),
         )
-    private val organizationEventManager = mockk<OrganizationEventManager> {
-        every { trackEvent(event = any()) } just runs
-    }
     private val mutableSnackbarDataFlow: MutableSharedFlow<BitwardenSnackbarData> =
         bufferedMutableSharedFlow()
     private val snackbarRelayManager: SnackbarRelayManager<SnackbarRelay> = mockk {
@@ -1370,9 +1365,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                     text = password,
                     toastDescriptorOverride = BitwardenString.password.asText(),
                 )
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientCopiedPassword(cipherId = cipherId),
-                )
             }
         }
 
@@ -1403,9 +1395,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                 clipboardManager.setText(
                     text = securityCode,
                     toastDescriptorOverride = BitwardenString.security_code.asText(),
-                )
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientCopiedCardCode(cipherId = cipherId),
                 )
             }
         }
@@ -2090,7 +2079,6 @@ class SearchViewModelTest : BaseViewModelTest() {
         specialCircumstanceManager = specialCircumstanceManager,
         accessibilitySelectionManager = accessibilitySelectionManager,
         autofillSelectionManager = autofillSelectionManager,
-        organizationEventManager = organizationEventManager,
         premiumStateManager = premiumStateManager,
         featureFlagManager = featureFlagManager,
         snackbarRelayManager = snackbarRelayManager,

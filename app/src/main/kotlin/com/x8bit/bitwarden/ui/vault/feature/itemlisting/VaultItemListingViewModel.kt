@@ -61,8 +61,6 @@ import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.ciphermatching.CipherMatchingManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
-import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
-import com.x8bit.bitwarden.data.platform.manager.model.OrganizationEvent
 import com.x8bit.bitwarden.data.platform.manager.network.NetworkConnectionManager
 import com.x8bit.bitwarden.data.platform.manager.util.toAutofillSelectionDataOrNull
 import com.x8bit.bitwarden.data.platform.manager.util.toCreateCredentialRequestOrNull
@@ -138,7 +136,6 @@ class VaultItemListingViewModel @Inject constructor(
     private val specialCircumstanceManager: SpecialCircumstanceManager,
     private val originManager: OriginManager,
     private val bitwardenCredentialManager: BitwardenCredentialManager,
-    private val organizationEventManager: OrganizationEventManager,
     private val networkConnectionManager: NetworkConnectionManager,
     private val relyingPartyParser: RelyingPartyParser,
     private val toastManager: ToastManager,
@@ -1215,11 +1212,6 @@ class VaultItemListingViewModel @Inject constructor(
                     text = it.login?.password.orEmpty(),
                     toastDescriptorOverride = BitwardenString.password.asText(),
                 )
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientCopiedPassword(
-                        cipherId = action.cipherId,
-                    ),
-                )
             }
         }
     }
@@ -1232,11 +1224,6 @@ class VaultItemListingViewModel @Inject constructor(
                 clipboardManager.setText(
                     text = it.card?.code.orEmpty(),
                     toastDescriptorOverride = BitwardenString.security_code.asText(),
-                )
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientCopiedCardCode(
-                        cipherId = action.cipherId,
-                    ),
                 )
             }
         }

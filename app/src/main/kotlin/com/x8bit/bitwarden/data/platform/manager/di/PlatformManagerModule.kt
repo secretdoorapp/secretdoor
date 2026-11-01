@@ -57,8 +57,6 @@ import com.x8bit.bitwarden.data.platform.manager.ciphermatching.CipherMatchingMa
 import com.x8bit.bitwarden.data.platform.manager.ciphermatching.CipherMatchingManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManagerImpl
-import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
-import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.garbage.GarbageCollectionManager
 import com.x8bit.bitwarden.data.platform.manager.garbage.GarbageCollectionManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.keyrotation.KeyRotationManager
@@ -104,11 +102,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object PlatformManagerModule {
-
-    @Provides
-    @Singleton
-    fun provideOrganizationEventManager(): OrganizationEventManager =
-        OrganizationEventManagerImpl()
 
     @Provides
     @Singleton
