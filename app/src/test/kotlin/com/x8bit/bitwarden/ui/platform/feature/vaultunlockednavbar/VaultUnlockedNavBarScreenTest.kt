@@ -47,6 +47,7 @@ class VaultUnlockedNavBarScreenTest : BitwardenComposeTest() {
                 onNavigateToVaultItem = {},
                 onNavigateToVaultEditItem = {},
                 onNavigateToDeleteAccount = {},
+                onNavigateToChangeMasterPassword = {},
                 onNavigateToExportVault = {},
                 onNavigateToFolders = {},
                 onNavigateToPasswordHistory = {},

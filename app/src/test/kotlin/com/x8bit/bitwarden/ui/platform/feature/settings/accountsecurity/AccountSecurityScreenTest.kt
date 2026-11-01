@@ -51,6 +51,7 @@ class AccountSecurityScreenTest : BitwardenComposeTest() {
 
     private var onNavigateBackCalled = false
     private var onNavigateToDeleteAccountCalled = false
+    private var onNavigateToChangeMasterPasswordCalled = false
     private var onNavigateToUnlockSetupScreenCalled = false
     private var onNavigateToManageDevicesCalled = false
 
@@ -91,6 +92,7 @@ class AccountSecurityScreenTest : BitwardenComposeTest() {
             AccountSecurityScreen(
                 onNavigateBack = { onNavigateBackCalled = true },
                 onNavigateToDeleteAccount = { onNavigateToDeleteAccountCalled = true },
+                onNavigateToChangeMasterPassword = { onNavigateToChangeMasterPasswordCalled = true },
                 onNavigateToSetupUnlockScreen = { onNavigateToUnlockSetupScreenCalled = true },
                 onNavigateToManageDevices = { onNavigateToManageDevicesCalled = true },
                 viewModel = viewModel,
@@ -1266,50 +1268,18 @@ class AccountSecurityScreenTest : BitwardenComposeTest() {
 
     @Suppress("MaxLineLength")
     @Test
-    fun `on two-step login click should display confirmation dialog and confirm click should send TwoStepLoginClick`() {
-        composeTestRule.onNode(isDialog()).assertDoesNotExist()
-        composeTestRule
-            .onNodeWithText("Two-step login")
-            .performScrollTo()
-            .performClick()
-        composeTestRule.onNode(isDialog()).assertExists()
-        composeTestRule
-            .onAllNodesWithText("Continue")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .performClick()
-        composeTestRule.onNode(isDialog()).assertDoesNotExist()
-        verify { viewModel.trySendAction(AccountSecurityAction.TwoStepLoginClick) }
-    }
-
-    @Test
-    fun `on NavigateToTwoStepLogin should call launchUri on intentManager`() {
-        val uri = "testUri"
-        mutableEventFlow.tryEmit(AccountSecurityEvent.NavigateToTwoStepLogin(uri))
-        verify { intentManager.launchUri(uri.toUri()) }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `on change master password click should display confirmation dialog and confirm should send ChangeMasterPasswordClick`() {
-        composeTestRule.onNode(isDialog()).assertDoesNotExist()
+    fun `on change master password click should send ChangeMasterPasswordClick`() {
         composeTestRule
             .onNodeWithText("Change master password")
             .performScrollTo()
             .performClick()
-        composeTestRule.onNode(isDialog()).assertExists()
-        composeTestRule
-            .onAllNodesWithText("Continue")
-            .filterToOne(hasAnyAncestor(isDialog()))
-            .performClick()
-        composeTestRule.onNode(isDialog()).assertDoesNotExist()
         verify { viewModel.trySendAction(AccountSecurityAction.ChangeMasterPasswordClick) }
     }
 
     @Test
-    fun `on NavigateToChangeMasterPassword should call launchUri on intentManager`() {
-        val uri = "testUri"
-        mutableEventFlow.tryEmit(AccountSecurityEvent.NavigateToChangeMasterPassword(uri))
-        verify { intentManager.launchUri(uri.toUri()) }
+    fun `on NavigateToChangeMasterPassword should call onNavigateToChangeMasterPassword`() {
+        mutableEventFlow.tryEmit(AccountSecurityEvent.NavigateToChangeMasterPassword)
+        assertTrue(onNavigateToChangeMasterPasswordCalled)
     }
 
     @Test

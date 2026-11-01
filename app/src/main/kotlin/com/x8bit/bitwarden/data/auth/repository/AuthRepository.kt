@@ -8,6 +8,7 @@ import com.x8bit.bitwarden.data.auth.manager.AuthStateManager
 import com.x8bit.bitwarden.data.auth.manager.KdfManager
 import com.x8bit.bitwarden.data.auth.manager.UserStateManager
 import com.x8bit.bitwarden.data.auth.repository.model.BreachCountResult
+import com.x8bit.bitwarden.data.auth.repository.model.ChangeMasterPasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.DeleteAccountResult
 import com.x8bit.bitwarden.data.auth.repository.model.EmailTokenResult
 import com.x8bit.bitwarden.data.auth.repository.model.GetDevicesResult
@@ -116,6 +117,16 @@ interface AuthRepository :
      * whether the user has ever logged in or created an account before.
      */
     val showWelcomeCarousel: Boolean
+
+    /**
+     * Changes the active vault's master password from [currentPassword] to [newPassword]. The
+     * vault's user key does not change; it is only wrapped with the new master password, on this
+     * device only.
+     */
+    suspend fun changeMasterPassword(
+        currentPassword: String,
+        newPassword: String,
+    ): ChangeMasterPasswordResult
 
     /**
      * Attempt to delete the current account using the [masterPassword] and log them out

@@ -18,6 +18,7 @@ data object AccountSecurityRoute
 fun NavGraphBuilder.accountSecurityDestination(
     onNavigateBack: () -> Unit,
     onNavigateToDeleteAccount: () -> Unit,
+    onNavigateToChangeMasterPassword: () -> Unit,
     onNavigateToSetupUnlockScreen: () -> Unit,
     onNavigateToManageDevices: () -> Unit,
 ) {
@@ -25,6 +26,7 @@ fun NavGraphBuilder.accountSecurityDestination(
         AccountSecurityScreen(
             onNavigateBack = onNavigateBack,
             onNavigateToDeleteAccount = onNavigateToDeleteAccount,
+            onNavigateToChangeMasterPassword = onNavigateToChangeMasterPassword,
             onNavigateToSetupUnlockScreen = onNavigateToSetupUnlockScreen,
             onNavigateToManageDevices = onNavigateToManageDevices,
         )

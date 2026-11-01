@@ -21,12 +21,10 @@ import com.x8bit.bitwarden.data.platform.error.NoActiveUserException
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
-import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.platform.repository.model.BiometricsKeyResult
 import com.x8bit.bitwarden.data.platform.repository.model.VaultTimeout
 import com.x8bit.bitwarden.data.platform.repository.model.VaultTimeoutAction
-import com.x8bit.bitwarden.data.platform.repository.util.FakeEnvironmentRepository
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.ui.platform.components.toggle.UnlockWithPinState
 import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.AccountSecurityAction.AuthenticatorSyncToggle
@@ -51,7 +49,6 @@ import javax.crypto.Cipher
 @Suppress("LargeClass")
 class AccountSecurityViewModelTest : BaseViewModelTest() {
 
-    private val fakeEnvironmentRepository = FakeEnvironmentRepository()
     private val mutableUserStateFlow = MutableStateFlow<UserState?>(DEFAULT_USER_STATE)
     private val authRepository: AuthRepository = mockk(relaxed = true) {
         every { userStateFlow } returns mutableUserStateFlow
@@ -96,6 +93,15 @@ class AccountSecurityViewModelTest : BaseViewModelTest() {
     @AfterEach
     fun teardown() {
         unmockkStatic(::isBuildVersionAtLeast)
+    }
+
+    @Test
+    fun `on ChangeMasterPasswordClick should emit NavigateToChangeMasterPassword`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(AccountSecurityAction.ChangeMasterPasswordClick)
+            assertEquals(AccountSecurityEvent.NavigateToChangeMasterPassword, awaitItem())
+        }
     }
 
     @Test
@@ -183,34 +189,6 @@ class AccountSecurityViewModelTest : BaseViewModelTest() {
         }
     }
 
-    @Suppress("MaxLineLength")
-    @Test
-    fun `on ChangeMasterPasswordClick should emit NavigateToChangeMasterPassword with correct URL based on US and EU environments`() =
-        runTest {
-            fakeEnvironmentRepository.environment = Environment.Prod.Us
-            val viewModel = createViewModel()
-            viewModel.eventFlow.test {
-
-                viewModel.trySendAction(AccountSecurityAction.ChangeMasterPasswordClick)
-                assertEquals(
-                    AccountSecurityEvent.NavigateToChangeMasterPassword(
-                        "https://vault.bitwarden.com/#/settings",
-                    ),
-                    awaitItem(),
-                )
-
-                fakeEnvironmentRepository.environment = Environment.Prod.Eu
-
-                viewModel.trySendAction(AccountSecurityAction.ChangeMasterPasswordClick)
-                assertEquals(
-                    AccountSecurityEvent.NavigateToChangeMasterPassword(
-                        "https://vault.bitwarden.eu/#/settings",
-                    ),
-                    awaitItem(),
-                )
-            }
-        }
-
     @Test
     fun `on DeleteAccountClick should emit NavigateToDeleteAccount`() = runTest {
         val viewModel = createViewModel()
@@ -288,34 +266,6 @@ class AccountSecurityViewModelTest : BaseViewModelTest() {
         )
         verify { settingsRepository.vaultTimeoutAction = VaultTimeoutAction.LOGOUT }
     }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `on TwoStepLoginClick should emit NavigateToTwoStepLogin with correct URL based on US and EU environments`() =
-        runTest {
-            fakeEnvironmentRepository.environment = Environment.Prod.Us
-            val viewModel = createViewModel()
-            viewModel.eventFlow.test {
-
-                viewModel.trySendAction(AccountSecurityAction.TwoStepLoginClick)
-                assertEquals(
-                    AccountSecurityEvent.NavigateToTwoStepLogin(
-                        "https://vault.bitwarden.com/#/settings",
-                    ),
-                    awaitItem(),
-                )
-
-                fakeEnvironmentRepository.environment = Environment.Prod.Eu
-
-                viewModel.trySendAction(AccountSecurityAction.TwoStepLoginClick)
-                assertEquals(
-                    AccountSecurityEvent.NavigateToTwoStepLogin(
-                        "https://vault.bitwarden.eu/#/settings",
-                    ),
-                    awaitItem(),
-                )
-            }
-        }
 
     @Test
     fun `on EnableBiometricsClick should emit ShowBiometricsPrompt`() = runTest {
@@ -749,14 +699,12 @@ class AccountSecurityViewModelTest : BaseViewModelTest() {
         initialState: AccountSecurityState? = DEFAULT_STATE,
         authRepository: AuthRepository = this.authRepository,
         vaultRepository: VaultRepository = this.vaultRepository,
-        environmentRepository: EnvironmentRepository = this.fakeEnvironmentRepository,
         settingsRepository: SettingsRepository = this.settingsRepository,
         featureFlagManager: FeatureFlagManager = this.featureFlagManager,
     ): AccountSecurityViewModel = AccountSecurityViewModel(
         authRepository = authRepository,
         vaultRepository = vaultRepository,
         settingsRepository = settingsRepository,
-        environmentRepository = environmentRepository,
         featureFlagManager = featureFlagManager,
         savedStateHandle = SavedStateHandle().apply {
             set("state", initialState)

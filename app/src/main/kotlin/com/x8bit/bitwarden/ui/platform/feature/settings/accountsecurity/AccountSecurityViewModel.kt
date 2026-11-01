@@ -4,7 +4,6 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.bitwarden.core.data.manager.model.FlagKey
-import com.bitwarden.data.repository.util.baseWebVaultUrlOrDefault
 import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.resource.BitwardenPlurals
 import com.bitwarden.ui.platform.resource.BitwardenString
@@ -17,7 +16,6 @@ import com.x8bit.bitwarden.data.auth.repository.model.PolicyInformation
 import com.x8bit.bitwarden.data.auth.repository.model.UserFingerprintResult
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
-import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.platform.repository.model.BiometricsKeyResult
 import com.x8bit.bitwarden.data.platform.repository.model.VaultTimeout
@@ -46,7 +44,6 @@ class AccountSecurityViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val vaultRepository: VaultRepository,
     private val settingsRepository: SettingsRepository,
-    private val environmentRepository: EnvironmentRepository,
     private val firstTimeActionManager: FirstTimeActionManager,
     featureFlagManager: FeatureFlagManager,
     savedStateHandle: SavedStateHandle,
@@ -74,12 +71,6 @@ class AccountSecurityViewModel @Inject constructor(
         )
     },
 ) {
-    private val webSettingsUrl: String
-        get() {
-            val baseUrl = environmentRepository.environment.baseWebVaultUrlOrDefault
-            return "$baseUrl/#/settings"
-        }
-
     init {
         stateFlow
             .onEach { savedStateHandle[KEY_STATE] = it }
@@ -144,7 +135,6 @@ class AccountSecurityViewModel @Inject constructor(
         is AccountSecurityAction.VaultTimeoutTypeSelect -> handleVaultTimeoutTypeSelect(action)
         is AccountSecurityAction.CustomVaultTimeoutSelect -> handleCustomVaultTimeoutSelect(action)
         is AccountSecurityAction.VaultTimeoutActionSelect -> handleVaultTimeoutActionSelect(action)
-        AccountSecurityAction.TwoStepLoginClick -> handleTwoStepLoginClick()
         AccountSecurityAction.UnlockWithBiometricToggleDisabled -> {
             handleUnlockWithBiometricToggleDisabled()
         }
@@ -182,7 +172,7 @@ class AccountSecurityViewModel @Inject constructor(
     private fun handleBackClick() = sendEvent(AccountSecurityEvent.NavigateBack)
 
     private fun handleChangeMasterPasswordClick() {
-        sendEvent(AccountSecurityEvent.NavigateToChangeMasterPassword(webSettingsUrl))
+        sendEvent(AccountSecurityEvent.NavigateToChangeMasterPassword)
     }
 
     private fun handleConfirmLogoutClick() {
@@ -279,10 +269,6 @@ class AccountSecurityViewModel @Inject constructor(
         action: AccountSecurityAction.VaultTimeoutActionSelect,
     ) {
         setVaultTimeoutAction(action.vaultTimeoutAction)
-    }
-
-    private fun handleTwoStepLoginClick() {
-        sendEvent(AccountSecurityEvent.NavigateToTwoStepLogin(webSettingsUrl))
     }
 
     private fun handleUnlockWithBiometricToggleDisabled() {
@@ -622,14 +608,9 @@ sealed class AccountSecurityEvent {
     data object NavigateToFingerprintPhrase : AccountSecurityEvent()
 
     /**
-     * Navigate to the two step login screen.
-     */
-    data class NavigateToTwoStepLogin(val url: String) : AccountSecurityEvent()
-
-    /**
      * Navigate to the change master password screen.
      */
-    data class NavigateToChangeMasterPassword(val url: String) : AccountSecurityEvent()
+    data object NavigateToChangeMasterPassword : AccountSecurityEvent()
 
     /**
      * Shows the prompt for biometrics using with the given [cipher].
@@ -736,11 +717,6 @@ sealed class AccountSecurityAction {
     data class VaultTimeoutActionSelect(
         val vaultTimeoutAction: VaultTimeoutAction,
     ) : AccountSecurityAction()
-
-    /**
-     * User clicked two-step login.
-     */
-    data object TwoStepLoginClick : AccountSecurityAction()
 
     /**
      * User toggled the unlock with biometrics switch to off.

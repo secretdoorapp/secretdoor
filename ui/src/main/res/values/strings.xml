@@ -595,6 +595,12 @@ Scanning will happen automatically.</string>
     <string name="vault_x">Vault: %1$s</string>
     <string name="item_saved_but_these_files_could_not_be_attached_x">Item saved, but these files could not be attached: %1$s</string>
     <string name="add_file">Add file</string>
+    <string name="current_master_password">Current master password</string>
+    <string name="new_master_password">New master password</string>
+    <string name="confirm_new_master_password">Confirm new master password</string>
+    <string name="changing_master_password">Changing master password…</string>
+    <string name="your_master_password_was_changed_backups_made_before_still_use_the_old_one">Your master password was changed. Backups made before this change still open only with your old master password, so make a new backup.</string>
+    <string name="your_vault_key_stays_the_same_only_the_password_that_unlocks_it_changes">Your items stay as they are; only the password that unlocks your vault changes. Use a long passphrase you can remember – there is no way to recover it.</string>
     <string name="importing_backup">Importing backup…</string>
     <string name="adds_the_items_from_a_backup_to_this_vault">Adds the items from a backup file to this vault. Items you already have are kept. When an item is in both, the newer copy is kept.</string>
     <string name="items_imported_x_already_in_your_vault_y">Items imported: %1$d. Already in your vault: %2$d.</string>

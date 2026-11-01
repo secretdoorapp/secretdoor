@@ -93,6 +93,7 @@ import com.x8bit.bitwarden.data.auth.manager.UserStateManager
 import com.x8bit.bitwarden.data.auth.manager.model.AuthRequest
 import com.x8bit.bitwarden.data.auth.manager.model.MigrateNewUserToKeyConnectorResult
 import com.x8bit.bitwarden.data.auth.repository.model.BreachCountResult
+import com.x8bit.bitwarden.data.auth.repository.model.ChangeMasterPasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.DeleteAccountResult
 import com.x8bit.bitwarden.data.auth.repository.model.DeviceInfo
 import com.x8bit.bitwarden.data.auth.repository.model.EmailTokenResult
@@ -402,6 +403,97 @@ class AuthRepositoryTest {
         fakeAuthDiskSource.storeShouldTrustDevice(userId = USER_ID_1, shouldTrustDevice = false)
         assertEquals(false, repository.shouldTrustDevice)
     }
+
+    @Test
+    fun `changeMasterPassword stores the re-wrapped user key and the new password hash`() =
+        runTest {
+            fakeAuthDiskSource.userState = SINGLE_USER_STATE_1
+            fakeAuthDiskSource.storeMasterPasswordHash(userId = USER_ID_1, passwordHash = "oldHash")
+            coEvery {
+                vaultSdkSource.validatePassword(
+                    userId = USER_ID_1,
+                    password = "old password",
+                    passwordHash = "oldHash",
+                )
+            } returns true.asSuccess()
+            coEvery {
+                vaultSdkSource.updatePassword(userId = USER_ID_1, newPassword = "new password")
+            } returns UpdatePasswordResponse(passwordHash = "serverHash", newKey = "newKey").asSuccess()
+            coEvery {
+                authSdkSource.hashPassword(
+                    salt = SALT,
+                    password = "new password",
+                    kdf = BASE_PROFILE_1.toSdkParams(),
+                    purpose = HashPurpose.LOCAL_AUTHORIZATION,
+                )
+            } returns "newHash".asSuccess()
+
+            val result = repository.changeMasterPassword(
+                currentPassword = "old password",
+                newPassword = "new password",
+            )
+
+            assertEquals(ChangeMasterPasswordResult.Success, result)
+            assertEquals(
+                "newKey",
+                fakeAuthDiskSource
+                    .userState
+                    ?.activeAccount
+                    ?.profile
+                    ?.userDecryptionOptions
+                    ?.masterPasswordUnlock
+                    ?.masterKeyWrappedUserKey,
+            )
+            fakeAuthDiskSource.assertMasterPasswordHash(userId = USER_ID_1, passwordHash = "newHash")
+        }
+
+    @Test
+    fun `changeMasterPassword with the wrong current password changes nothing`() = runTest {
+        fakeAuthDiskSource.userState = SINGLE_USER_STATE_1
+        fakeAuthDiskSource.storeMasterPasswordHash(userId = USER_ID_1, passwordHash = "oldHash")
+        coEvery {
+            vaultSdkSource.validatePassword(
+                userId = USER_ID_1,
+                password = "wrong",
+                passwordHash = "oldHash",
+            )
+        } returns false.asSuccess()
+
+        val result = repository.changeMasterPassword(
+            currentPassword = "wrong",
+            newPassword = "new password",
+        )
+
+        assertEquals(ChangeMasterPasswordResult.WrongPassword, result)
+        assertEquals(SINGLE_USER_STATE_1, fakeAuthDiskSource.userState)
+        coVerify(exactly = 0) { vaultSdkSource.updatePassword(any(), any()) }
+    }
+
+    @Test
+    fun `changeMasterPassword returns an error and changes nothing when the SDK fails`() =
+        runTest {
+            val error = Throwable("Fail")
+            fakeAuthDiskSource.userState = SINGLE_USER_STATE_1
+            fakeAuthDiskSource.storeMasterPasswordHash(userId = USER_ID_1, passwordHash = "oldHash")
+            coEvery {
+                vaultSdkSource.validatePassword(
+                    userId = USER_ID_1,
+                    password = "old password",
+                    passwordHash = "oldHash",
+                )
+            } returns true.asSuccess()
+            coEvery {
+                vaultSdkSource.updatePassword(userId = USER_ID_1, newPassword = "new password")
+            } returns error.asFailure()
+
+            val result = repository.changeMasterPassword(
+                currentPassword = "old password",
+                newPassword = "new password",
+            )
+
+            assertEquals(ChangeMasterPasswordResult.Error(error = error), result)
+            assertEquals(SINGLE_USER_STATE_1, fakeAuthDiskSource.userState)
+        }
 
     @Test
     fun `deleteAccountWithMasterPassword with a valid password erases the local vault`() =

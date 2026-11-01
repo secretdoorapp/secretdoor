@@ -115,6 +115,7 @@ fun SavedStateHandle.toSettingsArgs(): SettingsArgs {
 fun NavGraphBuilder.settingsGraph(
     navController: NavController,
     onNavigateToDeleteAccount: () -> Unit,
+    onNavigateToChangeMasterPassword: () -> Unit,
     onNavigateToExportVault: () -> Unit,
     onNavigateToFolders: () -> Unit,
     onNavigateToSetupUnlockScreen: () -> Unit,
@@ -151,6 +152,7 @@ fun NavGraphBuilder.settingsGraph(
         accountSecurityDestination(
             onNavigateBack = { navController.popBackStack() },
             onNavigateToDeleteAccount = onNavigateToDeleteAccount,
+            onNavigateToChangeMasterPassword = onNavigateToChangeMasterPassword,
             onNavigateToSetupUnlockScreen = onNavigateToSetupUnlockScreen,
             onNavigateToManageDevices = onNavigateToManageDevices,
         )

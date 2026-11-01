@@ -72,6 +72,7 @@ import com.x8bit.bitwarden.data.auth.manager.TrustedDeviceManager
 import com.x8bit.bitwarden.data.auth.manager.UserLogoutManager
 import com.x8bit.bitwarden.data.auth.manager.UserStateManager
 import com.x8bit.bitwarden.data.auth.repository.model.BreachCountResult
+import com.x8bit.bitwarden.data.auth.repository.model.ChangeMasterPasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.DeleteAccountResult
 import com.x8bit.bitwarden.data.auth.repository.model.EmailTokenResult
 import com.x8bit.bitwarden.data.auth.repository.model.GetDevicesResult
@@ -318,6 +319,54 @@ internal class AuthRepositoryImpl(
             .logoutFlow
             .onEach { logout(userId = it.userId, reason = LogoutReason.Notification) }
             .launchIn(unconfinedScope)
+    }
+
+    override suspend fun changeMasterPassword(
+        currentPassword: String,
+        newPassword: String,
+    ): ChangeMasterPasswordResult {
+        val userState = authDiskSource.userState
+            ?: return ChangeMasterPasswordResult.Error(error = NoActiveUserException())
+        val userId = userState.activeUserId
+        val account = userState.activeAccount
+        val decryptionOptions = account.profile.userDecryptionOptions
+        val masterPasswordUnlock = decryptionOptions?.masterPasswordUnlock
+            ?: return ChangeMasterPasswordResult.Error(
+                error = MissingPropertyException("MasterPasswordUnlock data"),
+            )
+        when (val validation = validatePassword(password = currentPassword)) {
+            is ValidatePasswordResult.Error -> {
+                return ChangeMasterPasswordResult.Error(error = validation.error)
+            }
+
+            is ValidatePasswordResult.Success -> {
+                if (!validation.isValid) return ChangeMasterPasswordResult.WrongPassword
+            }
+        }
+        // The SDK wraps the unchanged user key with a master key made from the new password
+        // (same KDF settings and salt), so items, PIN and biometric unlock keep working.
+        val response = vaultSdkSource
+            .updatePassword(userId = userId, newPassword = newPassword)
+            .getOrElse { return ChangeMasterPasswordResult.Error(error = it) }
+        val updatedProfile = account.profile.copy(
+            userDecryptionOptions = decryptionOptions.copy(
+                masterPasswordUnlock = masterPasswordUnlock.copy(
+                    masterKeyWrappedUserKey = response.newKey,
+                ),
+            ),
+        )
+        authDiskSource.userState = userState.copy(
+            accounts = userState.accounts + (userId to account.copy(profile = updatedProfile)),
+        )
+        authSdkSource
+            .hashPassword(
+                salt = masterPasswordUnlock.salt,
+                password = newPassword,
+                kdf = masterPasswordUnlock.kdf.toKdf(),
+                purpose = HashPurpose.LOCAL_AUTHORIZATION,
+            )
+            .onSuccess { authDiskSource.storeMasterPasswordHash(userId = userId, passwordHash = it) }
+        return ChangeMasterPasswordResult.Success
     }
 
     override suspend fun deleteAccountWithMasterPassword(

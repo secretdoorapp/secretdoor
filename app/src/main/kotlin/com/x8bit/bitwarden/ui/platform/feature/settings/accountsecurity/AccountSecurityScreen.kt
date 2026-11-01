@@ -47,7 +47,6 @@ import com.bitwarden.ui.platform.components.dropdown.BitwardenMultiSelectButton
 import com.bitwarden.ui.platform.components.dropdown.BitwardenTimePickerButton
 import com.bitwarden.ui.platform.components.header.BitwardenListHeaderText
 import com.bitwarden.ui.platform.components.model.CardStyle
-import com.bitwarden.ui.platform.components.row.BitwardenExternalLinkRow
 import com.bitwarden.ui.platform.components.row.BitwardenTextRow
 import com.bitwarden.ui.platform.components.scaffold.BitwardenScaffold
 import com.bitwarden.ui.platform.components.support.BitwardenSupportingText
@@ -84,6 +83,7 @@ import javax.crypto.Cipher
 fun AccountSecurityScreen(
     onNavigateBack: () -> Unit,
     onNavigateToDeleteAccount: () -> Unit,
+    onNavigateToChangeMasterPassword: () -> Unit,
     onNavigateToSetupUnlockScreen: () -> Unit,
     onNavigateToManageDevices: () -> Unit,
     viewModel: AccountSecurityViewModel = hiltViewModel(),
@@ -110,12 +110,8 @@ fun AccountSecurityScreen(
             }
 
 
-            is AccountSecurityEvent.NavigateToTwoStepLogin -> {
-                intentManager.launchUri(event.url.toUri())
-            }
-
-            is AccountSecurityEvent.NavigateToChangeMasterPassword -> {
-                intentManager.launchUri(event.url.toUri())
+            AccountSecurityEvent.NavigateToChangeMasterPassword -> {
+                onNavigateToChangeMasterPassword()
             }
 
             is AccountSecurityEvent.NavigateToManageDevices -> onNavigateToManageDevices()
@@ -329,22 +325,6 @@ fun AccountSecurityScreen(
                     .standardHorizontalMargin()
                     .fillMaxWidth(),
             )
-            BitwardenExternalLinkRow(
-                text = stringResource(id = BitwardenString.two_step_login),
-                onConfirmClick = {
-                    viewModel.trySendAction(AccountSecurityAction.TwoStepLoginClick)
-                },
-                withDivider = false,
-                dialogTitle = stringResource(id = BitwardenString.continue_to_web_app),
-                dialogMessage = stringResource(
-                    id = BitwardenString.two_step_login_description_long,
-                ),
-                cardStyle = CardStyle.Middle(),
-                modifier = Modifier
-                    .testTag("TwoStepLoginLinkItemView")
-                    .standardHorizontalMargin()
-                    .fillMaxWidth(),
-            )
             if (state.isManageDevicesEnabled) {
                 BitwardenTextRow(
                     text = stringResource(id = BitwardenString.devices),
@@ -359,18 +339,14 @@ fun AccountSecurityScreen(
                 )
             }
             if (state.isUnlockWithPasswordEnabled) {
-                BitwardenExternalLinkRow(
+                BitwardenTextRow(
                     text = stringResource(id = BitwardenString.change_master_password),
-                    onConfirmClick = {
+                    onClick = {
                         viewModel.trySendAction(AccountSecurityAction.ChangeMasterPasswordClick)
                     },
-                    withDivider = false,
-                    dialogTitle = stringResource(id = BitwardenString.continue_to_web_app),
-                    dialogMessage = stringResource(
-                        id = BitwardenString.change_master_password_description_long,
-                    ),
                     cardStyle = CardStyle.Middle(),
                     modifier = Modifier
+                        .testTag("ChangeMasterPasswordLabel")
                         .standardHorizontalMargin()
                         .fillMaxWidth(),
                 )

@@ -22,6 +22,8 @@ import com.x8bit.bitwarden.ui.platform.feature.premium.upgraded.navigateToUpgrad
 import com.x8bit.bitwarden.ui.platform.feature.premium.upgraded.upgradedToPremiumDestination
 import com.x8bit.bitwarden.ui.platform.feature.search.navigateToSearch
 import com.x8bit.bitwarden.ui.platform.feature.search.searchDestination
+import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.changemasterpassword.changeMasterPasswordDestination
+import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.changemasterpassword.navigateToChangeMasterPassword
 import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.deleteaccount.deleteAccountDestination
 import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.deleteaccount.navigateToDeleteAccount
 import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.deleteaccountconfirmation.deleteAccountConfirmationDestination
@@ -116,6 +118,7 @@ fun NavGraphBuilder.vaultUnlockedGraph(
             onNavigateToVaultEditItem = { navController.navigateToVaultAddEdit(it) },
             onNavigateToSearchVault = { navController.navigateToSearch(searchType = it) },
             onNavigateToDeleteAccount = { navController.navigateToDeleteAccount() },
+            onNavigateToChangeMasterPassword = { navController.navigateToChangeMasterPassword() },
             onNavigateToManageDevices = { navController.navigateToManageDevices() },
             onNavigateToPasswordHistory = {
                 navController.navigateToPasswordHistory(
@@ -157,6 +160,7 @@ fun NavGraphBuilder.vaultUnlockedGraph(
         aboutPrivilegedAppsDestination(
             onNavigateBack = { navController.popBackStack() },
         )
+        changeMasterPasswordDestination(onNavigateBack = { navController.popBackStack() })
         deleteAccountDestination(
             onNavigateBack = { navController.popBackStack() },
             onNavigateToDeleteAccountConfirmation = {

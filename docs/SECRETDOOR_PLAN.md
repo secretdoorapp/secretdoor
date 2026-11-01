@@ -162,6 +162,12 @@ stored key material.
     password (`KdfManagerImpl`, stored locally only). The user key does not change; the SDK
     client is restarted with the new settings before the vault is marked unlocked.
 
+### Phase 4b: Account security
+- [x] Change master password on the device (Account security > Change master password): checks
+  the current password, re-wraps the unchanged user key with the new password (SDK
+  `makeUpdatePassword`) and stores the new wrapped key and password hash. Backups made earlier
+  still need the old password. The web-vault link and the Two-step login link are gone.
+
 ### Phase 5: Branding cleanup
 - Replace remaining user-visible "Bitwarden" strings, icons, About screen, links, and README.
 - Progress:
