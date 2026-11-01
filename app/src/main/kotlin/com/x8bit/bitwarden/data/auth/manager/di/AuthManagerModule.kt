@@ -3,6 +3,7 @@ package com.x8bit.bitwarden.data.auth.manager.di
 import android.content.Context
 import com.bitwarden.core.data.manager.dispatcher.DispatcherManager
 import com.bitwarden.core.data.manager.toast.ToastManager
+import com.bitwarden.data.manager.file.FileManager
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
 import com.x8bit.bitwarden.data.auth.manager.AuthStateManager
 import com.x8bit.bitwarden.data.auth.manager.AuthStateManagerImpl
@@ -51,6 +52,7 @@ object AuthManagerModule {
     @Singleton
     fun provideUserLogoutManager(
         authDiskSource: AuthDiskSource,
+        fileManager: FileManager,
         generatorDiskSource: GeneratorDiskSource,
         passwordHistoryDiskSource: PasswordHistoryDiskSource,
         settingsDiskSource: SettingsDiskSource,
@@ -62,6 +64,7 @@ object AuthManagerModule {
     ): UserLogoutManager =
         UserLogoutManagerImpl(
             authDiskSource = authDiskSource,
+            fileManager = fileManager,
             generatorDiskSource = generatorDiskSource,
             passwordHistoryDiskSource = passwordHistoryDiskSource,
             settingsDiskSource = settingsDiskSource,
