@@ -862,7 +862,6 @@ Doriți să comutați la acest cont?</string>
     <string name="step_1_of_3">Pasul 1 din 3</string>
     <string name="export_your_saved_logins">Exportă autentificările salvate</string>
     <string name="delete_this_file_after_import_is_complete">Vei șterge acest fișier după finalizarea importului.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Pe computerul tău, deschide o filă nouă în browser și <annotation emphasis="bold">accesează <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Autentifică-te în aplicația web SecretDoor.</string>
     <string name="step_2_of_3">Pasul 2 din 3</string>
     <string name="log_in_to_bitwarden">Autentifică-te în SecretDoor</string>
@@ -878,7 +877,6 @@ Doriți să comutați la acest cont?</string>
     <string name="syncing_logins_loading_message">Se sincronizează autentificările…</string>
     <string name="download_the_browser_extension">Descarcă extensia pentru browser</string>
     <string name="use_the_web_app">Folosește aplicația web</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Autentifică-te pe bitwarden.com pentru a-ți gestiona cu ușurință contul și a actualiza setările.</string>
     <string name="autofill_passwords">Completează automat parolele</string>
     <string name="set_up_autofill_on_all_your_devices">Configurează completarea automată pe toate dispozitivele tale pentru a te autentifica cu o singură atingere oriunde.</string>
     <string name="import_successful">Import reușit!</string>

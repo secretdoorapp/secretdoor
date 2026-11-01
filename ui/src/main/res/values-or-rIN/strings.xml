@@ -857,7 +857,6 @@
     <string name="step_1_of_3">3 ରୁ 1 ପଦକ୍ଷେପ</string>
     <string name="export_your_saved_logins">ଆପଣଙ୍କ ସଞ୍ଚିତ ପ୍ରବେଶ ରପ୍ତାନୀ</string>
     <string name="delete_this_file_after_import_is_complete">ଆମଦାନୀ ସମାପ୍ତ ହେବା ପରେ ଆପଣ ଏହି ଫାଇଲ୍ ଲିଭାଇବେ।</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">ଆପଣଙ୍କ କମ୍ପ୍ୟୁଟରରେ, ଏକ ନୂଆ ବ୍ରାଉଜର ଟ୍ୟାବ୍ ଖୋଲନ୍ତୁ ଏବଂ <annotation emphasis="bold"><annotation arg="0">%1$s</annotation> କୁ ଯାଆନ୍ତୁ</annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">SecretDoor ୱେବ ଆପ୍‌ରେ ପ୍ରବେଶ।</string>
     <string name="step_2_of_3">3 ରୁ 2 ପଦକ୍ଷେପ</string>
     <string name="log_in_to_bitwarden">SecretDoor ରେ ପ୍ରବେଶ</string>
@@ -873,7 +872,6 @@
     <string name="syncing_logins_loading_message">ପ୍ରବେଶ ସିଙ୍କ କରୁଛି…</string>
     <string name="download_the_browser_extension">ବ୍ରାଉଜର ଏକ୍ସଟେନସନ୍ ଡାଉନଲୋଡ୍</string>
     <string name="use_the_web_app">ୱେବ ଆପ୍ ବ୍ୟବହାର</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">ଆପଣଙ୍କ ଖାତା ସହଜରେ ପରିଚାଳନା କରିବାକୁ ଏବଂ ସେଟିଂ ଅପଡେଟ୍ କରିବାକୁ bitwarden.com ରେ ପ୍ରବେଶ କରନ୍ତୁ।</string>
     <string name="autofill_passwords">ପାସୱାର୍ଡ ଅଟୋଫିଲ୍</string>
     <string name="set_up_autofill_on_all_your_devices">ଯେ କୌଣସି ସ୍ଥାନରେ ଗୋଟିଏ ଟ୍ୟାପ୍ ରେ ପ୍ରବେଶ କରିବାକୁ ସମସ୍ତ ଡିଭାଇସ୍‌ରେ ଅଟୋଫିଲ୍ ବ୍ୟବସ୍ଥା କରନ୍ତୁ।</string>
     <string name="import_successful">ଆମଦାନୀ ସଫଳ!</string>

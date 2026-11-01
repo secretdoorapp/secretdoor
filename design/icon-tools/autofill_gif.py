@@ -1,5 +1,5 @@
 """Draws the "Set up autofill" animation (gif_setup_autofill.gif, light and night) with SecretDoor
-branding: a login form, the keyboard suggestion chip "SecretDoor  My vault", unlock, filled fields
+branding (the round SecretDoor logo, secretdoor_logo.jpg): a login form, the keyboard suggestion chip "SecretDoor  My vault", unlock, filled fields
 and a tap on "Log in". Usage: autofill_gif.py RES_DIR (e.g. ui/src/main/res).
 """
 import io
@@ -57,6 +57,23 @@ def door(size, color):
     buf = io.BytesIO()
     surf.write_to_png(buf)
     return Image.open(io.BytesIO(buf.getvalue())).convert('RGBA')
+
+
+def logo(size, _cache={}):
+    """The round SecretDoor logo (secretdoor_logo.jpg) cropped to a circle, as an RGBA image."""
+    src = _cache.get('src')
+    if src is None:
+        src = _cache['src'] = Image.open(os.path.join(os.path.dirname(__file__),
+                                                      'secretdoor_logo.jpg')).convert('RGB')
+    w, h = src.size
+    side = min(w, h)
+    img = src.crop(((w - side) // 2, (h - side) // 2, (w - side) // 2 + side,
+                    (h - side) // 2 + side)).resize((size, size), Image.LANCZOS).convert('RGBA')
+    mask = Image.new('L', (size * 4, size * 4), 0)
+    ImageDraw.Draw(mask).ellipse([size * 4 * 0.02, size * 4 * 0.02, size * 4 * 0.98,
+                                  size * 4 * 0.98], fill=255)
+    img.putalpha(mask.resize((size, size), Image.LANCZOS))
+    return img
 
 
 def ease(x):
@@ -149,7 +166,6 @@ def frame(t, th, glyphs):
         cw = 14 + 42 + 14 + nw + 18 + sw + 18
         cx0 = W / 2 - cw / 2
         r(cx0, top + 18, cx0 + cw, top + 78, 8, fill=th['chip'])
-        r(cx0 + 10, top + 27, cx0 + 52, top + 69, 6, fill=th['logo_bg'])
         paste(glyphs['chip'], cx0 + 31, top + 48)
         d.text(((cx0 + 66) * S, (top + 48) * S), 'SecretDoor', font=name_font,
                fill=th['chip_text'], anchor='lm')
@@ -185,8 +201,7 @@ def frame(t, th, glyphs):
 
 def main(res_dir):
     for folder, th in THEMES.items():
-        glyphs = {'field': door(38 * S, th['glyph']), 'chip': door(30 * S, (255, 255, 255)),
-                  'big': door(86 * S, th['glyph'])}
+        glyphs = {'field': logo(38 * S), 'chip': logo(42 * S), 'big': logo(150 * S)}
         frames = [frame(i * FPS_MS / 1000, th, glyphs)
                   for i in range(round(DURATION * 1000 / FPS_MS))]
         keys = [frames[round(sec * 1000 / FPS_MS)] for sec in (1.6, 2.5, 2.9, 4.5)]

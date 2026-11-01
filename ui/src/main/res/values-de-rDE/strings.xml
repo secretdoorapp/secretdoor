@@ -856,7 +856,6 @@ Möchtest du zu diesem Konto wechseln?</string>
     <string name="step_1_of_3">Schritt 1 von 3</string>
     <string name="export_your_saved_logins">Deine gespeicherten Zugangsdaten exportieren</string>
     <string name="delete_this_file_after_import_is_complete">Du musst diese Datei nach Abschluss des Imports löschen.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Öffne auf deinem Computer einen neuen Browser-Tab und gehe zu vault.bitwarden.com</string>
     <string name="log_in_to_the_bitwarden_web_app">Melde dich bei der SecretDoor Web-App an.</string>
     <string name="step_2_of_3">Schritt 2 von 3</string>
     <string name="log_in_to_bitwarden">Bei SecretDoor anmelden</string>
@@ -872,7 +871,6 @@ Möchtest du zu diesem Konto wechseln?</string>
     <string name="syncing_logins_loading_message">Zugangsdaten werden synchronisiert…</string>
     <string name="download_the_browser_extension">Die Browser-Erweiterung herunterladen</string>
     <string name="use_the_web_app">Verwende die Web-App</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Melde dich bei bitwarden.com an, um dein Konto einfach zu verwalten und Einstellungen zu aktualisieren.</string>
     <string name="autofill_passwords">Passwörter automatisch ausfüllen</string>
     <string name="set_up_autofill_on_all_your_devices">Richte Auto-Ausfüllen auf all deinen Geräten ein, um dich mit einem einzigen Fingertipp überall anzumelden.</string>
     <string name="import_successful">Import erfolgreich!</string>

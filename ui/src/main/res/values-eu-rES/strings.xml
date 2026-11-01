@@ -855,7 +855,6 @@ Kontu honetara aldatu nahi duzu?</string>
     <string name="step_1_of_3">1. urratsa 3-tik</string>
     <string name="export_your_saved_logins">Esportatu zure gordetako saioak</string>
     <string name="delete_this_file_after_import_is_complete">Fitxategi hau ezabatuko duzu inportazioa amaitutakoan.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Zure ordenagailuan, ireki nabigatzailearen fitxa berri bat eta <annotation emphasis="bold">joan <annotation arg="0">%1$s</annotation>-ra</annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Hasi saioa SecretDoor web-aplikazioan.</string>
     <string name="step_2_of_3">2. urratsa 3-tik</string>
     <string name="log_in_to_bitwarden">Hasi saioa SecretDoor-en</string>
@@ -871,7 +870,6 @@ Kontu honetara aldatu nahi duzu?</string>
     <string name="syncing_logins_loading_message">Saioak sinkronizatzen…</string>
     <string name="download_the_browser_extension">Deskargatu nabigatzailearen hedapena</string>
     <string name="use_the_web_app">Erabili web-aplikazioa</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Hasi saioa bitwarden.com-en zure kontua erraz kudeatzeko eta ezarpenak eguneratzeko.</string>
     <string name="autofill_passwords">Autobeteketa pasahitzak</string>
     <string name="set_up_autofill_on_all_your_devices">Konfiguratu autobeteketa zure gailu guztietan edonon ukitu bakarrarekin saioa hasteko.</string>
     <string name="import_successful">Inportazioa arrakastatsua!</string>

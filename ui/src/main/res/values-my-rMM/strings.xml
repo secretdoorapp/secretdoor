@@ -852,7 +852,6 @@
     <string name="step_1_of_3">အဆင့် ၁ ၏ ၃</string>
     <string name="export_your_saved_logins">သင့်သိမ်းဆည်းထားသော ဝင်ရောက်မှုများကို တင်ပို့ပါ</string>
     <string name="delete_this_file_after_import_is_complete">တင်သွင်းခြင်း ပြီးဆုံးပြီးနောက် ဤဖိုင်ကို သင်ဖျက်မည်။</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">သင့်ကွန်ပျူတာပေါ်တွင်၊ ဘရောက်ဆာ တက်ဘ်အသစ်ဖွင့်ပြီး <annotation emphasis="bold"><annotation arg="0">%1$s</annotation> သို့ သွားပါ</annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">SecretDoor ဝဘ်အက်ပ်သို့ ဝင်ရောက်ပါ။</string>
     <string name="step_2_of_3">အဆင့် ၂ ၏ ၃</string>
     <string name="log_in_to_bitwarden">SecretDoor သို့ ဝင်ရောက်ပါ</string>
@@ -868,7 +867,6 @@
     <string name="syncing_logins_loading_message">ဝင်ရောက်မှုများ ထပ်တူပြုနေသည်…</string>
     <string name="download_the_browser_extension">ဘရောက်ဆာ တိုးချဲ့မှုကို ဒေါင်းလုဒ်လုပ်ပါ</string>
     <string name="use_the_web_app">ဝဘ်အက်ပ်ကို သုံးပါ</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">သင့်အကောင့်ကို အလွယ်တကူ စီမံခန့်ခွဲရန်နှင့် ဆက်တင်များ အပ်ဒိတ်လုပ်ရန် bitwarden.com တွင် ဝင်ရောက်ပါ။</string>
     <string name="autofill_passwords">စကားဝှက်များ အလိုအလျောက်ဖြည့်ပါ</string>
     <string name="set_up_autofill_on_all_your_devices">မည်နေရာတွင်မဆို တစ်ချက်နှိပ်ရုံဖြင့် ဝင်ရောက်ရန် သင့်စက်ပစ္စည်းအားလုံးတွင် အလိုအလျောက်ဖြည့်ခြင်းကို သတ်မှတ်ပါ။</string>
     <string name="import_successful">တင်သွင်းခြင်း အောင်မြင်ပါပြီ!</string>

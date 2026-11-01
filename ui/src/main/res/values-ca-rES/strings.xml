@@ -857,7 +857,6 @@ Voleu canviar a aquest compte?</string>
     <string name="step_1_of_3">Pas 1 de 3</string>
     <string name="export_your_saved_logins">Exporta els teus inicis de sessió desats</string>
     <string name="delete_this_file_after_import_is_complete">Eliminaràs aquest fitxer després que la importació s\'hagi completat.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Al teu ordinador, obre una nova pestanya del navegador i <annotation emphasis="bold">vés a <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Inicia sessió a l\'aplicació web de SecretDoor.</string>
     <string name="step_2_of_3">Pas 2 de 3</string>
     <string name="log_in_to_bitwarden">Inicia sessió a SecretDoor</string>
@@ -873,7 +872,6 @@ Voleu canviar a aquest compte?</string>
     <string name="syncing_logins_loading_message">Sincronitzant inicis de sessió…</string>
     <string name="download_the_browser_extension">Descarrega l\'extensió del navegador</string>
     <string name="use_the_web_app">Utilitza l\'aplicació web</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Inicia sessió a bitwarden.com per gestionar fàcilment el teu compte i actualitzar la configuració.</string>
     <string name="autofill_passwords">Emplenament automàtic de contrasenyes</string>
     <string name="set_up_autofill_on_all_your_devices">Configura l\'emplenament automàtic en tots els teus dispositius per iniciar sessió amb un sol toc a qualsevol lloc.</string>
     <string name="import_successful">Importació exitosa!</string>

@@ -877,7 +877,6 @@ Ydych chi am newid i\'r cyfrif hwn?</string>
     <string name="step_1_of_3">Cam 1 o 3</string>
     <string name="export_your_saved_logins">Allforio\'ch mewngofnodiadau wedi\'u cadw</string>
     <string name="delete_this_file_after_import_is_complete">Byddwch yn dileu\'r ffeil hon ar ôl i\'r mewnforio ddod i ben.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Ar eich cyfrifiadur, agorwch dab porwr newydd ac <annotation emphasis="bold">ewch i <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Mewngofnodwch i ap gwe SecretDoor.</string>
     <string name="step_2_of_3">Cam 2 o 3</string>
     <string name="log_in_to_bitwarden">Mewngofnodi i SecretDoor</string>
@@ -893,7 +892,6 @@ Ydych chi am newid i\'r cyfrif hwn?</string>
     <string name="syncing_logins_loading_message">Yn cydamseru mewngofnodiadau…</string>
     <string name="download_the_browser_extension">Lawrlwythwch estyniad y porwr</string>
     <string name="use_the_web_app">Defnyddiwch yr ap gwe</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Mewngofnodwch yn bitwarden.com i reoli\'ch cyfrif yn hawdd a diweddaru gosodiadau.</string>
     <string name="autofill_passwords">Llenwi cyfrineiriau yn awtomatig</string>
     <string name="set_up_autofill_on_all_your_devices">Sefydlwch lenwi awtomatig ar eich holl ddyfeisiau i fewngofnodi gydag un tapiad unrhyw le.</string>
     <string name="import_successful">Mewnforio\'n Llwyddiannus!</string>

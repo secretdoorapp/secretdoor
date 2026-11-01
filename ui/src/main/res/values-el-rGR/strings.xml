@@ -857,7 +857,6 @@
     <string name="step_1_of_3">Βήμα 1 από 3</string>
     <string name="export_your_saved_logins">Εξαγωγή των αποθηκευμένων σας συνδέσεων</string>
     <string name="delete_this_file_after_import_is_complete">Θα διαγράψετε αυτό το αρχείο μετά την ολοκλήρωση της εισαγωγής.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Στον υπολογιστή σας, ανοίξτε μια νέα καρτέλα του προγράμματος περιήγησης και <annotation emphasis="bold">πηγαίνετε στο <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Συνδεθείτε στην εφαρμογή ιστού SecretDoor.</string>
     <string name="step_2_of_3">Βήμα 2 από 3</string>
     <string name="log_in_to_bitwarden">Σύνδεση στο SecretDoor</string>
@@ -873,7 +872,6 @@
     <string name="syncing_logins_loading_message">Συγχρονισμός συνδέσεων...</string>
     <string name="download_the_browser_extension">Κατεβάστε την επέκταση περιηγητή</string>
     <string name="use_the_web_app">Χρήση της εφαρμογής web</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Συνδεθείτε στο bitwarden.com για να διαχειριστείτε εύκολα το λογαριασμό σας και να ενημερώσετε τις ρυθμίσεις.</string>
     <string name="autofill_passwords">Αυτόματη συμπλήρωση κωδικών πρόσβασης</string>
     <string name="set_up_autofill_on_all_your_devices">Ρυθμίστε την αυτόματη συμπλήρωση όλων των συσκευών σας για να συνδεθείτε με ένα μόνο πάτημα οπουδήποτε.</string>
     <string name="import_successful">Εισαγωγή Επιτυχής!</string>

@@ -15,7 +15,7 @@ picks (for example, Google Drive) on demand or on a schedule.
 | Backup format | SecretDoor's own file (see Phase 4): the vault exactly as stored on the device, and the whole file encrypted again with a key derived from the vault's user key. |
 | Backup destination | Storage Access Framework folder chosen by the user (Google Drive, local storage, and others); a persisted URI permission is kept. Scheduled backups use WorkManager. |
 | Vaults | One vault per device for now; a backup can be merged into it. Separate vaults (switching between several) are planned. |
-| Pricing | Free: the whole password manager, plus manually exporting the encrypted backup file to any location (the user can upload it to the cloud themselves). Paid: SecretDoor uploading backups to the cloud itself (on demand or on a schedule). |
+| Pricing | The app is free software. Everything in it today is free, including manual backups and scheduled backups to a file the user chooses, and stays free. If an optional paid add-on is ever offered, it will be announced first and will not remove free features (see `docs/help/premium.md`). |
 | Master password hint | Optional, stored only on the device (not encrypted), shown on the unlock screen via "Show master password hint". |
 | App ID | `app.secretdoor` (done). Internal Kotlin packages stay `com.x8bit.bitwarden.*` to keep upstream security merges easy. |
 
@@ -157,8 +157,7 @@ stored key material.
     Drive keeps earlier versions.
   - [x] Restore: "Restore from backup" on the Create vault screen (pick file, enter master
     password).
-  - [ ] Paid gate: `AutoBackupManager.isAutoBackupAvailable` is `true` until billing exists
-    (Google Play Billing for `standard`; F-Droid needs a separate model).
+  - [x] Scheduled backup to a chosen file is free (`AutoBackupManager.isAutoBackupAvailable`).
   - [x] Import a backup into the current vault (Backup screen or ☰ "Import backup" on My vault):
     the backup's user key is unlocked in a temporary SDK client, every encrypted string is
     re-encrypted for this vault (only the item key for items that have one) and checked by

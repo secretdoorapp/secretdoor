@@ -857,7 +857,6 @@
     <string name="step_1_of_3">படி 1/3</string>
     <string name="export_your_saved_logins">உங்கள் சேமிக்கப்பட்ட உள்நுழைவுகளை ஏற்றுமதி செய்யுங்கள்</string>
     <string name="delete_this_file_after_import_is_complete">இறக்குமதி முடிந்த பிறகு இந்த கோப்பை நீக்குவீர்கள்.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">உங்கள் கணினியில், ஒரு புதிய உலாவி தப்பைத் திறந்து <annotation emphasis="bold">செல்லுங்கள் <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">SecretDoor வலை பயன்பாட்டில் உள்நுழையவும்.</string>
     <string name="step_2_of_3">படி 2/3</string>
     <string name="log_in_to_bitwarden">SecretDoor-ல் உள்நுழையவும்</string>
@@ -873,7 +872,6 @@
     <string name="syncing_logins_loading_message">உள்நுழைவுகளை ஒத்திசைக்கிறது…</string>
     <string name="download_the_browser_extension">உலாவி நீட்டிப்பை பதிவிறக்கு</string>
     <string name="use_the_web_app">வலை பயன்பாட்டைப் பயன்படுத்து</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">உங்கள் கணக்கை எளிதாக நிர்வகிக்கவும் மற்றும் அமைப்புகளை புதுப்பிக்கவும் bitwarden.com-ல் உள்நுழையவும்.</string>
     <string name="autofill_passwords">கடவுச்சொற்களை தானாக நிரப்பு</string>
     <string name="set_up_autofill_on_all_your_devices">எல்லா இடங்களிலும் ஒற்றை தட்டலில் உள்நுழைய உங்கள் எல்லா சாதனங்களிலும் தானியங்கு நிரப்புதலை அமைக்கவும்.</string>
     <string name="import_successful">இறக்குமதி வெற்றிகரமானது!</string>

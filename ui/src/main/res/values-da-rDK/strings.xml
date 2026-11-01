@@ -857,7 +857,6 @@ Skift til denne konto?</string>
     <string name="step_1_of_3">Trin 1 af 3</string>
     <string name="export_your_saved_logins">Eksportere gemte logins</string>
     <string name="delete_this_file_after_import_is_complete">Slet denne fil, når importen er færdig.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Åbn en ny webbrowserfane på computeren, og gå til %1$s</string>
     <string name="log_in_to_the_bitwarden_web_app">Log ind på SecretDoors web-app.</string>
     <string name="step_2_of_3">Trin 2 af 3</string>
     <string name="log_in_to_bitwarden">Log ind på SecretDoor</string>
@@ -873,7 +872,6 @@ Skift til denne konto?</string>
     <string name="syncing_logins_loading_message">Synker logins...</string>
     <string name="download_the_browser_extension">Download webbrowserudvidelsen</string>
     <string name="use_the_web_app">Brug web-appen</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Log ind på bitwarden.com for nemt at håndtere brugerkontoen og opdatere indstillinger.</string>
     <string name="autofill_passwords">Autofyld adgangskoder</string>
     <string name="set_up_autofill_on_all_your_devices">Opsæt autofyldning på alle enhederne for at logge ind med ét enkelt tryk overalt.</string>
     <string name="import_successful">Import udført!</string>

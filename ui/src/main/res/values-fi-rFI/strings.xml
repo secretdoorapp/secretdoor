@@ -857,7 +857,6 @@ Haluatko vaihtaa tähän tiliin?</string>
     <string name="step_1_of_3">Vaihe 1/3</string>
     <string name="export_your_saved_logins">Vie tallennetut kirjautumistietosi</string>
     <string name="delete_this_file_after_import_is_complete">Poistat tämän tiedoston, kun tuonti on valmis.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Avaa tietokoneellasi uusi selainvälilehti ja <annotation emphasis="bold">mene osoitteeseen <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Kirjaudu SecretDoor-verkkosovellukseen.</string>
     <string name="step_2_of_3">Vaihe 2/3</string>
     <string name="log_in_to_bitwarden">Kirjaudu SecretDooriin</string>
@@ -873,7 +872,6 @@ Haluatko vaihtaa tähän tiliin?</string>
     <string name="syncing_logins_loading_message">Kirjautumistietoja synkronoidaan...</string>
     <string name="download_the_browser_extension">Lataa selaimen laajennus</string>
     <string name="use_the_web_app">Käytä verkkosovellusta</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Kirjaudu sisään osoitteessa bitwarden.com hallitaksesi tiliäsi ja päivittääksesi asetuksia helposti.</string>
     <string name="autofill_passwords">Automaattitäytä salasanoja</string>
     <string name="set_up_autofill_on_all_your_devices">Ota automaattinen täyttö käyttöön kaikilla laitteillasi kirjautuaksesi yhdellä napautuksella missä tahansa.</string>
     <string name="import_successful">Tuonti onnistui!</string>

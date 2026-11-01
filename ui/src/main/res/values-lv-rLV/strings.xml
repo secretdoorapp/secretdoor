@@ -862,7 +862,6 @@ Vai pārslēgties uz šo kontu?</string>
     <string name="step_1_of_3">1. solis no 3</string>
     <string name="export_your_saved_logins">Izgūt savus saglabātos pieteikšanās vienumus</string>
     <string name="delete_this_file_after_import_is_complete">Šī datne ir izdzēšama pēc tam, kad ievietošana ir pabeigta.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Savā datorā jāatver jauna pārlūka cilne un jādodas uz vault.bitwarden.com</string>
     <string name="log_in_to_the_bitwarden_web_app">Jāpiesakās SecretDoor tīmekļa lietotnē.</string>
     <string name="step_2_of_3">2. solis no 3</string>
     <string name="log_in_to_bitwarden">Jāpiesakās SecretDoor</string>
@@ -878,7 +877,6 @@ Vai pārslēgties uz šo kontu?</string>
     <string name="syncing_logins_loading_message">Sinhronizē pieteikšanās vienumus...</string>
     <string name="download_the_browser_extension">Lejupielādēt pārlūka paplašinājumu</string>
     <string name="use_the_web_app">Izmantot tīmekļa lietotni</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Piesakies bitwarden.com, lai viegli pārvaldītu savu kontu un atjauninātu iestatījumus!</string>
     <string name="autofill_passwords">Automātiski aizpildīt paroles</string>
     <string name="set_up_autofill_on_all_your_devices">Iestati automātisko aizpildi visās savās ierīcēs, lai visur pieteiktos ar vienu piesitienu!</string>
     <string name="import_successful">Ievietošana veiksmīga.</string>

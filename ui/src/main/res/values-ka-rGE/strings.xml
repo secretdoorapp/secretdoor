@@ -857,7 +857,6 @@
     <string name="step_1_of_3">ნაბიჯი 1 3-დან</string>
     <string name="export_your_saved_logins">თქვენი შენახული შესვლების ექსპორტი</string>
     <string name="delete_this_file_after_import_is_complete">თქვენ წაშლით ამ ფაილს იმპორტის დასრულების შემდეგ.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">თქვენს კომპიუტერზე, გახსენით ბრაუზერის ახალი ჩანართი და <annotation emphasis="bold">გადადით <annotation arg="0">%1$s</annotation></annotation>-ზე</string>
     <string name="log_in_to_the_bitwarden_web_app">შედით SecretDoor-ის ვებ-აპში.</string>
     <string name="step_2_of_3">ნაბიჯი 2 3-დან</string>
     <string name="log_in_to_bitwarden">SecretDoor-ში შესვლა</string>
@@ -873,7 +872,6 @@
     <string name="syncing_logins_loading_message">შესვლების სინქრონიზაცია…</string>
     <string name="download_the_browser_extension">ბრაუზერის გაფართოების ჩამოტვირთვა</string>
     <string name="use_the_web_app">ვებ-აპის გამოყენება</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">შედით bitwarden.com-ზე, რათა მარტივად მართოთ თქვენი ანგარიში და განაახლოთ პარამეტრები.</string>
     <string name="autofill_passwords">პაროლების ავტოშევსება</string>
     <string name="set_up_autofill_on_all_your_devices">დააყენეთ ავტოშევსება ყველა თქვენს მოწყობილობაზე, რათა შეხვიდეთ ერთი შეხებით ნებისმიერ ადგილას.</string>
     <string name="import_successful">იმპორტი წარმატებულია!</string>

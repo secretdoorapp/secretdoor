@@ -857,7 +857,6 @@ Soovid selle konto peale lülituda?</string>
     <string name="step_1_of_3">Samm 1 / 3</string>
     <string name="export_your_saved_logins">Ekspordi salvestatud sisselogimised</string>
     <string name="delete_this_file_after_import_is_complete">Kustutate selle faili pärast importimise lõpetamist.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Oma arvutis avage uus brauseri vahekaart ja <annotation emphasis="bold">minge aadressile <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Logige sisse SecretDoori veebirakendusse.</string>
     <string name="step_2_of_3">Samm 2 / 3</string>
     <string name="log_in_to_bitwarden">Logi sisse SecretDoorisse</string>
@@ -873,7 +872,6 @@ Soovid selle konto peale lülituda?</string>
     <string name="syncing_logins_loading_message">Sisselogimiste sünkroonimine…</string>
     <string name="download_the_browser_extension">Laadige alla brauserilaiendus</string>
     <string name="use_the_web_app">Kasutage veebirakendust</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Logige sisse aadressil bitwarden.com, et hõlpsasti oma kontot hallata ja seadeid uuendada.</string>
     <string name="autofill_passwords">Paroolide automaattäide</string>
     <string name="set_up_autofill_on_all_your_devices">Seadistage automaattäide kõigil oma seadmetel, et logida sisse ühe puudutusega kõikjal.</string>
     <string name="import_successful">Importimine õnnestus!</string>

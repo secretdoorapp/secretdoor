@@ -857,7 +857,6 @@ Queres comprobalo dende esa conta?</string>
     <string name="step_1_of_3">Paso 1 de 3</string>
     <string name="export_your_saved_logins">Exportar as credenciais gardadas</string>
     <string name="delete_this_file_after_import_is_complete">Eliminarase o arquivo unha vez se complete o importado.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">No teu computador, abre unha nova pestana e &lt;annotation emphasis="bold"&gt;vai a&lt;annotation arg="0"&gt; &lt;annotation arg="0"&gt;%1$s&lt;/annotation&gt;</string>
     <string name="log_in_to_the_bitwarden_web_app">Iniciar sesión na aplicación web de SecretDoor.</string>
     <string name="step_2_of_3">Paso 2 de 3</string>
     <string name="log_in_to_bitwarden">Iniciar sesión en SecretDoor</string>
@@ -873,7 +872,6 @@ Queres comprobalo dende esa conta?</string>
     <string name="syncing_logins_loading_message">Sincronizando credenciais...</string>
     <string name="download_the_browser_extension">Descarga a extensión de navegador</string>
     <string name="use_the_web_app">Usa a aplicación web</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Inicia sesión en bitwarden.com para xestionar a túa conta cómodamente e actualizar os axustes.</string>
     <string name="autofill_passwords">Autoenchido de contrasinais</string>
     <string name="set_up_autofill_on_all_your_devices">Configura o autoenchido en todos os teus dispositivos para iniciar sesión cun toque en todas partes.</string>
     <string name="import_successful">Importado con éxito!</string>

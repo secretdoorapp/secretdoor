@@ -863,7 +863,6 @@
     <string name="step_1_of_3">Крок 1 з 3</string>
     <string name="export_your_saved_logins">Экспартуйце свае захаваныя ўваходы</string>
     <string name="delete_this_file_after_import_is_complete">Вы выдаліце гэты файл пасля завяршэння імпарту.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">На сваім камп\'ютары адкрыйце новую ўкладку браўзера і <annotation emphasis="bold">перайдзіце на <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Увайдзіце ў вэб-праграму SecretDoor.</string>
     <string name="step_2_of_3">Крок 2 з 3</string>
     <string name="log_in_to_bitwarden">Увайсці ў SecretDoor</string>
@@ -879,7 +878,6 @@
     <string name="syncing_logins_loading_message">Сінхранізацыя ўваходаў…</string>
     <string name="download_the_browser_extension">Спампаваць пашырэнне для браўзера</string>
     <string name="use_the_web_app">Выкарыстоўваць вэб-праграму</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Увайдзіце на bitwarden.com, каб лёгка кіраваць сваім акаўнтам і абнаўляць налады.</string>
     <string name="autofill_passwords">Аўтазапаўненне пароляў</string>
     <string name="set_up_autofill_on_all_your_devices">Наладзьце аўтазапаўненне на ўсіх прыладах, каб уваходзіць адным націскам у любым месцы.</string>
     <string name="import_successful">Імпартаванне паспяхова!</string>

@@ -867,7 +867,6 @@ Ali želite preklopiti na ta račun?</string>
     <string name="step_1_of_3">Korak 1 od 3</string>
     <string name="export_your_saved_logins">Izvozi shranjene prijave</string>
     <string name="delete_this_file_after_import_is_complete">To datoteko boste izbrisali po zaključku uvoza.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">V računalniku odprite nov zavihek brskalnika in <annotation emphasis="bold">pojdite na <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Prijavite se v spletno aplikacijo SecretDoor.</string>
     <string name="step_2_of_3">Korak 2 od 3</string>
     <string name="log_in_to_bitwarden">Prijava v SecretDoor</string>
@@ -883,7 +882,6 @@ Ali želite preklopiti na ta račun?</string>
     <string name="syncing_logins_loading_message">Sinhronizacija prijav…</string>
     <string name="download_the_browser_extension">Prenesite razširitev za brskalnik</string>
     <string name="use_the_web_app">Uporabite spletno aplikacijo</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Prijavite se na bitwarden.com za enostavno upravljanje računa in posodabljanje nastavitev.</string>
     <string name="autofill_passwords">Samodejno izpolni gesla</string>
     <string name="set_up_autofill_on_all_your_devices">Nastavite samodejno izpolnjevanje na vseh napravah za prijavo z enim dotikom kjer koli.</string>
     <string name="import_successful">Uvoz uspešen!</string>

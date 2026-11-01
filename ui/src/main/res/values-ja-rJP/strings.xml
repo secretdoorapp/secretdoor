@@ -852,7 +852,6 @@
     <string name="step_1_of_3">手順1/3</string>
     <string name="export_your_saved_logins">保存したログイン情報をエクスポート</string>
     <string name="delete_this_file_after_import_is_complete">インポートが完了したら、このファイルを削除します。</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">コンピューターで新しいブラウザタブを開き、<annotation emphasis="bold">%1$s に移動します</annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">SecretDoor ウェブアプリにログインします。</string>
     <string name="step_2_of_3">手順 2/3</string>
     <string name="log_in_to_bitwarden">SecretDoor にログイン</string>
@@ -868,7 +867,6 @@
     <string name="syncing_logins_loading_message">ログインを同期...</string>
     <string name="download_the_browser_extension">ブラウザーの拡張機能をダウンロード</string>
     <string name="use_the_web_app">Webアプリを使用する</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">bitwarden.com にログインして、アカウントと設定を簡単に管理します。</string>
     <string name="autofill_passwords">パスワードの自動入力</string>
     <string name="set_up_autofill_on_all_your_devices">すべてのデバイスで自動入力を設定して、ワンタップでどこにでもログインできます。</string>
     <string name="import_successful">インポートが成功しました!</string>

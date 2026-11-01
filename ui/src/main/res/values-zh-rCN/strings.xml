@@ -852,7 +852,6 @@
     <string name="step_1_of_3">步骤 1 / 3</string>
     <string name="export_your_saved_logins">导出保存的登录信息</string>
     <string name="delete_this_file_after_import_is_complete">导入完成后您应该删除此文件。</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">在您的计算机上，打开一个新的浏览器标签页然后<annotation emphasis="bold">访问 <annotation arg="0">%1$s</annotation></annotation>。</string>
     <string name="log_in_to_the_bitwarden_web_app">登录到 SecretDoor 网页 App。</string>
     <string name="step_2_of_3">步骤 2 / 3</string>
     <string name="log_in_to_bitwarden">登录到 SecretDoor</string>
@@ -868,7 +867,6 @@
     <string name="syncing_logins_loading_message">正在同步登录…</string>
     <string name="download_the_browser_extension">下载浏览器扩展</string>
     <string name="use_the_web_app">使用网页 App</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">登录到 bitwarden.com 以轻松管理您的账户和更新设置。</string>
     <string name="autofill_passwords">自动填充密码</string>
     <string name="set_up_autofill_on_all_your_devices">在所有设备上设置自动填充，随时随地只需点击一下即可登录。</string>
     <string name="import_successful">导入成功！</string>

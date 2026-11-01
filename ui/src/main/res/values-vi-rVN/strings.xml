@@ -853,7 +853,6 @@ Bạn có muốn chuyển sang tài khoản này không?</string>
     <string name="step_1_of_3">Bước 1 trong 3</string>
     <string name="export_your_saved_logins">Xuất các thông tin đăng nhập đã lưu</string>
     <string name="delete_this_file_after_import_is_complete">Bạn sẽ xóa tệp này sau khi quá trình nhập dữ liệu hoàn tất.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Trên máy tính của bạn, mở một tab trình duyệt mới và <annotation emphasis="bold">truy cập <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Đăng nhập SecretDoor bản web.</string>
     <string name="step_2_of_3">Bước 2 trong 3</string>
     <string name="log_in_to_bitwarden">Đăng nhập SecretDoor</string>
@@ -869,7 +868,6 @@ Bạn có muốn chuyển sang tài khoản này không?</string>
     <string name="syncing_logins_loading_message">Đang đồng bộ đăng nhập…</string>
     <string name="download_the_browser_extension">Tải xuống tiện ích mở rộng trình duyệt</string>
     <string name="use_the_web_app">Dùng bản web</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Đăng nhập vào bitwarden.com để dễ dàng quản lý tài khoản và cập nhật cài đặt.</string>
     <string name="autofill_passwords">Tự động điền mật khẩu</string>
     <string name="set_up_autofill_on_all_your_devices">Thiết lập tính năng tự động điền trên mọi thiết bị của bạn để đăng nhập chỉ bằng một lần chạm ở bất kỳ đâu.</string>
     <string name="import_successful">Nhập thành công!</string>

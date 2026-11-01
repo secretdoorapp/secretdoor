@@ -856,7 +856,6 @@ Deseja trocar para esta conta?</string>
     <string name="step_1_of_3">1ª de 3 etapas</string>
     <string name="export_your_saved_logins">Exporte suas credenciais salvas</string>
     <string name="delete_this_file_after_import_is_complete">Você vai apagar esse arquivo depois que a importação for concluída.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">No seu computador, abra uma nova aba do navegador e <annotation emphasis="bold">acesse <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Conecte-se ao aplicativo web do SecretDoor.</string>
     <string name="step_2_of_3">2ª de 3 etapas</string>
     <string name="log_in_to_bitwarden">Conecte-se ao SecretDoor</string>
@@ -872,7 +871,6 @@ Deseja trocar para esta conta?</string>
     <string name="syncing_logins_loading_message">Sincronizando credenciais…</string>
     <string name="download_the_browser_extension">Baixe a extensão para navegador</string>
     <string name="use_the_web_app">Use o aplicativo web</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Conecte-se a bitwarden.com para gerenciar sua conta e atualizar as configurações com facilidade.</string>
     <string name="autofill_passwords">Preencha senhas automaticamente</string>
     <string name="set_up_autofill_on_all_your_devices">Configure o preenchimento automático em todos os seus dispositivos para se conectar em qualquer lugar com um único toque.</string>
     <string name="import_successful">Importação bem-sucedida!</string>

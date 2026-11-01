@@ -852,7 +852,6 @@
     <string name="step_1_of_3">1 / 3단계</string>
     <string name="export_your_saved_logins">저장된 로그인 내보내기</string>
     <string name="delete_this_file_after_import_is_complete">가져오기가 완료된 후 이 파일을 삭제하게 됩니다.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">컴퓨터에서, 새 브라우저 탭을 열고 <annotation emphasis="bold"><annotation arg="0">%1$s</annotation>에 접속합니다</annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">SecretDoor 웹 앱으로 로그인합니다.</string>
     <string name="step_2_of_3">2 / 3단계</string>
     <string name="log_in_to_bitwarden">SecretDoor에 로그인</string>
@@ -868,7 +867,6 @@
     <string name="syncing_logins_loading_message">로그인 동기화 중...</string>
     <string name="download_the_browser_extension">브라우저 확장 프로그램 다운로드</string>
     <string name="use_the_web_app">웹 앱 사용</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">bitwarden.com에 로그인하여 계정을 쉽게 관리하고 설정을 업데이트하세요.</string>
     <string name="autofill_passwords">비밀번호 자동 채우기</string>
     <string name="set_up_autofill_on_all_your_devices">모든 기기에서 자동 채우기를 설정하여 어디서나 한 번의 탭으로 로그인하세요.</string>
     <string name="import_successful">가져오기 성공!</string>

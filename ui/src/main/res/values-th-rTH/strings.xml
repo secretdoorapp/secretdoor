@@ -852,7 +852,6 @@
     <string name="step_1_of_3">ขั้นตอนที่ 1 จาก 3</string>
     <string name="export_your_saved_logins">ส่งออกข้อมูลเข้าสู่ระบบที่บันทึกไว้ของคุณ</string>
     <string name="delete_this_file_after_import_is_complete">คุณจะลบไฟล์นี้หลังจากนำเข้าเสร็จสมบูรณ์</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">บนคอมพิวเตอร์ ให้เปิดแท็บเบราว์เซอร์ใหม่และ <annotation emphasis="bold">ไปที่ <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">เข้าสู่ระบบเว็บแอป SecretDoor</string>
     <string name="step_2_of_3">ขั้นตอนที่ 2 จาก 3</string>
     <string name="log_in_to_bitwarden">เข้าสู่ระบบ SecretDoor</string>
@@ -868,7 +867,6 @@
     <string name="syncing_logins_loading_message">กำลังซิงค์ข้อมูลเข้าสู่ระบบ…</string>
     <string name="download_the_browser_extension">ดาวน์โหลดส่วนขยายเบราว์เซอร์</string>
     <string name="use_the_web_app">ใช้เว็บแอป</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">เข้าสู่ระบบที่ bitwarden.com เพื่อจัดการบัญชีและอัปเดตการตั้งค่าของคุณได้อย่างง่ายดาย</string>
     <string name="autofill_passwords">ป้อนรหัสผ่านอัตโนมัติ</string>
     <string name="set_up_autofill_on_all_your_devices">ตั้งค่าการป้อนอัตโนมัติบนอุปกรณ์ทั้งหมดของคุณเพื่อเข้าสู่ระบบด้วยการแตะเพียงครั้งเดียวจากทุกที่</string>
     <string name="import_successful">นำเข้าสำเร็จ!</string>

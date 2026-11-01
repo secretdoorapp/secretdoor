@@ -862,7 +862,6 @@
     <string name="step_1_of_3">שלב 1 מתוך 3</string>
     <string name="export_your_saved_logins">ייצא את הכניסות השמורות שלך</string>
     <string name="delete_this_file_after_import_is_complete">תמחק את קובץ הזה לאחר שהייבוא הושלם.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">במחשב שלך, פתח כרטיסיית דפדפן חדשה ו<annotation emphasis="bold">לך אל <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">היכנס ליישום הרשת של SecretDoor.</string>
     <string name="step_2_of_3">שלב 2 מתוך 3</string>
     <string name="log_in_to_bitwarden">היכנס אל SecretDoor</string>
@@ -878,7 +877,6 @@
     <string name="syncing_logins_loading_message">מסנכרן כניסות…</string>
     <string name="download_the_browser_extension">הורד את הרחבת הדפדפן</string>
     <string name="use_the_web_app">השתמש ביישום הרשת</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">היכנס אל bitwarden.com כדי לנהל את החשבון שלך ולעדכן הגדרות.</string>
     <string name="autofill_passwords">מלא אוטומטית סיסמאות</string>
     <string name="set_up_autofill_on_all_your_devices">הגדר מילוי אוטומטי בכל המכשירים שלך כדי להיכנס עם הקשה אחת בכל מקום.</string>
     <string name="import_successful">הייבוא הצליח!</string>

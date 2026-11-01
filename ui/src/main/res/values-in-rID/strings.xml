@@ -852,7 +852,6 @@ Apakah Anda ingin beralih ke akun ini?</string>
     <string name="step_1_of_3">Langkah 1 dari 3</string>
     <string name="export_your_saved_logins">Ekspor login tersimpan Anda</string>
     <string name="delete_this_file_after_import_is_complete">File ini akan dihapus setelah impor selesai.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Di komputer Anda, buka tab browser baru dan <annotation emphasis="bold">pergi ke <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Masuk ke aplikasi web SecretDoor.</string>
     <string name="step_2_of_3">Langkah 2 dari 3</string>
     <string name="log_in_to_bitwarden">Masuk ke SecretDoor</string>
@@ -868,7 +867,6 @@ Apakah Anda ingin beralih ke akun ini?</string>
     <string name="syncing_logins_loading_message">Menyinkronkan login…</string>
     <string name="download_the_browser_extension">Unduh ekstensi peramban</string>
     <string name="use_the_web_app">Gunakan aplikasi web</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Masuk di bitwarden.com untuk mengelola akun dan memperbarui pengaturan dengan mudah.</string>
     <string name="autofill_passwords">Isi otomatis sandi</string>
     <string name="set_up_autofill_on_all_your_devices">Atur isi otomatis di semua perangkat Anda untuk login dengan sekali ketuk di mana saja.</string>
     <string name="import_successful">Impor Berhasil!</string>
