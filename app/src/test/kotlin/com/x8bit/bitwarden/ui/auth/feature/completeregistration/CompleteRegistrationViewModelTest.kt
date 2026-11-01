@@ -200,7 +200,6 @@ class CompleteRegistrationViewModelTest : BaseViewModelTest() {
                 isMasterPasswordStrong = true,
             )
         }
-        coVerify(exactly = 0) { mockAuthRepository.login(email = any(), password = any()) }
     }
 
     @Test

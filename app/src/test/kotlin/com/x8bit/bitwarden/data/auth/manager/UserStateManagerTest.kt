@@ -4,7 +4,6 @@ import app.cash.turbine.test
 import com.bitwarden.core.data.manager.dispatcher.DispatcherManager
 import com.bitwarden.core.data.manager.dispatcher.FakeDispatcherManager
 import com.bitwarden.data.datasource.disk.model.EnvironmentUrlDataJson
-import com.bitwarden.network.model.GetTokenResponseJson
 import com.bitwarden.network.model.KdfTypeJson
 import com.bitwarden.network.model.createMockOrganizationNetwork
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.AccountJson
@@ -21,15 +20,11 @@ import com.x8bit.bitwarden.data.vault.manager.VaultLockManager
 import com.x8bit.bitwarden.data.vault.repository.model.VaultUnlockData
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.unmockkStatic
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNull
 import java.time.Instant
@@ -55,16 +50,6 @@ class UserStateManagerTest {
         vaultLockManager = vaultLockManager,
         dispatcherManager = dispatcherManager,
     )
-
-    @BeforeEach
-    fun setup() {
-        mockkStatic(GetTokenResponseJson.Success::toUserState)
-    }
-
-    @AfterEach
-    fun tearDown() {
-        unmockkStatic(GetTokenResponseJson.Success::toUserState)
-    }
 
     @Test
     fun `userStateFlow should update according to changes in its underlying data sources`() =

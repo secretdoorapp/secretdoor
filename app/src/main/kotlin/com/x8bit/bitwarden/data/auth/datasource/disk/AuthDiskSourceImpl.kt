@@ -27,6 +27,7 @@ import java.util.UUID
 
 // These keys should be encrypted
 private const val ACCOUNT_TOKENS_KEY = "accountTokens"
+private const val AUTHENTICATOR_SYNC_SYMMETRIC_KEY = "authenticatorSyncSymmetric"
 private const val AUTHENTICATOR_SYNC_UNLOCK_KEY = "authenticatorSyncUnlock"
 private const val BIOMETRICS_INIT_VECTOR_KEY = "biometricInitializationVector"
 private const val BIOMETRICS_UNLOCK_KEY = "userKeyBiometricUnlock"

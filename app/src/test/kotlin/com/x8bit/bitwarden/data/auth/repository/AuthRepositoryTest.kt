@@ -64,7 +64,6 @@ import com.x8bit.bitwarden.data.auth.repository.model.VerifyOtpResult
 import com.x8bit.bitwarden.data.auth.repository.model.createMockWrappedAccountCryptographicState
 import com.x8bit.bitwarden.data.auth.repository.util.toKdfRequestModel
 import com.x8bit.bitwarden.data.auth.repository.util.toSdkParams
-import com.x8bit.bitwarden.data.auth.repository.util.toUserState
 import com.x8bit.bitwarden.data.auth.repository.util.updateMasterPasswordUnlock
 import com.x8bit.bitwarden.data.auth.util.toSdkParams
 import com.x8bit.bitwarden.data.platform.error.NoActiveUserException
@@ -216,10 +215,7 @@ class AuthRepositoryTest {
 
     @BeforeEach
     fun beforeEach() {
-        mockkStatic(
-            GetTokenResponseJson.Success::toUserState,
-            UserStateJson::updateMasterPasswordUnlock,
-        )
+        mockkStatic(UserStateJson::updateMasterPasswordUnlock)
         mockkConstructor(
             NoActiveUserException::class,
             MissingPropertyException::class,
@@ -234,10 +230,7 @@ class AuthRepositoryTest {
 
     @AfterEach
     fun tearDown() {
-        unmockkStatic(
-            GetTokenResponseJson.Success::toUserState,
-            UserStateJson::updateMasterPasswordUnlock,
-        )
+        unmockkStatic(UserStateJson::updateMasterPasswordUnlock)
         mockkConstructor(
             NoActiveUserException::class,
             MissingPropertyException::class,

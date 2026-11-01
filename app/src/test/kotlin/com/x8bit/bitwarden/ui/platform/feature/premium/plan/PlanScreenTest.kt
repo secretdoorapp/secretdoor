@@ -62,10 +62,6 @@ class PlanScreenTest : BitwardenComposeTest() {
     fun setUp() {
         setContent(
             authTabLaunchers = AuthTabLaunchers(
-                duo = mockk(),
-                sso = mockk(),
-                webAuthn = mockk(),
-                cookie = mockk(),
                 premiumCheckout = premiumCheckoutLauncher,
                 stripePortal = stripePortalLauncher,
             ),
