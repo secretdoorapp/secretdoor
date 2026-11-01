@@ -38,7 +38,6 @@ import com.x8bit.bitwarden.data.auth.repository.model.UpdateKdfMinimumsResult
 import com.x8bit.bitwarden.data.auth.repository.util.toSdkParams
 import com.x8bit.bitwarden.data.auth.repository.util.updateForcePasswordReset
 import com.x8bit.bitwarden.data.platform.manager.keyrotation.KeyRotationManager
-import com.x8bit.bitwarden.data.platform.manager.policy.PasswordPolicyManager
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.platform.repository.model.VaultTimeout
 import com.x8bit.bitwarden.data.platform.repository.model.VaultTimeoutAction
@@ -126,9 +125,6 @@ class VaultLockManagerTest {
     private val pinProtectedUserKeyManager: PinProtectedUserKeyManager = mockk {
         coEvery { migratePinProtectedUserKeyIfNeeded(userId = any()) } just runs
     }
-    private val passwordPolicyManager: PasswordPolicyManager = mockk {
-        every { validatePasswordAgainstPolicies(password = any(), isCreation = any()) } returns true
-    }
     private val keyRotationManager: KeyRotationManager = mockk {
         coEvery { rotateAutoUnlockKey(userId = any()) } just runs
         coEvery { rotateAuthenticatorSyncKey(userId = any()) } just runs
@@ -147,7 +143,6 @@ class VaultLockManagerTest {
         dispatcherManager = fakeDispatcherManager,
         kdfManager = kdfManager,
         pinProtectedUserKeyManager = pinProtectedUserKeyManager,
-        passwordPolicyManager = passwordPolicyManager,
         keyRotationManager = keyRotationManager,
     )
 
@@ -1915,63 +1910,6 @@ class VaultLockManagerTest {
             )
 
             assertEquals(VaultUnlockResult.Success, result)
-            verify(exactly = 1) {
-                passwordPolicyManager.validatePasswordAgainstPolicies(
-                    password = masterPassword,
-                    isCreation = false,
-                )
-            }
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `unlockVault with initUserCryptoMethod masterPasswordUnlock when the password fails policies should store WEAK_MASTER_PASSWORD_ON_LOGIN`() =
-        runTest {
-            val kdf = MOCK_PROFILE.toSdkParams()
-            val email = MOCK_PROFILE.email
-            val masterPassword = "mockValue"
-            val initUserCryptoMethod = InitUserCryptoMethod.MasterPasswordUnlock(
-                password = masterPassword,
-                masterPasswordUnlock = MOCK_MASTER_PASSWORD_UNLOCK_DATA,
-            )
-            every {
-                passwordPolicyManager.validatePasswordAgainstPolicies(
-                    password = masterPassword,
-                    isCreation = false,
-                )
-            } returns false
-            coEvery {
-                vaultSdkSource.initializeCrypto(
-                    userId = USER_ID,
-                    request = InitUserCryptoRequest(
-                        accountCryptographicState = ACCOUNT_CRYPTOGRAPHIC_STATE,
-                        userId = USER_ID,
-                        kdfParams = kdf,
-                        email = email,
-                        method = initUserCryptoMethod,
-                        upgradeToken = null,
-                    ),
-                )
-            } returns InitializeCryptoResult.Success.asSuccess()
-            mutableVaultTimeoutStateFlow.value = VaultTimeout.ThirtyMinutes
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-
-            val result = vaultLockManager.unlockVault(
-                accountCryptographicState = ACCOUNT_CRYPTOGRAPHIC_STATE,
-                userId = USER_ID,
-                email = email,
-                kdf = kdf,
-                initUserCryptoMethod = initUserCryptoMethod,
-                organizationKeys = null,
-            )
-
-            assertEquals(VaultUnlockResult.Success, result)
-            fakeAuthDiskSource.assertUserState(
-                userState = MOCK_USER_STATE.updateForcePasswordReset(
-                    userId = USER_ID,
-                    reason = ForcePasswordResetReason.WEAK_MASTER_PASSWORD_ON_LOGIN,
-                ),
-            )
         }
 
     @Suppress("MaxLineLength")
@@ -2056,12 +1994,6 @@ class VaultLockManagerTest {
 
             assertEquals(VaultUnlockResult.Success, result)
             fakeAuthDiskSource.assertUserState(userState = initialUserState)
-            verify(exactly = 0) {
-                passwordPolicyManager.validatePasswordAgainstPolicies(
-                    password = any(),
-                    isCreation = any(),
-                )
-            }
         }
 
     @Suppress("MaxLineLength")
@@ -2101,12 +2033,6 @@ class VaultLockManagerTest {
             assertEquals(VaultUnlockResult.Success, result)
             fakeAuthDiskSource.assertUserState(userState = MOCK_USER_STATE)
             fakeAuthDiskSource.assertMasterPasswordHash(userId = USER_ID, passwordHash = null)
-            verify(exactly = 0) {
-                passwordPolicyManager.validatePasswordAgainstPolicies(
-                    password = any(),
-                    isCreation = any(),
-                )
-            }
             coVerify(exactly = 0) {
                 authSdkSource.hashPassword(
                     salt = any(),
@@ -2128,12 +2054,6 @@ class VaultLockManagerTest {
                 password = masterPassword,
                 masterPasswordUnlock = MOCK_MASTER_PASSWORD_UNLOCK_DATA,
             )
-            every {
-                passwordPolicyManager.validatePasswordAgainstPolicies(
-                    password = masterPassword,
-                    isCreation = false,
-                )
-            } returns false
             coEvery {
                 vaultSdkSource.initializeCrypto(
                     userId = USER_ID,
@@ -2162,12 +2082,6 @@ class VaultLockManagerTest {
             assertEquals(VaultUnlockResult.GenericError(error = error), result)
             fakeAuthDiskSource.assertUserState(userState = MOCK_USER_STATE)
             fakeAuthDiskSource.assertMasterPasswordHash(userId = USER_ID, passwordHash = null)
-            verify(exactly = 0) {
-                passwordPolicyManager.validatePasswordAgainstPolicies(
-                    password = any(),
-                    isCreation = any(),
-                )
-            }
             coVerify(exactly = 0) {
                 authSdkSource.hashPassword(
                     salt = any(),

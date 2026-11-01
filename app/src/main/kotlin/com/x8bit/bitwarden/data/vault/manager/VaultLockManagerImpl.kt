@@ -22,7 +22,6 @@ import com.bitwarden.data.manager.appstate.model.AppCreationState
 import com.bitwarden.data.manager.appstate.model.AppForegroundState
 import com.bitwarden.network.model.MasterPasswordUnlockDataJson
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
-import com.x8bit.bitwarden.data.auth.datasource.disk.model.ForcePasswordResetReason
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.UserStateJson
 import com.x8bit.bitwarden.data.auth.datasource.sdk.AuthSdkSource
 import com.x8bit.bitwarden.data.auth.manager.KdfManager
@@ -31,12 +30,10 @@ import com.x8bit.bitwarden.data.auth.repository.model.LogoutReason
 import com.x8bit.bitwarden.data.auth.repository.model.UpdateKdfMinimumsResult
 import com.x8bit.bitwarden.data.auth.repository.util.activeUserIdChangesFlow
 import com.x8bit.bitwarden.data.auth.repository.util.toSdkParams
-import com.x8bit.bitwarden.data.auth.repository.util.updateForcePasswordReset
 import com.x8bit.bitwarden.data.auth.repository.util.userAccountTokens
 import com.x8bit.bitwarden.data.auth.repository.util.userSwitchingChangesFlow
 import com.x8bit.bitwarden.data.platform.error.NoActiveUserException
 import com.x8bit.bitwarden.data.platform.manager.keyrotation.KeyRotationManager
-import com.x8bit.bitwarden.data.platform.manager.policy.PasswordPolicyManager
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.platform.repository.model.VaultTimeout
 import com.x8bit.bitwarden.data.platform.repository.model.VaultTimeoutAction
@@ -102,7 +99,6 @@ internal class VaultLockManagerImpl(
     private val userLogoutManager: UserLogoutManager,
     private val kdfManager: KdfManager,
     private val pinProtectedUserKeyManager: PinProtectedUserKeyManager,
-    private val passwordPolicyManager: PasswordPolicyManager,
     private val keyRotationManager: KeyRotationManager,
     dispatcherManager: DispatcherManager,
     context: Context,
@@ -274,7 +270,6 @@ internal class VaultLockManagerImpl(
 
     /**
      * Hashes a password and stores it as the master password hash for a given user.
-     * The password is also validated against any stored Master Password policies.
      */
     private suspend fun processMasterPassword(
         initUserCryptoMethod: InitUserCryptoMethod,
@@ -295,17 +290,6 @@ internal class VaultLockManagerImpl(
                         passwordHash = passwordHash,
                     )
                 }
-
-            // If there is currently no forcePasswordResetReason, then we want to check to see if
-            // the password is strong enough based on known policies.
-            if (userState?.accounts[userId]?.profile?.forcePasswordResetReason == null &&
-                !passwordPolicyManager.validatePasswordAgainstPolicies(it.password, false)
-            ) {
-                authDiskSource.userState = userState?.updateForcePasswordReset(
-                    userId = userId,
-                    reason = ForcePasswordResetReason.WEAK_MASTER_PASSWORD_ON_LOGIN,
-                )
-            }
         }
     }
 

@@ -14,7 +14,6 @@ import com.x8bit.bitwarden.data.platform.datasource.disk.PushDiskSource
 import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.data.platform.manager.CredentialExchangeRegistryManager
 import com.x8bit.bitwarden.data.platform.manager.model.UnregisterExportResult
-import com.x8bit.bitwarden.data.platform.manager.policy.UserNotificationPolicyManager
 import com.x8bit.bitwarden.data.platform.repository.model.VaultTimeoutAction
 import com.x8bit.bitwarden.data.tools.generator.datasource.disk.GeneratorDiskSource
 import com.x8bit.bitwarden.data.tools.generator.datasource.disk.PasswordHistoryDiskSource
@@ -68,9 +67,6 @@ class UserLogoutManagerTest {
     private val credentialExchangeRegistryManager: CredentialExchangeRegistryManager = mockk {
         coEvery { unregister() } returns UnregisterExportResult.Success
     }
-    private val userNotificationPolicyManager: UserNotificationPolicyManager = mockk {
-        every { shouldClearOnSoftLogout(userId = any()) } returns true
-    }
 
     private val userLogoutManager: UserLogoutManager =
         UserLogoutManagerImpl(
@@ -84,7 +80,6 @@ class UserLogoutManagerTest {
             vaultSdkSource = vaultSdkSource,
             dispatcherManager = FakeDispatcherManager(),
             credentialExchangeRegistryManager = credentialExchangeRegistryManager,
-            userNotificationPolicyManager = userNotificationPolicyManager,
         )
 
     @Suppress("MaxLineLength")
@@ -313,92 +308,6 @@ class UserLogoutManagerTest {
                 pinProtectedUserKey = pinProtectedUserKey,
             )
             authDiskSource.storeEncryptedPin(userId = userId, encryptedPin = encryptedPin)
-        }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `softLogout when shouldClearOnSoftLogout is true should not restore the vault policy banner dismissed date`() {
-        val userId = USER_ID_1
-        setupSoftLogoutStubs(userId = userId)
-        every {
-            userNotificationPolicyManager.shouldClearOnSoftLogout(userId = userId)
-        } returns true
-        every {
-            settingsDiskSource.getVaultPolicyBannerDismissedDate(userId = userId)
-        } returns DISMISSAL_REVISION_DATE
-
-        userLogoutManager.softLogout(userId = userId, reason = LogoutReason.AccountDelete)
-
-        assertDataCleared(userId = userId)
-        verify(exactly = 0) {
-            settingsDiskSource.storeVaultPolicyBannerDismissedDate(
-                userId = any(),
-                dismissalRevisionDate = any(),
-            )
-        }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `softLogout when shouldClearOnSoftLogout is false should restore the vault policy banner dismissed date`() {
-        val userId = USER_ID_1
-        setupSoftLogoutStubs(userId = userId)
-        every {
-            userNotificationPolicyManager.shouldClearOnSoftLogout(userId = userId)
-        } returns false
-        every {
-            settingsDiskSource.getVaultPolicyBannerDismissedDate(userId = userId)
-        } returns DISMISSAL_REVISION_DATE
-
-        userLogoutManager.softLogout(userId = userId, reason = LogoutReason.AccountDelete)
-
-        assertDataCleared(userId = userId)
-        verify(exactly = 1) {
-            userNotificationPolicyManager.shouldClearOnSoftLogout(userId = userId)
-            settingsDiskSource.storeVaultPolicyBannerDismissedDate(
-                userId = userId,
-                dismissalRevisionDate = DISMISSAL_REVISION_DATE,
-            )
-        }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `softLogout when shouldClearOnSoftLogout is false and there is no dismissed date should restore a null vault policy banner dismissed date`() {
-        val userId = USER_ID_1
-        setupSoftLogoutStubs(userId = userId)
-        every {
-            userNotificationPolicyManager.shouldClearOnSoftLogout(userId = userId)
-        } returns false
-        every { settingsDiskSource.getVaultPolicyBannerDismissedDate(userId = userId) } returns null
-
-        userLogoutManager.softLogout(userId = userId, reason = LogoutReason.AccountDelete)
-
-        assertDataCleared(userId = userId)
-        verify(exactly = 1) {
-            settingsDiskSource.storeVaultPolicyBannerDismissedDate(
-                userId = userId,
-                dismissalRevisionDate = null,
-            )
-        }
-    }
-
-    @Test
-    fun `logout should not restore the vault policy banner dismissed date`() {
-        val userId = USER_ID_1
-        every { authDiskSource.userState } returns SINGLE_USER_STATE_1
-
-        userLogoutManager.logout(userId = userId, reason = LogoutReason.AccountDelete)
-
-        assertDataCleared(userId = userId)
-        verify(exactly = 0) {
-            userNotificationPolicyManager.shouldClearOnSoftLogout(userId = any())
-            settingsDiskSource.getVaultPolicyBannerDismissedDate(userId = any())
-            settingsDiskSource.storeVaultPolicyBannerDismissedDate(
-                userId = any(),
-                dismissalRevisionDate = any(),
-            )
         }
     }
 

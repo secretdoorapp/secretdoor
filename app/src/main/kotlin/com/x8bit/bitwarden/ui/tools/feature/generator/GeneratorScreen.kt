@@ -52,7 +52,6 @@ import com.bitwarden.ui.platform.components.button.BitwardenStandardIconButton
 import com.bitwarden.ui.platform.components.button.model.BitwardenButtonData
 import com.bitwarden.ui.platform.components.button.model.BitwardenHelpButtonData
 import com.bitwarden.ui.platform.components.card.BitwardenActionCard
-import com.bitwarden.ui.platform.components.card.BitwardenInfoCalloutCard
 import com.bitwarden.ui.platform.components.coachmark.CoachMarkActionText
 import com.bitwarden.ui.platform.components.coachmark.CoachMarkContainer
 import com.bitwarden.ui.platform.components.coachmark.model.CoachMarkHighlightShape
@@ -252,7 +251,6 @@ fun GeneratorScreen(
             utilityBar = {
                 MainStateOptionsItem(
                     selectedType = state.selectedType,
-                    passcodePolicyOverride = state.passcodePolicyOverride,
                     possibleMainStates = state.typeOptions.toImmutableList(),
                     onMainStateOptionClicked = onMainStateOptionClicked,
                     onShowNextCoachMark = onShowNextCoachMark,
@@ -421,20 +419,6 @@ private fun CoachMarkScope<ExploreGeneratorCoachMark>.ScrollContent(
                         .fillMaxWidth()
                         .standardHorizontalMargin(),
                 )
-                Spacer(modifier = Modifier.height(12.dp))
-            }
-        }
-
-        if (state.isUnderPolicy) {
-            item {
-                BitwardenInfoCalloutCard(
-                    text = stringResource(id = BitwardenString.password_generator_policy_in_effect),
-                    modifier = Modifier
-                        .testTag("PasswordGeneratorPolicyInEffectLabel")
-                        .standardHorizontalMargin()
-                        .fillMaxWidth(),
-                )
-
                 Spacer(modifier = Modifier.height(12.dp))
             }
         }
@@ -684,7 +668,6 @@ private fun CoachMarkScope<ExploreGeneratorCoachMark>.GeneratedStringItem(
 @Composable
 private fun CoachMarkScope<ExploreGeneratorCoachMark>.MainStateOptionsItem(
     selectedType: GeneratorState.MainType,
-    passcodePolicyOverride: GeneratorState.PasscodePolicyOverride?,
     possibleMainStates: ImmutableList<GeneratorState.MainTypeOption>,
     onMainStateOptionClicked: (GeneratorState.MainTypeOption) -> Unit,
     onShowNextCoachMark: () -> Unit,
@@ -699,25 +682,6 @@ private fun CoachMarkScope<ExploreGeneratorCoachMark>.MainStateOptionsItem(
                     text = stringResource(id = mainOptionType.labelRes),
                     onClick = { onMainStateOptionClicked(mainOptionType) },
                     isChecked = selectedType.mainTypeOption == mainOptionType,
-                    isEnabled = when (mainOptionType) {
-                        GeneratorState.MainTypeOption.PASSWORD -> {
-                            when (passcodePolicyOverride) {
-                                GeneratorState.PasscodePolicyOverride.PASSWORD -> true
-                                GeneratorState.PasscodePolicyOverride.PASSPHRASE -> false
-                                null -> true
-                            }
-                        }
-
-                        GeneratorState.MainTypeOption.PASSPHRASE -> {
-                            when (passcodePolicyOverride) {
-                                GeneratorState.PasscodePolicyOverride.PASSWORD -> false
-                                GeneratorState.PasscodePolicyOverride.PASSPHRASE -> true
-                                null -> true
-                            }
-                        }
-
-                        GeneratorState.MainTypeOption.USERNAME -> true
-                    },
                     testTag = mainOptionType.testTag,
                 )
             }

@@ -6,8 +6,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.bitwarden.ui.platform.components.button.model.BitwardenButtonData
 import com.bitwarden.ui.platform.components.card.BitwardenActionCard
-import com.bitwarden.ui.platform.components.icon.BitwardenIcon
-import com.bitwarden.ui.platform.components.icon.model.IconData
 import com.bitwarden.ui.platform.components.util.rememberVectorPainter
 import com.bitwarden.ui.platform.resource.BitwardenDrawable
 import com.bitwarden.ui.platform.resource.BitwardenString
@@ -114,26 +112,5 @@ fun VaultActionCard(
             )
         }
 
-        is VaultState.ActionCardState.VaultPolicyBanner -> {
-            BitwardenActionCard(
-                cardTitle = actionCardState.title?.invoke(),
-                cardSubtitle = actionCardState.message(),
-                actionButton = actionCardState.button?.let {
-                    BitwardenButtonData(
-                        label = it,
-                        onClick = { vaultHandlers.actionCardClick(actionCardState) },
-                    )
-                },
-                onDismissClick = { vaultHandlers.dismissActionCardClick(actionCardState) }
-                    .takeIf { actionCardState.button == null },
-                leadingContent = {
-                    BitwardenIcon(
-                        iconData = IconData.Local(iconRes = BitwardenDrawable.ic_info_circle),
-                        tint = BitwardenTheme.colorScheme.icon.secondary,
-                    )
-                },
-                modifier = modifier,
-            )
-        }
     }
 }

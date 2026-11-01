@@ -26,7 +26,6 @@ import com.bitwarden.network.model.DeleteAccountResponseJson
 import com.bitwarden.network.model.GetTokenResponseJson
 import com.bitwarden.network.model.KdfJson
 import com.bitwarden.network.model.KdfTypeJson
-import com.bitwarden.network.model.MasterPasswordPolicyOptionsJson
 import com.bitwarden.network.model.MasterPasswordUnlockDataJson
 import com.bitwarden.network.model.PreLoginResponseJson
 import com.bitwarden.network.model.RefreshTokenResponseJson
@@ -55,7 +54,6 @@ import com.x8bit.bitwarden.data.auth.repository.model.BreachCountResult
 import com.x8bit.bitwarden.data.auth.repository.model.ChangeMasterPasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.DeleteAccountResult
 import com.x8bit.bitwarden.data.auth.repository.model.LogoutReason
-import com.x8bit.bitwarden.data.auth.repository.model.PolicyInformation
 import com.x8bit.bitwarden.data.auth.repository.model.RegisterResult
 import com.x8bit.bitwarden.data.auth.repository.model.RequestOtpResult
 import com.x8bit.bitwarden.data.auth.repository.model.SwitchAccountResult
@@ -71,7 +69,6 @@ import com.x8bit.bitwarden.data.auth.repository.util.updateMasterPasswordUnlock
 import com.x8bit.bitwarden.data.auth.util.toSdkParams
 import com.x8bit.bitwarden.data.platform.error.NoActiveUserException
 import com.x8bit.bitwarden.data.platform.manager.LogsManager
-import com.x8bit.bitwarden.data.platform.manager.policy.PasswordPolicyManager
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.platform.repository.util.FakeEnvironmentRepository
 import com.x8bit.bitwarden.data.vault.datasource.sdk.VaultSdkSource
@@ -173,7 +170,6 @@ class AuthRepositoryTest {
         every { softLogout(any(), any()) } just runs
     }
 
-    private val passwordPolicyManager: PasswordPolicyManager = mockk()
     private val logsManager: LogsManager = mockk {
         every { setUserData(userId = any(), environmentType = any()) } just runs
     }
@@ -212,7 +208,6 @@ class AuthRepositoryTest {
         biometricsEncryptionManager = mockk(),
         userLogoutManager = userLogoutManager,
         dispatcherManager = dispatcherManager,
-        passwordPolicyManager = passwordPolicyManager,
         logsManager = logsManager,
         userStateManager = userStateManager,
         kdfManager = kdfManager,
@@ -1305,29 +1300,6 @@ private val USER_DECRYPTION_OPTIONS = UserDecryptionOptionsJson(
     masterPasswordUnlock = null,
 )
 
-private val MASTER_PASSWORD_POLICY_OPTIONS = MasterPasswordPolicyOptionsJson(
-    minimumComplexity = 3,
-    minimumLength = 12,
-    shouldRequireUppercase = true,
-    shouldRequireLowercase = true,
-    shouldRequireNumbers = true,
-    shouldRequireSpecialCharacters = true,
-    shouldEnforceOnLogin = true,
-)
-
-/**
- * The [PolicyInformation.MasterPassword] that [MASTER_PASSWORD_POLICY_OPTIONS] maps to via
- * `toPolicyInformation`.
- */
-private val MASTER_PASSWORD_POLICY_INFORMATION = PolicyInformation.MasterPassword(
-    minLength = 12,
-    minComplexity = 3,
-    requireUpper = true,
-    requireLower = true,
-    requireNumbers = true,
-    requireSpecial = true,
-    enforceOnLogin = true,
-)
 
 @Deprecated(
     message = "Use GET_TOKEN_WITH_ACCOUNT_KEYS_RESPONSE_SUCCESS instead",
