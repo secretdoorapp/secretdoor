@@ -419,11 +419,9 @@
     <string name="export_vault_file_pw_protect_info">קובץ ייצוא זה יהיה מוגן סיסמה ודורש את סיסמת הקובץ כדי לפענח.</string>
     <string name="export_vault_confirmation_title">אשר ייצוא כספת</string>
     <string name="warning">אזהרה</string>
-    <string name="export_vault_failure">הייתה בעיה בייצוא הכספת שלך.  אם הבעיה נמשכת, אתה תצטרך לייצא מכספת הרשת.</string>
     <string name="export_vault_success">הכספת יוצאה בהצלחה</string>
     <string name="clone">שכפול</string>
     <string name="password_generator_policy_in_effect">מדיניות ארגון אחת או יותר משפיעה על הגדרות המחולל שלך</string>
-    <string name="unable_to_save_attachment">הייתה בעיה בשמירת צרופה זו. אם הבעיה נמשכת, אתה יכול לשמור אותה מכספת הרשת.</string>
     <string name="save_attachment_success">הצרופה נשמרה בהצלחה</string>
     <string name="autofill_tile_accessibility_required">נא להפעיל את \"שירות הנגישות של המילוי האוטומטי\" מהגדרות SecretDoor כדי להשתמש באריח המילוי האוטומטי.</string>
     <string name="autofill_tile_uri_not_found">לא זוהו שדות סיסמה</string>
@@ -735,9 +733,7 @@
     <string name="two_step_login_description_long">הפוך את החשבון שלך למאובטח יותר על ידי הגדרת כניסה דו־שלבית ביישום הרשת של SecretDoor.</string>
     <string name="change_master_password_description_long">אתה יכול לשנות את הסיסמה הראשית שלך ביישום הרשת של SecretDoor.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">למד עוד אודות אופן השימוש ב־SecretDoor במרכז העזרה.</string>
-    <string name="privacy_policy_description_long">בדוק את מדיניות הפרטיות שלנו ב־bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">גלה עוד תכונות של חשבון ה־SecretDoor שלך ביישום הרשת.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor מאפשר לך לשתף את פריטי הכספת שלך עם אחרים על ידי שימוש בארגון. למד עוד באתר האינטרנט bitwarden.com.</string>
     <string name="created_x">נוצר %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">הארגון שלך דורש ממך להגדיר סיסמה ראשית.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">הגדר אפשרות ביטול נעילה כדי לשנות את פעולת פסק הזמן לכספת שלך.</string>
@@ -850,8 +846,6 @@
     <string name="add_login">הוסף פרטי כניסה</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">שתף קבצים ונתונים באופן מאובטח עם כל אחד, בכל פלטפורמה. המידע שלך יישאר מוצפן מקצה־לקצה תוך הגבלת חשיפה.</string>
     <string name="send_sensitive_information_safely">שלח מידע רגיש, באופן בטוח</string>
-    <string name="import_saved_logins">ייבא כניסות שמורות</string>
-    <string name="use_a_computer_to_import_logins">השתמש במחשב כדי לייבא כניסות ממנהל סיסמאות קיים</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">אתה יכול לחזור כדי להשלים את השלב הזה בכל עת בהגדרות הכספת.</string>
     <string name="import_logins_later">ייבא כניסות מאוחר יותר</string>
     <string name="import_logins_later_dialog_title">לייבא כניסות מאוחר יותר?</string>
@@ -883,7 +877,6 @@
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">זה לא שרת מוכר של SecretDoor. ייתכן שתצטרך לבדוק עם הספק שלך או לעדכן את השרת שלך.</string>
     <string name="syncing_logins_loading_message">מסנכרן כניסות…</string>
     <string name="download_the_browser_extension">הורד את הרחבת הדפדפן</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">לך אל bitwarden.com/download כדי לשלב את SecretDoor לתוך הדפדפן המועדף שלך עבור חוויה חלקה.</string>
     <string name="use_the_web_app">השתמש ביישום הרשת</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">היכנס אל bitwarden.com כדי לנהל את החשבון שלך ולעדכן הגדרות.</string>
     <string name="autofill_passwords">מלא אוטומטית סיסמאות</string>
@@ -1151,9 +1144,7 @@
     <string name="account_synced_from_bitwarden_app">חשבון המיובא מתוך יישום SecretDoor</string>
     <string name="local_codes">קודים מקומיים (%1$d)</string>
     <string name="required_information_missing">חסר מידע נדרש</string>
-    <string name="required_information_missing_message">חסר מידע נדרש (למשל \'שירותים\' או \'סוד\'). בדוק את הקובץ שלך ונסה שוב. בקר ב־bitwarden.com/help עבור תמיכה</string>
     <string name="file_could_not_be_processed">לא היה ניתן לעבד את הקובץ</string>
-    <string name="file_could_not_be_processed_message">לא היה ניתן לעבד את הקובץ. וודא שהוא JSON תקני ונסה שוב. צריך עזרה? בקר ב־bitwarden.com/help</string>
     <string name="get_help">קבלת עזרה</string>
     <string name="error_cannot_decrypt">[שגיאה: לא ניתן לפענח]</string>
     <string name="copy_error_report">העתק דוח שגיאה</string>

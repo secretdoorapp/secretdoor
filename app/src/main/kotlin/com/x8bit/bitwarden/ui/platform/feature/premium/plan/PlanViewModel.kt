@@ -59,7 +59,7 @@ private const val PLACEHOLDER_TEXT = "--"
 /**
  * The callback URL for the premium checkout custom tab.
  */
-const val PREMIUM_CHECKOUT_CALLBACK_URL = "bitwarden://premium-checkout-result"
+const val PREMIUM_CHECKOUT_CALLBACK_URL = "secretdoor://premium-checkout-result"
 
 /**
  * View model for the plan screen, driving the upgrade flow for free users and

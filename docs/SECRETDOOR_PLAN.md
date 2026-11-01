@@ -17,7 +17,7 @@ picks (for example, Google Drive) on demand or on a schedule.
 | Vaults | One vault per device for now; a backup can be merged into it. Separate vaults (switching between several) are planned. |
 | Pricing | Free: the whole password manager, plus manually exporting the encrypted backup file to any location (the user can upload it to the cloud themselves). Paid: SecretDoor uploading backups to the cloud itself (on demand or on a schedule). |
 | Master password hint | Optional, stored only on the device (not encrypted), shown on the unlock screen via "Show master password hint". |
-| App ID | `io.github.zcoklin.secretdoor` (done). Internal Kotlin packages stay `com.x8bit.bitwarden.*` to keep upstream security merges easy. |
+| App ID | `app.secretdoor` (done). Internal Kotlin packages stay `com.x8bit.bitwarden.*` to keep upstream security merges easy. |
 
 ## Key Insight
 

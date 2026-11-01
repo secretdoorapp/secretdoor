@@ -35,6 +35,7 @@ import com.bitwarden.ui.platform.manager.IntentManager
 import com.bitwarden.ui.util.asText
 import com.bitwarden.ui.util.isCoachMarkToolTip
 import com.x8bit.bitwarden.data.platform.manager.util.AppResumeStateManager
+import com.x8bit.bitwarden.data.platform.util.SecretDoorLinks
 import com.x8bit.bitwarden.ui.platform.base.BitwardenComposeTest
 import com.x8bit.bitwarden.ui.tools.feature.generator.model.GeneratorMode
 import com.x8bit.bitwarden.ui.vault.model.VaultAddEditType
@@ -1602,7 +1603,7 @@ class GeneratorScreenTest : BitwardenComposeTest() {
     fun `on NavigateToTooltip should call launchUri on IntentManager`() {
         mutableEventFlow.tryEmit(GeneratorEvent.NavigateToTooltip)
         verify {
-            intentManager.launchUri("https://bitwarden.com/help/generator/#username-types".toUri())
+            intentManager.launchUri(SecretDoorLinks.GENERATOR_USERNAME_TYPES_URL.toUri())
         }
     }
 

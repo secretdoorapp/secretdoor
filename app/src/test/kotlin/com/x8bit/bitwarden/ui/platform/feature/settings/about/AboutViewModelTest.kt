@@ -7,14 +7,12 @@ import com.bitwarden.core.data.manager.util.deviceData
 import com.bitwarden.data.datasource.disk.model.FlightRecorderDataSet
 import com.bitwarden.data.datasource.disk.model.ServerConfig
 import com.bitwarden.data.repository.ServerConfigRepository
-import com.bitwarden.data.repository.util.baseWebVaultUrlOrDefault
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.util.asText
 import com.bitwarden.ui.util.concat
 import com.x8bit.bitwarden.data.platform.manager.LogsManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
-import com.x8bit.bitwarden.data.platform.repository.util.FakeEnvironmentRepository
 import com.x8bit.bitwarden.ui.platform.feature.settings.about.util.getStopsLoggingStringForActiveLog
 import io.mockk.coVerify
 import io.mockk.every
@@ -38,7 +36,6 @@ import java.time.ZoneOffset
 
 class AboutViewModelTest : BaseViewModelTest() {
 
-    private val environmentRepository = FakeEnvironmentRepository()
     private val clipboardManager: BitwardenClipboardManager = mockk()
     private val logsManager: LogsManager = mockk {
         every { isEnabled } returns false
@@ -166,16 +163,6 @@ class AboutViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `on LearnAboutOrganizationsClick should emit NavigateToLearnAboutOrganizations`() =
-        runTest {
-            val viewModel = createViewModel(DEFAULT_ABOUT_STATE)
-            viewModel.eventFlow.test {
-                viewModel.trySendAction(AboutAction.LearnAboutOrganizationsClick)
-                assertEquals(AboutEvent.NavigateToLearnAboutOrganizations, awaitItem())
-            }
-        }
-
-    @Test
     fun `on SubmitCrashLogsClick should update isSubmitCrashLogsEnabled to true`() = runTest {
         val viewModel = createViewModel(DEFAULT_ABOUT_STATE)
         assertFalse(viewModel.stateFlow.value.isSubmitCrashLogsEnabled)
@@ -217,16 +204,29 @@ class AboutViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `on WebVaultClick should emit NavigateToWebVault`() = runTest {
-        val viewModel = createViewModel(DEFAULT_ABOUT_STATE)
+    fun `on SourceCodeClick should emit NavigateToSourceCode`() = runTest {
+        val viewModel = createViewModel()
         viewModel.eventFlow.test {
-            viewModel.trySendAction(AboutAction.WebVaultClick)
-            assertEquals(
-                AboutEvent.NavigateToWebVault(
-                    vaultUrl = environmentRepository.environment.baseWebVaultUrlOrDefault,
-                ),
-                awaitItem(),
-            )
+            viewModel.trySendAction(AboutAction.SourceCodeClick)
+            assertEquals(AboutEvent.NavigateToSourceCode, awaitItem())
+        }
+    }
+
+    @Test
+    fun `on LicenseClick should emit NavigateToLicense`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(AboutAction.LicenseClick)
+            assertEquals(AboutEvent.NavigateToLicense, awaitItem())
+        }
+    }
+
+    @Test
+    fun `on NoticesClick should emit NavigateToNotices`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(AboutAction.NoticesClick)
+            assertEquals(AboutEvent.NavigateToNotices, awaitItem())
         }
     }
 
@@ -236,7 +236,6 @@ class AboutViewModelTest : BaseViewModelTest() {
         savedStateHandle = SavedStateHandle().apply { set("state", state) },
         clipboardManager = clipboardManager,
         clock = FIXED_CLOCK,
-        environmentRepository = environmentRepository,
         logsManager = logsManager,
         settingsRepository = settingsRepository,
         serverConfigRepository = serverConfigRepository,
@@ -254,8 +253,10 @@ private val DEFAULT_ABOUT_STATE: AboutState = AboutState(
     serverData = "\uD83C\uDF29 Server: 2025.7.1".asText(),
     deviceData = "<device_data>".asText(),
     ciData = "<ci_info>".asText(),
-    copyrightInfo = ("SecretDoor is based on Bitwarden.\n" +
-        "© Bitwarden Inc. 2015-${Year.now(FIXED_CLOCK).value}. Licensed under GPLv3.")
+    copyrightInfo = ("SecretDoor is free software under the GNU GPL v3 and comes with " +
+        "ABSOLUTELY NO WARRANTY.\n" +
+        "Based on Bitwarden for Android, © Bitwarden Inc. 2015-${Year.now(FIXED_CLOCK).value}. " +
+        "SecretDoor is not affiliated with Bitwarden.")
         .asText(),
     isSubmitCrashLogsEnabled = false,
     shouldShowCrashLogsButton = false,

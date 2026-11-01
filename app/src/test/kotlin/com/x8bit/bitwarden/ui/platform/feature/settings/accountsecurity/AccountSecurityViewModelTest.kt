@@ -14,10 +14,8 @@ import com.bitwarden.ui.util.asText
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.OnboardingStatus
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.LogoutReason
-import com.x8bit.bitwarden.data.auth.repository.model.UserFingerprintResult
 import com.x8bit.bitwarden.data.auth.repository.model.UserState
 import com.x8bit.bitwarden.data.auth.repository.model.createMockOrganization
-import com.x8bit.bitwarden.data.platform.error.NoActiveUserException
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
@@ -62,7 +60,6 @@ class AccountSecurityViewModelTest : BaseViewModelTest() {
         every { isUnlockWithPinEnabled } returns false
         every { vaultTimeout } returns VaultTimeout.ThirtyMinutes
         every { vaultTimeoutAction } returns VaultTimeoutAction.LOCK
-        coEvery { getUserFingerprint() } returns UserFingerprintResult.Success(FINGERPRINT)
         every { isUnlockWithBiometricsEnabledFlow } returns mutableBiometricsUnlockEnabledFlow
         every { isUnlockWithPinEnabledFlow } returns mutablePinUnlockEnabledFlow
     }
@@ -97,7 +94,6 @@ class AccountSecurityViewModelTest : BaseViewModelTest() {
     fun `initial state should be correct when saved state is set`() {
         val viewModel = createViewModel(initialState = DEFAULT_STATE)
         assertEquals(DEFAULT_STATE, viewModel.stateFlow.value)
-        coVerify { settingsRepository.getUserFingerprint() }
     }
 
     @Test
@@ -106,52 +102,6 @@ class AccountSecurityViewModelTest : BaseViewModelTest() {
         assertEquals(DEFAULT_STATE, viewModel.stateFlow.value)
         verify {
             settingsRepository.isUnlockWithBiometricsEnabled
-        }
-        coVerify { settingsRepository.getUserFingerprint() }
-    }
-
-    @Test
-    fun `on FingerprintResultReceive should update the fingerprint phrase`() = runTest {
-        val fingerprint = "fingerprint"
-        val viewModel = createViewModel(initialState = DEFAULT_STATE)
-        // Set fingerprint phrase to value received
-        viewModel.trySendAction(
-            AccountSecurityAction.Internal.FingerprintResultReceive(
-                UserFingerprintResult.Success(fingerprint),
-            ),
-        )
-        assertEquals(
-            DEFAULT_STATE.copy(fingerprintPhrase = fingerprint.asText()),
-            viewModel.stateFlow.value,
-        )
-        // Clear fingerprint phrase
-        viewModel.trySendAction(
-            AccountSecurityAction.Internal.FingerprintResultReceive(
-                fingerprintResult = UserFingerprintResult.Error(error = NoActiveUserException()),
-            ),
-        )
-        assertEquals(
-            DEFAULT_STATE.copy(fingerprintPhrase = "".asText()),
-            viewModel.stateFlow.value,
-        )
-    }
-
-    @Test
-    fun `on AccountFingerprintPhraseClick should show the fingerprint phrase dialog`() = runTest {
-        val viewModel = createViewModel()
-        viewModel.trySendAction(AccountSecurityAction.AccountFingerprintPhraseClick)
-        assertEquals(
-            DEFAULT_STATE.copy(dialog = AccountSecurityDialog.FingerprintPhrase),
-            viewModel.stateFlow.value,
-        )
-    }
-
-    @Test
-    fun `on FingerPrintLearnMoreClick should emit NavigateToFingerprintPhrase`() = runTest {
-        val viewModel = createViewModel()
-        viewModel.eventFlow.test {
-            viewModel.trySendAction(AccountSecurityAction.FingerPrintLearnMoreClick)
-            assertEquals(AccountSecurityEvent.NavigateToFingerprintPhrase, awaitItem())
         }
     }
 
@@ -667,7 +617,6 @@ class AccountSecurityViewModelTest : BaseViewModelTest() {
 }
 
 private val CIPHER = mockk<Cipher>()
-private const val FINGERPRINT: String = "fingerprint"
 
 private const val DEFAULT_USER_ID: String = "activeUserId"
 private val DEFAULT_USER_STATE = UserState(
@@ -728,7 +677,6 @@ private val DEFAULT_USER_STATE = UserState(
 
 private val DEFAULT_STATE: AccountSecurityState = AccountSecurityState(
     dialog = null,
-    fingerprintPhrase = FINGERPRINT.asText(),
     isUnlockWithBiometricsEnabled = false,
     isUnlockWithPasswordEnabled = true,
     isUnlockWithPinEnabled = false,

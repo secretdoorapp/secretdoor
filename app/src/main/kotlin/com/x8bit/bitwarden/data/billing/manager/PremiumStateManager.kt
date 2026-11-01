@@ -3,13 +3,13 @@ package com.x8bit.bitwarden.data.billing.manager
 import com.x8bit.bitwarden.data.billing.model.PremiumCard
 import com.x8bit.bitwarden.data.billing.repository.model.SubscriptionStatusState
 import com.x8bit.bitwarden.data.billing.repository.model.UpgradeLifecycleState
+import com.x8bit.bitwarden.data.platform.util.SecretDoorLinks
 import kotlinx.coroutines.flow.StateFlow
 
 /**
  * URL opened when the user taps the "Learn more" CTA on the "Upgraded to Premium" action card.
  */
-const val UPGRADED_TO_PREMIUM_LEARN_MORE_URL: String =
-    "https://bitwarden.com/help/password-manager-plans/"
+const val UPGRADED_TO_PREMIUM_LEARN_MORE_URL: String = SecretDoorLinks.PREMIUM_URL
 
 /**
  * Manages Premium upgrade state for the active user.

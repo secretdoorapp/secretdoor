@@ -417,11 +417,9 @@
     <string name="export_vault_file_pw_protect_info">ಈ ಫೈಲ್ ರಫ್ತು ಪಾಸ್ವರ್ಡ್-ರಕ್ಷಿತವಾಗಿರುತ್ತದೆ ಮತ್ತು ಡೀಕ್ರಿಪ್ಟ್ ಮಾಡಲು ಫೈಲ್ ಪಾಸ್ವರ್ಡ್ ಅಗತ್ಯವಿರುತ್ತದೆ.</string>
     <string name="export_vault_confirmation_title">ವಾಲ್ಟ್ ರಫ್ತು ಖಚಿತಪಡಿಸಿ</string>
     <string name="warning">ಎಚ್ಚರಿಕೆ</string>
-    <string name="export_vault_failure">ನಿಮ್ಮ ವಾಲ್ಟ್ ಅನ್ನು ರಫ್ತು ಮಾಡುವಲ್ಲಿ ಸಮಸ್ಯೆ ಇತ್ತು. ಸಮಸ್ಯೆ ಮುಂದುವರಿದರೆ, ನೀವು ವೆಬ್ ವಾಲ್ಟ್ನಿಂದ ರಫ್ತು ಮಾಡಬೇಕಾಗುತ್ತದೆ.</string>
     <string name="export_vault_success">ವಾಲ್ಟ್ ಯಶಸ್ವಿಯಾಗಿ ರಫ್ತು ಮಾಡಲಾಗಿದೆ</string>
     <string name="clone">ಕ್ಲೋನ್</string>
     <string name="password_generator_policy_in_effect">ಒಂದು ಅಥವಾ ಹೆಚ್ಚಿನ ಸಂಸ್ಥೆ ನೀತಿಗಳು ನಿಮ್ಮ ಜನರೇಟರ್ ಸೆಟ್ಟಿಂಗ್‌ಗಳ ಮೇಲೆ ಪರಿಣಾಮ ಬೀರುತ್ತವೆ</string>
-    <string name="unable_to_save_attachment">ಈ ಲಗತ್ತನ್ನು ಉಳಿಸುವಲ್ಲಿ ಸಮಸ್ಯೆ ಇದೆ. ಸಮಸ್ಯೆ ಮುಂದುವರಿದರೆ, ನೀವು ಅದನ್ನು ವೆಬ್ ವಾಲ್ಟ್‌ನಿಂದ ಉಳಿಸಬಹುದು.</string>
     <string name="save_attachment_success">ಲಗತ್ತು ಯಶಸ್ವಿಯಾಗಿ ಉಳಿಸಲಾಗಿದೆ</string>
     <string name="autofill_tile_accessibility_required">ಸ್ವಯಂ ಭರ್ತಿ ಟೈಲ್ ಬಳಸಲು SecretDoor ಸೆಟ್ಟಿಂಗ್ಗಳಿಂದ “ಸ್ವಯಂ ಭರ್ತಿ ಪ್ರವೇಶಿಸುವಿಕೆ ಸೇವೆ” ಆನ್ ಮಾಡಿ.</string>
     <string name="autofill_tile_uri_not_found">No password fields detected</string>
@@ -731,9 +729,7 @@
     <string name="two_step_login_description_long">SecretDoor ವೆಬ್ ಅಪ್ಲಿಕೇಶನ್ನಲ್ಲಿ ಎರಡು-ಹಂತದ ಲಾಗಿನ್ ಅನ್ನು ಹೊಂದಿಸುವ ಮೂಲಕ ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಹೆಚ್ಚು ಸುರಕ್ಷಿತವಾಗಿಸಿ.</string>
     <string name="change_master_password_description_long">ನಿಮ್ಮ ಮಾಸ್ಟರ್ ಪಾಸ್ವರ್ಡ್ ಅನ್ನು ನೀವು SecretDoor ವೆಬ್ ಅಪ್ಲಿಕೇಶನ್ನಲ್ಲಿ ಬದಲಾಯಿಸಬಹುದು.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">ಸಹಾಯ ಕೇಂದ್ರದಲ್ಲಿ SecretDoor ಅನ್ನು ಹೇಗೆ ಬಳಸುವುದು ಎಂಬುದರ ಬಗ್ಗೆ ಇನ್ನಷ್ಟು ತಿಳಿಯಿರಿ.</string>
-    <string name="privacy_policy_description_long">bitwarden.com ನಲ್ಲಿ ನಮ್ಮ ಗೌಪ್ಯತಾ ನೀತಿಯನ್ನು ಪರಿಶೀಲಿಸಿ.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">ವೆಬ್ ಅಪ್ಲಿಕೇಶನ್ನಲ್ಲಿ ನಿಮ್ಮ SecretDoor ಖಾತೆಯ ಹೆಚ್ಚಿನ ವೈಶಿಷ್ಟ್ಯಗಳನ್ನು ಅನ್ವೇಷಿಸಿ.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor ಸಂಸ್ಥೆಯನ್ನು ಬಳಸುವ ಮೂಲಕ ನಿಮ್ಮ ವಾಲ್ಟ್ ಐಟಂಗಳನ್ನು ಇತರರೊಂದಿಗೆ ಹಂಚಿಕೊಳ್ಳಲು ನಿಮಗೆ ಅನುಮತಿಸುತ್ತದೆ. bitwarden.com ವೆಬ್ಸೈಟ್ನಲ್ಲಿ ಇನ್ನಷ್ಟು ತಿಳಿಯಿರಿ.</string>
     <string name="created_x">ರಚಿಸಲಾಗಿದೆ %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">ನಿಮ್ಮ ಸಂಸ್ಥೆಯು ನೀವು ಮಾಸ್ಟರ್ ಪಾಸ್ವರ್ಡ್ ಅನ್ನು ಹೊಂದಿಸಬೇಕಾಗುತ್ತದೆ.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">ನಿಮ್ಮ ವಾಲ್ಟ್ ಸಮಯ ಮೀರುವಿಕೆ ಕ್ರಿಯೆಯನ್ನು ಬದಲಾಯಿಸಲು ಅನ್ಲಾಕ್ ಆಯ್ಕೆಯನ್ನು ಹೊಂದಿಸಿ.</string>
@@ -845,8 +841,6 @@
     <string name="add_login">ಲಾಗಿನ್ ಸೇರಿಸಿ</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">ಯಾವುದೇ ವೇದಿಕೆಯಲ್ಲಿ ಯಾರೊಂದಿಗಾದರೂ ಫೈಲ್ಗಳು ಮತ್ತು ಡೇಟಾವನ್ನು ಸುರಕ್ಷಿತವಾಗಿ ಹಂಚಿಕೊಳ್ಳಿ. ಒಡ್ಡಿಕೆಯನ್ನು ಮಿತಿಗೊಳಿಸುವಾಗ ನಿಮ್ಮ ಮಾಹಿತಿಯು ಎಂಡ್-ಟು-ಎಂಡ್ ಎನ್ಕ್ರಿಪ್ಟ್ ಆಗಿ ಉಳಿಯುತ್ತದೆ.</string>
     <string name="send_sensitive_information_safely">ಸೂಕ್ಷ್ಮ ಮಾಹಿತಿಯನ್ನು ಸುರಕ್ಷಿತವಾಗಿ ಕಳುಹಿಸಿ</string>
-    <string name="import_saved_logins">ಉಳಿಸಿದ ಲಾಗಿನ್ಗಳನ್ನು ಆಮದು ಮಾಡಿ</string>
-    <string name="use_a_computer_to_import_logins">ಅಸ್ತಿತ್ವದಲ್ಲಿರುವ ಪಾಸ್ವರ್ಡ್ ಮ್ಯಾನೇಜರ್ನಿಂದ ಲಾಗಿನ್ಗಳನ್ನು ಆಮದು ಮಾಡಲು ಕಂಪ್ಯೂಟರ್ ಬಳಸಿ</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">ವಾಲ್ಟ್ ಸೆಟ್ಟಿಂಗ್ಗಳಲ್ಲಿ ಯಾವುದೇ ಸಮಯದಲ್ಲಿ ನೀವು ಈ ಹಂತವನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ಹಿಂತಿರುಗಬಹುದು.</string>
     <string name="import_logins_later">ನಂತರ ಲಾಗಿನ್ಗಳನ್ನು ಆಮದು ಮಾಡಿ</string>
     <string name="import_logins_later_dialog_title">ನಂತರ ಲಾಗಿನ್ಗಳನ್ನು ಆಮದು ಮಾಡುವುದೇ?</string>
@@ -878,7 +872,6 @@
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">ಇದು ಗುರುತಿಸಲ್ಪಟ್ಟ SecretDoor ಸರ್ವರ್ ಅಲ್ಲ. ನೀವು ನಿಮ್ಮ ಪೂರೈಕೆದಾರರೊಂದಿಗೆ ಪರಿಶೀಲಿಸಬೇಕಾಗಬಹುದು ಅಥವಾ ನಿಮ್ಮ ಸರ್ವರ್ ಅನ್ನು ನವೀಕರಿಸಬೇಕಾಗಬಹುದು.</string>
     <string name="syncing_logins_loading_message">ಲಾಗಿನ್ಗಳನ್ನು ಸಿಂಕ್ ಮಾಡಲಾಗುತ್ತಿದೆ…</string>
     <string name="download_the_browser_extension">ಬ್ರೌಸರ್ ವಿಸ್ತರಣೆಯನ್ನು ಡೌನ್ಲೋಡ್ ಮಾಡಿ</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">ತಡೆರಹಿತ ಅನುಭವಕ್ಕಾಗಿ ನಿಮ್ಮ ನೆಚ್ಚಿನ ಬ್ರೌಸರ್ಗೆ SecretDoor ಅನ್ನು ಸಂಯೋಜಿಸಲು bitwarden.com/download ಗೆ ಹೋಗಿ.</string>
     <string name="use_the_web_app">ವೆಬ್ ಅಪ್ಲಿಕೇಶನ್ ಬಳಸಿ</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಸುಲಭವಾಗಿ ನಿರ್ವಹಿಸಲು ಮತ್ತು ಸೆಟ್ಟಿಂಗ್ಗಳನ್ನು ನವೀಕರಿಸಲು bitwarden.com ನಲ್ಲಿ ಲಾಗಿನ್ ಮಾಡಿ.</string>
     <string name="autofill_passwords">ಪಾಸ್ವರ್ಡ್ಗಳನ್ನು ಸ್ವಯಂ ಭರ್ತಿ ಮಾಡಿ</string>
@@ -1144,9 +1137,7 @@
     <string name="account_synced_from_bitwarden_app">SecretDoor ಅಪ್ಲಿಕೇಶನ್ನಿಂದ ಸಿಂಕ್ ಮಾಡಿದ ಖಾತೆ</string>
     <string name="local_codes">ಸ್ಥಳೀಯ ಕೋಡ್ಗಳು (%1$d)</string>
     <string name="required_information_missing">ಅಗತ್ಯ ಮಾಹಿತಿ ಕಾಣೆಯಾಗಿದೆ</string>
-    <string name="required_information_missing_message">ಅಗತ್ಯ ಮಾಹಿತಿ ಕಾಣೆಯಾಗಿದೆ (ಉದಾ, ‘services’ ಅಥವಾ ‘secret’). ನಿಮ್ಮ ಫೈಲ್ ಅನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ. ಬೆಂಬಲಕ್ಕಾಗಿ bitwarden.com/help ಗೆ ಭೇಟಿ ನೀಡಿ</string>
     <string name="file_could_not_be_processed">ಫೈಲ್ ಅನ್ನು ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ</string>
-    <string name="file_could_not_be_processed_message">ಫೈಲ್ ಅನ್ನು ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಇದು ಮಾನ್ಯ JSON ಆಗಿದೆಯೆಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ. ಸಹಾಯ ಬೇಕೇ? bitwarden.com/help ಗೆ ಭೇಟಿ ನೀಡಿ</string>
     <string name="get_help">ಸಹಾಯ ಪಡೆ</string>
     <string name="error_cannot_decrypt">[ದೋಷ: ಡೀಕ್ರಿಪ್ಟ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ]</string>
     <string name="copy_error_report">ದೋಷ ವರದಿಯನ್ನು ನಕಲಿಸಿ</string>

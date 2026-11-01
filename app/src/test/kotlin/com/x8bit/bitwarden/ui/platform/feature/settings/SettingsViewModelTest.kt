@@ -7,6 +7,7 @@ import com.x8bit.bitwarden.data.billing.manager.PremiumStateManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
+import com.x8bit.bitwarden.data.platform.util.SecretDoorLinks
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -230,7 +231,7 @@ class SettingsViewModelTest : BaseViewModelTest() {
             viewModel.trySendAction(SettingsAction.UpgradedToPremiumCardClick)
             assertEquals(
                 SettingsEvent.NavigateToUrl(
-                    url = "https://bitwarden.com/help/password-manager-plans/",
+                    url = SecretDoorLinks.PREMIUM_URL,
                 ),
                 awaitItem(),
             )

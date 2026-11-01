@@ -415,11 +415,9 @@
     <string name="export_vault_file_pw_protect_info">此檔案匯出將受密碼保護，需要檔案密碼才能解密。</string>
     <string name="export_vault_confirmation_title">確認匯出密碼庫</string>
     <string name="warning">警告</string>
-    <string name="export_vault_failure">匯出您的密碼庫時發生錯誤。若問題持續發生，請改用網頁版密碼庫匯出資料。</string>
     <string name="export_vault_success">已成功匯出密碼庫</string>
     <string name="clone">克隆</string>
     <string name="password_generator_policy_in_effect">一個或多個組織原則正影響密碼產生器設定。</string>
-    <string name="unable_to_save_attachment">儲存附件時發生錯誤。若問題持續發生，請改用網頁版密碼庫儲存附件。</string>
     <string name="save_attachment_success">已成功儲存附件</string>
     <string name="autofill_tile_accessibility_required">請到 SecretDoor 設定中開啟「自動填入無障礙服務」以使用自動填入功能。</string>
     <string name="autofill_tile_uri_not_found">未偵測到密碼欄位</string>
@@ -728,9 +726,7 @@
     <string name="two_step_login_description_long">在 SecretDoor Web 應用程式中設定兩步驟登入，讓您的帳戶更加安全。</string>
     <string name="change_master_password_description_long">您可以在 SecretDoor Web 應用程式上變更主密碼。</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">在幫助中心了解有關如何使用 SecretDoor 的更多資訊。</string>
-    <string name="privacy_policy_description_long">在 bitwarden.com 上查看我們的隱私權政策。</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">在 Web 應用程式上探索 SecretDoor 帳戶的更多功能。</string>
-    <string name="learn_about_organizations_description_long">SecretDoor 可讓您透過組織與其他人共用您的密碼庫項目。請造訪 bitwarden.com 網站以了解更多資訊。</string>
     <string name="created_x">建立於%1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">您的組織要求您設定主密碼。</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">設定一個解鎖方式來變更您的密碼庫逾時動作。</string>
@@ -841,8 +837,6 @@
     <string name="add_login">新增登入資料</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">安全的和任何人及任何平臺分享檔案及資料。您的資料會受到端對端加密的保護。</string>
     <string name="send_sensitive_information_safely">安全傳送機密的資訊</string>
-    <string name="import_saved_logins">匯入已儲存的登入資訊</string>
-    <string name="use_a_computer_to_import_logins">使用電腦來匯入其它密碼管理器的登入資訊</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">您可以在設定中的帳號安全來隨時回到此步驟。</string>
     <string name="import_logins_later">稍後再匯入登入資訊</string>
     <string name="import_logins_later_dialog_title">稍後再匯入登入資訊嗎？</string>
@@ -874,7 +868,6 @@
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">這不是一個 SecretDoor 伺服器。您可能需要聯繫您的提供商或更新您的伺服器。</string>
     <string name="syncing_logins_loading_message">正在同步登入資訊...</string>
     <string name="download_the_browser_extension">下載瀏覽器擴充套件</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">瀏覽到 bitwarden.com/download 來結合 SecretDoor 到您最愛的瀏覽器提供最好的體驗。</string>
     <string name="use_the_web_app">使用網頁應用程式</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">登入到 bitwarden.com 來輕易管理您的帳號及更新偏好設定。</string>
     <string name="autofill_passwords">自動填入密碼</string>
@@ -1138,9 +1131,7 @@
     <string name="account_synced_from_bitwarden_app">從 SecretDoor 應用程式同步的帳戶</string>
     <string name="local_codes">本機代碼（%1$d）</string>
     <string name="required_information_missing">缺少必要資訊</string>
-    <string name="required_information_missing_message">缺少必要資訊（例如「服務」或「密鑰」）。請檢查您的檔案後再試一次。如需支援，請造訪 bitwarden.com/help</string>
     <string name="file_could_not_be_processed">無法處理檔案</string>
-    <string name="file_could_not_be_processed_message">無法處理檔案。請確認其為有效的 JSON 後再試一次。需要協助？請造訪 bitwarden.com/help</string>
     <string name="get_help">尋求協助</string>
     <string name="error_cannot_decrypt">[錯誤：無法解密]</string>
     <string name="copy_error_report">複製錯誤報告</string>

@@ -36,6 +36,7 @@ import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.platform.repository.util.FakeEnvironmentRepository
+import com.x8bit.bitwarden.data.platform.util.SecretDoorLinks
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockCipherView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockCollectionView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockFolderView
@@ -1979,7 +1980,7 @@ class VaultItemViewModelTest : BaseViewModelTest() {
                 )
                 assertEquals(
                     VaultItemEvent.NavigateToUri(
-                        "https://bitwarden.com/help/integrated-authenticator",
+                        SecretDoorLinks.AUTHENTICATOR_CODES_URL,
                     ),
                     awaitItem(),
                 )

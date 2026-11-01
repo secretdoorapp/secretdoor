@@ -53,7 +53,7 @@ configure<ApplicationExtension> {
     }
 
     defaultConfig {
-        applicationId = "io.github.zcoklin.secretdoor"
+        applicationId = "app.secretdoor"
         minSdk {
             version = release(libs.versions.minSdk.get().toInt())
         }

@@ -417,11 +417,9 @@ Skandering gebeur outomaties.</string>
     <string name="export_vault_file_pw_protect_info">Hierdie lêeruitvoer sal met \'n wagwoord beskerm word en die lêerwagwoord benodig om te dekripteer.</string>
     <string name="export_vault_confirmation_title">Bevestig kluisuitstuur</string>
     <string name="warning">Waarskuwing</string>
-    <string name="export_vault_failure">Daar was \'n probleem met die uitvoer van u kluis. As die probleem aanhou, sal u vanaf die webkluis moet uitvoer.</string>
     <string name="export_vault_success">Kluis suksesvol uitgestuur</string>
     <string name="clone">Kloon</string>
     <string name="password_generator_policy_in_effect">Een of meer organisasiebeleide beïnvloed u genereerderinstellings</string>
-    <string name="unable_to_save_attachment">Daar was ’n probleem met die bewaar van hierdie aanhegsel. Indien die probleem voortduur moet u vanuit die webkluis bewaar.</string>
     <string name="save_attachment_success">Aanhegsel suksesvol bewaar</string>
     <string name="autofill_tile_accessibility_required">Skakel asseblief “Outovul-toeganklikheidsdiens” in SecretDoor-instellings aan om die outovul-teël te gebruik.</string>
     <string name="autofill_tile_uri_not_found">Geen wagwoordvelde bespeur</string>
@@ -731,9 +729,7 @@ Wil u na die rekening omskakel?</string>
     <string name="two_step_login_description_long">Maak u rekening veiliger deur tweestap-aanmelding in die SecretDoor-webprogram op te stel.</string>
     <string name="change_master_password_description_long">U kan u hoofwagwoord in die SecretDoor-webtoep verander.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Kom meer te wete oor hoe om SecretDoor in die hulpsentrum te gebruik.</string>
-    <string name="privacy_policy_description_long">Besoek ons privaatheidsbeleid op bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Verken meer funksies van u SecretDoor-rekening op die webprogram.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor laat u toe om u kluis-items met ander te deel deur \'n organisasie te gebruik. Kom meer te wete op die bitwarden.com-webwerf.</string>
     <string name="created_x">Geskep %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">U organisasie vereis dat u \'n hoofwagwoord instel.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Stel ’n ontgrendelopsie op om u kluisuittellingaksie te verander.</string>
@@ -846,8 +842,6 @@ Hier is hoe:</string>
     <string name="add_login">Voeg aantekening toe</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Deel lêers en data veilig met enigiemand, op enige platform. U inligting sal end-tot-end-enkripteer bly terwyl blootstelling beperk word.</string>
     <string name="send_sensitive_information_safely">Stuur sensitiewe inligting veilig</string>
-    <string name="import_saved_logins">Voer gestoorde aanmeldings in</string>
-    <string name="use_a_computer_to_import_logins">Gebruik ’n rekenaar om aantekeninge uit ’n bestaande wagwoordbestuurder in te voer</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">U kan enige tyd terugkeer om hierdie stap in Kluisinstellings te voltooi.</string>
     <string name="import_logins_later">Voer aanmeldings later in</string>
     <string name="import_logins_later_dialog_title">Voer aanmeldings later in?</string>
@@ -879,7 +873,6 @@ Hier is hoe:</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Dit is nie \'n erkende SecretDoor-bediener nie. U moet dalk met u verskaffer kontak of u bediener opdateer.</string>
     <string name="syncing_logins_loading_message">Besig om aanmeldings te sinkroniseer…</string>
     <string name="download_the_browser_extension">Laai die blaaier-uitbreiding af</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Gaan na bitwarden.com/download om SecretDoor in u gunsteling-blaaier te integreer vir \'n naatlose ervaring.</string>
     <string name="use_the_web_app">Gebruik die webprogram</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Meld aan by bitwarden.com om u rekening maklik te bestuur en instellings by te werk.</string>
     <string name="autofill_passwords">Outovul wagwoorde</string>
@@ -1147,9 +1140,7 @@ Die vervanging van die sertifikaat kan u verbinding met omgewings wat dit tans g
     <string name="account_synced_from_bitwarden_app">Rekening vanaf SecretDoor-toep gesinchroniseer</string>
     <string name="local_codes">Plaaslike kodes (%1$d)</string>
     <string name="required_information_missing">Vereiste inligting ontbreek</string>
-    <string name="required_information_missing_message">Vereiste inligting ontbreek (bv. ‘dienste’ of ‘geheim’). Kontroleer u lêer en probeer weer. Besoek bitwarden.com/help vir ondersteuning</string>
     <string name="file_could_not_be_processed">Lêer kon nie verwerk word nie</string>
-    <string name="file_could_not_be_processed_message">Lêer kon nie verwerk word nie. Maak seker dat dit geldige JSON is en probeer weer. Het u hulp nodig? Besoek bitwarden.com/help</string>
     <string name="get_help">Kry hulp</string>
     <string name="error_cannot_decrypt">[fout: kan nie dekripteer nie]</string>
     <string name="copy_error_report">Kopieer foutverslag</string>

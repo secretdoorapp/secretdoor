@@ -417,11 +417,9 @@ Koodi skannataan automaattisesti.</string>
     <string name="export_vault_file_pw_protect_info">Tämä vientitiedosto suojataan salasanalla, joka on syötettävä salauksen purkamiseksi.</string>
     <string name="export_vault_confirmation_title">Vahvista holvin vienti</string>
     <string name="warning">Varoitus</string>
-    <string name="export_vault_failure">Holvin viemisessä ilmeni ongelma. Jos ongelma jatkuu, sinun on vietava holvi verkkoholvista.</string>
     <string name="export_vault_success">Holvin vienti onnistui</string>
     <string name="clone">Kloonaa</string>
     <string name="password_generator_policy_in_effect">Yksi tai useampi organisaatiokäytäntö vaikuttaa generaattorisi asetuksiin</string>
-    <string name="unable_to_save_attachment">Liitteen tallennuksessa oli ongelma. Jos ongelma jatkuu, voit tehdä tallennuksen verkkoholvin kautta.</string>
     <string name="save_attachment_success">Tiedostoliite tallennettiin</string>
     <string name="autofill_tile_accessibility_required">Ota “Automaattisen täytön helppokäyttöpalvelu” käyttöön SecretDoorin asetuksista käyttääksesi automaattisen täytön ruutua.</string>
     <string name="autofill_tile_uri_not_found">Salasanakenttiä ei havaittu</string>
@@ -731,9 +729,7 @@ Haluatko vaihtaa tähän tiliin?</string>
     <string name="two_step_login_description_long">Paranna tilisi suojausta määrittämällä kaksivaiheinen kirjautuminen SecretDoorin verkkosovelluksessa.</string>
     <string name="change_master_password_description_long">Voit vaihtaa pääsalasanasi SecretDoorin verkkosovelluksessa.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Tutustu SecretDooriin ja opettele käyttämään sitä Tukikeskuksessa.</string>
-    <string name="privacy_policy_description_long">Tutustu tietosuojakäytäntöömme osoitteessa bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Tutustu SecretDoor-tilisi muihin omimaisuuksiin verkkosovelluksessa.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor mahdollistaa holvisi sisällön jakamisen organisaation avulla. Lue lisää osoitteesta bitwarden.com.</string>
     <string name="created_x">Luotu %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Organisaatiosi edellyttää, että asetat pääsalasanan.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Muuta holvisi aikakatkaisutoimintoa määrittämällä lukituksen avaustapa.</string>
@@ -845,8 +841,6 @@ Haluatko vaihtaa tähän tiliin?</string>
     <string name="add_login">Lisää kirjautuminen</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Jaa tiedostoja ja dataa turvallisesti kenen tahansa kanssa millä tahansa alustalla. Tiedot pysyvät päästä päähän salattuina ja altistuminen rajoitetaan.</string>
     <string name="send_sensitive_information_safely">Lähetä arkaluonteisia tietoja turvallisesti</string>
-    <string name="import_saved_logins">Tuo tallennetut kirjautumistiedot</string>
-    <string name="use_a_computer_to_import_logins">Tuo kirjautumiset olemassa olevasta salasananhallinnasta tietokoneella</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Voit palata suorittamaan tämän vaiheen milloin tahansa holvin asetuksista.</string>
     <string name="import_logins_later">Tuo kirjautumistietoja myöhemmin</string>
     <string name="import_logins_later_dialog_title">Tuodaanko kirjautumistiedot myöhemmin?</string>
@@ -878,7 +872,6 @@ Haluatko vaihtaa tähän tiliin?</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Tätä ei tunnistettu SecretDoor-palvelimeksi. Tarkista tiedot palveluntarjoajaltasi tai päivitä palvelimesi.</string>
     <string name="syncing_logins_loading_message">Kirjautumistietoja synkronoidaan...</string>
     <string name="download_the_browser_extension">Lataa selaimen laajennus</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Siirry osoitteeseen bitwarden.com/download integroidaksesi SecretDoorin suosikkiselaimeesi saumattoman kokemuksen saamiseksi.</string>
     <string name="use_the_web_app">Käytä verkkosovellusta</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Kirjaudu sisään osoitteessa bitwarden.com hallitaksesi tiliäsi ja päivittääksesi asetuksia helposti.</string>
     <string name="autofill_passwords">Automaattitäytä salasanoja</string>
@@ -1144,9 +1137,7 @@ Haluatko vaihtaa tähän tiliin?</string>
     <string name="account_synced_from_bitwarden_app">Tili synkronoitu SecretDoor-sovellukseen</string>
     <string name="local_codes">Paikalliset koodit (%1$d)</string>
     <string name="required_information_missing">Tarpeellisia tietoja puuttuu</string>
-    <string name="required_information_missing_message">Vaaditua tietoa puuttuu (esim. ‘services‘ tai ‘secret’). Tarkista tiedostosi ja yritä uudelleen. Katso bitwarden.com/help, jos tarvitse apua</string>
     <string name="file_could_not_be_processed">Tiedostoa ei voitu käsitellä</string>
-    <string name="file_could_not_be_processed_message">Tiedostoa ei voitu käsitellä. Varmista, että se on JSON-muodossa ja yritä uudelleen. Tarvitsetko apua? Katso bitwarden.com/help</string>
     <string name="get_help">Hanki ohjeita</string>
     <string name="error_cannot_decrypt">[virhe: salausta ei voi purkaa]</string>
     <string name="copy_error_report">Kopioi virheilmoitus</string>

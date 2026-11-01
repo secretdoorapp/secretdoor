@@ -48,6 +48,7 @@ import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.platform.theme.BitwardenTheme
 import com.bitwarden.ui.util.Text
 import com.bitwarden.ui.util.asText
+import com.x8bit.bitwarden.data.platform.util.SecretDoorLinks
 
 /**
  * Displays the about screen.
@@ -65,25 +66,32 @@ fun AboutScreen(
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     EventsEffect(viewModel = viewModel) { event ->
         when (event) {
-            is AboutEvent.NavigateToWebVault -> intentManager.launchUri(event.vaultUrl.toUri())
             AboutEvent.NavigateBack -> onNavigateBack.invoke()
             AboutEvent.NavigateToFlightRecorder -> onNavigateToFlightRecorder()
             AboutEvent.NavigateToRecordedLogs -> onNavigateToRecordedLogs()
 
             AboutEvent.NavigateToFlightRecorderHelp -> {
-                intentManager.launchUri("https://github.com/zcoklin/secretdoor#readme".toUri())
+                intentManager.launchUri(SecretDoorLinks.FLIGHT_RECORDER_URL.toUri())
             }
 
             AboutEvent.NavigateToHelpCenter -> {
-                intentManager.launchUri("https://github.com/zcoklin/secretdoor#readme".toUri())
+                intentManager.launchUri(SecretDoorLinks.HELP_CENTER_URL.toUri())
             }
 
             AboutEvent.NavigateToPrivacyPolicy -> {
-                intentManager.launchUri("https://github.com/zcoklin/secretdoor#privacy".toUri())
+                intentManager.launchUri(SecretDoorLinks.PRIVACY_URL.toUri())
             }
 
-            AboutEvent.NavigateToLearnAboutOrganizations -> {
-                intentManager.launchUri("https://bitwarden.com/help/about-organizations".toUri())
+            AboutEvent.NavigateToSourceCode -> {
+                intentManager.launchUri(SecretDoorLinks.REPOSITORY_URL.toUri())
+            }
+
+            AboutEvent.NavigateToLicense -> {
+                intentManager.launchUri(SecretDoorLinks.LICENSE_URL.toUri())
+            }
+
+            AboutEvent.NavigateToNotices -> {
+                intentManager.launchUri(SecretDoorLinks.NOTICES_URL.toUri())
             }
         }
     }
@@ -108,6 +116,9 @@ fun AboutScreen(
             modifier = Modifier.fillMaxSize(),
             onHelpCenterClick = { viewModel.trySendAction(AboutAction.HelpCenterClick) },
             onPrivacyPolicyClick = { viewModel.trySendAction(AboutAction.PrivacyPolicyClick) },
+            onSourceCodeClick = { viewModel.trySendAction(AboutAction.SourceCodeClick) },
+            onLicenseClick = { viewModel.trySendAction(AboutAction.LicenseClick) },
+            onNoticesClick = { viewModel.trySendAction(AboutAction.NoticesClick) },
             onSubmitCrashLogsCheckedChange = {
                 viewModel.trySendAction(AboutAction.SubmitCrashLogsClick(it))
             },
@@ -131,6 +142,9 @@ private fun AboutScreenContent(
     state: AboutState,
     onHelpCenterClick: () -> Unit,
     onPrivacyPolicyClick: () -> Unit,
+    onSourceCodeClick: () -> Unit,
+    onLicenseClick: () -> Unit,
+    onNoticesClick: () -> Unit,
     onSubmitCrashLogsCheckedChange: (Boolean) -> Unit,
     onFlightRecorderCheckedChange: (Boolean) -> Unit,
     onFlightRecorderTooltipClick: () -> Unit,
@@ -182,6 +196,49 @@ private fun AboutScreenContent(
                 .standardHorizontalMargin()
                 .fillMaxWidth()
                 .testTag(tag = "PrivacyPolicyRow"),
+        )
+        BitwardenExternalLinkRow(
+            text = stringResource(id = BitwardenString.source_code),
+            onConfirmClick = onSourceCodeClick,
+            dialogTitle = stringResource(id = BitwardenString.continue_to_the_source_code),
+            dialogMessage = stringResource(
+                id = BitwardenString.see_the_source_code_of_secretdoor_on_github,
+            ),
+            withDivider = false,
+            cardStyle = CardStyle.Middle(),
+            modifier = Modifier
+                .standardHorizontalMargin()
+                .fillMaxWidth()
+                .testTag(tag = "SourceCodeRow"),
+        )
+        BitwardenExternalLinkRow(
+            text = stringResource(id = BitwardenString.license_gnu_gpl_v3),
+            onConfirmClick = onLicenseClick,
+            dialogTitle = stringResource(id = BitwardenString.continue_to_the_license),
+            dialogMessage = stringResource(
+                id = BitwardenString.read_the_terms_secretdoor_is_distributed_under,
+            ),
+            withDivider = false,
+            cardStyle = CardStyle.Middle(),
+            modifier = Modifier
+                .standardHorizontalMargin()
+                .fillMaxWidth()
+                .testTag(tag = "LicenseRow"),
+        )
+        BitwardenExternalLinkRow(
+            text = stringResource(id = BitwardenString.open_source_notices),
+            onConfirmClick = onNoticesClick,
+            dialogTitle = stringResource(id = BitwardenString.continue_to_the_notices),
+            dialogMessage = stringResource(
+                id = BitwardenString
+                    .see_where_the_code_comes_from_and_the_licenses_of_the_libraries_it_uses,
+            ),
+            withDivider = false,
+            cardStyle = CardStyle.Bottom,
+            modifier = Modifier
+                .standardHorizontalMargin()
+                .fillMaxWidth()
+                .testTag(tag = "NoticesRow"),
         )
         CopyRow(
             text = state.version,
@@ -308,6 +365,9 @@ private fun AboutScreenContent_preview() {
             ),
             onHelpCenterClick = {},
             onPrivacyPolicyClick = {},
+            onSourceCodeClick = {},
+            onLicenseClick = {},
+            onNoticesClick = {},
             onSubmitCrashLogsCheckedChange = { },
             onFlightRecorderCheckedChange = { },
             onFlightRecorderTooltipClick = {},

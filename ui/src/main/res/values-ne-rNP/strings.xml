@@ -417,11 +417,9 @@
     <string name="export_vault_file_pw_protect_info">यो फाइल निर्यात पासवर्ड-सुरक्षित हुनेछ र डिक्रिप्ट गर्न फाइल पासवर्ड आवश्यक पर्नेछ।</string>
     <string name="export_vault_confirmation_title">भल्ट निर्यात पुष्टि गर्नुहोस्</string>
     <string name="warning">चेतावनी</string>
-    <string name="export_vault_failure">तपाईंको भल्ट निर्यात गर्न समस्या भयो। यदि समस्या जारी रह्यो भने, तपाईंले वेब भल्टबाट निर्यात गर्नुपर्नेछ।</string>
     <string name="export_vault_success">भल्ट सफलतापूर्वक निर्यात गरियो</string>
     <string name="clone">क्लोन गर्नुहोस्</string>
     <string name="password_generator_policy_in_effect">एक वा बढी संगठन नीतिहरूले तपाईंको जेनरेटर सेटिङहरूलाई असर गरिरहेको छ</string>
-    <string name="unable_to_save_attachment">यो संलग्न बचत गर्न समस्या भयो। यदि समस्या जारी रह्यो भने, तपाईं यसलाई वेब भल्टबाट बचत गर्न सक्नुहुन्छ।</string>
     <string name="save_attachment_success">संलग्न सफलतापूर्वक बचत गरियो</string>
     <string name="autofill_tile_accessibility_required">स्वत: भरण टाइल प्रयोग गर्न SecretDoor सेटिङ्सबाट “स्वत: भरण पहुँच सेवा” सक्रिय गर्नुहोस्।</string>
     <string name="autofill_tile_uri_not_found">कुनै पासवर्ड फिल्डहरू पत्ता लागेन</string>
@@ -731,9 +729,7 @@
     <string name="two_step_login_description_long">SecretDoor वेब एपमा दुई-चरण लगइन सेट अप गरेर आफ्नो खाता अझ सुरक्षित बनाउनुहोस्।</string>
     <string name="change_master_password_description_long">तपाईं SecretDoor वेब एपमा आफ्नो मास्टर पासवर्ड परिवर्तन गर्न सक्नुहुन्छ।</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">सहायता केन्द्रमा SecretDoor कसरी प्रयोग गर्ने भन्ने बारे थप जान्नुहोस्।</string>
-    <string name="privacy_policy_description_long">bitwarden.com मा हाम्रो गोपनीयता नीति हेर्नुहोस्।</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">वेब एपमा आफ्नो SecretDoor खाताको थप सुविधाहरू अन्वेषण गर्नुहोस्।</string>
-    <string name="learn_about_organizations_description_long">SecretDoor ले तपाईंलाई संगठन प्रयोग गरेर अरूसँग आफ्नो भल्ट वस्तुहरू साझेदारी गर्न अनुमति दिन्छ। bitwarden.com वेबसाइटमा थप जान्नुहोस्।</string>
     <string name="created_x">सिर्जना गरियो %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">तपाईंको संगठनले तपाईंलाई मास्टर पासवर्ड सेट गर्न आवश्यक छ।</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">आफ्नो भल्ट समय सीमा कार्य परिवर्तन गर्न एउटा अनलक विकल्प सेट अप गर्नुहोस्।</string>
@@ -845,8 +841,6 @@
     <string name="add_login">लगइन थप्नुहोस्</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">फाइलहरू र डाटा कुनै पनि प्लेटफर्ममा जो कोहीसँग सुरक्षित रूपमा साझेदारी गर्नुहोस्। तपाईंको जानकारी अन्त-देखि-अन्त इन्क्रिप्टेड रहनेछ जबकि जोखिम सीमित हुनेछ।</string>
     <string name="send_sensitive_information_safely">संवेदनशील जानकारी सुरक्षित रूपमा पठाउनुहोस्</string>
-    <string name="import_saved_logins">बचत गरिएका लगइनहरू आयात गर्नुहोस्</string>
-    <string name="use_a_computer_to_import_logins">अवस्थित पासवर्ड प्रबन्धकबाट लगइनहरू आयात गर्न कम्प्युटर प्रयोग गर्नुहोस्</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">तपाईं भल्ट सेटिङ्समा कुनै पनि समय यो चरण पूरा गर्न फर्कन सक्नुहुन्छ।</string>
     <string name="import_logins_later">लगइनहरू पछि आयात गर्नुहोस्</string>
     <string name="import_logins_later_dialog_title">लगइनहरू पछि आयात गर्ने?</string>
@@ -878,7 +872,6 @@
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">यो मान्यता प्राप्त SecretDoor सर्भर होइन। तपाईंले आफ्नो प्रदायकसँग जाँच गर्न वा आफ्नो सर्भर अद्यावधिक गर्न आवश्यक पर्न सक्छ।</string>
     <string name="syncing_logins_loading_message">लगइनहरू सिङ्क गर्दै…</string>
     <string name="download_the_browser_extension">ब्राउजर विस्तार डाउनलोड गर्नुहोस्</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">सहज अनुभवको लागि आफ्नो मनपर्ने ब्राउजरमा SecretDoor एकीकृत गर्न bitwarden.com/download मा जानुहोस्।</string>
     <string name="use_the_web_app">वेब एप प्रयोग गर्नुहोस्</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">आफ्नो खाता सजिलै प्रबन्ध गर्न र सेटिङहरू अद्यावधिक गर्न bitwarden.com मा लग इन गर्नुहोस्।</string>
     <string name="autofill_passwords">पासवर्डहरू स्वत: भरण गर्नुहोस्</string>
@@ -1144,9 +1137,7 @@
     <string name="account_synced_from_bitwarden_app">SecretDoor एपबाट सिङ्क गरिएको खाता</string>
     <string name="local_codes">स्थानीय कोडहरू (%1$d)</string>
     <string name="required_information_missing">आवश्यक जानकारी हराइरहेको छ</string>
-    <string name="required_information_missing_message">आवश्यक जानकारी हराइरहेको छ (जस्तै, ‘services’ वा ‘secret’)। आफ्नो फाइल जाँच गर्नुहोस् र फेरि प्रयास गर्नुहोस्। सहायताको लागि bitwarden.com/help मा जानुहोस्</string>
     <string name="file_could_not_be_processed">फाइल प्रशोधन गर्न सकिएन</string>
-    <string name="file_could_not_be_processed_message">फाइल प्रशोधन गर्न सकिएन। यो मान्य JSON छ भनी सुनिश्चित गर्नुहोस् र फेरि प्रयास गर्नुहोस्। मद्दत चाहिन्छ? bitwarden.com/help मा जानुहोस्</string>
     <string name="get_help">सहायता प्राप्त गर्नुहोस्</string>
     <string name="error_cannot_decrypt">[त्रुटि: डिक्रिप्ट गर्न सकिँदैन]</string>
     <string name="copy_error_report">त्रुटि रिपोर्ट प्रतिलिपि गर्नुहोस्</string>

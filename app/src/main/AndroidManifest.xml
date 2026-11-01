@@ -10,10 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="horizons.permission.HEADSET_CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.READ_USER_DICTIONARY" />
 
     <application
         android:name=".BitwardenApplication"
@@ -48,19 +45,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="https" />
-                <data android:host="*.bitwarden.com" />
-                <data android:host="*.bitwarden.eu" />
-                <data android:host="*.bitwarden.pw" />
-                <data android:host="*.bitwarden-gov.com" />
-                <data android:pathPattern="/redirect-connector.*" />
-            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -73,7 +57,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="bitwarden" />
+                <data android:scheme="secretdoor" />
             </intent-filter>
             <!-- Handle Credential Exchange transfer requests -->
             <intent-filter

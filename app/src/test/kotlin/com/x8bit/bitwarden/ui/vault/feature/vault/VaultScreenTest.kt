@@ -2426,7 +2426,7 @@ class VaultScreenTest : BitwardenComposeTest() {
                 viewState = VaultState.ViewState.NoItems,
             )
         }
-        val importSavedLogins = "Import saved logins"
+        val importSavedLogins = "Import your items"
         composeTestRule
             .onNodeWithText(importSavedLogins)
             .assertDoesNotExist()

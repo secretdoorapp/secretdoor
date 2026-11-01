@@ -417,11 +417,9 @@ El escaneo se realizará automáticamente.</string>
     <string name="export_vault_file_pw_protect_info">Esta exportación de archivo estará protegida por contraseña, y requerirá la contraseña del archivo para descifrarla.</string>
     <string name="export_vault_confirmation_title">Confirmar exportación de la caja fuerte</string>
     <string name="warning">Advertencia</string>
-    <string name="export_vault_failure">Hubo un problema al exportar tu caja fuerte. Si el problema persiste, tendrás que exportar desde la caja fuerte web.</string>
     <string name="export_vault_success">Caja fuerte exportada con éxito</string>
     <string name="clone">Clonar</string>
     <string name="password_generator_policy_in_effect">Una o más políticas de la organización están afectando la configuración del generador</string>
-    <string name="unable_to_save_attachment">Hubo un problema al guardar este archivo adjunto. Si el problema persiste, puedes guardarlo desde la caja fuerte en la web.</string>
     <string name="save_attachment_success">Archivo adjunto guardado con éxito</string>
     <string name="autofill_tile_accessibility_required">Por favor, habilite \"Servicio de Accesibilidad de Autocompletado\" en la configuración de SecretDoor para utilizar la función de autocompletado.</string>
     <string name="autofill_tile_uri_not_found">No se han detectado campos de contraseña</string>
@@ -732,9 +730,7 @@ seleccione Agregar TOTP para almacenar la clave de forma segura</string>
     <string name="two_step_login_description_long">Haz tu cuenta más segura al configurar el inicio de sesión en dos pasos en la aplicación web de SecretDoor.</string>
     <string name="change_master_password_description_long">Puedes cambiar tu contraseña maestra en la aplicación web de SecretDoor.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Más información sobre cómo usar SecretDoor en el centro de Ayuda.</string>
-    <string name="privacy_policy_description_long">Revise nuestra política de privacidad en bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Explora más características de tu cuenta de SecretDoor en la aplicación web.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor te permite compartir tus elementos de la caja fuerte con otros utilizando una organización. Más información en el sitio web de bitwarden.com.</string>
     <string name="created_x">Creado %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Tu organización requiere que establezcas una contraseña maestra.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Configura una opción de desbloqueo para cambiar tu acción de tiempo de espera de tu caja fuerte.</string>
@@ -846,8 +842,6 @@ seleccione Agregar TOTP para almacenar la clave de forma segura</string>
     <string name="add_login">Agregar inicio de sesión</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Comparte archivos y datos de forma segura con cualquiera, en cualquier plataforma. Tu información permanecerá encriptada de extremo a extremo, limitando su exposición.</string>
     <string name="send_sensitive_information_safely">Envía información sensible de forma segura</string>
-    <string name="import_saved_logins">Importar inicios de sesión guardados</string>
-    <string name="use_a_computer_to_import_logins">Utilice un ordenador para importar los datos de inicio de sesión desde un administrador de contraseñas existente</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Puede volver a completar este paso en cualquier momento en los ajustes de Caja fuerte.</string>
     <string name="import_logins_later">Importar inicios de sesión más tarde</string>
     <string name="import_logins_later_dialog_title">¿Importar inicios de sesión más tarde?</string>
@@ -879,7 +873,6 @@ seleccione Agregar TOTP para almacenar la clave de forma segura</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Este no es un servidor de SecretDoor reconocido. Puede que tengas que consultar con tu proveedor o actualizar tu servidor.</string>
     <string name="syncing_logins_loading_message">Sincronizando inicios de sesión...</string>
     <string name="download_the_browser_extension">Descarga la extensión del navegador</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Ve a bitwarden.com/download para integrar SecretDoor en tu navegador favorito y disfrutar de una experiencia fluida.</string>
     <string name="use_the_web_app">Usa la aplicación web</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Inicia sesión en bitwarden.com para gestionar fácilmente tu cuenta y actualizar los ajustes.</string>
     <string name="autofill_passwords">Autorellenar contraseñas</string>
@@ -1147,9 +1140,7 @@ cualquier problema.</string>
     <string name="account_synced_from_bitwarden_app">Cuenta sincronizada desde la aplicación de SecretDoor</string>
     <string name="local_codes">Códigos locales (%1$d)</string>
     <string name="required_information_missing">Información requerida faltante</string>
-    <string name="required_information_missing_message">Falta información requerida (por ejemplo, \'servicios\' o \'secreto\'). Revisa tu archivo e inténtalo de nuevo. Visita bitwarden.com/help para obtener soporte</string>
     <string name="file_could_not_be_processed">No se pudo procesar el archivo</string>
-    <string name="file_could_not_be_processed_message">No se pudo procesar el archivo. Asegúrate de que sea un JSON válido e inténtalo de nuevo. ¿Necesitas ayuda? Visita bitwarden.com/help</string>
     <string name="get_help">Obtener ayuda</string>
     <string name="error_cannot_decrypt">[error: no se puede descifrar]</string>
     <string name="copy_error_report">Copiar informe de error</string>

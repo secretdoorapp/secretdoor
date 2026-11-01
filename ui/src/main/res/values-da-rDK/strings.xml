@@ -417,11 +417,9 @@ Skanning vil ske automatisk.</string>
     <string name="export_vault_file_pw_protect_info">Denne fileksport adgangskodebeskyttes, og dekryptering vil kræve filadgangskoden.</string>
     <string name="export_vault_confirmation_title">Bekræft eksport af boks</string>
     <string name="warning">Advarsel</string>
-    <string name="export_vault_failure">Der opstod et problem med at eksportere din vault. Hvis problemet fortsætter, skal du eksportere fra web-vaulten.</string>
     <string name="export_vault_success">Boks eksporteret</string>
     <string name="clone">Klon</string>
     <string name="password_generator_policy_in_effect">En eller flere organisationspolitikker påvirker generatorindstillingerne</string>
-    <string name="unable_to_save_attachment">Et problem opstod med at gemme denne vedhæftning. Fortsætter problemet, gem den i stedet fra web-boksen.</string>
     <string name="save_attachment_success">Vedhæftning gemt</string>
     <string name="autofill_tile_accessibility_required">Aktivér \"Autoudfyld-tilgængelighedstjeneste\" fra SecretDoor-indstillinger for at benytte flisen Autoudfyld.</string>
     <string name="autofill_tile_uri_not_found">Ingen adgangskodefelter fundet</string>
@@ -731,9 +729,7 @@ Skift til denne konto?</string>
     <string name="two_step_login_description_long">Øg kontosikkerheden ved at oprette totrinsindlogning i SecretDoor web-appen.</string>
     <string name="change_master_password_description_long">Hovedadgangskoden kan ændres fra SecretDoor web-appen.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Læs mere i Hjælpecenter om, hvordan SecretDoor benyttes.</string>
-    <string name="privacy_policy_description_long">Tjek vores Fortrolighedspolitik på bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Tjek flere funktioner ud i SecretDoor-kontoen på web-appen.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor muliggør deling af boks-emner med andre vha. en organisation. Læs mere på bitwarden.com-webstedet.</string>
     <string name="created_x">Oprettet %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Organisationen kræver, at der opsættes en hovedadgangskode.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Opsæt en oplåsningsmetode for at ændre boks-timeouthandlingen.</string>
@@ -845,8 +841,6 @@ Skift til denne konto?</string>
     <string name="add_login">Tilføj login</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Del filer og data sikkert med alle på enhver platform. Oplysningerne forbliver ende-til-ende krypterede samtidig med begrænset eksponering.</string>
     <string name="send_sensitive_information_safely">Send sensitive oplysninger sikkert</string>
-    <string name="import_saved_logins">Importere gemte logins</string>
-    <string name="use_a_computer_to_import_logins">Brug en computer til import af logins fra en eksisterende adgangskodehåndtering</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Dette trin kan når som helst fuldføres i Boks under Indstillinger.</string>
     <string name="import_logins_later">Importere logins senere</string>
     <string name="import_logins_later_dialog_title">Importere logins senere?</string>
@@ -878,7 +872,6 @@ Skift til denne konto?</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Dette er ikke en genkendt SecretDoor-server. Man skal muligvis tjekke med sin udbyder eller opdatere sin server.</string>
     <string name="syncing_logins_loading_message">Synker logins...</string>
     <string name="download_the_browser_extension">Download webbrowserudvidelsen</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Gå til bitwarden.com/download for at integrere SecretDoor i den foretrukne webbrowser for en problemfri oplevelse.</string>
     <string name="use_the_web_app">Brug web-appen</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Log ind på bitwarden.com for nemt at håndtere brugerkontoen og opdatere indstillinger.</string>
     <string name="autofill_passwords">Autofyld adgangskoder</string>
@@ -1144,9 +1137,7 @@ Skift til denne konto?</string>
     <string name="account_synced_from_bitwarden_app">Konto synket fra SecretDoor-appen</string>
     <string name="local_codes">Lokale koder (%1$d)</string>
     <string name="required_information_missing">Påkrævet information mangler</string>
-    <string name="required_information_missing_message">Påkrævet info mangler (f.eks. \'services\' eller \'secret\'). Kontrollér din fil, og prøv igen. Besøg bitwarden.com/help for support</string>
     <string name="file_could_not_be_processed">Filen kunne ikke behandles</string>
-    <string name="file_could_not_be_processed_message">Filen kunne ikke behandles. Sørg for, at den er gyldig JSON, og prøv igen. Har du brug for hjælp? Besøg bitwarden.com/help</string>
     <string name="get_help">Få hjælp</string>
     <string name="error_cannot_decrypt">[fejl: kan ikke dekryptere]</string>
     <string name="copy_error_report">Kopiér fejlrapport</string>

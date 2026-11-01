@@ -417,11 +417,9 @@ L\'escaneig es farà automàticament.</string>
     <string name="export_vault_file_pw_protect_info">Aquesta exportació de fitxers estarà protegida amb contrasenya i requerirà la contrasenya del fitxer per desxifrar-la.</string>
     <string name="export_vault_confirmation_title">Confirma l\'exportació de la Caixa forta</string>
     <string name="warning">Advertiment</string>
-    <string name="export_vault_failure">Hi ha hagut un problema en exportar el teu cofre. Si el problema persisteix, hauràs d\'exportar des del cofre web.</string>
     <string name="export_vault_success">S\'ha exportat la caixa forta amb èxit</string>
     <string name="clone">Clona</string>
     <string name="password_generator_policy_in_effect">Una o més polítiques d’organització afecten la configuració del generador.</string>
-    <string name="unable_to_save_attachment">S\'ha produït un problema en guardar aquest fitxer adjunt. Si el problema continua, podeu guardar-lo des del web.</string>
     <string name="save_attachment_success">L\'adjunt s\'ha guardat correctament</string>
     <string name="autofill_tile_accessibility_required">Activeu \"Servei d\'accessibilitat d\'emplenament automàtic\" de la configuració de SecretDoor per utilitzar el mosaic d\'emplenament automàtic.</string>
     <string name="autofill_tile_uri_not_found">No s\'han detectat camps de contrasenya</string>
@@ -731,9 +729,7 @@ Voleu canviar a aquest compte?</string>
     <string name="two_step_login_description_long">Fes que el vostre compte siga més segur configurant l\'inici de sessió en dos passos a l\'aplicació web de SecretDoor.</string>
     <string name="change_master_password_description_long">Podeu canviar la vostra contrasenya mestra a l\'aplicació web de SecretDoor.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Obteniu més informació sobre com utilitzar SecretDoor al Centre d\'ajuda.</string>
-    <string name="privacy_policy_description_long">Consulteu la nostra política de privadesa a bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Exploreu més característiques del vostre compte SecretDoor a l\'aplicació web.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor us permet compartir els elements de la vostra caixa forta amb altres usuaris mitjançant una organització. Més informació al lloc web bitwarden.com.</string>
     <string name="created_x">Creat %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">La vostra organització requereix que establiu una contrasenya mestra.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Configura una opció de desbloqueig per canviar l\'acció de temps d\'espera de la caixa forta.</string>
@@ -845,8 +841,6 @@ Voleu canviar a aquest compte?</string>
     <string name="add_login">Afig inici de sessió</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Comparteix fitxers i dades de manera segura amb qualsevol persona, en qualsevol plataforma. La teua informació romandrà xifrada de principi a fi i alhora limitarà l\'exposició.</string>
     <string name="send_sensitive_information_safely">Envieu informació confidencial, de manera segura</string>
-    <string name="import_saved_logins">Importar inicis de sessió desats</string>
-    <string name="use_a_computer_to_import_logins">Utilitza un ordinador per importar inicis de sessió des d\'un gestor de contrasenyes existent</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Pots tornar per completar aquest pas en qualsevol moment a Configuració del cofre.</string>
     <string name="import_logins_later">Importa els inicis de sessió més tard</string>
     <string name="import_logins_later_dialog_title">Importe els inicis de sessió més tard?</string>
@@ -878,7 +872,6 @@ Voleu canviar a aquest compte?</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Aquest no és un servidor de SecretDoor reconegut. Potser has de consultar amb el teu proveïdor o actualitzar el teu servidor.</string>
     <string name="syncing_logins_loading_message">Sincronitzant inicis de sessió…</string>
     <string name="download_the_browser_extension">Descarrega l\'extensió del navegador</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Vés a bitwarden.com/download per integrar SecretDoor al teu navegador favorit per a una experiència sense problemes.</string>
     <string name="use_the_web_app">Utilitza l\'aplicació web</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Inicia sessió a bitwarden.com per gestionar fàcilment el teu compte i actualitzar la configuració.</string>
     <string name="autofill_passwords">Emplenament automàtic de contrasenyes</string>
@@ -1144,9 +1137,7 @@ Voleu canviar a aquest compte?</string>
     <string name="account_synced_from_bitwarden_app">Compte sincronitzat des de l\'aplicació SecretDoor</string>
     <string name="local_codes">Codis locals (%1$d)</string>
     <string name="required_information_missing">Falta informació obligatòria</string>
-    <string name="required_information_missing_message">Falta informació obligatòria (p. ex., ‘services’ o ‘secret’). Revisa el teu fitxer i torna a provar. Visita bitwarden.com/help per obtenir suport</string>
     <string name="file_could_not_be_processed">No s\'ha pogut processar el fitxer</string>
-    <string name="file_could_not_be_processed_message">No s\'ha pogut processar el fitxer. Assegura\'t que és un JSON vàlid i torna a provar. Necessites ajuda? Visita bitwarden.com/help</string>
     <string name="get_help">Obteniu ajuda</string>
     <string name="error_cannot_decrypt">[error: no es pot desxifrar]</string>
     <string name="copy_error_report">Copia l\'informe d\'error</string>

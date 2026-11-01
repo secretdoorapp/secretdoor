@@ -416,11 +416,9 @@
     <string name="export_vault_file_pw_protect_info">Fitxategien esportazio hori pasahitzaren bidez babestuta egongo da eta deszifratzeko fitxategi pasahitza beharko da.</string>
     <string name="export_vault_confirmation_title">Baieztatu kutxa gotorra esportatzea</string>
     <string name="warning">Kontuz</string>
-    <string name="export_vault_failure">Arazo bat egon da zure kutxa esportatzean. Arazoak jarraitzen badu, web-kutxatik esportatu beharko duzu.</string>
     <string name="export_vault_success">Kutxa gotorra ongi esportatu da</string>
     <string name="clone">Klonatu</string>
     <string name="password_generator_policy_in_effect">Erakundeko politika batek edo gehiagok sortzailearen konfigurazioari eragiten diote</string>
-    <string name="unable_to_save_attachment">Arazo bat egon da eranskin hau atxikitzean. Arazoak bere horretan jarraitzen badu, webguneko kutxa gotorretik atxiki dezakezu.</string>
     <string name="save_attachment_success">Eranskina ondo atxiki da</string>
     <string name="autofill_tile_accessibility_required">Mesedez, aktibatu \"Autobeteketaren Irisgarritasun Zerbitzua\" SecretDoor Ezarpenetatik Autobeteketa laukia erabiltzeko.</string>
     <string name="autofill_tile_uri_not_found">Ez da pasahitz eremurik detektatu</string>
@@ -729,9 +727,7 @@ Kontu honetara aldatu nahi duzu?</string>
     <string name="two_step_login_description_long">Egin zure kontua seguruagoa bi urratsetako saioa konfiguratuz SecretDoor web-aplikazioan.</string>
     <string name="change_master_password_description_long">Zure pasahitz nagusia SecretDoor web-aplikazioan alda dezakezu.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Ikasi gehiago SecretDoor erabiltzeari buruz Laguntza-zentroan.</string>
-    <string name="privacy_policy_description_long">Begiratu gure pribatutasun-politika bitwarden.com-en.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Arakatu zure SecretDoor kontuaren ezaugarri gehiago web-aplikazioan.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor-ek zure kutxako elementuak beste batzuekin partekatzeko aukera ematen dizu erakunde bat erabiliz. Ikasi gehiago bitwarden.com webgunean.</string>
     <string name="created_x">Sortua %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Zure erakundeak pasahitz nagusi bat ezartzea eskatzen du.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Konfiguratu desblokeo-aukeraketa zure kutxaren denbora-mugaren ekintza aldatzeko.</string>
@@ -843,8 +839,6 @@ Kontu honetara aldatu nahi duzu?</string>
     <string name="add_login">Gehitu saioa</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Partekatu fitxategiak eta datuak segurtasunez edonorekin, edozein plataformatatik. Zure informazioa muturretik muturrera enkriptatuta egongo da, esposizioa mugatuz.</string>
     <string name="send_sensitive_information_safely">Bidali informazio sentikorra, segurtasunez</string>
-    <string name="import_saved_logins">Inportatu gordetako saioak</string>
-    <string name="use_a_computer_to_import_logins">Erabili ordenagailu bat dagoen pasahitz-kudeatzaile batetik saioak inportatzeko</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Edonoiz itzul zaitezke urrats hau osatzeko Kutxaren ezarpenetatik.</string>
     <string name="import_logins_later">Inportatu saioak geroago</string>
     <string name="import_logins_later_dialog_title">Saioak geroago inportatu?</string>
@@ -876,7 +870,6 @@ Kontu honetara aldatu nahi duzu?</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Hau ez da SecretDoor zerbitzari ezagun bat. Baliteke zure hornitzailearekin egiaztatu edo zure zerbitzaria eguneratu behar izatea.</string>
     <string name="syncing_logins_loading_message">Saioak sinkronizatzen…</string>
     <string name="download_the_browser_extension">Deskargatu nabigatzailearen hedapena</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Joan bitwarden.com/download-era SecretDoor zure nabigatzaile gogokoenan integratzeko esperientzia ezin hobea izateko.</string>
     <string name="use_the_web_app">Erabili web-aplikazioa</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Hasi saioa bitwarden.com-en zure kontua erraz kudeatzeko eta ezarpenak eguneratzeko.</string>
     <string name="autofill_passwords">Autobeteketa pasahitzak</string>
@@ -1142,9 +1135,7 @@ Kontu honetara aldatu nahi duzu?</string>
     <string name="account_synced_from_bitwarden_app">SecretDoor aplikaziotik sinkronizatutako kontua</string>
     <string name="local_codes">Kode lokalak (%1$d)</string>
     <string name="required_information_missing">Beharrezko informazioa falta da</string>
-    <string name="required_information_missing_message">Beharrezko informazioa falta da (adibidez, \'zerbitzuak\' edo \'sekretua\'). Egiaztatu zure fitxategia eta saiatu berriro. Bisitatu bitwarden.com/help laguntza jasotzeko</string>
     <string name="file_could_not_be_processed">Fitxategia ezin izan da prozesatu</string>
-    <string name="file_could_not_be_processed_message">Fitxategia ezin izan da prozesatu. Ziurtatu JSON balioduna dela eta saiatu berriro. Laguntza behar duzu? Bisitatu bitwarden.com/help</string>
     <string name="get_help">Jaso laguntza</string>
     <string name="error_cannot_decrypt">[errorea: ezin da desenkriptatu]</string>
     <string name="copy_error_report">Kopiatu errore-txostena</string>

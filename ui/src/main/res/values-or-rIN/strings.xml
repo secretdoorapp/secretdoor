@@ -417,11 +417,9 @@
     <string name="export_vault_file_pw_protect_info">ଏହି ଫାଇଲ୍ ରପ୍ତାନୀ ପାସୱାର୍ଡ ଦ୍ୱାରା ସୁରକ୍ଷିତ ହେବ ଏବଂ ଡିକ୍ରିପ୍ଟ୍ କରିବାକୁ ଫାଇଲ୍ ପାସୱାର୍ଡ ଆବଶ୍ୟକ।</string>
     <string name="export_vault_confirmation_title">ତିଜୋରି ରପ୍ତାନୀ ନିଶ୍ଚିତ</string>
     <string name="warning">ସତର୍କତା</string>
-    <string name="export_vault_failure">ଆପଣଙ୍କ ତିଜୋରି ରପ୍ତାନୀରେ ଏକ ସମସ୍ୟା ଥିଲା। ଯଦି ସମସ୍ୟା ଜାରି ରହେ, ଆପଣ ୱେବ ତିଜୋରିରୁ ରପ୍ତାନୀ କରିବାକୁ ପଡ଼ିବ।</string>
     <string name="export_vault_success">ତିଜୋରି ସଫଳତାର ସହ ରପ୍ତାନୀ</string>
     <string name="clone">କ୍ଲୋନ୍</string>
     <string name="password_generator_policy_in_effect">ଗୋଟିଏ ବା ଏକାଧିକ ସଂଗଠନ ନୀତି ଆପଣଙ୍କ ଜେନେରେଟର୍ ସେଟିଂକୁ ପ୍ରଭାବିତ କରୁଛି</string>
-    <string name="unable_to_save_attachment">ଏହି ସଂଲଗ୍ନ ସଞ୍ଚୟ କରିବାରେ ଏକ ସମସ୍ୟା ଥିଲା। ଯଦି ସମସ୍ୟା ଜାରି ରହେ, ଆପଣ ଏହାକୁ ୱେବ ତିଜୋରିରୁ ସଞ୍ଚୟ କରିପାରିବେ।</string>
     <string name="save_attachment_success">ସଂଲଗ୍ନ ସଫଳତାର ସହ ସଞ୍ଚୟ</string>
     <string name="autofill_tile_accessibility_required">ଅଟୋଫିଲ୍ ଟାଇଲ୍ ବ୍ୟବହାର କରିବାକୁ SecretDoor Settings ରୁ “Autofill Accessibility Service” ଚାଲୁ କରନ୍ତୁ।</string>
     <string name="autofill_tile_uri_not_found">କୌଣସି ପାସୱାର୍ଡ କ୍ଷେତ୍ର ଚିହ୍ନଟ ହୋଇନାହିଁ</string>
@@ -731,9 +729,7 @@
     <string name="two_step_login_description_long">SecretDoor ୱେବ ଆପ୍‌ରେ ଦୁଇ-ପଦକ୍ଷେପ ପ୍ରବେଶ ବ୍ୟବସ୍ଥା କରି ଆପଣଙ୍କ ଖାତାକୁ ଅଧିକ ସୁରକ୍ଷିତ କରନ୍ତୁ।</string>
     <string name="change_master_password_description_long">ଆପଣ SecretDoor ୱେବ ଆପ୍‌ରେ ଆପଣଙ୍କ ମାଷ୍ଟର ପାସୱାର୍ଡ ବଦଳାଇପାରିବେ।</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">SecretDoor ବ୍ୟବହାର ବିଷୟରେ ଅଧିକ ଜାଣିବାକୁ Help center କୁ ଯାଆନ୍ତୁ।</string>
-    <string name="privacy_policy_description_long">bitwarden.com ରେ ଆମର ଗୋପନୀୟତା ନୀତି ଦେଖନ୍ତୁ।</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">ୱେବ ଆପ୍‌ରେ ଆପଣଙ୍କ SecretDoor ଖାତାର ଅଧିକ ବୈଶିଷ୍ଟ୍ୟ ଅନୁସନ୍ଧାନ କରନ୍ତୁ।</string>
-    <string name="learn_about_organizations_description_long">SecretDoor ଆପଣଙ୍କୁ ଏକ ସଂଗଠନ ବ୍ୟବହାର କରି ଅନ୍ୟମାନଙ୍କ ସହ ଆପଣଙ୍କ ତିଜୋରି ଆଇଟମ୍ ବାଣ୍ଟିବାକୁ ଅନୁମତି ଦିଏ। bitwarden.com ୱେବସାଇଟରେ ଅଧିକ ଜାଣନ୍ତୁ।</string>
     <string name="created_x">%1$s ରେ ସୃଷ୍ଟି</string>
     <string name="your_organization_requires_you_to_set_a_master_password">ଆପଣଙ୍କ ସଂଗଠନ ଆପଣଙ୍କୁ ଏକ ମାଷ୍ଟର ପାସୱାର୍ଡ ସେଟ୍ କରିବାକୁ ଦାବି କରେ।</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">ଆପଣଙ୍କ ତିଜୋରି ସମୟ ସୀମା କାର୍ଯ୍ୟ ବଦଳାଇବାକୁ ଏକ ଖୋଲିବା ବିକଳ୍ପ ବ୍ୟବସ୍ଥା।</string>
@@ -845,8 +841,6 @@
     <string name="add_login">ପ୍ରବେଶ ଯୋଡନ୍ତୁ</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">ଯେ କୌଣସି ପ୍ଲାଟଫର୍ମରେ ଯେ କୌଣସି ବ୍ୟକ୍ତିଙ୍କ ସହ ଫାଇଲ୍ ଏବଂ ଡାଟା ସୁରକ୍ଷିତ ଭାବରେ ବାଣ୍ଟନ୍ତୁ। ଆପଣଙ୍କ ସୂଚନା end-to-end ଏନକ୍ରିପ୍ଟେଡ୍ ରହିବ ଏବଂ ଏକ୍ସପୋଜର୍ ସୀମିତ ହେବ।</string>
     <string name="send_sensitive_information_safely">ସମ୍ବେଦନଶୀଳ ସୂଚନା, ସୁରକ୍ଷିତ ଭାବରେ ପଠାନ୍ତୁ</string>
-    <string name="import_saved_logins">ସଞ୍ଚିତ ପ୍ରବେଶ ଆମଦାନୀ</string>
-    <string name="use_a_computer_to_import_logins">ଏକ ବିଦ୍ୟମାନ ପାସୱାର୍ଡ ମ୍ୟାନେଜରରୁ ପ୍ରବେଶ ଆମଦାନୀ କରିବାକୁ ଏକ କମ୍ପ୍ୟୁଟର ବ୍ୟବହାର</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Vault Settings ରେ ଆପଣ ଯେ କୌଣସି ସମୟରେ ଏହି ପଦକ୍ଷେପ ସମାପ୍ତ କରିବାକୁ ଫେରିପାରିବେ।</string>
     <string name="import_logins_later">ପରେ ପ୍ରବେଶ ଆମଦାନୀ</string>
     <string name="import_logins_later_dialog_title">ପରେ ପ୍ରବେଶ ଆମଦାନୀ?</string>
@@ -878,7 +872,6 @@
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">ଏହା ଏକ ସ୍ୱୀକୃତ SecretDoor ସର୍ଭର ନୁହେଁ। ଆପଣଙ୍କୁ ଆପଣଙ୍କ ପ୍ରଦାତାଙ୍କ ସହ ଯାଞ୍ଚ କିମ୍ବା ଆପଣଙ୍କ ସର୍ଭର ଅପଡେଟ୍ କରିବାକୁ ପଡ଼ିପାରେ।</string>
     <string name="syncing_logins_loading_message">ପ୍ରବେଶ ସିଙ୍କ କରୁଛି…</string>
     <string name="download_the_browser_extension">ବ୍ରାଉଜର ଏକ୍ସଟେନସନ୍ ଡାଉନଲୋଡ୍</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">ଏକ ସମନ୍ୱିତ ଅଭିଜ୍ଞତା ପାଇଁ SecretDoor କୁ ଆପଣଙ୍କ ପସନ୍ଦର ବ୍ରାଉଜରରେ ସମନ୍ୱିତ କରିବାକୁ bitwarden.com/download କୁ ଯାଆନ୍ତୁ।</string>
     <string name="use_the_web_app">ୱେବ ଆପ୍ ବ୍ୟବହାର</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">ଆପଣଙ୍କ ଖାତା ସହଜରେ ପରିଚାଳନା କରିବାକୁ ଏବଂ ସେଟିଂ ଅପଡେଟ୍ କରିବାକୁ bitwarden.com ରେ ପ୍ରବେଶ କରନ୍ତୁ।</string>
     <string name="autofill_passwords">ପାସୱାର୍ଡ ଅଟୋଫିଲ୍</string>
@@ -1144,9 +1137,7 @@
     <string name="account_synced_from_bitwarden_app">SecretDoor ଆପ୍‌ରୁ ସିଙ୍କ ହୋଇଥିବା ଖାତା</string>
     <string name="local_codes">ସ୍ଥାନୀୟ କୋଡ୍ (%1$d)</string>
     <string name="required_information_missing">ଆବଶ୍ୟକ ସୂଚନା ନାହିଁ</string>
-    <string name="required_information_missing_message">ଆବଶ୍ୟକ ସୂଚନା ନାହିଁ (ଯେପରିକି ‘services’ କିମ୍ବା ‘secret’)। ଆପଣଙ୍କ ଫାଇଲ୍ ଯାଞ୍ଚ କରନ୍ତୁ ଏବଂ ପୁନଃ ଚେଷ୍ଟା। ସମର୍ଥନ ପାଇଁ bitwarden.com/help ଦେଖନ୍ତୁ</string>
     <string name="file_could_not_be_processed">ଫାଇଲ୍ ପ୍ରକ୍ରିୟାକରଣ ହୋଇପାରିଲା ନାହିଁ</string>
-    <string name="file_could_not_be_processed_message">ଫାଇଲ୍ ପ୍ରକ୍ରିୟାକରଣ ହୋଇପାରିଲା ନାହିଁ। ଏହା ବୈଧ JSON ବୋଲି ନିଶ୍ଚିତ କରନ୍ତୁ ଏବଂ ପୁନଃ ଚେଷ୍ଟା। ସାହାଯ୍ୟ ଆବଶ୍ୟକ? bitwarden.com/help ଦେଖନ୍ତୁ</string>
     <string name="get_help">ସାହାଯ୍ୟ ପାଆନ୍ତୁ</string>
     <string name="error_cannot_decrypt">[ତ୍ରୁଟି: ଡିକ୍ରିପ୍ଟ୍ ହୋଇପାରିଲା ନାହିଁ]</string>
     <string name="copy_error_report">ତ୍ରୁଟି ରିପୋର୍ଟ କପି</string>

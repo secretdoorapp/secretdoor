@@ -417,11 +417,9 @@ Het scannen gebeurt automatisch.</string>
     <string name="export_vault_file_pw_protect_info">Deze bestandsexport wordt met een wachtwoord beveiligd en vereist het bestandswachtwoord om te decoderen.</string>
     <string name="export_vault_confirmation_title">Kluisexport bevestigen</string>
     <string name="warning">Waarschuwing</string>
-    <string name="export_vault_failure">Er ging iets mis met het exporteren van je kluis. Als het probleem aanhoudt, moet je exporteren via de webkluis.</string>
     <string name="export_vault_success">Kluis met succes geëxporteerd</string>
     <string name="clone">Dupliceren</string>
     <string name="password_generator_policy_in_effect">Een of meer organisatiebeleidseisen heeft invloed op de instellingen van je generator.</string>
-    <string name="unable_to_save_attachment">Er ging iets mis met het bewaren van deze bijlage. Als het probleem aanhoudt, kun je het bewaren via de webkluis.</string>
     <string name="save_attachment_success">Bijlage succesvol opgeslagen</string>
     <string name="autofill_tile_accessibility_required">Zet \"Automatisch invullen toegankelijkheidsservice\" aan bij SecretDoor Instellingen om de Autofill tegel te gebruiken.</string>
     <string name="autofill_tile_uri_not_found">Geen wachtwoordvelden gevonden</string>
@@ -731,9 +729,7 @@ Wilt u naar dit account wisselen?</string>
     <string name="two_step_login_description_long">Maak je account veiliger met het instellen van tweestapsaanmelding in de SecretDoor-webapp.</string>
     <string name="change_master_password_description_long">Je kunt je hoofdwachtwoord wijzigen in de SecretDoor-webapp.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Leer meer over het gebruik van SecretDoor in het Helpcentrum.</string>
-    <string name="privacy_policy_description_long">Bekijk ons privacybeleid op bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Ontdek meer functies van je SecretDoor-account in de webapp.</string>
-    <string name="learn_about_organizations_description_long">Met SecretDoor kun je je kluis-items met anderen delen door gebruik te maken van een organisatie. Lees meer op de website bitwarden.com.</string>
     <string name="created_x">Aangemaakt: %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Je organisatie vereist dat je een hoofdwachtwoord instelt.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Stel een ontgrendelingsmethode in om je kluis time-out actie te wijzigen.</string>
@@ -845,8 +841,6 @@ Wilt u naar dit account wisselen?</string>
     <string name="add_login">Login toevoegen</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Deel bestanden en gegevens veilig met iedereen, op elk platform. Je informatie blijft end-to-end versleuteld terwijl en blootstelling beperkt.</string>
     <string name="send_sensitive_information_safely">Gevoelige informatie veilig versturen</string>
-    <string name="import_saved_logins">Opgeslagen logins importeren</string>
-    <string name="use_a_computer_to_import_logins">Gebruik een computer om logins te importeren uit een bestaande wachtwoordmanager</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Je kunt deze stap op ieder moment afronden in je Kluis via Instellingen.</string>
     <string name="import_logins_later">Logingegevens later importeren</string>
     <string name="import_logins_later_dialog_title">Logingegevens later importeren?</string>
@@ -878,7 +872,6 @@ Wilt u naar dit account wisselen?</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Dit is geen herkende SecretDoor-server. Je moet mogelijk controleren met je provider of je server bijwerken.</string>
     <string name="syncing_logins_loading_message">Inloggegevens synchroniseren...</string>
     <string name="download_the_browser_extension">Browserextensie downloaden</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Ga naar bitwarden.com/download om SecretDoor in je favoriete browser te integreren voor een naadloze werking.</string>
     <string name="use_the_web_app">Webapp gebruiken</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Inloggen op bitwarden.com om je account en instellingen te beheren.</string>
     <string name="autofill_passwords">Wachtwoorden automatisch invullen</string>
@@ -1144,9 +1137,7 @@ Wilt u naar dit account wisselen?</string>
     <string name="account_synced_from_bitwarden_app">Account gesynchroniseerd vanuit SecretDoor app</string>
     <string name="local_codes">Lokale codes (%1$d)</string>
     <string name="required_information_missing">Verplichte informatie ontbreekt</string>
-    <string name="required_information_missing_message">Vereiste informatie ontbreekt (bijv. \'services\' of \'secret\'). Controleer je bestand en probeer het opnieuw. Bezoek bitwarden.com/help voor ondersteuning</string>
     <string name="file_could_not_be_processed">Bestand kon niet worden verwerkt</string>
-    <string name="file_could_not_be_processed_message">Bestand kon niet worden verwerkt. Zorg ervoor dat het geldige JSON is en probeer het opnieuw. Hulp nodig? Ga naar bitwarden.com/help</string>
     <string name="get_help">Krijg hulp</string>
     <string name="error_cannot_decrypt">[fout: kan niet ontsleutelen]</string>
     <string name="copy_error_report">Foutrapportage kopiëren</string>

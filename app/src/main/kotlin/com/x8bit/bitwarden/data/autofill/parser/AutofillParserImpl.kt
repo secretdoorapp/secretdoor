@@ -33,9 +33,9 @@ private val BLOCK_LISTED_URIS: List<String> = listOf(
     "androidapp://com.x8bit.bitwarden",
     "androidapp://com.x8bit.bitwarden.beta",
     "androidapp://com.x8bit.bitwarden.dev",
-    "androidapp://io.github.zcoklin.secretdoor",
-    "androidapp://io.github.zcoklin.secretdoor.beta",
-    "androidapp://io.github.zcoklin.secretdoor.dev",
+    "androidapp://app.secretdoor",
+    "androidapp://app.secretdoor.beta",
+    "androidapp://app.secretdoor.dev",
     "androidapp://com.oneplus.applocker",
 )
 

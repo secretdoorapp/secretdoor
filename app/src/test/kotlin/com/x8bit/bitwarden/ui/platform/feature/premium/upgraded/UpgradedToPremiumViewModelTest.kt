@@ -3,6 +3,7 @@ package com.x8bit.bitwarden.ui.platform.feature.premium.upgraded
 import app.cash.turbine.test
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.x8bit.bitwarden.data.billing.manager.PremiumStateManager
+import com.x8bit.bitwarden.data.platform.util.SecretDoorLinks
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -25,7 +26,7 @@ class UpgradedToPremiumViewModelTest : BaseViewModelTest() {
             viewModel.trySendAction(UpgradedToPremiumAction.LearnMoreClick)
             assertEquals(
                 UpgradedToPremiumEvent.NavigateToUrl(
-                    url = "https://bitwarden.com/help/password-manager-plans/",
+                    url = SecretDoorLinks.PREMIUM_URL,
                 ),
                 awaitItem(),
             )

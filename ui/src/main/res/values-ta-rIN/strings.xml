@@ -417,11 +417,9 @@
     <string name="export_vault_file_pw_protect_info">இந்த கோப்பு ஏற்றுமதி கடவுச்சொல் பாதுகாக்கப்பட்டதாக இருக்கும் மற்றும் கோப்பை மறைகுறியாக்க கோப்பு கடவுச்சொல் தேவைப்படும்.</string>
     <string name="export_vault_confirmation_title">பெட்டக ஏற்றுமதியை உறுதிசெய்</string>
     <string name="warning">எச்சரிக்கை</string>
-    <string name="export_vault_failure">உங்கள் பாதுகாப்பு பையை ஏற்றுமதி செய்வதில் சிக்கல் ஏற்பட்டது. சிக்கல் தொடர்ந்தால், இணைய பாதுகாப்பு பையிலிருந்து ஏற்றுமதி செய்ய வேண்டும்.</string>
     <string name="export_vault_success">பெட்டகம் வெற்றிகரமாக ஏற்றுமதி செய்யப்பட்டது</string>
     <string name="clone">நகலி</string>
     <string name="password_generator_policy_in_effect">ஒன்று அ மேற்பட்ட நிறுவன கொள்கைகள் உமது உருவாக்கி அமைப்புகளை பாதிக்கிறது</string>
-    <string name="unable_to_save_attachment">இவ்விணைப்பை சேமிப்பதில் ஏதோ சிக்கல். சிக்கல் தொடர்ந்தால், வலைப்பெட்டகத்திலிருந்து இதைச் சேமிக்கலாம்.</string>
     <string name="save_attachment_success">சேர்ப்பு வெற்றிகரமாக சேமிக்கப்பட்டது</string>
     <string name="autofill_tile_accessibility_required">தானாக நிரப்புதல் டைலை பயன்படுத்த பிட்வார்டன் அமைப்புகளிலிருந்து \"தானாக நிரப்புதல் அணுகல் சேவை\" என்பதை இயக்கவும்.</string>
     <string name="autofill_tile_uri_not_found">கடவுச்சொல் புலங்களேதும் கண்டறியப்படவில்லை</string>
@@ -731,9 +729,7 @@
     <string name="two_step_login_description_long">SecretDoor வலைச்செயலியில் இரு-படி உள்நுழைவை அமைத்து உமது கணக்கின் பாதுகாப்பை அதிகரி.</string>
     <string name="change_master_password_description_long">SecretDoor வலைச்செயலியில் உமது பிரதான கடவுச்சொல்லை மாற்றலாம்.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">உதவி மையத்தில் SecretDoor-ஐ எவ்வாறு பயன்படுத்துவது என்பது பற்றி மேலும் அறிக.</string>
-    <string name="privacy_policy_description_long">bitwarden.com இல் எங்கள் தனியுரிமைக் கொள்கையைப் பாருங்கள்.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">வலைப் பயன்பாட்டில் உங்கள் SecretDoor கணக்கின் மேலும் அம்சங்களை ஆராயுங்கள்.</string>
-    <string name="learn_about_organizations_description_long">ஒரு நிறுவனத்தைப் பயன்படுத்தி உங்கள் பெட்டக உருப்படிகளை மற்றவர்களுடன் பகிர SecretDoor உங்களை அனுமதிக்கிறது. bitwarden.com இணையதளத்தில் மேலும் அறிக.</string>
     <string name="created_x">உருவாக்கப்பட்டது %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">உங்கள் நிறுவனம் ஒரு முதன்மை கடவுச்சொல்லை அமைக்குமாறு உங்களை கோருகிறது.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">உங்கள் பெட்டக காலாவதி நடவடிக்கையை மாற்ற ஒரு திறக்கும் விருப்பத்தை அமைக்கவும்.</string>
@@ -845,8 +841,6 @@
     <string name="add_login">உள்நுழைவைச் சேர்க்கவும்</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">கோப்புகள் மற்றும் தரவை யாருடனும், எத்தளத்திலும் பாதுகாப்பாகப் பகிர்க. வெளிப்படுதலைக் கட்டுப்படுத்தி உமது தகவல் இருமுனை மறையாக்கம் செய்யப்பட்டிருக்கும்.</string>
     <string name="send_sensitive_information_safely">மறைமுகத் தகவலை அனுப்புக, பாதுகாப்பாக</string>
-    <string name="import_saved_logins">சேமிக்கப்பட்ட உள்நுழைவுகளை இறக்குமதி செய்</string>
-    <string name="use_a_computer_to_import_logins">ஏற்கனவே உள்ள கடவுச்சொல் மேலாளரிடமிருந்து உள்நுழைவுகளை இறக்குமதி செய்ய ஒரு கணினியைப் பயன்படுத்தவும்</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">பெட்டக அமைப்புகளில் எந்த நேரத்திலும் இந்த படிநிலையை முடிக்க நீங்கள் திரும்பலாம்.</string>
     <string name="import_logins_later">பின்னர் உள்நுழைவுகளை இறக்குமதி செய்</string>
     <string name="import_logins_later_dialog_title">பின்னர் உள்நுழைவுகளை இறக்குமதி செய்யவா?</string>
@@ -878,7 +872,6 @@
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">இது அங்கீகரிக்கப்பட்ட SecretDoor சர்வர் அல்ல. உங்கள் வழங்குநருடன் சரிபார்க்க அல்லது உங்கள் சர்வரை புதுப்பிக்க வேண்டியிருக்கலாம்.</string>
     <string name="syncing_logins_loading_message">உள்நுழைவுகளை ஒத்திசைக்கிறது…</string>
     <string name="download_the_browser_extension">உலாவி நீட்டிப்பை பதிவிறக்கு</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">உங்கள் விருப்பமான உலாவியில் SecretDoor-ஐ ஒருங்கிணைக்க bitwarden.com/download -க்குச் செல்லவும்.</string>
     <string name="use_the_web_app">வலை பயன்பாட்டைப் பயன்படுத்து</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">உங்கள் கணக்கை எளிதாக நிர்வகிக்கவும் மற்றும் அமைப்புகளை புதுப்பிக்கவும் bitwarden.com-ல் உள்நுழையவும்.</string>
     <string name="autofill_passwords">கடவுச்சொற்களை தானாக நிரப்பு</string>
@@ -1144,9 +1137,7 @@
     <string name="account_synced_from_bitwarden_app">கணக்கு SecretDoor செயலியிலிருந்து ஒத்திசைக்கப்பட்டது</string>
     <string name="local_codes">உள்ளூர் குறியீடுகள் (%1$d)</string>
     <string name="required_information_missing">தேவையான தகவல் இல்லை</string>
-    <string name="required_information_missing_message">தேவையான தகவல் இல்லை (எ.கா., ‘services’ அல்லது ‘secret’). உங்கள் கோப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும். ஆதரவிற்கு bitwarden.com/help-ஐப் பார்வையிடவும்</string>
     <string name="file_could_not_be_processed">கோப்பைச் செயல்படுத்த முடியவில்லை</string>
-    <string name="file_could_not_be_processed_message">கோப்பைச் செயல்படுத்த முடியவில்லை. இது செல்லுபடியாகும் JSON என்பதை உறுதிசெய்து மீண்டும் முயற்சிக்கவும். உதவி தேவையா? bitwarden.com/help-ஐப் பார்வையிடவும்</string>
     <string name="get_help">உதவி பெறு</string>
     <string name="error_cannot_decrypt">[பிழை: மறைகுறியாக்க முடியவில்லை]</string>
     <string name="copy_error_report">பிழை அறிக்கையை நகலெடு</string>

@@ -58,6 +58,8 @@ import com.bitwarden.ui.util.onAllNodesWithTextAfterScroll
 import com.bitwarden.ui.util.onNodeWithContentDescriptionAfterScroll
 import com.bitwarden.ui.util.onNodeWithTextAfterScroll
 import com.bitwarden.vault.UriMatchType
+import com.x8bit.bitwarden.data.platform.repository.model.UriMatchType as UriMatchTypeModel
+import com.x8bit.bitwarden.data.platform.util.SecretDoorLinks
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockCipherView
 import com.x8bit.bitwarden.ui.credentials.manager.CredentialProviderCompletionManager
 import com.x8bit.bitwarden.ui.credentials.manager.model.CreateCredentialResult
@@ -89,7 +91,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.time.LocalDate
-import com.x8bit.bitwarden.data.platform.repository.model.UriMatchType as UriMatchTypeModel
 
 @Suppress("LargeClass")
 class VaultAddEditScreenTest : BitwardenComposeTest() {
@@ -179,7 +180,7 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
         mutableEventFlow.tryEmit(VaultAddEditEvent.NavigateToTooltipUri)
         verify {
             intentManager.launchUri(
-                "https://bitwarden.com/help/managing-items/#protect-individual-items".toUri(),
+                SecretDoorLinks.MASTER_PASSWORD_REPROMPT_URL.toUri(),
             )
         }
     }
@@ -189,7 +190,7 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
         mutableEventFlow.tryEmit(VaultAddEditEvent.NavigateToAuthenticatorKeyTooltipUri)
         verify {
             intentManager.launchUri(
-                "https://bitwarden.com/help/integrated-authenticator".toUri(),
+                SecretDoorLinks.AUTHENTICATOR_CODES_URL.toUri(),
             )
         }
     }
@@ -4957,7 +4958,7 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
     fun `on NavigateToLearnMore should call launchUri`() {
         mutableEventFlow.tryEmit(VaultAddEditEvent.NavigateToLearnMore)
         verify(exactly = 1) {
-            intentManager.launchUri(uri = "https://bitwarden.com/help/uri-match-detection/".toUri())
+            intentManager.launchUri(uri = SecretDoorLinks.URI_MATCH_DETECTION_URL.toUri())
         }
     }
 

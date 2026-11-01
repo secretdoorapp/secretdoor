@@ -45,6 +45,7 @@ import com.x8bit.bitwarden.data.platform.manager.network.NetworkConnectionManage
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.platform.repository.model.VaultSection
 import com.x8bit.bitwarden.data.platform.repository.util.FakeEnvironmentRepository
+import com.x8bit.bitwarden.data.platform.util.SecretDoorLinks
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockBankAccountView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockCardListView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockCardView
@@ -564,7 +565,7 @@ class VaultViewModelTest : BaseViewModelTest() {
                 )
                 assertEquals(
                     VaultEvent.NavigateToUrl(
-                        url = "https://bitwarden.com/help/password-manager-plans/",
+                        url = SecretDoorLinks.PREMIUM_URL,
                     ),
                     awaitItem(),
                 )

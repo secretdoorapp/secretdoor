@@ -5,11 +5,15 @@ encrypted with your master password, and is never sent to any server. You decide
 backups go.
 
 SecretDoor is a fork of [Bitwarden for Android](https://github.com/bitwarden/android) and uses the
-Bitwarden SDK for all encryption. It is not affiliated with or endorsed by Bitwarden Inc.
+Bitwarden SDK for all encryption. It is free software under the GNU GPL v3. It is not affiliated
+with or endorsed by Bitwarden Inc. See [NOTICE.md](NOTICE.md).
+
+**Documentation:** [docs/README.md](docs/README.md)
 
 ## Contents
 
 - [Features](#features)
+- [Documentation](#documentation)
 - [Privacy](#privacy)
 - [Backups](#backups)
 - [Compatibility](#compatibility)
@@ -23,7 +27,15 @@ Bitwarden SDK for all encryption. It is not affiliated with or endorsed by Bitwa
 - Password and passphrase generator, password history and TOTP verification codes.
 - Unlock with your master password, a PIN or biometrics.
 - Autofill for apps and browsers, and passkeys through Android Credential Manager.
+- Several vaults on one phone, each with its own master password; rename, delete and add vaults.
 - Encrypted backups you can save anywhere, plus optional automatic backups.
+
+## Documentation
+
+User documentation lives in [docs/](docs/README.md): [privacy](docs/PRIVACY.md),
+[backups](docs/help/backups.md), [managing vaults](docs/help/managing-vaults.md),
+[security](docs/help/security.md), [autofill](docs/help/autofill.md), [SSH
+keys](docs/help/ssh-keys.md) and more. The help buttons inside the app open these pages.
 
 ## Privacy
 
@@ -49,13 +61,15 @@ Bitwarden SDK for all encryption. It is not affiliated with or endorsed by Bitwa
 Because the vault exists only on your phone, losing the phone or uninstalling the app loses the
 vault unless you have a backup.
 
-- **Save backup file** (Settings > Vault > Backup) writes a `.zip` file to any location you pick,
-  for example Google Drive. The file holds your vault exactly as it is stored on the phone:
-  encrypted, including folders and attachments. You need your master password to restore it.
+- **Save backup file** (Settings > Vault > Backup) writes one `.secretdoor` file to any location
+  you pick, for example Google Drive. The whole file is encrypted (AES-256-GCM, with a key derived
+  from your vault key), including folders and attachments. You need your master password to
+  restore it.
 - **Automatic backup** writes the backup to a file you choose once, daily or weekly, even when
   the vault is locked. Google Drive keeps earlier versions of the file.
 - **Restore from backup** is on the "Create vault" screen of a fresh install. Pick the backup file
   and enter the vault's master password.
+- **Import backup** adds a backup to the current vault or as a separate vault.
 
 **Export vault** (Settings > Vault) is separate: it produces Bitwarden-compatible files (CSV, JSON
 or password-protected JSON) for moving to another password manager.
@@ -72,7 +86,7 @@ or password-protected JSON) for moving to another password manager.
 1. Clone the repository:
 
     ```sh
-    $ git clone https://github.com/zcoklin/secretdoor
+    $ git clone https://github.com/secretdoorapp/secretdoor
     ```
 
 2. Create a `user.properties` file in the root directory with a `gitHubToken` property: a
@@ -96,8 +110,16 @@ Code style follows [docs/STYLE_AND_BEST_PRACTICES.md](docs/STYLE_AND_BEST_PRACTI
 ## License
 
 SecretDoor is licensed under the [GNU General Public License v3.0](LICENSE.txt), like the
-Bitwarden Android app it is based on. Bitwarden is a trademark of Bitwarden Inc.; SecretDoor is an
-independent project.
+Bitwarden Android app it is based on. It is a modified version of that app; see
+[NOTICE.md](NOTICE.md) for what was changed, the origin of the code, the Bitwarden SDK and every
+third-party license ([full list](docs/THIRD_PARTY_LICENSES.md)). The app links to its source code,
+license and notices on its About screen.
+
+Bitwarden is a trademark of Bitwarden Inc.; SecretDoor is an independent project and is not
+affiliated with Bitwarden.
+
+Distribute the `fdroid` build (no Google libraries). The `standard` flavor contains proprietary
+Google components; read the notes in [NOTICE.md](NOTICE.md#which-build-to-distribute) first.
 
 ## Dependencies
 

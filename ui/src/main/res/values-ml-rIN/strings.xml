@@ -417,11 +417,9 @@
     <string name="export_vault_file_pw_protect_info">ഈ ഫയൽ കയറ്റുമതി പാസ്വേഡ് പരിരക്ഷിതമായിരിക്കും, ഡീക്രിപ്റ്റ് ചെയ്യാൻ ഫയൽ പാസ്വേഡ് ആവശ്യമാണ്.</string>
     <string name="export_vault_confirmation_title">വാൾട് എക്‌സ്‌പോർട്ട് സ്ഥിരീകരിക്കുക</string>
     <string name="warning">മുന്നറിയിപ്പ്‌</string>
-    <string name="export_vault_failure">നിങ്ങളുടെ വോൾട്ട് കയറ്റുമതി ചെയ്യുന്നതിൽ ഒരു പ്രശ്നമുണ്ടായി. പ്രശ്നം നിലനിൽക്കുകയാണെങ്കിൽ, നിങ്ങൾ വെബ് വോൾട്ടിൽ നിന്ന് കയറ്റുമതി ചെയ്യേണ്ടതായി വരും.</string>
     <string name="export_vault_success">വാൾട് വിജയകരമായി എക്സ്പോർട് ചെയ്‌തു</string>
     <string name="clone">ക്ലോൺ</string>
     <string name="password_generator_policy_in_effect">ഒന്നോ അതിലധികമോ സംഘടന നയങ്ങൾ നിങ്ങളുടെ പാസ്സ്‌വേഡ് സൃഷ്ടാവിൻ്റെ ക്രമീകരണങ്ങളെ ബാധിക്കുന്നു</string>
-    <string name="unable_to_save_attachment">ഈ അറ്റാച്ചുമെന്റ് സംരക്ഷിക്കുന്നതിൽ ഒരു പ്രശ്നമുണ്ട്. പ്രശ്നം നിലനിൽക്കുകയാണെങ്കിൽ, നിങ്ങൾക്ക് വെബ് വാൾട്ടിൽ നിന്ന് അറ്റാച്ചുമെന്റ് സംരക്ഷിക്കാൻ കഴിയും.</string>
     <string name="save_attachment_success">അറ്റാച്ചുമെന്റ് വിജയകരമായി സംരക്ഷിച്ചു</string>
     <string name="autofill_tile_accessibility_required">ഓട്ടോഫിൽ ടൈൽ ഉപയോഗിക്കുന്നതിന് ദയവായി SecretDoor ക്രമീകരണങ്ങളിൽ നിന്ന് “Autofill Accessibility Service” ഓണാക്കുക.</string>
     <string name="autofill_tile_uri_not_found">പാസ്‌വേഡ് ഫീൽഡുകളൊന്നും കണ്ടെത്തിയില്ല</string>
@@ -731,9 +729,7 @@
     <string name="two_step_login_description_long">SecretDoor വെബ് ആപ്പിൽ ടു-സ്റ്റെപ്പ് ലോഗിൻ സജ്ജീകരിച്ച് നിങ്ങളുടെ അക്കൗണ്ട് കൂടുതൽ സുരക്ഷിതമാക്കുക.</string>
     <string name="change_master_password_description_long">SecretDoor വെബ് ആപ്പിൽ നിങ്ങൾക്ക് നിങ്ങളുടെ മാസ്റ്റർ പാസ്വേഡ് മാറ്റാം.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">സഹായ കേന്ദ്രത്തിൽ SecretDoor എങ്ങനെ ഉപയോഗിക്കാമെന്നതിനെക്കുറിച്ച് കൂടുതലറിയുക.</string>
-    <string name="privacy_policy_description_long">bitwarden.com-ൽ ഞങ്ങളുടെ സ്വകാര്യതാ നയം പരിശോധിക്കുക.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">വെബ് ആപ്പിൽ നിങ്ങളുടെ SecretDoor അക്കൗണ്ടിന്റെ കൂടുതൽ സവിശേഷതകൾ പര്യവേക്ഷണം ചെയ്യുക.</string>
-    <string name="learn_about_organizations_description_long">ഒരു സംഘടന ഉപയോഗിച്ച് നിങ്ങളുടെ വോൾട്ട് ഇനങ്ങൾ മറ്റുള്ളവരുമായി പങ്കിടാൻ SecretDoor നിങ്ങളെ അനുവദിക്കുന്നു. bitwarden.com വെബ്സൈറ്റിൽ കൂടുതലറിയുക.</string>
     <string name="created_x">സൃഷ്ടിച്ചത് %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">നിങ്ങളുടെ സംഘടന ഒരു മാസ്റ്റർ പാസ്വേഡ് സജ്ജീകരിക്കാൻ ആവശ്യപ്പെടുന്നു.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">നിങ്ങളുടെ വോൾട്ട് ടൈംഔട്ട് പ്രവർത്തനം മാറ്റാൻ ഒരു അൺലോക്ക് ഓപ്ഷൻ സജ്ജീകരിക്കുക.</string>
@@ -845,8 +841,6 @@
     <string name="add_login">ലോഗിൻ ചേർക്കുക</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">ഏത് പ്ലാറ്റ്ഫോമിലും ആർക്കും ഫയലുകളും ഡാറ്റയും സുരക്ഷിതമായി പങ്കിടുക. എക്സ്പോഷർ പരിമിതപ്പെടുത്തുമ്പോൾ നിങ്ങളുടെ വിവരങ്ങൾ എൻഡ്-ടു-എൻഡ് എൻക്രിപ്റ്റ് ചെയ്ത നിലയിൽ തുടരും.</string>
     <string name="send_sensitive_information_safely">സെൻസിറ്റീവ് വിവരങ്ങൾ സുരക്ഷിതമായി അയയ്ക്കുക</string>
-    <string name="import_saved_logins">സംരക്ഷിച്ച ലോഗിനുകൾ ഇംപോർട്ട് ചെയ്യുക</string>
-    <string name="use_a_computer_to_import_logins">നിലവിലുള്ള ഒരു പാസ്വേഡ് മാനേജറിൽ നിന്ന് ലോഗിനുകൾ ഇംപോർട്ട് ചെയ്യാൻ ഒരു കമ്പ്യൂട്ടർ ഉപയോഗിക്കുക</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">വോൾട്ട് ക്രമീകരണങ്ങളിൽ ഏത് സമയത്തും ഈ ഘട്ടം പൂർത്തിയാക്കാൻ നിങ്ങൾക്ക് മടങ്ങാം.</string>
     <string name="import_logins_later">പിന്നീട് ലോഗിനുകൾ ഇംപോർട്ട് ചെയ്യുക</string>
     <string name="import_logins_later_dialog_title">പിന്നീട് ലോഗിനുകൾ ഇംപോർട്ട് ചെയ്യണോ?</string>
@@ -878,7 +872,6 @@
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">ഇത് അംഗീകൃത SecretDoor സെർവറല്ല. നിങ്ങൾ നിങ്ങളുടെ ദാതാവുമായി പരിശോധിക്കുകയോ നിങ്ങളുടെ സെർവർ അപ്ഡേറ്റ് ചെയ്യുകയോ ചെയ്യേണ്ടി വന്നേക്കാം.</string>
     <string name="syncing_logins_loading_message">ലോഗിനുകൾ സമന്വയിപ്പിക്കുന്നു…</string>
     <string name="download_the_browser_extension">ബ്രൗസർ എക്സ്റ്റൻഷൻ ഡൗൺലോഡ് ചെയ്യുക</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">തടസ്സമില്ലാത്ത അനുഭവത്തിനായി SecretDoor നിങ്ങളുടെ പ്രിയപ്പെട്ട ബ്രൗസറിൽ സംയോജിപ്പിക്കാൻ bitwarden.com/download-ലേക്ക് പോകുക.</string>
     <string name="use_the_web_app">വെബ് ആപ്പ് ഉപയോഗിക്കുക</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">നിങ്ങളുടെ അക്കൗണ്ട് എളുപ്പത്തിൽ നിയന്ത്രിക്കാനും ക്രമീകരണങ്ങൾ അപ്ഡേറ്റ് ചെയ്യാനും bitwarden.com-ൽ ലോഗിൻ ചെയ്യുക.</string>
     <string name="autofill_passwords">പാസ്വേഡുകൾ ഓട്ടോഫിൽ ചെയ്യുക</string>
@@ -1144,9 +1137,7 @@
     <string name="account_synced_from_bitwarden_app">SecretDoor ആപ്പിൽ നിന്ന് സമന്വയിപ്പിച്ച അക്കൗണ്ട്</string>
     <string name="local_codes">പ്രാദേശിക കോഡുകൾ (%1$d)</string>
     <string name="required_information_missing">ആവശ്യമായ വിവരങ്ങൾ നൽകിയിട്ടില്ല</string>
-    <string name="required_information_missing_message">ആവശ്യമായ വിവരങ്ങൾ നൽകിയിട്ടില്ല (ഉദാ: ‘services’ അല്ലെങ്കിൽ ‘secret’). നിങ്ങളുടെ ഫയൽ പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക. പിന്തുണയ്ക്കായി bitwarden.com/help സന്ദർശിക്കുക</string>
     <string name="file_could_not_be_processed">ഫയൽ പ്രോസസ്സ് ചെയ്യാനായില്ല</string>
-    <string name="file_could_not_be_processed_message">ഫയൽ പ്രോസസ്സ് ചെയ്യാനായില്ല. ഇത് സാധുവായ JSON ആണെന്ന് ഉറപ്പാക്കി വീണ്ടും ശ്രമിക്കുക. സഹായം വേണോ? bitwarden.com/help സന്ദർശിക്കുക</string>
     <string name="get_help">Get Help</string>
     <string name="error_cannot_decrypt">[പിശക്: ഡീക്രിപ്റ്റ് ചെയ്യാനാകില്ല]</string>
     <string name="copy_error_report">പിശക് റിപ്പോർട്ട് പകർത്തുക</string>

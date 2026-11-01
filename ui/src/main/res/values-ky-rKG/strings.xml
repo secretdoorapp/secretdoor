@@ -417,11 +417,9 @@
     <string name="export_vault_file_pw_protect_info">Бул файл экспорттоо сырсөз менен корголот жана чечүү үчүн файлдын сырсөзүн талап кылат.</string>
     <string name="export_vault_confirmation_title">Купчулду экспорттоону ырастоо</string>
     <string name="warning">Эскертүү</string>
-    <string name="export_vault_failure">Купчулду экспорттоодо көйгөй чыкты. Эгерде көйгөй уланса, веб купчулдан экспорттоого туура келет.</string>
     <string name="export_vault_success">Купчул ийгиликтүү экспорттолду</string>
     <string name="clone">Клондоо</string>
     <string name="password_generator_policy_in_effect">Бир же бир нече уюм саясаты сиздин генератор орнотууларыңызга таасир этүүдө</string>
-    <string name="unable_to_save_attachment">Бул тиркемени сактоодо көйгөй чыкты. Эгерде көйгөй уланса, аны веб купчулдан сактай аласыз.</string>
     <string name="save_attachment_success">Тиркеме ийгиликтүү сакталды</string>
     <string name="autofill_tile_accessibility_required">Автолуктоо плиткасын колдонуу үчүн SecretDoor Орнотууларынан “Автолуктоо Жеткиликтүүлүк Кызматын” күйгүзүңүз.</string>
     <string name="autofill_tile_uri_not_found">Сырсөз талаалары аныкталган жок</string>
@@ -731,9 +729,7 @@
     <string name="two_step_login_description_long">SecretDoor веб колдонмосунда эки кадамдуу кирүүнү орнотуу менен аккаунтуңузду коопсуз кылыңыз.</string>
     <string name="change_master_password_description_long">Сиз башкы сырсөзүңүздү SecretDoor веб колдонмосунда өзгөртө аласыз.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">SecretDoorди кантип колдонуу жөнүндө Жардам борборунан көбүрөөк билүү.</string>
-    <string name="privacy_policy_description_long">bitwarden.com сайтындагы купуялык саясатыбыз менен таанышыңыз.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">SecretDoor аккаунтуңуздун дагы көп функцияларын веб колдонмодо изилдеңиз.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor уюмду колдонуу менен купчул элементтериңизди башкалар менен бөлүшүүгө мүмкүнчүлүк берет. bitwarden.com веб-сайтында көбүрөөк билип алыңыз.</string>
     <string name="created_x">%1$s түзүлгөн</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Уюмуңуз сизден башкы сырсөз коюуну талап кылат.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Купчул убактыңыздын аракетин өзгөртүү үчүн ачуу параметрин орнотуңуз.</string>
@@ -845,8 +841,6 @@
     <string name="add_login">Кирүү кошуу</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Файлдарды жана маалыматтарды каалаган адам менен, каалаган платформада коопсуз бөлүшүңүз. Сиздин маалыматтарыңыз ачыкка чыгууну чектөө менен учтан-учка шифрленген бойдон калат.</string>
     <string name="send_sensitive_information_safely">Маанилүү маалыматтарды коопсуз жөнөтүү</string>
-    <string name="import_saved_logins">Сакталган кирүүлөрдү импорттоо</string>
-    <string name="use_a_computer_to_import_logins">Кирүү маалыматтарын учурдагы сырсөз башкаруучудан импорттоо үчүн компьютерди колдонуңуз</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Сиз бул кадамды аяктоо үчүн каалаган убакта Купчул Орнотууларына кайта аласыз.</string>
     <string name="import_logins_later">Кирүүлөрдү кийин импорттоо</string>
     <string name="import_logins_later_dialog_title">Кирүүлөрдү кийин импорттоо?</string>
@@ -878,7 +872,6 @@
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Бул таанылган SecretDoor сервери эмес. Провайдериңизден текшеришиңиз же сервериңизди жаңыртышыңыз керек болушу мүмкүн.</string>
     <string name="syncing_logins_loading_message">Кирүүлөрдү синхрондоштуруу…</string>
     <string name="download_the_browser_extension">Браузер кошумча мүмкүнчүлүгүн жүктөп алуу</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Үзгүлтүксүз тажрыйба үчүн SecretDoorди сүйүктүү браузериңизге интеграциялоо үчүн bitwarden.com/download дарегине өтүңүз.</string>
     <string name="use_the_web_app">Веб колдонмону колдонуу</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Аккаунтуңузду оңой башкаруу жана орнотууларды жаңыртуу үчүн bitwarden.com сайтына кириңиз.</string>
     <string name="autofill_passwords">Сырсөздөрдү автолуктоо</string>
@@ -1144,9 +1137,7 @@
     <string name="account_synced_from_bitwarden_app">SecretDoor колдонмосунан синхрондоштурулган каттоо эсеби</string>
     <string name="local_codes">Жергиликтүү коддор (%1$d)</string>
     <string name="required_information_missing">Талап кылынган маалымат жок</string>
-    <string name="required_information_missing_message">Талап кылынган маалымат жок (мисалы, ‘services’ же ‘secret’). Файлыңызды текшерип, кайра аракет кылыңыз. Жардам алуу үчүн bitwarden.com/help сайтына кириңиз</string>
     <string name="file_could_not_be_processed">Файлды иштетүү мүмкүн болбой калды</string>
-    <string name="file_could_not_be_processed_message">Файлды иштетүү мүмкүн болбой калды. Ал туура JSON экенине ынанып, кайра аракет кылыңыз. Жардам керекпи? bitwarden.com/help сайтына кириңиз</string>
     <string name="get_help">Жардам алуу</string>
     <string name="error_cannot_decrypt">[ката: чечүү мүмкүн эмес]</string>
     <string name="copy_error_report">Ката отчетун көчүрүү</string>

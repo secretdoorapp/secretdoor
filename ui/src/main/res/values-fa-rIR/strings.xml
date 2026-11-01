@@ -417,11 +417,9 @@
     <string name="export_vault_file_pw_protect_info">این پرونده برون ریزی با کلمه عبور محافظت می‌شود و برای رمزگشایی به کلمه عبور پرونده نیاز دارد.</string>
     <string name="export_vault_confirmation_title">برون ریزی گاوصندوق را تأیید کنید</string>
     <string name="warning">هشدار</string>
-    <string name="export_vault_failure">هنگام برون ریزی گاوصندوق شما مشکلی پیش آمد. اگر مشکل همچنان ادامه داشت، باید از گاوصندوق وب برون ریزی بگیرید.</string>
     <string name="export_vault_success">برون ریزی گاوصندوق با موفقیت انجام شد</string>
     <string name="clone">شبیه‌سازی</string>
     <string name="password_generator_policy_in_effect">یک یا چند سیاست سازمان بر تنظیمات تولید کننده شما تأثیر می‌گذارد</string>
-    <string name="unable_to_save_attachment">هنگام ذخیره این پیوست مشکلی رخ داد. اگر مشکل همچنان ادامه داشت، می‌توانید آن را از گاوصندوق وب ذخیره کنید.</string>
     <string name="save_attachment_success">پیوست با موفقیت ذخیره شد.</string>
     <string name="autofill_tile_accessibility_required">لطفاً برای استفاده از کاشی پر کردن خودکار، \"سرویس دسترسی پر کردن خودکار\" را از تنظیمات SecretDoor فعال کنید.</string>
     <string name="autofill_tile_uri_not_found">هیچ فیلدی برای کلمه عبور شناسایی نشد</string>
@@ -731,9 +729,7 @@
     <string name="two_step_login_description_long">با راه‌اندازی ورود دو مرحله‌ای در برنامه وب SecretDoor، حساب کاربری خود را ایمن‌تر کنید.</string>
     <string name="change_master_password_description_long">می‌توانید کلمه عبور اصلی خود را در برنامه وب SecretDoor تغییر دهید.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">درباره نحوه استفاده از SecretDoor در مرکز راهنمایی بیشتر بیاموزید.</string>
-    <string name="privacy_policy_description_long">سیاست حفظ حریم خصوصی ما را در bitwarden.com بررسی کنید.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">ویژگی‌های بیشتر حساب کاربری SecretDoor خود را در برنامه وب کاوش کنید.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor به شما اجازه می‌دهد تا با استفاده از یک سازمان، موارد گاوصندوق خود را با دیگران به اشتراک بگذارید. در وب سایت bitwarden.com بیشتر بیاموزید.</string>
     <string name="created_x">ساخته شده: %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">سازمان‌تان از شما می‌خواهد که یک کلمه عبور اصلی تنظیم کنید.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">یک گزینه باز کردن قفل برای پایان زمان مجاز راه‌اندازی کنید.</string>
@@ -845,8 +841,6 @@
     <string name="add_login">افزودن ورود</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">پرونده‌ها و داده‌های خود را به‌صورت امن با هر کسی، در هر پلتفرمی به اشتراک بگذارید. اطلاعات شما در حین اشتراک‌گذاری به‌طور کامل با رمزگذاری انتها به انتها باقی خواهد ماند و میزان افشا محدود می‌شود.</string>
     <string name="send_sensitive_information_safely">اطلاعات حساس را به‌صورت ایمن ارسال کنید</string>
-    <string name="import_saved_logins">ورودهای ذخیره‌شده را درون ریزی کنید</string>
-    <string name="use_a_computer_to_import_logins">از یک رایانه برای درون ریزی ورودهای ذخیره‌شده از یک مدیر کلمه عبور موجود استفاده کنید</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">می‌توانید هر زمان برای تکمیل این مرحله به بخش تنظیمات گاوصندوق مراجعه کنید.</string>
     <string name="import_logins_later">ورودها را بعداً درون ریزی کنید</string>
     <string name="import_logins_later_dialog_title">ورودها را بعداً درون ریزی می‌کنید؟</string>
@@ -878,7 +872,6 @@
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">این یک سرور معتبر SecretDoor نیست. ممکن است لازم باشد با ارائه‌دهنده خود بررسی کنید یا سرور را به‌روزرسانی نمایید.</string>
     <string name="syncing_logins_loading_message">همگام‌سازی ورودها…</string>
     <string name="download_the_browser_extension">افزونه مرورگر را بارگیری کنید</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">به نشانی bitwarden.com/download بروید تا SecretDoor را در مرورگر مورد علاقه‌تان یکپارچه‌سازی کنید و تجربه‌ای روان داشته باشید.</string>
     <string name="use_the_web_app">از برنامه وب استفاده کنید</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">در bitwarden.com وارد شوید تا به‌راحتی حساب کاربری خود را مدیریت کرده و تنظیمات را به‌روزرسانی کنید.</string>
     <string name="autofill_passwords">پر کردن خودکار کلمات عبور</string>
@@ -1144,9 +1137,7 @@
     <string name="account_synced_from_bitwarden_app">حساب از برنامه SecretDoor همگام‌سازی شد</string>
     <string name="local_codes">کدهای محلی (%1$d)</string>
     <string name="required_information_missing">اطلاعات مورد نیاز موجود نیست</string>
-    <string name="required_information_missing_message">اطلاعات ضروری موجود نیست (مانند «سرویس‌ها» یا «رمز محرمانه»). پرونده خود را بررسی کنید و دوباره تلاش کنید. برای پشتیبانی به bitwarden.com/help مراجعه کنید</string>
     <string name="file_could_not_be_processed">پرونده قابل پردازش نیست</string>
-    <string name="file_could_not_be_processed_message">پرونده قابل پردازش نیست. مطمئن شوید JSON معتبر است و دوباره تلاش کنید. نیاز به کمک دارید؟ به bitwarden.com/help مراجعه کنید</string>
     <string name="get_help">کمک گرفتن</string>
     <string name="error_cannot_decrypt">[خطا: رمزگشایی امکان‌پذیر نیست]</string>
     <string name="copy_error_report">رونوشت از گزارش خطا</string>

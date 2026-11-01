@@ -14,6 +14,7 @@ import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
 import com.bitwarden.ui.platform.manager.IntentManager
 import com.bitwarden.ui.util.assertNoDialogExists
 import com.x8bit.bitwarden.data.autofill.model.browser.BrowserPackage
+import com.x8bit.bitwarden.data.platform.util.SecretDoorLinks
 import com.x8bit.bitwarden.ui.platform.base.BitwardenComposeTest
 import com.x8bit.bitwarden.ui.platform.feature.settings.autofill.browser.model.BrowserAutofillSettingsOption
 import com.x8bit.bitwarden.ui.platform.manager.utils.startBrowserAutofillSettingsActivity
@@ -75,7 +76,7 @@ class SetupBrowserAutofillScreenTest : BitwardenComposeTest() {
         mutableEventFlow.tryEmit(SetupBrowserAutofillEvent.NavigateToBrowserIntegrationsInfo)
         verify(exactly = 1) {
             intentManager.launchUri(
-                uri = "https://bitwarden.com/help/auto-fill-android/#browser-integrations/".toUri(),
+                uri = SecretDoorLinks.AUTOFILL_BROWSERS_URL.toUri(),
             )
         }
     }

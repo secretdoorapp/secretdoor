@@ -70,6 +70,7 @@ import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.platform.theme.BitwardenTheme
 import com.bitwarden.ui.util.asText
 import com.x8bit.bitwarden.data.platform.repository.model.UriMatchType
+import com.x8bit.bitwarden.data.platform.util.SecretDoorLinks
 import com.x8bit.bitwarden.ui.platform.feature.settings.autofill.browser.BrowserAutofillSettingsCard
 import com.x8bit.bitwarden.ui.platform.feature.settings.autofill.handlers.AutoFillHandlers
 import com.x8bit.bitwarden.ui.platform.feature.settings.autofill.util.displayLabel
@@ -133,12 +134,12 @@ fun AutoFillScreen(
             }
 
             AutoFillEvent.NavigateToLearnMore -> {
-                intentManager.launchUri("https://bitwarden.com/help/uri-match-detection/".toUri())
+                intentManager.launchUri(SecretDoorLinks.URI_MATCH_DETECTION_URL.toUri())
             }
 
             AutoFillEvent.NavigateToAutofillHelp -> {
                 intentManager.launchUri(
-                    uri = "https://bitwarden.com/help/auto-fill-android-troubleshooting/".toUri(),
+                    uri = SecretDoorLinks.AUTOFILL_TROUBLESHOOTING_URL.toUri(),
                 )
             }
         }

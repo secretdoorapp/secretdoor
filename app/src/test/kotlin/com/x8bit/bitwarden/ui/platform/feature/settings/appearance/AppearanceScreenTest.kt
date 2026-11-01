@@ -10,7 +10,6 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
-import androidx.core.net.toUri
 import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
 import com.bitwarden.core.util.isBuildVersionAtLeast
 import com.bitwarden.ui.platform.feature.settings.appearance.model.AppLanguage
@@ -171,14 +170,6 @@ class AppearanceScreenTest : BitwardenComposeTest() {
     fun `on NavigateBack should call onNavigateBack`() {
         mutableEventFlow.tryEmit(AppearanceEvent.NavigateBack)
         assertTrue(haveCalledNavigateBack)
-    }
-
-    @Test
-    fun `on NavigateToWebsiteIconsHelp should call launchUri`() {
-        mutableEventFlow.tryEmit(AppearanceEvent.NavigateToWebsiteIconsHelp)
-        verify {
-            intentManager.launchUri("https://bitwarden.com/help/website-icons/".toUri())
-        }
     }
 
     @Test

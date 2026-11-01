@@ -425,11 +425,9 @@ Bydd sganio yn digwydd yn awtomatig.</string>
     <string name="export_vault_file_pw_protect_info">Bydd yr allforiad ffeil hwn wedi\'i ddiogelu gan gyfrinair a bydd angen cyfrinair y ffeil i\'w ddadgryptio.</string>
     <string name="export_vault_confirmation_title">Cadarnhau allforio\'r gell</string>
     <string name="warning">Rhybudd</string>
-    <string name="export_vault_failure">Cafwyd problem wrth allforio\'ch cwpwrdd. Os bydd y broblem yn parhau, bydd angen i chi allforio o\'r cwpwrdd gwe.</string>
     <string name="export_vault_success">Cwpwrdd wedi\'i allforio\'n llwyddiannus</string>
     <string name="clone">Clonio</string>
     <string name="password_generator_policy_in_effect">Mae un neu fwy o bolisïau sefydliad yn effeithio ar eich gosodiadau cynhyrchydd</string>
-    <string name="unable_to_save_attachment">Cafwyd problem wrth gadw\'r atodiad hwn. Os bydd y broblem yn parhau, gallwch ei gadw o\'r cwpwrdd gwe.</string>
     <string name="save_attachment_success">Cadwyd yr atodiad yn llwyddiannus</string>
     <string name="autofill_tile_accessibility_required">Trowch “Gwasanaeth Hygyrchedd Llenwi Awtomatig” ymlaen o Gosodiadau SecretDoor i ddefnyddio teils Llenwi Awtomatig.</string>
     <string name="autofill_tile_uri_not_found">Dim meysydd cyfrinair wedi\'u canfod</string>
@@ -747,9 +745,7 @@ Ydych chi am newid i\'r cyfrif hwn?</string>
     <string name="two_step_login_description_long">Gallwch wneud eich cyfrif yn fwy diogel drwy alluogi mewngofnodi dau gam yn ap gwe SecretDoor.</string>
     <string name="change_master_password_description_long">Gallwch newid eich cyfrinair meistr ar ap gwe SecretDoor.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Dysgwch fwy am sut i ddefnyddio SecretDoor ar y Ganolfan Gymorth.</string>
-    <string name="privacy_policy_description_long">Edrychwch ar ein polisi preifatrwydd ar bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Archwiliwch fwy o nodweddion eich cyfrif SecretDoor ar y cymhwysiad gwe.</string>
-    <string name="learn_about_organizations_description_long">Mae SecretDoor yn caniatáu i chi rannu eich eitemau cwpwrdd ag eraill trwy ddefnyddio sefydliad. Dysgwch fwy ar wefan bitwarden.com.</string>
     <string name="created_x">Wedi\'i greu %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Mae eich sefydliad yn gofyn i chi osod cyfrinair meistr.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Sefydlu opsiwn datgloi i newid gweithred amser allan eich cwpwrdd.</string>
@@ -865,8 +861,6 @@ Ydych chi am newid i\'r cyfrif hwn?</string>
     <string name="add_login">Ychwanegu mewngofnodiad</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Rhannu ffeiliau a data yn ddiogel ag unrhyw un, ar unrhyw blatfform. Bydd eich gwybodaeth yn parhau i fod wedi\'i amgryptio pen-i-ben tra\'n cyfyngu ar amlygiad.</string>
     <string name="send_sensitive_information_safely">Anfon gwybodaeth sensitif, yn ddiogel</string>
-    <string name="import_saved_logins">Mewnforio mewngofnodiadau wedi\'u cadw</string>
-    <string name="use_a_computer_to_import_logins">Defnyddiwch gyfrifiadur i fewnforio mewngofnodiadau o reolwr cyfrineiriau presennol</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Gallwch ddychwelyd i gwblhau\'r cam hwn unrhyw bryd yn Gosodiadau Cwpwrdd.</string>
     <string name="import_logins_later">Mewnforio mewngofnodiadau yn hwyrach</string>
     <string name="import_logins_later_dialog_title">Mewnforio mewngofnodiadau yn hwyrach?</string>
@@ -898,7 +892,6 @@ Ydych chi am newid i\'r cyfrif hwn?</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Nid yw hwn yn weinydd SecretDoor adnabyddus. Efallai y bydd angen i chi wirio gyda\'ch darparwr neu ddiweddaru\'ch gweinydd.</string>
     <string name="syncing_logins_loading_message">Yn cydamseru mewngofnodiadau…</string>
     <string name="download_the_browser_extension">Lawrlwythwch estyniad y porwr</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Ewch i bitwarden.com/download i integreiddio SecretDoor i\'ch porwr ffafriol am brofiad di-dor.</string>
     <string name="use_the_web_app">Defnyddiwch yr ap gwe</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Mewngofnodwch yn bitwarden.com i reoli\'ch cyfrif yn hawdd a diweddaru gosodiadau.</string>
     <string name="autofill_passwords">Llenwi cyfrineiriau yn awtomatig</string>
@@ -1172,9 +1165,7 @@ Ydych chi am newid i\'r cyfrif hwn?</string>
     <string name="account_synced_from_bitwarden_app">Cyfrif wedi\'i gydamseru o ap SecretDoor</string>
     <string name="local_codes">Codau lleol (%1$d)</string>
     <string name="required_information_missing">Gwybodaeth Ofynnol ar Goll</string>
-    <string name="required_information_missing_message">Mae gwybodaeth ofynnol ar goll (e.e., \'services\' neu \'secret\'). Gwiriwch eich ffeil a cheisiwch eto. Ewch i bitwarden.com/help am gymorth</string>
     <string name="file_could_not_be_processed">Ni ellid Prosesu\'r Ffeil</string>
-    <string name="file_could_not_be_processed_message">Ni ellid prosesu\'r ffeil. Sicrhewch ei bod yn JSON dilys a cheisiwch eto. Angen cymorth? Ewch i bitwarden.com/help</string>
     <string name="get_help">Cael Cymorth</string>
     <string name="error_cannot_decrypt">[gwall: ni ellir dadgryptio]</string>
     <string name="copy_error_report">Copïo adroddiad gwall</string>
