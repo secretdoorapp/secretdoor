@@ -50,3 +50,5 @@ duplicates.txt
 
 # Local Claude settings
 .claude/settings.local.json
+compile.log
+compile.done
