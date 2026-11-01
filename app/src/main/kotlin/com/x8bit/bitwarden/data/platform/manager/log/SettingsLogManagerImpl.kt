@@ -36,7 +36,6 @@ internal class SettingsLogManagerImpl(
                 }
             }
             .appendLine("  $accessibilityEnabledString")
-            .appendLine("  $autofillAssistString")
             .appendLine("  $copyTotpString")
             .appendLine("  $askToAddItemString")
             .appendLine("  $defaultUriMatchString")
@@ -115,13 +114,6 @@ internal class SettingsLogManagerImpl(
             "Use accessibility: Enabled"
         } else {
             "Use accessibility: Disabled"
-        }
-
-    private val autofillAssistString: String
-        get() = if (settingsRepository.isFillAssistEnabled) {
-            "Autofill assist: Enabled"
-        } else {
-            "Autofill assist: Disabled"
         }
 
     private val copyTotpString: String

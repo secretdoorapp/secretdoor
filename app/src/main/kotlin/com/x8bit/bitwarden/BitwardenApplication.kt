@@ -6,7 +6,6 @@ import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import com.bitwarden.annotation.OmitFromCoverage
 import com.bitwarden.data.manager.flightrecorder.FlightRecorderManager
-import com.x8bit.bitwarden.data.autofill.manager.FillAssistManager
 import com.x8bit.bitwarden.data.platform.datasource.disk.legacy.DiskSourceMigrationLogger
 import com.x8bit.bitwarden.data.platform.manager.LogsManager
 import com.x8bit.bitwarden.data.platform.manager.network.NetworkConfigManager
@@ -33,9 +32,6 @@ class BitwardenApplication : Application(), SingletonImageLoader.Factory {
 
     @Inject
     lateinit var diskSourceMigrationLogger: DiskSourceMigrationLogger
-
-    @Inject
-    lateinit var fillAssistManager: FillAssistManager
 
     @Inject
     lateinit var networkConfigManager: NetworkConfigManager

@@ -28,7 +28,6 @@ class SettingsLogManagerTest {
         every { vaultTimeout } returns VaultTimeout.FifteenMinutes
         every { vaultTimeoutAction } returns VaultTimeoutAction.LOCK
         every { isInlineAutofillEnabled } returns false
-        every { isFillAssistEnabled } returns false
         every { isAutoCopyTotpDisabled } returns true
         every { isAutofillSavePromptDisabled } returns true
         every { defaultUriMatchType } returns UriMatchType.DOMAIN
@@ -76,7 +75,6 @@ class SettingsLogManagerTest {
             Autofill:
               Autofill Service: Disabled
               Use accessibility: Disabled
-              Autofill assist: Disabled
               Copy TOTP automatically: Disabled
               Ask to add item: Disabled
               Default URI match detection: DOMAIN
@@ -106,7 +104,6 @@ class SettingsLogManagerTest {
         every { settingsRepository.vaultTimeout } returns VaultTimeout.Never
         every { settingsRepository.vaultTimeoutAction } returns VaultTimeoutAction.LOGOUT
         every { settingsRepository.isInlineAutofillEnabled } returns true
-        every { settingsRepository.isFillAssistEnabled } returns true
         every { settingsRepository.isAutoCopyTotpDisabled } returns false
         every { settingsRepository.isAutofillSavePromptDisabled } returns false
         every { settingsRepository.defaultUriMatchType } returns UriMatchType.EXACT
@@ -147,7 +144,6 @@ class SettingsLogManagerTest {
                 CHROME_BETA: On
                 VIVALDI_STABLE: On
               Use accessibility: Enabled
-              Autofill assist: Enabled
               Copy TOTP automatically: Enabled
               Ask to add item: Enabled
               Default URI match detection: EXACT
@@ -187,7 +183,6 @@ class SettingsLogManagerTest {
             Autofill:
               Autofill Service: Disabled
               Use accessibility: Disabled
-              Autofill assist: Disabled
               Copy TOTP automatically: Disabled
               Ask to add item: Disabled
               Default URI match detection: DOMAIN
@@ -225,7 +220,6 @@ class SettingsLogManagerTest {
             Autofill:
               Autofill Service: Disabled
               Use accessibility: Disabled
-              Autofill assist: Disabled
               Copy TOTP automatically: Disabled
               Ask to add item: Disabled
               Default URI match detection: DOMAIN
@@ -265,7 +259,6 @@ class SettingsLogManagerTest {
               Autofill Service: Enabled
                 Display autofill suggestions: Popup
               Use accessibility: Disabled
-              Autofill assist: Disabled
               Copy TOTP automatically: Disabled
               Ask to add item: Disabled
               Default URI match detection: DOMAIN
@@ -319,7 +312,6 @@ class SettingsLogManagerTest {
                 BRAVE_RELEASE: Off
                 CHROME_STABLE: On
               Use accessibility: Disabled
-              Autofill assist: Disabled
               Copy TOTP automatically: Disabled
               Ask to add item: Disabled
               Default URI match detection: DOMAIN
