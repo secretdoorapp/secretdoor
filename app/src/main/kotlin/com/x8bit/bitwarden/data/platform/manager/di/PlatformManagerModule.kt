@@ -16,7 +16,6 @@ import com.bitwarden.data.datasource.disk.ConfigDiskSource
 import com.bitwarden.data.manager.NativeLibraryManager
 import com.bitwarden.network.BitwardenServiceClient
 import com.bitwarden.network.model.BitwardenServiceClientConfig
-import com.bitwarden.network.service.PushService
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilityEnabledManager

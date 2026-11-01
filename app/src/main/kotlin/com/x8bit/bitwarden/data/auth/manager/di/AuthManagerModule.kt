@@ -3,8 +3,6 @@ package com.x8bit.bitwarden.data.auth.manager.di
 import android.content.Context
 import com.bitwarden.core.data.manager.dispatcher.DispatcherManager
 import com.bitwarden.core.data.manager.toast.ToastManager
-import com.bitwarden.network.service.AuthRequestsService
-import com.bitwarden.network.service.NewAuthRequestService
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
 import com.x8bit.bitwarden.data.auth.manager.AuthStateManager
 import com.x8bit.bitwarden.data.auth.manager.AuthStateManagerImpl
