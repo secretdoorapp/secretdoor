@@ -2,6 +2,7 @@ package com.x8bit.bitwarden.data.auth.manager
 
 import com.bitwarden.core.data.manager.dispatcher.FakeDispatcherManager
 import com.bitwarden.core.data.manager.toast.ToastManager
+import com.bitwarden.data.manager.file.FileManager
 import com.bitwarden.network.model.KdfTypeJson
 import com.bitwarden.ui.platform.base.MainDispatcherExtension
 import com.bitwarden.ui.platform.resource.BitwardenString
@@ -25,9 +26,13 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.io.File
 import java.time.Instant
+import kotlin.io.path.createTempDirectory
 
 @ExtendWith(MainDispatcherExtension::class)
 class UserLogoutManagerTest {
@@ -64,9 +69,15 @@ class UserLogoutManagerTest {
         coEvery { unregister() } returns UnregisterExportResult.Success
     }
 
+    private val filesDirectory: File = createTempDirectory(prefix = "logout-test").toFile()
+    private val fileManager: FileManager = mockk {
+        every { filesDirectory } returns this@UserLogoutManagerTest.filesDirectory.absolutePath
+    }
+
     private val userLogoutManager: UserLogoutManager =
         UserLogoutManagerImpl(
             authDiskSource = authDiskSource,
+            fileManager = fileManager,
             generatorDiskSource = generatorDiskSource,
             passwordHistoryDiskSource = passwordHistoryDiskSource,
             settingsDiskSource = settingsDiskSource,
@@ -90,6 +101,22 @@ class UserLogoutManagerTest {
             credentialExchangeRegistryManager.unregister()
         }
         assertDataCleared(userId = userId)
+    }
+
+    @Test
+    fun `logout for deleting the vault should erase that user's attachment files only`() {
+        val deletedAttachment = File(filesDirectory, "attachments/$USER_ID_1/cipher/attachment")
+            .also { it.parentFile?.mkdirs(); it.writeText("secret") }
+        val otherAttachment = File(filesDirectory, "attachments/$USER_ID_2/cipher/attachment")
+            .also { it.parentFile?.mkdirs(); it.writeText("keep") }
+        every { authDiskSource.userState } returns MULTI_USER_STATE
+
+        userLogoutManager.logout(userId = USER_ID_1, reason = LogoutReason.AccountDelete)
+
+        assertFalse(deletedAttachment.exists())
+        assertFalse(File(filesDirectory, "attachments/$USER_ID_1").exists())
+        assertTrue(otherAttachment.exists())
+        filesDirectory.deleteRecursively()
     }
 
     @Suppress("MaxLineLength")

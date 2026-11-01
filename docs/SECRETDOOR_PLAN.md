@@ -67,7 +67,7 @@ stored key material.
   - [x] Attachments: encrypted files stored at `files/attachments/<userId>/<cipherId>/<id>`,
     decrypted from a cache copy when opened, deleted with the attachment or cipher.
   - [x] Credential Exchange import saves ciphers to disk.
-  - [ ] Delete attachment files when the vault is deleted (logout / account removal).
+  - [x] Attachment files are deleted with the vault (account delete erases `files/attachments/<userId>`).
   - [x] Logout: "Log out" is removed everywhere (Settings, unlock screen, account switcher) and
     the "Log out" session timeout action is gone (stored values lock instead).
     `UserLogoutManagerImpl` refuses to erase anything unless the reason is
@@ -128,9 +128,10 @@ stored key material.
   - [x] Server login removed: login, SSO, TDE, Key Connector, trusted devices, registration,
     push notifications, login requests, device management, Fill Assist, push token storage, and
     the app's providers for unused `:network` services.
-  - [ ] Still left behind the network guard: one-time passcode flows for accounts without a
-    master password (export, delete account), the server environment/region settings, cookie
-    acquisition (wired into the SDK platform API), and the service code inside `:network`.
+  - [x] One-time-passcode flows (export, credential export, delete account) removed.
+  - [ ] Still left behind the network guard (inert, large refactors): the server environment
+    (still used for icon and web-vault URLs in ~12 view models), cookie acquisition (wired into the
+    SDK platform API), token refresh, and the service code inside `:network`.
 
 ### Phase 4: Backup and restore
 - Format (version 2, `.secretdoor`): `SECRETDOOR`, a version byte, the header length and a JSON

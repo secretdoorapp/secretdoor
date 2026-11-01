@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import com.bitwarden.core.data.manager.dispatcher.DispatcherManager
 import com.bitwarden.core.data.manager.toast.ToastManager
 import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
+import com.bitwarden.data.manager.file.FileManager
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
 import com.x8bit.bitwarden.data.auth.manager.model.LogoutEvent
@@ -20,6 +21,9 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.io.File
+
+private const val ATTACHMENTS_DIRECTORY: String = "attachments"
 
 /**
  * Primary implementation of [UserLogoutManager].
@@ -27,6 +31,7 @@ import timber.log.Timber
 @Suppress("LongParameterList")
 internal class UserLogoutManagerImpl(
     private val authDiskSource: AuthDiskSource,
+    private val fileManager: FileManager,
     private val generatorDiskSource: GeneratorDiskSource,
     private val passwordHistoryDiskSource: PasswordHistoryDiskSource,
     private val settingsDiskSource: SettingsDiskSource,
@@ -129,6 +134,10 @@ internal class UserLogoutManagerImpl(
         unconfinedScope.launch {
             passwordHistoryDiskSource.clearPasswordHistories(userId = userId)
             vaultDiskSource.deleteVaultData(userId = userId)
+        }
+        // Attachment files live outside the database, so they must be erased separately.
+        ioScope.launch {
+            File(fileManager.filesDirectory, "$ATTACHMENTS_DIRECTORY/$userId").deleteRecursively()
         }
     }
 
