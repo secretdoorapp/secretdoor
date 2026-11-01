@@ -1,283 +1,254 @@
 # Third-party licenses
 
-This file lists the libraries that are packaged into SecretDoor builds, with the license each one declares in its published metadata. It is generated from the resolved dependency lists of the `fdroid` and `standard` release builds. The license texts are available from each project (and inside the library files).
+This file lists the libraries that are packaged into SecretDoor builds, with the license each one declares in its published metadata. It is generated from the resolved dependency list of the `fdroid` release build. The license texts are available from each project (and inside the library files).
 
-**Builds:** *both* = in the `fdroid` and the `standard` flavor; *standard only* = only in the `standard` flavor (see [NOTICE.md](../NOTICE.md) for why the `fdroid` flavor is recommended for distribution).
-
-| Library | Version | License | Included in |
-| --- | --- | --- | --- |
-| `androidx.activity:activity` | 1.13.0 | Apache-2.0 | both |
-| `androidx.activity:activity-compose` | 1.13.0 | Apache-2.0 | both |
-| `androidx.activity:activity-ktx` | 1.13.0 | Apache-2.0 | both |
-| `androidx.annotation:annotation` | 1.10.0 | Apache-2.0 | both |
-| `androidx.annotation:annotation-experimental` | 1.5.1 | Apache-2.0 | both |
-| `androidx.annotation:annotation-jvm` | 1.10.0 | Apache-2.0 | both |
-| `androidx.appcompat:appcompat` | 1.8.0 | Apache-2.0 | both |
-| `androidx.appcompat:appcompat-resources` | 1.8.0 | Apache-2.0 | both |
-| `androidx.arch.core:core-common` | 2.2.0 | Apache-2.0 | both |
-| `androidx.arch.core:core-runtime` | 2.2.0 | Apache-2.0 | both |
-| `androidx.autofill:autofill` | 1.3.0 | Apache-2.0 | both |
-| `androidx.biometric:biometric` | 1.2.0-alpha05 | Apache-2.0 | both |
-| `androidx.browser:browser` | 1.10.0 | Apache-2.0 | both |
-| `androidx.camera:camera-camera2` | 1.6.2 | Apache-2.0 | both |
-| `androidx.camera:camera-camera2-pipe` | 1.6.2 | Apache-2.0 | both |
-| `androidx.camera:camera-compose` | 1.6.2 | Apache-2.0 | both |
-| `androidx.camera:camera-core` | 1.6.2 | Apache-2.0 / BSD-3-Clause | both |
-| `androidx.camera:camera-lifecycle` | 1.6.2 | Apache-2.0 | both |
-| `androidx.camera:camera-video` | 1.6.2 | Apache-2.0 | both |
-| `androidx.camera:camera-view` | 1.6.2 | Apache-2.0 | both |
-| `androidx.camera.featurecombinationquery:featurecombinationquery` | 1.6.2 | Apache-2.0 | both |
-| `androidx.camera.viewfinder:viewfinder-compose` | 1.6.2 | Apache-2.0 | both |
-| `androidx.camera.viewfinder:viewfinder-core` | 1.6.2 | Apache-2.0 | both |
-| `androidx.collection:collection` | 1.5.0 | Apache-2.0 | both |
-| `androidx.collection:collection-jvm` | 1.5.0 | Apache-2.0 | both |
-| `androidx.collection:collection-ktx` | 1.5.0 | Apache-2.0 | both |
-| `androidx.compose:compose-bom` | 2026.09.00 | Apache-2.0 | both |
-| `androidx.compose.animation:animation` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.animation:animation-android` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.animation:animation-core` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.animation:animation-core-android` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.foundation:foundation` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.foundation:foundation-android` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.foundation:foundation-layout` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.foundation:foundation-layout-android` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.material:material-ripple` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.material:material-ripple-android` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.material3:material3` | 1.4.0 | Apache-2.0 | both |
-| `androidx.compose.material3:material3-android` | 1.4.0 | Apache-2.0 | both |
-| `androidx.compose.material3.adaptive:adaptive` | 1.3.0 | Apache-2.0 | both |
-| `androidx.compose.material3.adaptive:adaptive-android` | 1.3.0 | Apache-2.0 | both |
-| `androidx.compose.runtime:runtime` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.runtime:runtime-android` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.runtime:runtime-annotation` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.runtime:runtime-annotation-android` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.runtime:runtime-retain` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.runtime:runtime-retain-android` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.runtime:runtime-saveable` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.runtime:runtime-saveable-android` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.ui:ui` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.ui:ui-android` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.ui:ui-geometry` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.ui:ui-geometry-android` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.ui:ui-graphics` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.ui:ui-graphics-android` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.ui:ui-text` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.ui:ui-text-android` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.ui:ui-tooling-preview` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.ui:ui-tooling-preview-android` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.ui:ui-unit` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.ui:ui-unit-android` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.ui:ui-util` | 1.12.1 | Apache-2.0 | both |
-| `androidx.compose.ui:ui-util-android` | 1.12.1 | Apache-2.0 | both |
-| `androidx.concurrent:concurrent-futures` | 1.1.0 | Apache-2.0 | both |
-| `androidx.concurrent:concurrent-futures-ktx` | 1.1.0 | Apache-2.0 | both |
-| `androidx.core:core` | 1.19.1 | Apache-2.0 | both |
-| `androidx.core:core-backported-fixes` | 1.0.0 | Apache-2.0 | both |
-| `androidx.core:core-ktx` | 1.19.1 | Apache-2.0 | both |
-| `androidx.core:core-splashscreen` | 1.2.0 | Apache-2.0 | both |
-| `androidx.core:core-viewtree` | 1.0.0 | Apache-2.0 | both |
-| `androidx.credentials:credentials` | 1.6.0 | Apache-2.0 | both |
-| `androidx.credentials.providerevents:providerevents` | 1.0.0-alpha06 | Apache-2.0 | both |
-| `androidx.credentials.providerevents:providerevents-play-services` | 1.0.0-alpha06 | Apache-2.0 | standard only |
-| `androidx.cursoradapter:cursoradapter` | 1.0.0 | Apache-2.0 | both |
-| `androidx.customview:customview` | 1.0.0 | Apache-2.0 | both |
-| `androidx.customview:customview-poolingcontainer` | 1.0.0 | Apache-2.0 | both |
-| `androidx.drawerlayout:drawerlayout` | 1.0.0 | Apache-2.0 | both |
-| `androidx.emoji2:emoji2` | 1.4.0 | Apache-2.0 | both |
-| `androidx.emoji2:emoji2-views-helper` | 1.4.0 | Apache-2.0 | both |
-| `androidx.exifinterface:exifinterface` | 1.4.2 | Apache-2.0 | both |
-| `androidx.fragment:fragment` | 1.5.4 | Apache-2.0 | both |
-| `androidx.graphics:graphics-path` | 1.0.1 | Apache-2.0 | both |
-| `androidx.hilt:hilt-lifecycle-viewmodel` | 1.4.0 | Apache-2.0 | both |
-| `androidx.hilt:hilt-lifecycle-viewmodel-compose` | 1.4.0 | Apache-2.0 | both |
-| `androidx.hilt:hilt-navigation-compose` | 1.4.0 | Apache-2.0 | both |
-| `androidx.interpolator:interpolator` | 1.0.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-common` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-common-java8` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-common-jvm` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-livedata` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-livedata-core` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-livedata-core-ktx` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-process` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-runtime` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-runtime-android` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-runtime-compose` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-runtime-compose-android` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-runtime-ktx` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-runtime-ktx-android` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-service` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-viewmodel` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-viewmodel-android` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-viewmodel-compose` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-viewmodel-compose-android` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-viewmodel-ktx` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-viewmodel-savedstate` | 2.11.0 | Apache-2.0 | both |
-| `androidx.lifecycle:lifecycle-viewmodel-savedstate-android` | 2.11.0 | Apache-2.0 | both |
-| `androidx.loader:loader` | 1.0.0 | Apache-2.0 | both |
-| `androidx.media3:media3-common` | 1.9.0 | Apache-2.0 | both |
-| `androidx.media3:media3-container` | 1.9.0 | Apache-2.0 | both |
-| `androidx.media3:media3-muxer` | 1.9.0 | Apache-2.0 | both |
-| `androidx.navigation:navigation-common` | 2.9.8 | Apache-2.0 | both |
-| `androidx.navigation:navigation-common-android` | 2.9.8 | Apache-2.0 | both |
-| `androidx.navigation:navigation-compose` | 2.9.8 | Apache-2.0 | both |
-| `androidx.navigation:navigation-compose-android` | 2.9.8 | Apache-2.0 | both |
-| `androidx.navigation:navigation-runtime` | 2.9.8 | Apache-2.0 | both |
-| `androidx.navigation:navigation-runtime-android` | 2.9.8 | Apache-2.0 | both |
-| `androidx.navigationevent:navigationevent` | 1.0.0 | Apache-2.0 | both |
-| `androidx.navigationevent:navigationevent-android` | 1.0.0 | Apache-2.0 | both |
-| `androidx.navigationevent:navigationevent-compose` | 1.0.0 | Apache-2.0 | both |
-| `androidx.navigationevent:navigationevent-compose-android` | 1.0.0 | Apache-2.0 | both |
-| `androidx.profileinstaller:profileinstaller` | 1.4.1 | Apache-2.0 | both |
-| `androidx.resourceinspection:resourceinspection-annotation` | 1.0.1 | Apache-2.0 | both |
-| `androidx.room:room-common` | 2.7.0 | Apache-2.0 | both |
-| `androidx.room:room-common-jvm` | 2.7.0 | Apache-2.0 | both |
-| `androidx.room:room-runtime` | 2.7.0 | Apache-2.0 | both |
-| `androidx.room:room-runtime-android` | 2.7.0 | Apache-2.0 | both |
-| `androidx.room3:room3-common` | 3.0.3 | Apache-2.0 | both |
-| `androidx.room3:room3-common-jvm` | 3.0.3 | Apache-2.0 | both |
-| `androidx.room3:room3-runtime` | 3.0.3 | Apache-2.0 | both |
-| `androidx.room3:room3-runtime-android` | 3.0.3 | Apache-2.0 | both |
-| `androidx.savedstate:savedstate` | 1.4.0 | Apache-2.0 | both |
-| `androidx.savedstate:savedstate-android` | 1.4.0 | Apache-2.0 | both |
-| `androidx.savedstate:savedstate-compose` | 1.4.0 | Apache-2.0 | both |
-| `androidx.savedstate:savedstate-compose-android` | 1.4.0 | Apache-2.0 | both |
-| `androidx.savedstate:savedstate-ktx` | 1.4.0 | Apache-2.0 | both |
-| `androidx.security:security-crypto` | 1.1.0 | Apache-2.0 | both |
-| `androidx.sqlite:sqlite` | 2.7.1 | Apache-2.0 | both |
-| `androidx.sqlite:sqlite-android` | 2.7.1 | Apache-2.0 | both |
-| `androidx.sqlite:sqlite-async` | 2.7.1 | Apache-2.0 | both |
-| `androidx.sqlite:sqlite-async-android` | 2.7.1 | Apache-2.0 | both |
-| `androidx.sqlite:sqlite-framework` | 2.7.1 | Apache-2.0 | both |
-| `androidx.sqlite:sqlite-framework-android` | 2.7.1 | Apache-2.0 | both |
-| `androidx.startup:startup-runtime` | 1.2.0 | Apache-2.0 | both |
-| `androidx.tracing:tracing` | 1.3.0 | Apache-2.0 | both |
-| `androidx.tracing:tracing-android` | 1.3.0 | Apache-2.0 | both |
-| `androidx.tracing:tracing-ktx` | 1.3.0 | Apache-2.0 | both |
-| `androidx.vectordrawable:vectordrawable` | 1.2.0 | Apache-2.0 | both |
-| `androidx.vectordrawable:vectordrawable-animated` | 1.2.0 | Apache-2.0 | both |
-| `androidx.versionedparcelable:versionedparcelable` | 1.1.1 | Apache-2.0 | both |
-| `androidx.viewpager:viewpager` | 1.0.0 | Apache-2.0 | both |
-| `androidx.window:window` | 1.5.0 | Apache-2.0 | both |
-| `androidx.window:window-core` | 1.5.0 | Apache-2.0 | both |
-| `androidx.window:window-core-android` | 1.5.0 | Apache-2.0 | both |
-| `androidx.work:work-runtime` | 2.12.0 | Apache-2.0 | both |
-| `androidx.work:work-runtime-ktx` | 2.12.0 | Apache-2.0 | both |
-| `com.android.billingclient:billing` | 9.1.0 | Android Software Development Kit License | standard only |
-| `com.bitwarden:sdk-android` | 4.0.0-9737-d9119f7a | see project | both |
-| `com.google.accompanist:accompanist-drawablepainter` | 0.37.3 | Apache-2.0 | both |
-| `com.google.android.datatransport:transport-api` | 3.0.0 | Apache-2.0 | standard only |
-| `com.google.android.datatransport:transport-backend-cct` | 3.1.8 | Apache-2.0 | standard only |
-| `com.google.android.datatransport:transport-runtime` | 3.1.8 | Apache-2.0 | standard only |
-| `com.google.android.gms:play-services-base` | 18.7.2 | Android Software Development Kit License | standard only |
-| `com.google.android.gms:play-services-basement` | 18.9.0 | Android Software Development Kit License | standard only |
-| `com.google.android.gms:play-services-identity-credentials` | 16.0.0-alpha11 | Android Software Development Kit License | standard only |
-| `com.google.android.gms:play-services-location` | 19.0.0 | Android Software Development Kit License | standard only |
-| `com.google.android.gms:play-services-mlkit-text-recognition` | 19.0.1 | ML Kit Terms of Service | standard only |
-| `com.google.android.gms:play-services-mlkit-text-recognition-common` | 19.1.0 | ML Kit Terms of Service | standard only |
-| `com.google.android.gms:play-services-places-placereport` | 17.0.0 | Android Software Development Kit License | standard only |
-| `com.google.android.gms:play-services-tasks` | 18.3.2 | Android Software Development Kit License | standard only |
-| `com.google.android.odml:image` | 1.0.0-beta1 | Android Software Development Kit License | standard only |
-| `com.google.android.play:core-common` | 2.0.4 | Play Core Software Development Kit Terms of Service | standard only |
-| `com.google.android.play:review` | 2.0.2 | Play Core Software Development Kit Terms of Service | standard only |
-| `com.google.auto.value:auto-value-annotations` | 1.6.3 | Apache-2.0 | both |
-| `com.google.code.findbugs:jsr305` | 3.0.2 | Apache-2.0 | both |
-| `com.google.code.gson:gson` | 2.8.9 | Apache-2.0 | both |
-| `com.google.crypto.tink:tink-android` | 1.8.0 | Apache-2.0 | both |
-| `com.google.dagger:dagger` | 2.60.1 | Apache-2.0 | both |
-| `com.google.dagger:dagger-lint-aar` | 2.60.1 | Apache-2.0 | both |
-| `com.google.dagger:hilt-android` | 2.60.1 | Apache-2.0 | both |
-| `com.google.dagger:hilt-core` | 2.60.1 | Apache-2.0 | both |
-| `com.google.errorprone:error_prone_annotations` | 2.28.0 | Apache-2.0 | both |
-| `com.google.firebase:firebase-annotations` | 16.0.0 | Apache-2.0 | standard only |
-| `com.google.firebase:firebase-components` | 16.1.0 | Apache-2.0 | standard only |
-| `com.google.firebase:firebase-encoders` | 17.0.0 | Apache-2.0 | standard only |
-| `com.google.firebase:firebase-encoders-json` | 18.0.0 | Apache-2.0 | standard only |
-| `com.google.firebase:firebase-encoders-proto` | 16.0.0 | Apache-2.0 | standard only |
-| `com.google.guava:failureaccess` | 1.0.2 | Apache-2.0 | both |
-| `com.google.guava:guava` | 33.3.1-android | Apache-2.0 | both |
-| `com.google.guava:listenablefuture` | 9999.0-empty-to-avoid-conflict-with-guava | Apache-2.0 | both |
-| `com.google.j2objc:j2objc-annotations` | 3.0.0 | Apache-2.0 | both |
-| `com.google.mlkit:common` | 18.11.0 | ML Kit Terms of Service | standard only |
-| `com.google.mlkit:text-recognition` | 16.0.1 | ML Kit Terms of Service | standard only |
-| `com.google.mlkit:text-recognition-bundled-common` | 17.0.0 | ML Kit Terms of Service | standard only |
-| `com.google.mlkit:vision-common` | 17.3.0 | ML Kit Terms of Service | standard only |
-| `com.google.mlkit:vision-interfaces` | 16.3.0 | ML Kit Terms of Service | standard only |
-| `com.google.zxing:core` | 3.5.4 | Apache-2.0 | both |
-| `com.jakewharton.timber:timber` | 5.0.1 | Apache-2.0 | both |
-| `com.squareup.okhttp3:logging-interceptor` | 5.5.1 | Apache-2.0 | both |
-| `com.squareup.okhttp3:okhttp` | 5.5.1 | Apache-2.0 | both |
-| `com.squareup.okhttp3:okhttp-android` | 5.5.1 | Apache-2.0 | both |
-| `com.squareup.okhttp3:okhttp-bom` | 5.5.1 | Apache-2.0 | both |
-| `com.squareup.okio:okio` | 3.18.1 | Apache-2.0 | both |
-| `com.squareup.okio:okio-jvm` | 3.18.1 | Apache-2.0 | both |
-| `com.squareup.retrofit2:converter-kotlinx-serialization` | 3.0.0 | Apache-2.0 | both |
-| `com.squareup.retrofit2:retrofit` | 3.0.0 | Apache-2.0 | both |
-| `com.squareup.retrofit2:retrofit-bom` | 3.0.0 | Apache-2.0 | both |
-| `io.coil-kt.coil3:coil` | 3.6.3 | Apache-2.0 | both |
-| `io.coil-kt.coil3:coil-android` | 3.6.3 | Apache-2.0 | both |
-| `io.coil-kt.coil3:coil-compose` | 3.6.3 | Apache-2.0 | both |
-| `io.coil-kt.coil3:coil-compose-android` | 3.6.3 | Apache-2.0 | both |
-| `io.coil-kt.coil3:coil-compose-core` | 3.6.3 | Apache-2.0 | both |
-| `io.coil-kt.coil3:coil-compose-core-android` | 3.6.3 | Apache-2.0 | both |
-| `io.coil-kt.coil3:coil-core` | 3.6.3 | Apache-2.0 | both |
-| `io.coil-kt.coil3:coil-core-android` | 3.6.3 | Apache-2.0 | both |
-| `io.coil-kt.coil3:coil-gif` | 3.6.3 | Apache-2.0 | both |
-| `io.coil-kt.coil3:coil-network-core` | 3.6.3 | Apache-2.0 | both |
-| `io.coil-kt.coil3:coil-network-core-android` | 3.6.3 | Apache-2.0 | both |
-| `io.coil-kt.coil3:coil-network-okhttp` | 3.6.3 | Apache-2.0 | both |
-| `io.coil-kt.coil3:coil-network-okhttp-android` | 3.6.3 | Apache-2.0 | both |
-| `jakarta.inject:jakarta.inject-api` | 2.0.1 | Apache-2.0 | both |
-| `javax.inject:javax.inject` | 1 | Apache-2.0 | both |
-| `net.java.dev.jna:jna` | 5.17.0 | LGPL-2.1-or-later / Apache-2.0 | both |
-| `org.checkerframework:checker-qual` | 3.43.0 | MIT | both |
-| `org.jetbrains:annotations` | 23.0.0 | Apache-2.0 | both |
-| `org.jetbrains.androidx.lifecycle:lifecycle-common` | 2.9.6 | Apache-2.0 | both |
-| `org.jetbrains.androidx.lifecycle:lifecycle-runtime` | 2.9.6 | Apache-2.0 | both |
-| `org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose` | 2.9.6 | Apache-2.0 | both |
-| `org.jetbrains.androidx.savedstate:savedstate` | 1.3.6 | Apache-2.0 | both |
-| `org.jetbrains.androidx.savedstate:savedstate-compose` | 1.3.6 | Apache-2.0 | both |
-| `org.jetbrains.compose.animation:animation` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.animation:animation-android` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.animation:animation-core` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.animation:animation-core-android` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.foundation:foundation` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.foundation:foundation-android` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.foundation:foundation-layout` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.foundation:foundation-layout-android` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.runtime:runtime` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.runtime:runtime-android` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.runtime:runtime-saveable` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.runtime:runtime-saveable-android` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.ui:ui` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.ui:ui-android` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.ui:ui-geometry` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.ui:ui-geometry-android` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.ui:ui-graphics` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.ui:ui-graphics-android` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.ui:ui-text` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.ui:ui-text-android` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.ui:ui-unit` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.ui:ui-unit-android` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.ui:ui-util` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.compose.ui:ui-util-android` | 1.12.0 | Apache-2.0 | both |
-| `org.jetbrains.kotlin:kotlin-bom` | 1.8.0 | Apache-2.0 | both |
-| `org.jetbrains.kotlin:kotlin-parcelize-runtime` | 2.4.21 | Apache-2.0 | both |
-| `org.jetbrains.kotlin:kotlin-reflect` | 2.1.20 | Apache-2.0 | standard only |
-| `org.jetbrains.kotlin:kotlin-stdlib` | 2.4.21 | Apache-2.0 | both |
-| `org.jetbrains.kotlinx:atomicfu` | 0.28.0 | Apache-2.0 | both |
-| `org.jetbrains.kotlinx:atomicfu-jvm` | 0.28.0 | Apache-2.0 | both |
-| `org.jetbrains.kotlinx:kotlinx-collections-immutable` | 0.5.2 | Apache-2.0 | both |
-| `org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm` | 0.5.2 | Apache-2.0 | both |
-| `org.jetbrains.kotlinx:kotlinx-coroutines-android` | 1.11.0 | Apache-2.0 | both |
-| `org.jetbrains.kotlinx:kotlinx-coroutines-bom` | 1.11.0 | Apache-2.0 | both |
-| `org.jetbrains.kotlinx:kotlinx-coroutines-core` | 1.11.0 | Apache-2.0 | both |
-| `org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm` | 1.11.0 | Apache-2.0 | both |
-| `org.jetbrains.kotlinx:kotlinx-serialization-bom` | 1.11.0 | Apache-2.0 | both |
-| `org.jetbrains.kotlinx:kotlinx-serialization-core` | 1.11.0 | Apache-2.0 | both |
-| `org.jetbrains.kotlinx:kotlinx-serialization-core-jvm` | 1.11.0 | Apache-2.0 | both |
-| `org.jetbrains.kotlinx:kotlinx-serialization-json` | 1.11.0 | Apache-2.0 | both |
-| `org.jetbrains.kotlinx:kotlinx-serialization-json-jvm` | 1.11.0 | Apache-2.0 | both |
-| `org.jspecify:jspecify` | 1.0.0 | Apache-2.0 | both |
+| Library | Version | License |
+| --- | --- | --- |
+| `androidx.activity:activity` | 1.13.0 | Apache-2.0 |
+| `androidx.activity:activity-compose` | 1.13.0 | Apache-2.0 |
+| `androidx.activity:activity-ktx` | 1.13.0 | Apache-2.0 |
+| `androidx.annotation:annotation` | 1.10.0 | Apache-2.0 |
+| `androidx.annotation:annotation-experimental` | 1.5.1 | Apache-2.0 |
+| `androidx.annotation:annotation-jvm` | 1.10.0 | Apache-2.0 |
+| `androidx.appcompat:appcompat` | 1.8.0 | Apache-2.0 |
+| `androidx.appcompat:appcompat-resources` | 1.8.0 | Apache-2.0 |
+| `androidx.arch.core:core-common` | 2.2.0 | Apache-2.0 |
+| `androidx.arch.core:core-runtime` | 2.2.0 | Apache-2.0 |
+| `androidx.autofill:autofill` | 1.3.0 | Apache-2.0 |
+| `androidx.biometric:biometric` | 1.2.0-alpha05 | Apache-2.0 |
+| `androidx.browser:browser` | 1.10.0 | Apache-2.0 |
+| `androidx.camera:camera-camera2` | 1.6.2 | Apache-2.0 |
+| `androidx.camera:camera-camera2-pipe` | 1.6.2 | Apache-2.0 |
+| `androidx.camera:camera-compose` | 1.6.2 | Apache-2.0 |
+| `androidx.camera:camera-core` | 1.6.2 | Apache-2.0 / BSD-3-Clause |
+| `androidx.camera:camera-lifecycle` | 1.6.2 | Apache-2.0 |
+| `androidx.camera:camera-video` | 1.6.2 | Apache-2.0 |
+| `androidx.camera:camera-view` | 1.6.2 | Apache-2.0 |
+| `androidx.camera.featurecombinationquery:featurecombinationquery` | 1.6.2 | Apache-2.0 |
+| `androidx.camera.viewfinder:viewfinder-compose` | 1.6.2 | Apache-2.0 |
+| `androidx.camera.viewfinder:viewfinder-core` | 1.6.2 | Apache-2.0 |
+| `androidx.collection:collection` | 1.5.0 | Apache-2.0 |
+| `androidx.collection:collection-jvm` | 1.5.0 | Apache-2.0 |
+| `androidx.collection:collection-ktx` | 1.5.0 | Apache-2.0 |
+| `androidx.compose:compose-bom` | 2026.09.00 | Apache-2.0 |
+| `androidx.compose.animation:animation` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.animation:animation-android` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.animation:animation-core` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.animation:animation-core-android` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.foundation:foundation` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.foundation:foundation-android` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.foundation:foundation-layout` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.foundation:foundation-layout-android` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.material:material-ripple` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.material:material-ripple-android` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.material3:material3` | 1.4.0 | Apache-2.0 |
+| `androidx.compose.material3:material3-android` | 1.4.0 | Apache-2.0 |
+| `androidx.compose.material3.adaptive:adaptive` | 1.3.0 | Apache-2.0 |
+| `androidx.compose.material3.adaptive:adaptive-android` | 1.3.0 | Apache-2.0 |
+| `androidx.compose.runtime:runtime` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.runtime:runtime-android` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.runtime:runtime-annotation` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.runtime:runtime-annotation-android` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.runtime:runtime-retain` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.runtime:runtime-retain-android` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.runtime:runtime-saveable` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.runtime:runtime-saveable-android` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.ui:ui` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.ui:ui-android` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.ui:ui-geometry` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.ui:ui-geometry-android` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.ui:ui-graphics` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.ui:ui-graphics-android` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.ui:ui-text` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.ui:ui-text-android` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.ui:ui-tooling-preview` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.ui:ui-tooling-preview-android` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.ui:ui-unit` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.ui:ui-unit-android` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.ui:ui-util` | 1.12.1 | Apache-2.0 |
+| `androidx.compose.ui:ui-util-android` | 1.12.1 | Apache-2.0 |
+| `androidx.concurrent:concurrent-futures` | 1.1.0 | Apache-2.0 |
+| `androidx.concurrent:concurrent-futures-ktx` | 1.1.0 | Apache-2.0 |
+| `androidx.core:core` | 1.19.1 | Apache-2.0 |
+| `androidx.core:core-backported-fixes` | 1.0.0 | Apache-2.0 |
+| `androidx.core:core-ktx` | 1.19.1 | Apache-2.0 |
+| `androidx.core:core-splashscreen` | 1.2.0 | Apache-2.0 |
+| `androidx.core:core-viewtree` | 1.0.0 | Apache-2.0 |
+| `androidx.credentials:credentials` | 1.6.0 | Apache-2.0 |
+| `androidx.credentials.providerevents:providerevents` | 1.0.0-alpha06 | Apache-2.0 |
+| `androidx.cursoradapter:cursoradapter` | 1.0.0 | Apache-2.0 |
+| `androidx.customview:customview` | 1.0.0 | Apache-2.0 |
+| `androidx.customview:customview-poolingcontainer` | 1.0.0 | Apache-2.0 |
+| `androidx.drawerlayout:drawerlayout` | 1.0.0 | Apache-2.0 |
+| `androidx.emoji2:emoji2` | 1.4.0 | Apache-2.0 |
+| `androidx.emoji2:emoji2-views-helper` | 1.4.0 | Apache-2.0 |
+| `androidx.exifinterface:exifinterface` | 1.4.2 | Apache-2.0 |
+| `androidx.fragment:fragment` | 1.5.4 | Apache-2.0 |
+| `androidx.graphics:graphics-path` | 1.0.1 | Apache-2.0 |
+| `androidx.hilt:hilt-lifecycle-viewmodel` | 1.4.0 | Apache-2.0 |
+| `androidx.hilt:hilt-lifecycle-viewmodel-compose` | 1.4.0 | Apache-2.0 |
+| `androidx.hilt:hilt-navigation-compose` | 1.4.0 | Apache-2.0 |
+| `androidx.interpolator:interpolator` | 1.0.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-common` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-common-java8` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-common-jvm` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-livedata` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-livedata-core` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-livedata-core-ktx` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-process` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-runtime` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-runtime-android` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-runtime-compose` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-runtime-compose-android` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-runtime-ktx` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-runtime-ktx-android` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-service` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-viewmodel` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-viewmodel-android` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-viewmodel-compose` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-viewmodel-compose-android` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-viewmodel-ktx` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-viewmodel-savedstate` | 2.11.0 | Apache-2.0 |
+| `androidx.lifecycle:lifecycle-viewmodel-savedstate-android` | 2.11.0 | Apache-2.0 |
+| `androidx.loader:loader` | 1.0.0 | Apache-2.0 |
+| `androidx.media3:media3-common` | 1.9.0 | Apache-2.0 |
+| `androidx.media3:media3-container` | 1.9.0 | Apache-2.0 |
+| `androidx.media3:media3-muxer` | 1.9.0 | Apache-2.0 |
+| `androidx.navigation:navigation-common` | 2.9.8 | Apache-2.0 |
+| `androidx.navigation:navigation-common-android` | 2.9.8 | Apache-2.0 |
+| `androidx.navigation:navigation-compose` | 2.9.8 | Apache-2.0 |
+| `androidx.navigation:navigation-compose-android` | 2.9.8 | Apache-2.0 |
+| `androidx.navigation:navigation-runtime` | 2.9.8 | Apache-2.0 |
+| `androidx.navigation:navigation-runtime-android` | 2.9.8 | Apache-2.0 |
+| `androidx.navigationevent:navigationevent` | 1.0.0 | Apache-2.0 |
+| `androidx.navigationevent:navigationevent-android` | 1.0.0 | Apache-2.0 |
+| `androidx.navigationevent:navigationevent-compose` | 1.0.0 | Apache-2.0 |
+| `androidx.navigationevent:navigationevent-compose-android` | 1.0.0 | Apache-2.0 |
+| `androidx.profileinstaller:profileinstaller` | 1.4.1 | Apache-2.0 |
+| `androidx.resourceinspection:resourceinspection-annotation` | 1.0.1 | Apache-2.0 |
+| `androidx.room:room-common` | 2.7.0 | Apache-2.0 |
+| `androidx.room:room-common-jvm` | 2.7.0 | Apache-2.0 |
+| `androidx.room:room-runtime` | 2.7.0 | Apache-2.0 |
+| `androidx.room:room-runtime-android` | 2.7.0 | Apache-2.0 |
+| `androidx.room3:room3-common` | 3.0.3 | Apache-2.0 |
+| `androidx.room3:room3-common-jvm` | 3.0.3 | Apache-2.0 |
+| `androidx.room3:room3-runtime` | 3.0.3 | Apache-2.0 |
+| `androidx.room3:room3-runtime-android` | 3.0.3 | Apache-2.0 |
+| `androidx.savedstate:savedstate` | 1.4.0 | Apache-2.0 |
+| `androidx.savedstate:savedstate-android` | 1.4.0 | Apache-2.0 |
+| `androidx.savedstate:savedstate-compose` | 1.4.0 | Apache-2.0 |
+| `androidx.savedstate:savedstate-compose-android` | 1.4.0 | Apache-2.0 |
+| `androidx.savedstate:savedstate-ktx` | 1.4.0 | Apache-2.0 |
+| `androidx.security:security-crypto` | 1.1.0 | Apache-2.0 |
+| `androidx.sqlite:sqlite` | 2.7.1 | Apache-2.0 |
+| `androidx.sqlite:sqlite-android` | 2.7.1 | Apache-2.0 |
+| `androidx.sqlite:sqlite-async` | 2.7.1 | Apache-2.0 |
+| `androidx.sqlite:sqlite-async-android` | 2.7.1 | Apache-2.0 |
+| `androidx.sqlite:sqlite-framework` | 2.7.1 | Apache-2.0 |
+| `androidx.sqlite:sqlite-framework-android` | 2.7.1 | Apache-2.0 |
+| `androidx.startup:startup-runtime` | 1.2.0 | Apache-2.0 |
+| `androidx.tracing:tracing` | 1.3.0 | Apache-2.0 |
+| `androidx.tracing:tracing-android` | 1.3.0 | Apache-2.0 |
+| `androidx.tracing:tracing-ktx` | 1.3.0 | Apache-2.0 |
+| `androidx.vectordrawable:vectordrawable` | 1.2.0 | Apache-2.0 |
+| `androidx.vectordrawable:vectordrawable-animated` | 1.2.0 | Apache-2.0 |
+| `androidx.versionedparcelable:versionedparcelable` | 1.1.1 | Apache-2.0 |
+| `androidx.viewpager:viewpager` | 1.0.0 | Apache-2.0 |
+| `androidx.window:window` | 1.5.0 | Apache-2.0 |
+| `androidx.window:window-core` | 1.5.0 | Apache-2.0 |
+| `androidx.window:window-core-android` | 1.5.0 | Apache-2.0 |
+| `androidx.work:work-runtime` | 2.12.0 | Apache-2.0 |
+| `androidx.work:work-runtime-ktx` | 2.12.0 | Apache-2.0 |
+| `com.bitwarden:sdk-android` | 4.0.0-9737-d9119f7a | see project |
+| `com.google.accompanist:accompanist-drawablepainter` | 0.37.3 | Apache-2.0 |
+| `com.google.auto.value:auto-value-annotations` | 1.6.3 | Apache-2.0 |
+| `com.google.code.findbugs:jsr305` | 3.0.2 | Apache-2.0 |
+| `com.google.code.gson:gson` | 2.8.9 | Apache-2.0 |
+| `com.google.crypto.tink:tink-android` | 1.8.0 | Apache-2.0 |
+| `com.google.dagger:dagger` | 2.60.1 | Apache-2.0 |
+| `com.google.dagger:dagger-lint-aar` | 2.60.1 | Apache-2.0 |
+| `com.google.dagger:hilt-android` | 2.60.1 | Apache-2.0 |
+| `com.google.dagger:hilt-core` | 2.60.1 | Apache-2.0 |
+| `com.google.errorprone:error_prone_annotations` | 2.28.0 | Apache-2.0 |
+| `com.google.guava:failureaccess` | 1.0.2 | Apache-2.0 |
+| `com.google.guava:guava` | 33.3.1-android | Apache-2.0 |
+| `com.google.guava:listenablefuture` | 9999.0-empty-to-avoid-conflict-with-guava | Apache-2.0 |
+| `com.google.j2objc:j2objc-annotations` | 3.0.0 | Apache-2.0 |
+| `com.google.zxing:core` | 3.5.4 | Apache-2.0 |
+| `com.jakewharton.timber:timber` | 5.0.1 | Apache-2.0 |
+| `com.squareup.okhttp3:logging-interceptor` | 5.5.1 | Apache-2.0 |
+| `com.squareup.okhttp3:okhttp` | 5.5.1 | Apache-2.0 |
+| `com.squareup.okhttp3:okhttp-android` | 5.5.1 | Apache-2.0 |
+| `com.squareup.okhttp3:okhttp-bom` | 5.5.1 | Apache-2.0 |
+| `com.squareup.okio:okio` | 3.18.1 | Apache-2.0 |
+| `com.squareup.okio:okio-jvm` | 3.18.1 | Apache-2.0 |
+| `com.squareup.retrofit2:converter-kotlinx-serialization` | 3.0.0 | Apache-2.0 |
+| `com.squareup.retrofit2:retrofit` | 3.0.0 | Apache-2.0 |
+| `com.squareup.retrofit2:retrofit-bom` | 3.0.0 | Apache-2.0 |
+| `io.coil-kt.coil3:coil` | 3.6.3 | Apache-2.0 |
+| `io.coil-kt.coil3:coil-android` | 3.6.3 | Apache-2.0 |
+| `io.coil-kt.coil3:coil-compose` | 3.6.3 | Apache-2.0 |
+| `io.coil-kt.coil3:coil-compose-android` | 3.6.3 | Apache-2.0 |
+| `io.coil-kt.coil3:coil-compose-core` | 3.6.3 | Apache-2.0 |
+| `io.coil-kt.coil3:coil-compose-core-android` | 3.6.3 | Apache-2.0 |
+| `io.coil-kt.coil3:coil-core` | 3.6.3 | Apache-2.0 |
+| `io.coil-kt.coil3:coil-core-android` | 3.6.3 | Apache-2.0 |
+| `io.coil-kt.coil3:coil-gif` | 3.6.3 | Apache-2.0 |
+| `io.coil-kt.coil3:coil-network-core` | 3.6.3 | Apache-2.0 |
+| `io.coil-kt.coil3:coil-network-core-android` | 3.6.3 | Apache-2.0 |
+| `io.coil-kt.coil3:coil-network-okhttp` | 3.6.3 | Apache-2.0 |
+| `io.coil-kt.coil3:coil-network-okhttp-android` | 3.6.3 | Apache-2.0 |
+| `jakarta.inject:jakarta.inject-api` | 2.0.1 | Apache-2.0 |
+| `javax.inject:javax.inject` | 1 | Apache-2.0 |
+| `net.java.dev.jna:jna` | 5.17.0 | LGPL-2.1-or-later / Apache-2.0 |
+| `org.checkerframework:checker-qual` | 3.43.0 | MIT |
+| `org.jetbrains:annotations` | 23.0.0 | Apache-2.0 |
+| `org.jetbrains.androidx.lifecycle:lifecycle-common` | 2.9.6 | Apache-2.0 |
+| `org.jetbrains.androidx.lifecycle:lifecycle-runtime` | 2.9.6 | Apache-2.0 |
+| `org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose` | 2.9.6 | Apache-2.0 |
+| `org.jetbrains.androidx.savedstate:savedstate` | 1.3.6 | Apache-2.0 |
+| `org.jetbrains.androidx.savedstate:savedstate-compose` | 1.3.6 | Apache-2.0 |
+| `org.jetbrains.compose.animation:animation` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.animation:animation-android` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.animation:animation-core` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.animation:animation-core-android` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.foundation:foundation` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.foundation:foundation-android` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.foundation:foundation-layout` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.foundation:foundation-layout-android` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.runtime:runtime` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.runtime:runtime-android` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.runtime:runtime-saveable` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.runtime:runtime-saveable-android` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.ui:ui` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.ui:ui-android` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.ui:ui-geometry` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.ui:ui-geometry-android` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.ui:ui-graphics` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.ui:ui-graphics-android` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.ui:ui-text` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.ui:ui-text-android` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.ui:ui-unit` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.ui:ui-unit-android` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.ui:ui-util` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.compose.ui:ui-util-android` | 1.12.0 | Apache-2.0 |
+| `org.jetbrains.kotlin:kotlin-bom` | 1.8.0 | Apache-2.0 |
+| `org.jetbrains.kotlin:kotlin-parcelize-runtime` | 2.4.21 | Apache-2.0 |
+| `org.jetbrains.kotlin:kotlin-stdlib` | 2.4.21 | Apache-2.0 |
+| `org.jetbrains.kotlinx:atomicfu` | 0.28.0 | Apache-2.0 |
+| `org.jetbrains.kotlinx:atomicfu-jvm` | 0.28.0 | Apache-2.0 |
+| `org.jetbrains.kotlinx:kotlinx-collections-immutable` | 0.5.2 | Apache-2.0 |
+| `org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm` | 0.5.2 | Apache-2.0 |
+| `org.jetbrains.kotlinx:kotlinx-coroutines-android` | 1.11.0 | Apache-2.0 |
+| `org.jetbrains.kotlinx:kotlinx-coroutines-bom` | 1.11.0 | Apache-2.0 |
+| `org.jetbrains.kotlinx:kotlinx-coroutines-core` | 1.11.0 | Apache-2.0 |
+| `org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm` | 1.11.0 | Apache-2.0 |
+| `org.jetbrains.kotlinx:kotlinx-serialization-bom` | 1.11.0 | Apache-2.0 |
+| `org.jetbrains.kotlinx:kotlinx-serialization-core` | 1.11.0 | Apache-2.0 |
+| `org.jetbrains.kotlinx:kotlinx-serialization-core-jvm` | 1.11.0 | Apache-2.0 |
+| `org.jetbrains.kotlinx:kotlinx-serialization-json` | 1.11.0 | Apache-2.0 |
+| `org.jetbrains.kotlinx:kotlinx-serialization-json-jvm` | 1.11.0 | Apache-2.0 |
+| `org.jspecify:jspecify` | 1.0.0 | Apache-2.0 |
 
 ## Bitwarden SDK
 

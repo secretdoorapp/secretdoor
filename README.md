@@ -118,8 +118,8 @@ license and notices on its About screen.
 Bitwarden is a trademark of Bitwarden Inc.; SecretDoor is an independent project and is not
 affiliated with Bitwarden.
 
-Distribute the `fdroid` build (no Google libraries). The `standard` flavor contains proprietary
-Google components; read the notes in [NOTICE.md](NOTICE.md#which-build-to-distribute) first.
+The only build flavor is `fdroid` (no Google libraries). See
+[NOTICE.md](NOTICE.md#which-build-to-distribute) for the licensing notes.
 
 ## Dependencies
 
@@ -252,11 +252,6 @@ The following is an additional list of third-party dependencies that are only in
 - **Firebase Crashlytics**
     - https://github.com/firebase/firebase-android-sdk
     - Purpose: SDK for crash and non-fatal error reporting.
-    - License: Apache 2.0
-
-- **Google Play Reviews**
-    - https://developer.android.com/reference/com/google/android/play/core/release-notes
-    - Purpose: On standard builds provide an interface to add a review for the password manager application in Google Play.
     - License: Apache 2.0
 
 ### Development Environment Dependencies

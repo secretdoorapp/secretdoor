@@ -133,11 +133,8 @@ configure<ApplicationExtension> {
 
     flavorDimensions += listOf("mode")
     productFlavors {
-        create("standard") {
-            isDefault = true
-            dimension = "mode"
-        }
         create("fdroid") {
+            isDefault = true
             dimension = "mode"
         }
     }
@@ -181,7 +178,6 @@ androidComponents {
             .forEach { output ->
                 val fileNameWithoutExtension = when (flavorName) {
                     "fdroid" -> "$applicationId-$flavorName"
-                    "standard" -> applicationId
                     else -> output.outputFileName.get().removeExtensionIfPresent(".apk")
                 }
 
@@ -225,10 +221,6 @@ configurations.all {
 }
 
 dependencies {
-    fun standardImplementation(dependencyNotation: Any) {
-        add("standardImplementation", dependencyNotation)
-    }
-
 
     implementation(project(":annotation"))
     implementation(project(":core"))
@@ -280,11 +272,6 @@ dependencies {
     // For now we are restricted to running Compose tests for debug builds only
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
-
-    // Standard-specific flavor dependencies
-    standardImplementation(libs.google.billing)
-    standardImplementation(libs.google.mlkit.text.recognition)
-    standardImplementation(libs.google.play.review)
 
     // Pull in test fixtures from other modules
     testImplementation(testFixtures(project(":core")))

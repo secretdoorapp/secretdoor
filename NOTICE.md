@@ -106,16 +106,13 @@ compatible with the GPL v3. The complete list with licenses is in
 
 ### Which build to distribute
 
-The Gradle project has two product flavors.
-
-- **`fdroid`** contains only free software (plus the Bitwarden SDK above) and no Google services.
-  It is the build to publish on F-Droid, on GitHub and on Google Play.
-- **`standard`** additionally bundles proprietary Google libraries (Google Play Services, ML Kit text
-  recognition, Play Billing, Play Core) under the *Android Software Development Kit License*,
-  the *ML Kit Terms of Service* and the *Play Core Software Development Kit Terms of Service*.
-  These are not GPL-compatible, and ML Kit sends usage metrics to Google, which contradicts
-  SecretDoor's privacy promise. **Do not distribute the `standard` flavor** unless you have
-  reviewed those licenses and accepted the consequences.
+The Gradle project has a single product flavor, `fdroid`. It contains only free software (plus the
+Bitwarden SDK above) and no Google services, and it is the build to publish on F-Droid, on GitHub
+and on Google Play. An earlier `standard` flavor, which bundled proprietary Google libraries (Google
+Play Services, ML Kit text recognition, Play Billing, Play Core), was removed because those libraries
+are not GPL-compatible and send usage data to Google, which contradicts SecretDoor's privacy
+promise. If paid features need Play Billing later, add it to a separate Play-only build and review
+its licenses first.
 
 ## Distributing SecretDoor (including on app stores)
 
