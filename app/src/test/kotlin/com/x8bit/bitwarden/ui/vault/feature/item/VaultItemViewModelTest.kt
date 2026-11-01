@@ -2165,7 +2165,7 @@ class VaultItemViewModelTest : BaseViewModelTest() {
 
         @Suppress("MaxLineLength")
         @Test
-        fun `on NumberVisibilityClick should call trackEvent on the OrganizationEventManager and update the ViewState`() =
+        fun `on NumberVisibilityClick should update the ViewState`() =
             runTest {
                 every {
                     mockCipherView.toViewState(
@@ -2255,7 +2255,7 @@ class VaultItemViewModelTest : BaseViewModelTest() {
 
         @Suppress("MaxLineLength")
         @Test
-        fun `on CodeVisibilityClick should call trackEvent on the OrganizationEventManager and update the ViewState`() {
+        fun `on CodeVisibilityClick should update the ViewState`() {
             every {
                 mockCipherView.toViewState(
                     previousState = null,
