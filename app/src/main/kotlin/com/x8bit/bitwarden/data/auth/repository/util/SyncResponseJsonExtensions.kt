@@ -1,7 +1,5 @@
 package com.x8bit.bitwarden.data.auth.repository.util
 
-import com.bitwarden.core.data.serializer.SafeListSerializer
-import com.bitwarden.core.data.util.decodeFromStringOrNull
 import com.bitwarden.network.model.MemberDecryptionType
 import com.bitwarden.network.model.OrganizationStatusType
 import com.bitwarden.network.model.OrganizationType
@@ -19,23 +17,10 @@ import com.bitwarden.organizations.OrganizationUserType
 import com.bitwarden.organizations.Permissions
 import com.bitwarden.organizations.ProfileOrganization
 import com.bitwarden.organizations.SsoSettings
-import com.bitwarden.policies.Policy
-import com.bitwarden.policies.PolicyType
 import com.x8bit.bitwarden.data.auth.repository.model.Organization
-import com.x8bit.bitwarden.data.auth.repository.model.PolicyInformation
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
 import com.bitwarden.organizations.MemberDecryptionType as SdkMemberDecryptionType
 import com.bitwarden.organizations.ProductTierType as SdkProductTierType
 import com.bitwarden.organizations.ProviderType as SdkProviderType
-
-private val JSON = Json {
-    ignoreUnknownKeys = true
-    explicitNulls = false
-    serializersModule = SerializersModule {
-        contextual(List::class) { args -> SafeListSerializer(args.first()) }
-    }
-}
 
 /**
  * Maps the given [SyncResponseJson.Profile.Organization] to an [Organization] or `null` if the
@@ -168,58 +153,6 @@ private fun SyncResponseJson.Profile.Organization.toSdkProfileOrganization(): Pr
         ),
     )
 }
-
-/**
- * Convert the JSON data of the [Policy] object into [PolicyInformation] data.
- */
-val Policy.policyInformation: PolicyInformation?
-    get() = data?.let {
-        when (type) {
-            PolicyType.MASTER_PASSWORD -> {
-                JSON.decodeFromStringOrNull<PolicyInformation.MasterPassword>(it)
-            }
-
-            PolicyType.PASSWORD_GENERATOR -> {
-                JSON.decodeFromStringOrNull<PolicyInformation.PasswordGenerator>(it)
-            }
-
-            PolicyType.MAXIMUM_VAULT_TIMEOUT -> {
-                JSON.decodeFromStringOrNull<PolicyInformation.VaultTimeout>(it)
-            }
-
-            PolicyType.SEND_OPTIONS -> {
-                JSON.decodeFromStringOrNull<PolicyInformation.SendOptions>(it)
-            }
-
-            PolicyType.SEND_CONTROLS -> {
-                JSON.decodeFromStringOrNull<PolicyInformation.SendControls>(it)
-            }
-
-            PolicyType.ORGANIZATION_USER_NOTIFICATION -> {
-                JSON.decodeFromStringOrNull<PolicyInformation.OrganizationUserNotification>(it)
-            }
-
-            PolicyType.TWO_FACTOR_AUTHENTICATION,
-            PolicyType.SINGLE_ORG,
-            PolicyType.REQUIRE_SSO,
-            PolicyType.ORGANIZATION_DATA_OWNERSHIP,
-            PolicyType.DISABLE_SEND,
-            PolicyType.RESET_PASSWORD,
-            PolicyType.DISABLE_PERSONAL_VAULT_EXPORT,
-            PolicyType.ACTIVATE_AUTOFILL,
-            PolicyType.AUTOMATIC_APP_LOG_IN,
-            PolicyType.FREE_FAMILIES_SPONSORSHIP,
-            PolicyType.REMOVE_UNLOCK_WITH_PIN,
-            PolicyType.RESTRICTED_ITEM_TYPES,
-            PolicyType.URI_MATCH_DEFAULTS,
-            PolicyType.AUTOTYPE_DEFAULT_SETTING,
-            PolicyType.AUTOMATIC_USER_CONFIRMATION,
-            PolicyType.BLOCK_CLAIMED_DOMAIN_ACCOUNT_CREATION,
-            PolicyType.FILL_ASSIST,
-            PolicyType.AUTOTYPE_GA_POLICY,
-                -> null
-        }
-    }
 
 private fun SyncResponseJson.Profile.Permissions.toSdkPermissions(): Permissions =
     Permissions(

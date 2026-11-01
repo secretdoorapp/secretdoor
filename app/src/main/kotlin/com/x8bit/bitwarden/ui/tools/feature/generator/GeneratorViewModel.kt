@@ -1878,9 +1878,7 @@ data class GeneratorState(
     val selectedType: MainType,
     val generatorMode: GeneratorMode = GeneratorMode.Default,
     val currentEmailAddress: String,
-    val isUnderPolicy: Boolean = false,
     val website: String? = null,
-    var passcodePolicyOverride: PasscodePolicyOverride? = null,
     private val shouldShowCoachMarkTour: Boolean,
     val isUpgradedToPremiumCardEligible: Boolean = false,
 ) : Parcelable {
@@ -1921,14 +1919,6 @@ data class GeneratorState(
         PASSWORD(labelRes = BitwardenString.password, testTag = "password_option"),
         PASSPHRASE(labelRes = BitwardenString.passphrase, testTag = "passphrase_option"),
         USERNAME(labelRes = BitwardenString.username, testTag = "username_option"),
-    }
-
-    /**
-     * Enum representing the passcode types for the generator, such as PASSWORD and PASSPHRASE.
-     */
-    enum class PasscodePolicyOverride {
-        PASSWORD,
-        PASSPHRASE,
     }
 
     /**

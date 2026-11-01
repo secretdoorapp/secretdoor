@@ -18,7 +18,6 @@ import com.bitwarden.network.BitwardenServiceClient
 import com.bitwarden.network.model.BitwardenServiceClientConfig
 import com.bitwarden.network.service.PushService
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
-import com.x8bit.bitwarden.data.auth.datasource.sdk.AuthSdkSource
 import com.x8bit.bitwarden.data.auth.manager.AddTotpItemFromAuthenticatorManager
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilityEnabledManager
@@ -49,8 +48,6 @@ import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.LogsManager
 import com.x8bit.bitwarden.data.platform.manager.LogsManagerImpl
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.ResourceCacheManager
 import com.x8bit.bitwarden.data.platform.manager.ResourceCacheManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.ReviewPromptManager
@@ -77,10 +74,6 @@ import com.x8bit.bitwarden.data.platform.manager.network.NetworkCookieManager
 import com.x8bit.bitwarden.data.platform.manager.network.NetworkCookieManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.network.NetworkPermissionManager
 import com.x8bit.bitwarden.data.platform.manager.network.NetworkPermissionManagerImpl
-import com.x8bit.bitwarden.data.platform.manager.policy.PasswordPolicyManager
-import com.x8bit.bitwarden.data.platform.manager.policy.PasswordPolicyManagerImpl
-import com.x8bit.bitwarden.data.platform.manager.policy.UserNotificationPolicyManager
-import com.x8bit.bitwarden.data.platform.manager.policy.UserNotificationPolicyManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.restriction.RestrictionManager
 import com.x8bit.bitwarden.data.platform.manager.restriction.RestrictionManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.sdk.SdkPlatformApiFactory
@@ -243,36 +236,6 @@ object PlatformManagerModule {
         dispatcherManager: DispatcherManager,
     ): NetworkConnectionManager = NetworkConnectionManagerImpl(
         context = application.applicationContext,
-        dispatcherManager = dispatcherManager,
-    )
-
-    @Provides
-    @Singleton
-    fun providePolicyManager(): PolicyManager = PolicyManagerImpl()
-
-    @Provides
-    @Singleton
-    fun providePasswordPolicyManager(
-        authDiskSource: AuthDiskSource,
-        authSdkSource: AuthSdkSource,
-        policyManager: PolicyManager,
-    ): PasswordPolicyManager = PasswordPolicyManagerImpl(
-        authDiskSource = authDiskSource,
-        authSdkSource = authSdkSource,
-        policyManager = policyManager,
-    )
-
-    @Provides
-    @Singleton
-    fun provideUserNotificationPolicyManager(
-        authDiskSource: AuthDiskSource,
-        settingsDiskSource: SettingsDiskSource,
-        policyManager: PolicyManager,
-        dispatcherManager: DispatcherManager,
-    ): UserNotificationPolicyManager = UserNotificationPolicyManagerImpl(
-        authDiskSource = authDiskSource,
-        settingsDiskSource = settingsDiskSource,
-        policyManager = policyManager,
         dispatcherManager = dispatcherManager,
     )
 

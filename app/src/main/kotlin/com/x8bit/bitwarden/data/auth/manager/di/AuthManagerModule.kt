@@ -22,8 +22,6 @@ import com.x8bit.bitwarden.data.platform.datasource.disk.PushDiskSource
 import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.data.platform.manager.CredentialExchangeRegistryManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
-import com.x8bit.bitwarden.data.platform.manager.PolicyManager
-import com.x8bit.bitwarden.data.platform.manager.policy.UserNotificationPolicyManager
 import com.x8bit.bitwarden.data.tools.generator.datasource.disk.GeneratorDiskSource
 import com.x8bit.bitwarden.data.tools.generator.datasource.disk.PasswordHistoryDiskSource
 import com.x8bit.bitwarden.data.vault.datasource.disk.VaultDiskSource
@@ -67,7 +65,6 @@ object AuthManagerModule {
         vaultSdkSource: VaultSdkSource,
         dispatcherManager: DispatcherManager,
         credentialExchangeRegistryManager: CredentialExchangeRegistryManager,
-        userNotificationPolicyManager: UserNotificationPolicyManager,
     ): UserLogoutManager =
         UserLogoutManagerImpl(
             authDiskSource = authDiskSource,
@@ -80,7 +77,6 @@ object AuthManagerModule {
             vaultSdkSource = vaultSdkSource,
             dispatcherManager = dispatcherManager,
             credentialExchangeRegistryManager = credentialExchangeRegistryManager,
-            userNotificationPolicyManager = userNotificationPolicyManager,
         )
 
     @Provides
@@ -110,13 +106,11 @@ object AuthManagerModule {
         authDiskSource: AuthDiskSource,
         firstTimeActionManager: FirstTimeActionManager,
         vaultLockManager: VaultLockManager,
-        policyManager: PolicyManager,
         dispatcherManager: DispatcherManager,
     ): UserStateManager = UserStateManagerImpl(
         authDiskSource = authDiskSource,
         firstTimeActionManager = firstTimeActionManager,
         vaultLockManager = vaultLockManager,
-        policyManager = policyManager,
         dispatcherManager = dispatcherManager,
     )
 }

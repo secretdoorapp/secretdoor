@@ -6,6 +6,7 @@ import com.x8bit.bitwarden.data.auth.manager.KdfManager
 import com.x8bit.bitwarden.data.auth.manager.UserStateManager
 import com.x8bit.bitwarden.data.auth.repository.model.BreachCountResult
 import com.x8bit.bitwarden.data.auth.repository.model.ChangeMasterPasswordResult
+import com.x8bit.bitwarden.data.auth.repository.model.PasswordStrengthResult
 import com.x8bit.bitwarden.data.auth.repository.model.DeleteAccountResult
 import com.x8bit.bitwarden.data.auth.repository.model.LogoutReason
 import com.x8bit.bitwarden.data.auth.repository.model.RegisterResult
@@ -16,7 +17,6 @@ import com.x8bit.bitwarden.data.auth.repository.model.ValidatePinResult
 import com.x8bit.bitwarden.data.auth.repository.model.VerifyOtpResult
 import com.x8bit.bitwarden.data.platform.datasource.network.authenticator.AuthenticatorProvider
 import com.x8bit.bitwarden.data.platform.manager.BiometricsEncryptionManager
-import com.x8bit.bitwarden.data.platform.manager.policy.PasswordPolicyManager
 
 /**
  * Provides an API for observing and modifying authentication state.
@@ -27,8 +27,13 @@ interface AuthRepository :
     AuthStateManager,
     BiometricsEncryptionManager,
     KdfManager,
-    PasswordPolicyManager,
     UserStateManager {
+    /**
+     * Get the password strength for the given [email] and [password] combo. If no value is
+     * passed for the [email] will use the active email of the current active account.
+     */
+    fun getPasswordStrength(email: String? = null, password: String): PasswordStrengthResult
+
     /**
      * Changes the active vault's master password from [currentPassword] to [newPassword]. The
      * vault's user key does not change; it is only wrapped with the new master password, on this

@@ -19,7 +19,6 @@ import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.data.platform.manager.DatabaseSchemeManager
 import com.x8bit.bitwarden.data.platform.manager.ReviewPromptManager
 import com.x8bit.bitwarden.data.platform.manager.keyrotation.KeyRotationManager
-import com.x8bit.bitwarden.data.platform.manager.policy.PasswordPolicyManager
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.vault.datasource.disk.AutoBackupDiskSource
 import com.x8bit.bitwarden.data.vault.datasource.disk.VaultDiskSource
@@ -155,7 +154,6 @@ object VaultManagerModule {
         dispatcherManager: DispatcherManager,
         kdfManager: KdfManager,
         pinProtectedUserKeyManager: PinProtectedUserKeyManager,
-        passwordPolicyManager: PasswordPolicyManager,
         keyRotationManager: KeyRotationManager,
     ): VaultLockManager =
         VaultLockManagerImpl(
@@ -171,7 +169,6 @@ object VaultManagerModule {
             dispatcherManager = dispatcherManager,
             kdfManager = kdfManager,
             pinProtectedUserKeyManager = pinProtectedUserKeyManager,
-            passwordPolicyManager = passwordPolicyManager,
             keyRotationManager = keyRotationManager,
         )
 

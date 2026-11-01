@@ -47,7 +47,6 @@ import com.x8bit.bitwarden.data.auth.util.KdfParamsConstants.DEFAULT_ARGON2_PARA
 import com.x8bit.bitwarden.data.platform.error.NoActiveUserException
 import com.x8bit.bitwarden.data.platform.manager.BiometricsEncryptionManager
 import com.x8bit.bitwarden.data.platform.manager.LogsManager
-import com.x8bit.bitwarden.data.platform.manager.policy.PasswordPolicyManager
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.vault.datasource.sdk.VaultSdkSource
@@ -95,14 +94,12 @@ internal class AuthRepositoryImpl(
     private val userStateManager: UserStateManager,
     private val kdfManager: KdfManager,
     authStateManager: AuthStateManager,
-    passwordPolicyManager: PasswordPolicyManager,
     logsManager: LogsManager,
     dispatcherManager: DispatcherManager,
 ) : AuthRepository,
     AuthStateManager by authStateManager,
     BiometricsEncryptionManager by biometricsEncryptionManager,
     KdfManager by kdfManager,
-    PasswordPolicyManager by passwordPolicyManager,
     UserStateManager by userStateManager {
     /**
      * A scope intended for use when simply collecting multiple flows in order to combine them. The
