@@ -269,27 +269,6 @@ class SettingsRepositoryImpl(
             )
         }
 
-    override var isFillAssistEnabled: Boolean
-        get() = activeUserId
-            ?.let { settingsDiskSource.getFillAssistEnabled(userId = it) }
-            ?: false
-        set(value) {
-            val userId = activeUserId ?: return
-            settingsDiskSource.storeFillAssistEnabled(
-                userId = userId,
-                isFillAssistEnabled = value,
-            )
-        }
-
-    override val isFillAssistEnabledFlow: Flow<Boolean>
-        get() = activeUserId
-            ?.let { userId ->
-                settingsDiskSource
-                    .getFillAssistEnabledFlow(userId = userId)
-                    .map { it ?: false }
-            }
-            ?: flowOf(false)
-
     override var isAutoCopyTotpDisabled: Boolean
         get() = activeUserId
             ?.let { settingsDiskSource.getAutoCopyTotpDisabled(userId = it) }

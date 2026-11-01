@@ -20,7 +20,6 @@ import com.x8bit.bitwarden.data.autofill.manager.browser.BrowserAutofillDialogMa
 import com.x8bit.bitwarden.data.autofill.manager.browser.BrowserAutofillDialogManagerImpl
 import com.x8bit.bitwarden.data.autofill.manager.browser.BrowserThirdPartyAutofillEnabledManager
 import com.x8bit.bitwarden.data.autofill.manager.browser.BrowserThirdPartyAutofillEnabledManagerImpl
-import com.x8bit.bitwarden.data.autofill.manager.FillAssistManager
 import com.x8bit.bitwarden.data.autofill.parser.AutofillParser
 import com.x8bit.bitwarden.data.autofill.parser.AutofillParserImpl
 import com.x8bit.bitwarden.data.autofill.processor.AutofillProcessor
@@ -101,12 +100,10 @@ object AutofillModule {
     @Provides
     fun providesAutofillParser(
         settingsRepository: SettingsRepository,
-        fillAssistManager: FillAssistManager,
         featureFlagManager: FeatureFlagManager,
     ): AutofillParser =
         AutofillParserImpl(
             settingsRepository = settingsRepository,
-            fillAssistManager = fillAssistManager,
             featureFlagManager = featureFlagManager,
         )
 

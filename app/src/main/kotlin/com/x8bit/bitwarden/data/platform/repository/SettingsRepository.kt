@@ -148,16 +148,6 @@ interface SettingsRepository : FlightRecorderManager {
     var isInlineAutofillEnabled: Boolean
 
     /**
-     * Whether fill assist is enabled for the current user.
-     */
-    var isFillAssistEnabled: Boolean
-
-    /**
-     * Emits updates that track [isFillAssistEnabled] for the current user.
-     */
-    val isFillAssistEnabledFlow: Flow<Boolean>
-
-    /**
      * Whether the auto copying totp when autofilling is disabled for the current user.
      */
     var isAutoCopyTotpDisabled: Boolean
