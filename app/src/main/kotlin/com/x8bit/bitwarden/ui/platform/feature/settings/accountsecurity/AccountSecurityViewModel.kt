@@ -49,13 +49,10 @@ class AccountSecurityViewModel @Inject constructor(
         AccountSecurityState(
             dialog = null,
             fingerprintPhrase = "".asText(), // This will be filled in dynamically
-            isAuthenticatorSyncChecked = settingsRepository.isAuthenticatorSyncEnabled,
             isUnlockWithBiometricsEnabled = settingsRepository.isUnlockWithBiometricsEnabled &&
                 authRepository.isBiometricIntegrityValid(userId = userId),
             isUnlockWithPasswordEnabled = userState.activeAccount.hasMasterPassword,
             isUnlockWithPinEnabled = settingsRepository.isUnlockWithPinEnabled,
-            // SecretDoor has no companion authenticator app to share codes with.
-            shouldShowEnableAuthenticatorSync = false,
             userId = userId,
             vaultTimeout = settingsRepository.vaultTimeout,
             vaultTimeoutAction = settingsRepository.vaultTimeoutAction,
@@ -107,7 +104,6 @@ class AccountSecurityViewModel @Inject constructor(
 
     override fun handleAction(action: AccountSecurityAction): Unit = when (action) {
         AccountSecurityAction.AccountFingerprintPhraseClick -> handleAccountFingerprintPhraseClick()
-        is AccountSecurityAction.AuthenticatorSyncToggle -> handleAuthenticatorSyncToggle(action)
         AccountSecurityAction.BackClick -> handleBackClick()
         AccountSecurityAction.ChangeMasterPasswordClick -> handleChangeMasterPasswordClick()
         AccountSecurityAction.ConfirmLogoutClick -> handleConfirmLogoutClick()
@@ -145,13 +141,6 @@ class AccountSecurityViewModel @Inject constructor(
 
     private fun handleAccountFingerprintPhraseClick() {
         mutableStateFlow.update { it.copy(dialog = AccountSecurityDialog.FingerprintPhrase) }
-    }
-
-    private fun handleAuthenticatorSyncToggle(
-        action: AccountSecurityAction.AuthenticatorSyncToggle,
-    ) {
-        settingsRepository.isAuthenticatorSyncEnabled = action.enabled
-        mutableStateFlow.update { it.copy(isAuthenticatorSyncChecked = action.enabled) }
     }
 
     private fun handleBackClick() = sendEvent(AccountSecurityEvent.NavigateBack)
@@ -421,11 +410,9 @@ class AccountSecurityViewModel @Inject constructor(
 data class AccountSecurityState(
     val dialog: AccountSecurityDialog?,
     val fingerprintPhrase: Text,
-    val isAuthenticatorSyncChecked: Boolean,
     val isUnlockWithBiometricsEnabled: Boolean,
     val isUnlockWithPasswordEnabled: Boolean,
     val isUnlockWithPinEnabled: Boolean,
-    val shouldShowEnableAuthenticatorSync: Boolean,
     val userId: String,
     val vaultTimeout: VaultTimeout,
     val vaultTimeoutAction: VaultTimeoutAction,
@@ -542,13 +529,6 @@ sealed class AccountSecurityAction {
      * User clicked account fingerprint phrase.
      */
     data object AccountFingerprintPhraseClick : AccountSecurityAction()
-
-    /**
-     * User clicked the authenticator sync toggle.
-     */
-    data class AuthenticatorSyncToggle(
-        val enabled: Boolean,
-    ) : AccountSecurityAction()
 
     /**
      * User clicked back button.

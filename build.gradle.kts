@@ -37,7 +37,6 @@ dependencies {
 
     kover(project(":annotation"))
     kover(project(":app"))
-    kover(project(":authenticatorbridge"))
     kover(project(":core"))
     kover(project(":cxf"))
     kover(project(":data"))
@@ -52,7 +51,6 @@ detekt {
     source.from(
         "annotation/src",
         "app/src",
-        "authenticatorbridge/src",
         "core/src",
         "cxf/src",
         "data/src",

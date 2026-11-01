@@ -127,7 +127,6 @@ class VaultLockManagerTest {
     }
     private val keyRotationManager: KeyRotationManager = mockk {
         coEvery { rotateAutoUnlockKey(userId = any()) } just runs
-        coEvery { rotateAuthenticatorSyncKey(userId = any()) } just runs
     }
 
     private val vaultLockManager: VaultLockManager = VaultLockManagerImpl(
@@ -941,7 +940,6 @@ class VaultLockManagerTest {
                 )
                 kdfManager.updateKdfToMinimumsIfNeeded(masterPassword)
                 keyRotationManager.rotateAutoUnlockKey(userId = USER_ID)
-                keyRotationManager.rotateAuthenticatorSyncKey(userId = USER_ID)
             }
         }
 
@@ -1203,7 +1201,6 @@ class VaultLockManagerTest {
                 )
                 vaultSdkSource.getUserEncryptionKey(userId = USER_ID)
                 keyRotationManager.rotateAutoUnlockKey(userId = USER_ID)
-                keyRotationManager.rotateAuthenticatorSyncKey(userId = USER_ID)
             }
         }
 
@@ -1772,7 +1769,6 @@ class VaultLockManagerTest {
                 )
                 pinProtectedUserKeyManager.migratePinProtectedUserKeyIfNeeded(userId = USER_ID)
                 keyRotationManager.rotateAutoUnlockKey(userId = USER_ID)
-                keyRotationManager.rotateAuthenticatorSyncKey(userId = USER_ID)
             }
         }
 
@@ -1869,7 +1865,6 @@ class VaultLockManagerTest {
                     purpose = HashPurpose.LOCAL_AUTHORIZATION,
                 )
                 keyRotationManager.rotateAutoUnlockKey(userId = USER_ID)
-                keyRotationManager.rotateAuthenticatorSyncKey(userId = USER_ID)
             }
         }
 

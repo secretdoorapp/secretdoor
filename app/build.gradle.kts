@@ -229,7 +229,6 @@ dependencies {
         add("standardImplementation", dependencyNotation)
     }
 
-    implementation(project(":authenticatorbridge"))
 
     implementation(project(":annotation"))
     implementation(project(":core"))

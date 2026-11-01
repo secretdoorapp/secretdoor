@@ -5,32 +5,15 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
-    <uses-feature
-        android:name="android.hardware.nfc"
-        android:required="false" />
 
     <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
-    <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="horizons.permission.HEADSET_CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_USER_DICTIONARY" />
-    <!-- Protect access to AuthenticatorBridgeService using this custom permission.
-
-    Note that each build type uses a different value for knownCerts.
-
-    This in effect means that the only application that can connect to the debug/release/etc
-    variant AuthenticatorBridgeService is the debug/release/etc variant Bitwarden Authenticator
-    app. -->
-    <permission
-        android:name="${applicationId}.permission.AUTHENTICATOR_BRIDGE_SERVICE"
-        android:knownCerts="@array/known_authenticator_app_certs"
-        android:label="SecretDoor Bridge"
-        android:protectionLevel="signature|knownSigner"
-        tools:targetApi="s" />
 
     <application
         android:name=".BitwardenApplication"

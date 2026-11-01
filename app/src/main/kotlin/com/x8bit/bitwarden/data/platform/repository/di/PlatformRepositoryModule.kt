@@ -12,17 +12,12 @@ import com.x8bit.bitwarden.data.platform.datasource.disk.CookieDiskSource
 import com.x8bit.bitwarden.data.platform.datasource.disk.EnvironmentDiskSource
 import com.x8bit.bitwarden.data.platform.datasource.disk.FeatureFlagOverrideDiskSource
 import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
-import com.x8bit.bitwarden.data.platform.repository.AuthenticatorBridgeRepository
-import com.x8bit.bitwarden.data.platform.repository.AuthenticatorBridgeRepositoryImpl
 import com.x8bit.bitwarden.data.platform.repository.DebugMenuRepository
 import com.x8bit.bitwarden.data.platform.repository.DebugMenuRepositoryImpl
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepositoryImpl
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepositoryImpl
-import com.x8bit.bitwarden.data.vault.datasource.disk.VaultDiskSource
-import com.x8bit.bitwarden.data.vault.datasource.sdk.ScopedVaultSdkSource
-import com.x8bit.bitwarden.data.vault.datasource.sdk.VaultSdkSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -35,18 +30,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object PlatformRepositoryModule {
-
-    @Provides
-    @Singleton
-    fun providesAuthenticatorBridgeRepository(
-        authDiskSource: AuthDiskSource,
-        vaultDiskSource: VaultDiskSource,
-        scopedVaultSdkSource: ScopedVaultSdkSource,
-    ): AuthenticatorBridgeRepository = AuthenticatorBridgeRepositoryImpl(
-        authDiskSource = authDiskSource,
-        vaultDiskSource = vaultDiskSource,
-        scopedVaultSdkSource = scopedVaultSdkSource,
-    )
 
     @Provides
     @Singleton
@@ -69,7 +52,6 @@ object PlatformRepositoryModule {
         authDiskSource: AuthDiskSource,
         buildInfoManager: BuildInfoManager,
         settingsDiskSource: SettingsDiskSource,
-        vaultSdkSource: VaultSdkSource,
         accessibilityEnabledManager: AccessibilityEnabledManager,
         dispatcherManager: DispatcherManager,
         flightRecorderManager: FlightRecorderManager,
@@ -80,7 +62,6 @@ object PlatformRepositoryModule {
             authDiskSource = authDiskSource,
             buildInfoManager = buildInfoManager,
             settingsDiskSource = settingsDiskSource,
-            vaultSdkSource = vaultSdkSource,
             accessibilityEnabledManager = accessibilityEnabledManager,
             dispatcherManager = dispatcherManager,
             flightRecorderManager = flightRecorderManager,

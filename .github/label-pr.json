@@ -17,7 +17,6 @@
       "data/",
       "network/",
       "ui/",
-      "authenticatorbridge/",
       "gradle/"
     ],
     "app:password-manager": [

@@ -18,7 +18,6 @@ import com.bitwarden.network.BitwardenServiceClient
 import com.bitwarden.network.model.BitwardenServiceClientConfig
 import com.bitwarden.network.service.PushService
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
-import com.x8bit.bitwarden.data.auth.manager.AddTotpItemFromAuthenticatorManager
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilityEnabledManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillEnabledManager
@@ -82,9 +81,6 @@ import com.x8bit.bitwarden.data.platform.manager.sdk.SdkRepositoryFactory
 import com.x8bit.bitwarden.data.platform.manager.sdk.SdkRepositoryFactoryImpl
 import com.x8bit.bitwarden.data.platform.manager.sdk.log.SdkLoggerFactory
 import com.x8bit.bitwarden.data.platform.manager.sdk.log.SdkLoggerFactoryImpl
-import com.x8bit.bitwarden.data.platform.processor.AuthenticatorBridgeProcessor
-import com.x8bit.bitwarden.data.platform.processor.AuthenticatorBridgeProcessorImpl
-import com.x8bit.bitwarden.data.platform.repository.AuthenticatorBridgeRepository
 import com.x8bit.bitwarden.data.platform.repository.DebugMenuRepository
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
@@ -108,20 +104,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object PlatformManagerModule {
-
-    @Provides
-    @Singleton
-    fun provideAuthenticatorBridgeProcessor(
-        authenticatorBridgeRepository: AuthenticatorBridgeRepository,
-        addTotpItemFromAuthenticatorManager: AddTotpItemFromAuthenticatorManager,
-        @ApplicationContext context: Context,
-        dispatcherManager: DispatcherManager,
-    ): AuthenticatorBridgeProcessor = AuthenticatorBridgeProcessorImpl(
-        authenticatorBridgeRepository = authenticatorBridgeRepository,
-        addTotpItemFromAuthenticatorManager = addTotpItemFromAuthenticatorManager,
-        context = context,
-        dispatcherManager = dispatcherManager,
-    )
 
     @Provides
     @Singleton

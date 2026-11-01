@@ -12,11 +12,6 @@ interface KeyRotationManager {
     val shouldRotateBiometricKey: Flow<Unit>
 
     /**
-     * Checks if the Authenticator Sync key needs to be rotated ands does so if needed.
-     */
-    suspend fun rotateAuthenticatorSyncKey(userId: String)
-
-    /**
      * Checks if the Auto-unlock key needs to be rotated ands does so if needed.
      */
     suspend fun rotateAutoUnlockKey(userId: String)

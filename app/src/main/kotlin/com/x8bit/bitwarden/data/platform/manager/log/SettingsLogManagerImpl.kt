@@ -24,7 +24,6 @@ internal class SettingsLogManagerImpl(
             .appendLine("  $biometricsString")
             .appendLine("  $pinString")
             .apply { pinMpOnRestartString?.let { appendLine("    $it") } }
-            .appendLine("  $authSyncString")
             .appendLine("  $sessionTimeoutString")
             .appendLine("  $sessionTimeoutActionString")
             .appendLine("Autofill:")
@@ -78,13 +77,6 @@ internal class SettingsLogManagerImpl(
             }
         } else {
             null
-        }
-
-    private val authSyncString: String
-        get() = if (settingsRepository.isAuthenticatorSyncEnabled) {
-            "Allow authenticator sync: Enabled"
-        } else {
-            "Allow authenticator sync: Disabled"
         }
 
     private val sessionTimeoutString: String

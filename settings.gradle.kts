@@ -43,7 +43,6 @@ rootProject.name = "Bitwarden"
 include(
     ":annotation",
     ":app",
-    ":authenticatorbridge",
     ":core",
     ":cxf",
     ":data",

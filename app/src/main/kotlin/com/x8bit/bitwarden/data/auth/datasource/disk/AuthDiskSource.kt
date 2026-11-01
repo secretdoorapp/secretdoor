@@ -18,12 +18,6 @@ import java.time.Instant
 interface AuthDiskSource : AppIdProvider {
 
     /**
-     * The currently persisted authenticator sync symmetric key. This key is used for
-     * encrypting IPC traffic.
-     */
-    var authenticatorSyncSymmetricKey: ByteArray?
-
-    /**
      * The currently persisted saved email address (or `null` if not set).
      */
     var rememberedEmailAddress: String?
