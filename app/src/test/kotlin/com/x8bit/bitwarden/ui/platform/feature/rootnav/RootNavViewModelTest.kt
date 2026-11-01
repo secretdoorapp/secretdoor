@@ -46,7 +46,6 @@ class RootNavViewModelTest : BaseViewModelTest() {
     private val authRepository = mockk<AuthRepository> {
         every { userStateFlow } returns mutableUserStateFlow
         every { authStateFlow } returns mutableAuthStateFlow
-        every { showWelcomeCarousel } returns false
     }
 
     private val mockAuthRepository = mockk<AuthRepository>(relaxed = true)
@@ -80,7 +79,6 @@ class RootNavViewModelTest : BaseViewModelTest() {
     @Suppress("MaxLineLength")
     @Test
     fun `when there are no accounts and the user has not logged on before the nav state should be Auth without the welcome route`() {
-        every { authRepository.showWelcomeCarousel } returns true
         mutableUserStateFlow.tryEmit(null)
         val viewModel = createViewModel()
         assertEquals(
@@ -111,53 +109,6 @@ class RootNavViewModelTest : BaseViewModelTest() {
                         needsMasterPassword = false,
                         trustedDevice = null,
                         hasMasterPassword = true,
-                        isUsingKeyConnector = false,
-                        onboardingStatus = OnboardingStatus.COMPLETE,
-                        firstTimeState = FirstTimeState(
-                            showImportLoginsCard = true,
-                        ),
-                        isExportable = true,
-                        creationDate = null,
-                    ),
-                ),
-            ),
-        )
-        val viewModel = createViewModel()
-        assertEquals(
-            RootNavState.Auth,
-            viewModel.stateFlow.value,
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `when the active user has an untrusted device but has completed TDE login the nav state should be Auth`() {
-        every { authRepository.tdeLoginComplete } returns true
-        mutableUserStateFlow.tryEmit(
-            UserState(
-                activeUserId = "activeUserId",
-                accounts = listOf(
-                    UserState.Account(
-                        userId = "activeUserId",
-                        name = "name",
-                        email = "email",
-                        avatarColorHex = "avatarColorHex",
-                        environment = Environment.Prod.Us,
-                        isPremium = true,
-                        isPremiumFromSelf = true,
-                        isLoggedIn = false,
-                        isVaultUnlocked = true,
-                        needsPasswordReset = false,
-                        isBiometricsEnabled = false,
-                        organizations = emptyList(),
-                        needsMasterPassword = false,
-                        trustedDevice = UserState.TrustedDevice(
-                            isDeviceTrusted = false,
-                            hasAdminApproval = true,
-                            hasLoginApprovingDevice = true,
-                            hasResetPasswordPermission = false,
-                        ),
-                        hasMasterPassword = false,
                         isUsingKeyConnector = false,
                         onboardingStatus = OnboardingStatus.COMPLETE,
                         firstTimeState = FirstTimeState(

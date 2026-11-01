@@ -5,7 +5,6 @@ import com.bitwarden.ui.platform.base.createMockNavHostController
 import com.x8bit.bitwarden.ui.platform.base.BitwardenComposeTest
 import com.x8bit.bitwarden.ui.platform.feature.accessibilitydisclosure.AccessibilityDisclosureRoute
 import com.x8bit.bitwarden.ui.platform.feature.biometrics.UpdateBiometricsRoute
-import com.x8bit.bitwarden.ui.platform.feature.cookieacquisition.CookieAcquisitionRoute
 import com.x8bit.bitwarden.ui.platform.feature.localnetworkaccess.LocalNetworkAccessRoute
 import io.mockk.every
 import io.mockk.mockk
@@ -39,16 +38,6 @@ class OverlayNavScreenTest : BitwardenComposeTest() {
         composeTestRule.runOnIdle {
             verify(exactly = 1) {
                 mockNavHostController.navigate(route = UpdateBiometricsRoute, builder = any())
-            }
-        }
-    }
-
-    @Test
-    fun `on NavigateToCookieAcquisition should navigate to the cookie acquisition screen`() {
-        mutableEventFlow.tryEmit(OverlayNavEvent.NavigateToCookieAcquisition)
-        composeTestRule.runOnIdle {
-            verify(exactly = 1) {
-                mockNavHostController.navigate(route = CookieAcquisitionRoute, builder = any())
             }
         }
     }

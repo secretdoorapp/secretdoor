@@ -115,7 +115,7 @@
              Uses Theme.Translucent.NoTitleBar for invisibility while allowing normal lifecycle
              (Theme.NoDisplay requires finish() before onResume(), incompatible with ActivityResult).
 
-             Note: Unlike AuthCallbackActivity, this does NOT use noHistory="true" because it
+             Note: this does NOT use noHistory="true" because it
              must remain in the back stack to receive the ActivityResult callback from
              MainActivity. -->
         <activity
@@ -147,69 +147,6 @@
             android:launchMode="singleTop"
             android:noHistory="true"
             android:theme="@style/AutofillCallbackTheme" />
-
-        <activity
-            android:name=".AuthCallbackActivity"
-            android:exported="true"
-            android:launchMode="singleTop"
-            android:noHistory="true"
-            android:theme="@android:style/Theme.NoDisplay">
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="https" />
-                <data android:host="bitwarden.com" />
-                <data android:host="bitwarden.eu" />
-                <data android:host="bitwarden.pw" />
-                <data android:host="bitwarden-gov.com" />
-                <data android:pathPattern="/duo-callback" />
-                <data android:pathPattern="/sso-callback" />
-                <data android:pathPattern="/webauthn-callback" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="duo-callback"
-                    android:scheme="bitwarden" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="sso-callback"
-                    android:scheme="bitwarden" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="webauthn-callback"
-                    android:scheme="bitwarden" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="sso-cookie-vendor"
-                    android:scheme="bitwarden" />
-            </intent-filter>
-        </activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"

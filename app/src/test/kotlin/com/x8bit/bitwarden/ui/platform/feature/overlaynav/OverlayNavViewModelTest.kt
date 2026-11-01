@@ -3,8 +3,6 @@ package com.x8bit.bitwarden.ui.platform.feature.overlaynav
 import app.cash.turbine.test
 import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
 import com.bitwarden.ui.platform.base.BaseViewModelTest
-import com.x8bit.bitwarden.data.platform.manager.CookieAcquisitionRequestManager
-import com.x8bit.bitwarden.data.platform.manager.model.CookieAcquisitionRequest
 import com.x8bit.bitwarden.data.platform.manager.network.NetworkPermissionManager
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
@@ -23,10 +21,6 @@ class OverlayNavViewModelTest : BaseViewModelTest() {
     private val mutableLocalNetworkAccessFlow = MutableStateFlow(false)
     private val networkPermissionManager: NetworkPermissionManager = mockk {
         every { isLocalNetworkAccessRequiredStateFlow } returns mutableLocalNetworkAccessFlow
-    }
-    private val mutableCookieAcquisitionFlow = MutableStateFlow<CookieAcquisitionRequest?>(null)
-    private val cookieAcquisitionRequestManager: CookieAcquisitionRequestManager = mockk {
-        every { cookieAcquisitionRequestFlow } returns mutableCookieAcquisitionFlow
     }
     private val mutableShouldRotateBiometricKeyFlow = bufferedMutableSharedFlow<Unit>()
     private val vaultRepository: VaultRepository = mockk {
@@ -57,19 +51,6 @@ class OverlayNavViewModelTest : BaseViewModelTest() {
         }
 
     @Test
-    fun `when a cookie acquisition request is ready should emit NavigateToCookieAcquisition`() =
-        runTest {
-            val viewModel = createViewModel()
-            viewModel.eventFlow.test {
-                expectNoEvents()
-                mutableCookieAcquisitionFlow.value = CookieAcquisitionRequest(
-                    hostname = "vault.bitwarden.com",
-                )
-                assertEquals(OverlayNavEvent.NavigateToCookieAcquisition, awaitItem())
-            }
-        }
-
-    @Test
     fun `when the biometric key should be rotated should emit NavigateToUpdateBiometrics`() =
         runTest {
             val viewModel = createViewModel()
@@ -81,7 +62,6 @@ class OverlayNavViewModelTest : BaseViewModelTest() {
         }
 
     private fun createViewModel(): OverlayNavViewModel = OverlayNavViewModel(
-        cookieAcquisitionRequestManager = cookieAcquisitionRequestManager,
         networkPermissionManager = networkPermissionManager,
         vaultRepository = vaultRepository,
         settingsRepository = settingsRepository,

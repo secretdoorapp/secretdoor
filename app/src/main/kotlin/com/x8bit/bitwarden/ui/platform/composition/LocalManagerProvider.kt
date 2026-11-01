@@ -47,8 +47,6 @@ import com.x8bit.bitwarden.ui.platform.manager.biometrics.BiometricsManager
 import com.x8bit.bitwarden.ui.platform.manager.biometrics.BiometricsManagerImpl
 import com.x8bit.bitwarden.ui.platform.manager.keychain.KeyChainManager
 import com.x8bit.bitwarden.ui.platform.manager.keychain.KeyChainManagerImpl
-import com.x8bit.bitwarden.ui.platform.manager.nfc.NfcManager
-import com.x8bit.bitwarden.ui.platform.manager.nfc.NfcManagerImpl
 import com.x8bit.bitwarden.ui.platform.manager.permissions.PermissionsManager
 import com.x8bit.bitwarden.ui.platform.manager.permissions.PermissionsManagerImpl
 import com.x8bit.bitwarden.ui.platform.manager.review.AppReviewManager
@@ -78,7 +76,6 @@ fun LocalManagerProvider(
     credentialProviderCompletionManager: CredentialProviderCompletionManager =
         createCredentialProviderCompletionManager(activity = activity),
     keyChainManager: KeyChainManager = KeyChainManagerImpl(activity = activity),
-    nfcManager: NfcManager = NfcManagerImpl(activity = activity),
     permissionsManager: PermissionsManager = PermissionsManagerImpl(activity = activity),
     credentialExchangeImporter: CredentialExchangeImporter =
         credentialExchangeImporter(activity = activity),
@@ -107,7 +104,6 @@ fun LocalManagerProvider(
         LocalCredentialProviderCompletionManager provides credentialProviderCompletionManager,
         LocalIntentManager provides intentManager,
         LocalKeyChainManager provides keyChainManager,
-        LocalNfcManager provides nfcManager,
         LocalPermissionsManager provides permissionsManager,
         LocalCredentialExchangeImporter provides credentialExchangeImporter,
         LocalCredentialExchangeCompletionManager provides credentialExchangeCompletionManager,
@@ -154,13 +150,6 @@ val LocalFeatureFlagsState: ProvidableCompositionLocal<FeatureFlagsState> = comp
  */
 val LocalPermissionsManager: ProvidableCompositionLocal<PermissionsManager> = compositionLocalOf {
     error("CompositionLocal LocalPermissionsManager not present")
-}
-
-/**
- * Provides access to the NFC manager throughout the app.
- */
-val LocalNfcManager: ProvidableCompositionLocal<NfcManager> = compositionLocalOf {
-    error("CompositionLocal NfcManager not present")
 }
 
 /**

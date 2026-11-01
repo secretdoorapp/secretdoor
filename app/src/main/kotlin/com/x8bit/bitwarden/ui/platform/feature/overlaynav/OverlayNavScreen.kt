@@ -11,8 +11,6 @@ import com.x8bit.bitwarden.ui.platform.feature.accessibilitydisclosure.accessibi
 import com.x8bit.bitwarden.ui.platform.feature.accessibilitydisclosure.navigateToAccessibilityDisclosure
 import com.x8bit.bitwarden.ui.platform.feature.biometrics.navigateToUpdateBiometrics
 import com.x8bit.bitwarden.ui.platform.feature.biometrics.updateBiometricsDestination
-import com.x8bit.bitwarden.ui.platform.feature.cookieacquisition.cookieAcquisitionDestination
-import com.x8bit.bitwarden.ui.platform.feature.cookieacquisition.navigateToCookieAcquisition
 import com.x8bit.bitwarden.ui.platform.feature.localnetworkaccess.localNetworkAccessDestination
 import com.x8bit.bitwarden.ui.platform.feature.localnetworkaccess.navigateToLocalNetworkAccess
 import com.x8bit.bitwarden.ui.platform.feature.rootnav.RootNavigationRoute
@@ -40,10 +38,6 @@ fun OverlayNavScreen(
         // can appear on top of the rest of the app without interacting with the state-based
         // navigation used by RootNavScreen (which also exists here).
         rootNavDestination(onSplashScreenRemoved = onSplashScreenRemoved)
-        cookieAcquisitionDestination(
-            onDismiss = { navController.popBackStack() },
-            onSplashScreenRemoved = onSplashScreenRemoved,
-        )
         localNetworkAccessDestination(
             onDismiss = { navController.popBackStack() },
             onSplashScreenRemoved = onSplashScreenRemoved,
@@ -68,10 +62,6 @@ private fun OverlayNavEventsEffect(
         when (event) {
             OverlayNavEvent.NavigateToUpdateBiometrics -> {
                 navController.navigateToUpdateBiometrics()
-            }
-
-            OverlayNavEvent.NavigateToCookieAcquisition -> {
-                navController.navigateToCookieAcquisition()
             }
 
             OverlayNavEvent.NavigateToLocalNetworkAccess -> {

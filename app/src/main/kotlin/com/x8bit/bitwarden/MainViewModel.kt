@@ -13,16 +13,9 @@ import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.feature.settings.appearance.model.AppLanguage
 import com.bitwarden.ui.platform.feature.settings.appearance.model.AppTheme
 import com.bitwarden.ui.platform.model.TotpData
-import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.vault.CipherView
 import com.x8bit.bitwarden.data.auth.manager.AddTotpItemFromAuthenticatorManager
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
-import com.x8bit.bitwarden.data.auth.repository.model.EmailTokenResult
-import com.x8bit.bitwarden.data.auth.repository.util.getCookieCallbackResult
-import com.x8bit.bitwarden.data.auth.repository.util.getDuoCallbackTokenResult
-import com.x8bit.bitwarden.data.auth.repository.util.getSsoCallbackResult
-import com.x8bit.bitwarden.data.auth.repository.util.getWebAuthResult
-import com.x8bit.bitwarden.data.auth.util.getCompleteRegistrationDataIntentOrNull
 import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilitySelectionManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillSelectionManager
 import com.x8bit.bitwarden.data.autofill.util.getAutofillSaveItemOrNull
@@ -35,7 +28,6 @@ import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.garbage.GarbageCollectionManager
 import com.x8bit.bitwarden.data.platform.manager.model.AppResumeScreenData
-import com.x8bit.bitwarden.data.platform.manager.model.CompleteRegistrationData
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
@@ -194,10 +186,6 @@ class MainViewModel @Inject constructor(
             MainAction.OpenDebugMenu -> handleOpenDebugMenu()
             is MainAction.ResumeScreenDataReceived -> handleAppResumeDataUpdated(action)
             is MainAction.AppSpecificLanguageUpdate -> handleAppSpecificLanguageUpdate(action)
-            is MainAction.DuoResult -> handleDuoResult(action)
-            is MainAction.SsoResult -> handleSsoResult(action)
-            is MainAction.WebAuthnResult -> handleWebAuthnResult(action)
-            is MainAction.CookieAcquisitionResult -> handleCookieAcquisitionResult(action)
             is MainAction.PremiumCheckoutResult -> handlePremiumCheckoutResult(action)
             is MainAction.StripePortalResult -> handleStripePortalResult()
             is MainAction.Internal -> handleInternalAction(action)
@@ -228,26 +216,6 @@ class MainViewModel @Inject constructor(
 
     private fun handleAppSpecificLanguageUpdate(action: MainAction.AppSpecificLanguageUpdate) {
         settingsRepository.appLanguage = action.appLanguage
-    }
-
-    private fun handleDuoResult(action: MainAction.DuoResult) {
-        authRepository.setDuoCallbackTokenResult(
-            tokenResult = action.authResult.getDuoCallbackTokenResult(),
-        )
-    }
-
-    private fun handleSsoResult(action: MainAction.SsoResult) {
-        authRepository.setSsoCallbackResult(result = action.authResult.getSsoCallbackResult())
-    }
-
-    private fun handleWebAuthnResult(action: MainAction.WebAuthnResult) {
-        authRepository.setWebAuthResult(webAuthResult = action.authResult.getWebAuthResult())
-    }
-
-    private fun handleCookieAcquisitionResult(action: MainAction.CookieAcquisitionResult) {
-        authRepository.setCookieCallbackResult(
-            result = action.cookieCallbackResult.getCookieCallbackResult(),
-        )
     }
 
     private fun handlePremiumCheckoutResult(action: MainAction.PremiumCheckoutResult) {
@@ -352,15 +320,10 @@ class MainViewModel @Inject constructor(
         val hasVaultShortcut = intent.isMyVaultShortcut
         val hasAccountSecurityShortcut = intent.isAccountSecurityShortcut
         val hasPremiumCheckoutCallback = intent.isPremiumCheckoutCallback
-        val completeRegistrationData = intent.getCompleteRegistrationDataIntentOrNull()
         val importCredentialsRequest = intent.getProviderImportCredentialsRequest()
         val credentialProviderRequest =
             credentialProviderRequestManager.getPendingCredentialRequest()
         when {
-            completeRegistrationData != null -> {
-                handleCompleteRegistrationData(completeRegistrationData)
-            }
-
             autofillSaveItem != null -> {
                 specialCircumstanceManager.specialCircumstance =
                     SpecialCircumstance.AutofillSave(
@@ -458,50 +421,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun handleCompleteRegistrationData(data: CompleteRegistrationData) {
-        viewModelScope.launch {
-            // Attempt to load the environment for the user if they have a pre-auth environment
-            // saved.
-            environmentRepository.loadEnvironmentForEmail(userEmail = data.email)
-            // Determine if the token is still valid.
-            val emailTokenResult = authRepository.validateEmailToken(
-                email = data.email,
-                token = data.verificationToken,
-            )
-            when (emailTokenResult) {
-                is EmailTokenResult.Error -> {
-                    emailTokenResult
-                        .message
-                        ?.let { toastManager.show(message = it) }
-                        ?: run {
-                            toastManager.show(
-                                messageId = BitwardenString
-                                    .there_was_an_issue_validating_the_registration_token,
-                            )
-                        }
-                }
-
-                EmailTokenResult.Expired -> {
-                    specialCircumstanceManager.specialCircumstance = SpecialCircumstance
-                        .RegistrationEvent
-                        .ExpiredRegistrationLink
-                }
-
-                EmailTokenResult.Success -> {
-                    if (authRepository.activeUserId != null) {
-                        authRepository.hasPendingAccountAddition = true
-                    }
-                    specialCircumstanceManager.specialCircumstance =
-                        SpecialCircumstance.RegistrationEvent.CompleteRegistration(
-                            completeRegistrationData = data,
-                            timestamp = clock.millis(),
-                        )
-                }
-            }
-        }
-    }
-}
-
 /**
  * Models state for the [MainActivity].
  */
@@ -524,28 +443,6 @@ data class MainState(
  * Models actions for the [MainActivity].
  */
 sealed class MainAction {
-    /**
-     * Receive the result from the Duo login flow.
-     */
-    data class DuoResult(val authResult: AuthTabIntent.AuthResult) : MainAction()
-
-    /**
-     * Receive the result from the SSO login flow.
-     */
-    data class SsoResult(val authResult: AuthTabIntent.AuthResult) : MainAction()
-
-    /**
-     * Receive the result from the WebAuthn login flow.
-     */
-    data class WebAuthnResult(val authResult: AuthTabIntent.AuthResult) : MainAction()
-
-    /**
-     * Receive the result from the cookie acquisition flow.
-     */
-    data class CookieAcquisitionResult(
-        val cookieCallbackResult: AuthTabIntent.AuthResult,
-    ) : MainAction()
-
     /**
      * Receive the result from the premium checkout flow.
      */

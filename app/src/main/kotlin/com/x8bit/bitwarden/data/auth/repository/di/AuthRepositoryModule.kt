@@ -1,26 +1,18 @@
 package com.x8bit.bitwarden.data.auth.repository.di
 
 import com.bitwarden.core.data.manager.dispatcher.DispatcherManager
-import com.bitwarden.core.data.manager.toast.ToastManager
-import com.bitwarden.data.datasource.disk.ConfigDiskSource
 import com.bitwarden.network.service.AccountsService
-import com.bitwarden.network.service.DevicesService
 import com.bitwarden.network.service.HaveIBeenPwnedService
 import com.bitwarden.network.service.IdentityService
-import com.bitwarden.network.service.OrganizationService
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
 import com.x8bit.bitwarden.data.auth.datasource.sdk.AuthSdkSource
 import com.x8bit.bitwarden.data.auth.manager.AuthStateManager
 import com.x8bit.bitwarden.data.auth.manager.KdfManager
-import com.x8bit.bitwarden.data.auth.manager.KeyConnectorManager
-import com.x8bit.bitwarden.data.auth.manager.TrustedDeviceManager
 import com.x8bit.bitwarden.data.auth.manager.UserLogoutManager
 import com.x8bit.bitwarden.data.auth.manager.UserStateManager
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.AuthRepositoryImpl
-import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.data.platform.manager.BiometricsEncryptionManager
-import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.LogsManager
 import com.x8bit.bitwarden.data.platform.manager.policy.PasswordPolicyManager
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
@@ -46,56 +38,40 @@ object AuthRepositoryModule {
     fun providesAuthRepository(
         clock: Clock,
         accountsService: AccountsService,
-        devicesService: DevicesService,
         identityService: IdentityService,
         haveIBeenPwnedService: HaveIBeenPwnedService,
-        organizationService: OrganizationService,
         authSdkSource: AuthSdkSource,
         vaultSdkSource: VaultSdkSource,
         authDiskSource: AuthDiskSource,
-        settingsDiskSource: SettingsDiskSource,
-        configDiskSource: ConfigDiskSource,
         dispatcherManager: DispatcherManager,
         environmentRepository: EnvironmentRepository,
         settingsRepository: SettingsRepository,
         vaultRepository: VaultRepository,
         biometricsEncryptionManager: BiometricsEncryptionManager,
-        keyConnectorManager: KeyConnectorManager,
-        trustedDeviceManager: TrustedDeviceManager,
         userLogoutManager: UserLogoutManager,
         passwordPolicyManager: PasswordPolicyManager,
         logsManager: LogsManager,
         userStateManager: UserStateManager,
         kdfManager: KdfManager,
-        toastManager: ToastManager,
-        featureFlagManager: FeatureFlagManager,
         authStateManager: AuthStateManager,
     ): AuthRepository = AuthRepositoryImpl(
         clock = clock,
         accountsService = accountsService,
-        devicesService = devicesService,
         identityService = identityService,
-        organizationService = organizationService,
         authSdkSource = authSdkSource,
         vaultSdkSource = vaultSdkSource,
         authDiskSource = authDiskSource,
-        settingsDiskSource = settingsDiskSource,
-        configDiskSource = configDiskSource,
         haveIBeenPwnedService = haveIBeenPwnedService,
         dispatcherManager = dispatcherManager,
         environmentRepository = environmentRepository,
         settingsRepository = settingsRepository,
         vaultRepository = vaultRepository,
         biometricsEncryptionManager = biometricsEncryptionManager,
-        keyConnectorManager = keyConnectorManager,
-        trustedDeviceManager = trustedDeviceManager,
         userLogoutManager = userLogoutManager,
         passwordPolicyManager = passwordPolicyManager,
         logsManager = logsManager,
         userStateManager = userStateManager,
         kdfManager = kdfManager,
-        toastManager = toastManager,
-        featureFlagManager = featureFlagManager,
         authStateManager = authStateManager,
     )
 }
