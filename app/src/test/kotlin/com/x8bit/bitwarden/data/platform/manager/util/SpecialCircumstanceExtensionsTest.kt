@@ -38,8 +38,6 @@ class SpecialCircumstanceExtensionsTest {
                 shouldFinishWhenComplete = true,
             ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
-                shouldFinishWhenComplete = true,
-            ),
             SpecialCircumstance.ProviderCreateCredential(
                 createCredentialRequest = mockk(),
             ),
@@ -85,8 +83,6 @@ class SpecialCircumstanceExtensionsTest {
                 autofillSaveItem = mockk(),
             ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
-                shouldFinishWhenComplete = true,
-            ),
             SpecialCircumstance.ProviderCreateCredential(
                 createCredentialRequest = mockk(),
             ),
@@ -118,8 +114,6 @@ class SpecialCircumstanceExtensionsTest {
                 autofillSaveItem = mockk(),
             ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
-                shouldFinishWhenComplete = true,
-            ),
             SpecialCircumstance.Fido2Assertion(
                 fido2AssertionRequest = mockk(),
             ),
@@ -180,8 +174,6 @@ class SpecialCircumstanceExtensionsTest {
                 autofillSaveItem = mockk(),
             ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
-                shouldFinishWhenComplete = true,
-            ),
             SpecialCircumstance.ProviderGetPasswordRequest(
                 passwordGetRequest = mockk(),
             ),
@@ -223,8 +215,6 @@ class SpecialCircumstanceExtensionsTest {
                 autofillSaveItem = mockk(),
             ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
-                shouldFinishWhenComplete = true,
-            ),
             SpecialCircumstance.ProviderCreateCredential(
                 createCredentialRequest = mockk(),
             ),
@@ -266,8 +256,6 @@ class SpecialCircumstanceExtensionsTest {
                 autofillSaveItem = mockk(),
             ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
-                shouldFinishWhenComplete = true,
-            ),
             SpecialCircumstance.ProviderCreateCredential(
                 createCredentialRequest = mockk(),
             ),
@@ -340,8 +328,6 @@ class SpecialCircumstanceExtensionsTest {
                 autofillSaveItem = mockk(),
             ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
-                shouldFinishWhenComplete = true,
-            ),
             SpecialCircumstance.ProviderCreateCredential(
                 createCredentialRequest = mockk(),
             ),

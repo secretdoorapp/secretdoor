@@ -18,6 +18,7 @@ import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepositoryImpl
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepositoryImpl
+import com.x8bit.bitwarden.data.vault.datasource.sdk.VaultSdkSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -52,6 +53,7 @@ object PlatformRepositoryModule {
         authDiskSource: AuthDiskSource,
         buildInfoManager: BuildInfoManager,
         settingsDiskSource: SettingsDiskSource,
+        vaultSdkSource: VaultSdkSource,
         accessibilityEnabledManager: AccessibilityEnabledManager,
         dispatcherManager: DispatcherManager,
         flightRecorderManager: FlightRecorderManager,
@@ -62,6 +64,7 @@ object PlatformRepositoryModule {
             authDiskSource = authDiskSource,
             buildInfoManager = buildInfoManager,
             settingsDiskSource = settingsDiskSource,
+            vaultSdkSource = vaultSdkSource,
             accessibilityEnabledManager = accessibilityEnabledManager,
             dispatcherManager = dispatcherManager,
             flightRecorderManager = flightRecorderManager,

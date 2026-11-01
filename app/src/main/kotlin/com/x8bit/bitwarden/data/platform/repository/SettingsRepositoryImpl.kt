@@ -19,6 +19,7 @@ import com.x8bit.bitwarden.data.platform.repository.model.UriMatchType
 import com.x8bit.bitwarden.data.platform.repository.model.VaultSection
 import com.x8bit.bitwarden.data.platform.repository.model.VaultTimeout
 import com.x8bit.bitwarden.data.platform.repository.model.VaultTimeoutAction
+import com.x8bit.bitwarden.data.vault.datasource.sdk.VaultSdkSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,6 +47,7 @@ class SettingsRepositoryImpl(
     private val authDiskSource: AuthDiskSource,
     private val buildInfoManager: BuildInfoManager,
     private val settingsDiskSource: SettingsDiskSource,
+    private val vaultSdkSource: VaultSdkSource,
     flightRecorderManager: FlightRecorderManager,
     accessibilityEnabledManager: AccessibilityEnabledManager,
     dispatcherManager: DispatcherManager,

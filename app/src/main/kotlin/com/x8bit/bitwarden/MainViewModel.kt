@@ -404,6 +404,7 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+}
 
 /**
  * Models state for the [MainActivity].

@@ -70,6 +70,7 @@ class SettingsRepositoryTest {
         autofillEnabledManager = autofillEnabledManager,
         authDiskSource = fakeAuthDiskSource,
         settingsDiskSource = fakeSettingsDiskSource,
+        vaultSdkSource = vaultSdkSource,
         accessibilityEnabledManager = fakeAccessibilityEnabledManager,
         dispatcherManager = FakeDispatcherManager(),
         flightRecorderManager = flightRecorderManager,
