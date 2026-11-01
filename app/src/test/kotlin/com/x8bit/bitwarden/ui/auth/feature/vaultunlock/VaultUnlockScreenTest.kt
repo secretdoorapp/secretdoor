@@ -429,7 +429,7 @@ class VaultUnlockScreenTest : BitwardenComposeTest() {
         composeTestRule
             .onNodeWithText("Your vault is locked. Verify your master password to continue.")
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText("Unlock").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Unlock").performScrollTo().assertIsDisplayed()
 
         mutableStateFlow.update { it.copy(hideInput = true) }
         composeTestRule.onNodeWithText("Master password").assertDoesNotExist()

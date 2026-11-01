@@ -1,5 +1,7 @@
 package com.x8bit.bitwarden.ui.platform.components.listitem
 
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,10 +14,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bitwarden.ui.platform.base.util.cardStyle
+import com.bitwarden.ui.platform.base.util.nullableTestTag
 import com.bitwarden.ui.platform.components.icon.BitwardenIcon
 import com.bitwarden.ui.platform.components.icon.model.IconData
 import com.bitwarden.ui.platform.components.model.CardStyle
@@ -34,6 +38,8 @@ import com.bitwarden.ui.platform.theme.BitwardenTheme
  * @param modifier The [Modifier] to be applied to the [Row] composable that holds the list item.
  * @param subLabel The secondary text label to be displayed in the group item.
  * @param endIcon The [IconData] object used to draw the icon at the end of the group item.
+ * @param startImageRes Optional full-color artwork drawn untinted in place of [startIcon]; the
+ * [startIcon] test tag is still applied to it.
  */
 @Composable
 fun BitwardenGroupItem(
@@ -45,6 +51,7 @@ fun BitwardenGroupItem(
     modifier: Modifier = Modifier,
     subLabel: String? = null,
     endIcon: IconData.Local? = null,
+    @DrawableRes startImageRes: Int? = null,
 ) {
     Row(
         modifier = modifier
@@ -58,13 +65,23 @@ fun BitwardenGroupItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        BitwardenIcon(
-            iconData = startIcon,
-            tint = BitwardenTheme.colorScheme.icon.primary,
-            modifier = Modifier
-                .defaultMinSize(minHeight = 36.dp)
-                .size(size = 24.dp),
-        )
+        if (startImageRes != null) {
+            Image(
+                painter = painterResource(id = startImageRes),
+                contentDescription = startIcon.contentDescription?.invoke(),
+                modifier = Modifier
+                    .size(size = 36.dp)
+                    .nullableTestTag(tag = startIcon.testTag),
+            )
+        } else {
+            BitwardenIcon(
+                iconData = startIcon,
+                tint = BitwardenTheme.colorScheme.icon.primary,
+                modifier = Modifier
+                    .defaultMinSize(minHeight = 36.dp)
+                    .size(size = 24.dp),
+            )
+        }
 
         Column(modifier = Modifier.weight(weight = 1f)) {
             Text(

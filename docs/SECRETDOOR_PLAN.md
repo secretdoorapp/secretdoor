@@ -165,7 +165,14 @@ stored key material.
 ### Phase 5: Branding cleanup
 - Replace remaining user-visible "Bitwarden" strings, icons, About screen, links, and README.
 - Progress:
-  - [x] Icons, version 2 (`design/icon-tools/vault_icon.py`, preview
+  - [x] Icons, version 3 (`design/icon-tools/sheet_icons.py`, source sheet
+    `design/icon-source/secretdoor_icon_sheet.jpeg`, preview
+    `design/icon-review/sheet_icons_preview.png`): "Access Control / Handle" badge for the
+    launcher (all build types), splash and autofill logo, with a vector themed-icon glyph;
+    sheet artwork for the vault Types rows (Login, Card, Identity, Secure note), the same four
+    tiles as the empty-vault illustration (replaces `ill_items`), and a Master Key badge above
+    the unlock field. Notification and shield glyphs stay from version 2.
+  - [x] Icons, version 2 (replaced; `design/icon-tools/vault_icon.py`, preview
     `design/icon-review/vault_icon_preview.png`): closed round steel vault door with a glowing
     digital padlock; launcher foreground and themed icon, splash icon, autofill logo,
     notification and shield glyphs.

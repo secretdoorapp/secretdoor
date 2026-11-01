@@ -16,9 +16,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.bitwarden.ui.platform.base.util.standardHorizontalMargin
 import com.bitwarden.ui.platform.components.button.BitwardenFilledButton
@@ -29,6 +31,9 @@ import com.bitwarden.ui.platform.theme.BitwardenTheme
 
 /**
  * No items view for the [VaultScreen].
+ *
+ * @param vectorRes Optional illustration (vector or bitmap) shown above the text.
+ * @param imageSize The size of the illustration.
  */
 @Composable
 fun VaultNoItems(
@@ -38,6 +43,7 @@ fun VaultNoItems(
     modifier: Modifier = Modifier,
     @DrawableRes vectorRes: Int? = null,
     headerText: String? = null,
+    imageSize: Dp = 100.dp,
 ) {
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()),
@@ -47,11 +53,11 @@ fun VaultNoItems(
 
         vectorRes?.let {
             Image(
-                painter = rememberVectorPainter(id = it),
+                painter = painterResource(id = it),
                 contentDescription = null,
                 modifier = Modifier
                     .standardHorizontalMargin()
-                    .size(100.dp),
+                    .size(size = imageSize),
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -101,7 +107,8 @@ private fun VaultNoItems_preview() {
             modifier = Modifier.background(BitwardenTheme.colorScheme.background.primary),
         ) {
             VaultNoItems(
-                vectorRes = BitwardenDrawable.ill_items,
+                vectorRes = BitwardenDrawable.art_vault_items,
+                imageSize = 128.dp,
                 headerText = stringResource(id = BitwardenString.save_and_protect_your_data),
                 message = stringResource(
                     BitwardenString.the_vault_protects_more_than_just_passwords,

@@ -293,10 +293,11 @@ private fun LazyListScope.typesSection(
                 iconRes = BitwardenDrawable.ic_globe,
                 testTag = "LoginCipherIcon",
             ),
+            startImageRes = BitwardenDrawable.art_type_passwords,
             label = stringResource(id = BitwardenString.type_login),
             supportingLabel = state.loginItemsCount.toString(),
             onClick = vaultHandlers.loginGroupClick,
-            cardStyle = CardStyle.Top(dividerPadding = 56.dp),
+            cardStyle = CardStyle.Top(dividerPadding = 68.dp),
             modifier = Modifier
                 .animateItem()
                 .fillMaxWidth()
@@ -312,10 +313,11 @@ private fun LazyListScope.typesSection(
                     iconRes = BitwardenDrawable.ic_payment_card,
                     testTag = "CardCipherIcon",
                 ),
+                startImageRes = BitwardenDrawable.art_type_cards,
                 label = stringResource(id = BitwardenString.type_card),
                 supportingLabel = state.cardItemsCount.toString(),
                 onClick = vaultHandlers.cardGroupClick,
-                cardStyle = CardStyle.Middle(dividerPadding = 56.dp),
+                cardStyle = CardStyle.Middle(dividerPadding = 68.dp),
                 modifier = Modifier
                     .animateItem()
                     .fillMaxWidth()
@@ -351,10 +353,11 @@ private fun LazyListScope.typesSection(
                 iconRes = BitwardenDrawable.ic_id_card,
                 testTag = "IdentityCipherIcon",
             ),
+            startImageRes = BitwardenDrawable.art_type_identities,
             label = stringResource(id = BitwardenString.type_identity),
             supportingLabel = state.identityItemsCount.toString(),
             onClick = vaultHandlers.identityGroupClick,
-            cardStyle = CardStyle.Middle(dividerPadding = 56.dp),
+            cardStyle = CardStyle.Middle(dividerPadding = 68.dp),
             modifier = Modifier
                 .animateItem()
                 .fillMaxWidth()
@@ -409,10 +412,11 @@ private fun LazyListScope.typesSection(
                 iconRes = BitwardenDrawable.ic_note,
                 testTag = "SecureNoteCipherIcon",
             ),
+            startImageRes = BitwardenDrawable.art_type_notes,
             label = stringResource(id = BitwardenString.type_secure_note),
             supportingLabel = state.secureNoteItemsCount.toString(),
             onClick = vaultHandlers.secureNoteGroupClick,
-            cardStyle = CardStyle.Middle(dividerPadding = 56.dp),
+            cardStyle = CardStyle.Middle(dividerPadding = 68.dp),
             modifier = Modifier
                 .animateItem()
                 .fillMaxWidth()
