@@ -7,10 +7,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bitwarden.ui.platform.base.util.standardHorizontalMargin
+import com.bitwarden.ui.platform.components.button.BitwardenOutlinedButton
 import com.bitwarden.ui.platform.components.field.BitwardenPasswordField
 import com.bitwarden.ui.platform.components.field.BitwardenTextField
 import com.bitwarden.ui.platform.components.model.CardStyle
@@ -27,48 +29,74 @@ fun LazyListScope.vaultAddEditSshKeyItems(
 ) {
     item {
         Spacer(modifier = Modifier.height(8.dp))
-        BitwardenPasswordField(
-            label = stringResource(id = BitwardenString.private_key),
-            value = sshKeyState.privateKey,
-            readOnly = true,
-            onValueChange = { /* no-op */ },
-            showPassword = sshKeyState.showPrivateKey,
-            showPasswordChange = { sshKeyTypeHandlers.onPrivateKeyVisibilityChange(it) },
-            showPasswordTestTag = "ViewPrivateKeyButton",
-            passwordFieldTestTag = "PrivateKeyEntry",
+        BitwardenOutlinedButton(
+            label = stringResource(id = BitwardenString.generate_a_key),
+            onClick = sshKeyTypeHandlers.onGenerateKeyClick,
+            icon = null,
             cardStyle = CardStyle.Top(),
             modifier = Modifier
+                .testTag(tag = "GenerateSshKeyButton")
                 .fillMaxWidth()
                 .standardHorizontalMargin(),
         )
-    }
-
-    item {
-        BitwardenTextField(
-            label = stringResource(id = BitwardenString.public_key),
-            value = sshKeyState.publicKey,
-            readOnly = true,
-            onValueChange = { },
-            textFieldTestTag = "PublicKeyEntry",
-            cardStyle = CardStyle.Middle(),
-            modifier = Modifier
-                .fillMaxWidth()
-                .standardHorizontalMargin(),
-        )
-    }
-
-    item {
-        BitwardenTextField(
-            label = stringResource(id = BitwardenString.fingerprint),
-            value = sshKeyState.fingerprint,
-            readOnly = true,
-            onValueChange = { /* no-op */ },
-            textFieldTestTag = "FingerprintEntry",
+        BitwardenOutlinedButton(
+            label = stringResource(id = BitwardenString.import_a_key),
+            onClick = sshKeyTypeHandlers.onImportKeyClick,
+            icon = null,
             cardStyle = CardStyle.Bottom,
             modifier = Modifier
+                .testTag(tag = "ImportSshKeyButton")
                 .fillMaxWidth()
                 .standardHorizontalMargin(),
         )
+    }
+
+    if (sshKeyState.privateKey.isNotEmpty()) {
+        item { Spacer(modifier = Modifier.height(16.dp)) }
+        item {
+            BitwardenPasswordField(
+                label = stringResource(id = BitwardenString.private_key),
+                value = sshKeyState.privateKey,
+                readOnly = true,
+                onValueChange = { /* no-op */ },
+                showPassword = sshKeyState.showPrivateKey,
+                showPasswordChange = { sshKeyTypeHandlers.onPrivateKeyVisibilityChange(it) },
+                showPasswordTestTag = "ViewPrivateKeyButton",
+                passwordFieldTestTag = "PrivateKeyEntry",
+                cardStyle = CardStyle.Top(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .standardHorizontalMargin(),
+            )
+        }
+
+        item {
+            BitwardenTextField(
+                label = stringResource(id = BitwardenString.public_key),
+                value = sshKeyState.publicKey,
+                readOnly = true,
+                onValueChange = { },
+                textFieldTestTag = "PublicKeyEntry",
+                cardStyle = CardStyle.Middle(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .standardHorizontalMargin(),
+            )
+        }
+
+        item {
+            BitwardenTextField(
+                label = stringResource(id = BitwardenString.fingerprint),
+                value = sshKeyState.fingerprint,
+                readOnly = true,
+                onValueChange = { /* no-op */ },
+                textFieldTestTag = "FingerprintEntry",
+                cardStyle = CardStyle.Bottom,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .standardHorizontalMargin(),
+            )
+        }
     }
 }
 
@@ -88,6 +116,8 @@ private fun VaultAddEditSshKeyItems_preview() {
                 ),
                 sshKeyTypeHandlers = VaultAddEditSshKeyTypeHandlers(
                     onPrivateKeyVisibilityChange = { },
+                    onGenerateKeyClick = { },
+                    onImportKeyClick = { },
                 ),
             )
         }

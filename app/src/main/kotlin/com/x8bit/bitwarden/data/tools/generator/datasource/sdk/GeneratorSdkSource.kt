@@ -3,6 +3,8 @@ package com.x8bit.bitwarden.data.tools.generator.datasource.sdk
 import com.bitwarden.generators.PassphraseGeneratorRequest
 import com.bitwarden.generators.PasswordGeneratorRequest
 import com.bitwarden.generators.UsernameGeneratorRequest
+import com.bitwarden.ssh.KeyAlgorithm
+import com.bitwarden.vault.SshKeyView
 
 /**
  * Source of password generation functionality from the Bitwarden SDK.
@@ -46,4 +48,14 @@ interface GeneratorSdkSource {
     suspend fun generateForwardedServiceEmail(
         request: UsernameGeneratorRequest.Forwarded,
     ): Result<String>
+
+    /**
+     * Generates a new SSH key of the given [algorithm].
+     */
+    suspend fun generateSshKey(algorithm: KeyAlgorithm): Result<SshKeyView>
+
+    /**
+     * Reads an SSH key from [encodedKey], using [password] if it is encrypted.
+     */
+    suspend fun importSshKey(encodedKey: String, password: String): Result<SshKeyView>
 }

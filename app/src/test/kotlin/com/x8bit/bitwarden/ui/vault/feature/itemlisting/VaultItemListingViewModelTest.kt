@@ -1549,7 +1549,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 dialogState = VaultItemListingState.DialogState.VaultItemTypeSelection(
                     excludedOptions = persistentListOf(
                         CreateVaultItemType.FOLDER,
-                        CreateVaultItemType.SSH_KEY,
                         CreateVaultItemType.BANK_ACCOUNT,
                         CreateVaultItemType.LICENSE,
                         CreateVaultItemType.PASSPORT,
@@ -1580,7 +1579,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 dialogState = VaultItemListingState.DialogState.VaultItemTypeSelection(
                     excludedOptions = persistentListOf(
                         CreateVaultItemType.FOLDER,
-                        CreateVaultItemType.SSH_KEY,
                     ),
                 ),
             ),

@@ -11,9 +11,13 @@ import com.x8bit.bitwarden.ui.vault.feature.addedit.VaultAddEditViewModel
  * visibility changes for different SSH key fields (public key, private key, fingerprint).
  *
  * @property onPrivateKeyVisibilityChange Handler for toggling the visibility of the private key.
+ * @property onGenerateKeyClick Handler for choosing to generate a new key.
+ * @property onImportKeyClick Handler for choosing to import an existing key.
  */
 data class VaultAddEditSshKeyTypeHandlers(
     val onPrivateKeyVisibilityChange: (Boolean) -> Unit,
+    val onGenerateKeyClick: () -> Unit,
+    val onImportKeyClick: () -> Unit,
 ) {
     @Suppress("UndocumentedPublicClass")
     companion object {
@@ -25,12 +29,21 @@ data class VaultAddEditSshKeyTypeHandlers(
          */
         fun create(viewModel: VaultAddEditViewModel): VaultAddEditSshKeyTypeHandlers =
             VaultAddEditSshKeyTypeHandlers(
-
                 onPrivateKeyVisibilityChange = {
                     viewModel.trySendAction(
                         VaultAddEditAction.ItemType.SshKeyType.PrivateKeyVisibilityChange(
                             isVisible = it,
                         ),
+                    )
+                },
+                onGenerateKeyClick = {
+                    viewModel.trySendAction(
+                        VaultAddEditAction.ItemType.SshKeyType.GenerateKeyClick,
+                    )
+                },
+                onImportKeyClick = {
+                    viewModel.trySendAction(
+                        VaultAddEditAction.ItemType.SshKeyType.ImportKeyClick,
                     )
                 },
             )

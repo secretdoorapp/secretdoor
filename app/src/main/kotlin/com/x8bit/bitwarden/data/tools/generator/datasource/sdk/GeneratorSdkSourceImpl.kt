@@ -5,6 +5,8 @@ import com.bitwarden.generators.PassphraseGeneratorRequest
 import com.bitwarden.generators.PasswordGeneratorRequest
 import com.bitwarden.generators.UsernameGeneratorRequest
 import com.bitwarden.sdk.GeneratorClients
+import com.bitwarden.ssh.KeyAlgorithm
+import com.bitwarden.vault.SshKeyView
 import com.x8bit.bitwarden.data.platform.datasource.sdk.BaseSdkSource
 import com.x8bit.bitwarden.data.platform.manager.SdkClientManager
 import kotlinx.coroutines.withContext
@@ -56,6 +58,23 @@ class GeneratorSdkSourceImpl(
     ): Result<String> = runCatchingWithLogs {
         withContext(context = dispatcherManager.io) {
             useClient { generators().username(request) }
+        }
+    }
+
+    override suspend fun generateSshKey(
+        algorithm: KeyAlgorithm,
+    ): Result<SshKeyView> = runCatchingWithLogs {
+        withContext(context = dispatcherManager.io) {
+            useClient { ssh().generateSshKey(algorithm) }
+        }
+    }
+
+    override suspend fun importSshKey(
+        encodedKey: String,
+        password: String,
+    ): Result<SshKeyView> = runCatchingWithLogs {
+        withContext(context = dispatcherManager.io) {
+            useClient { ssh().importSshKey(encodedKey, password) }
         }
     }
 }

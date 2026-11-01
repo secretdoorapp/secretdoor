@@ -5,6 +5,7 @@ package com.x8bit.bitwarden.data.tools.generator.repository
 import com.bitwarden.generators.PassphraseGeneratorRequest
 import com.bitwarden.generators.PasswordGeneratorRequest
 import com.bitwarden.generators.UsernameGeneratorRequest
+import com.bitwarden.ssh.KeyAlgorithm
 import com.bitwarden.vault.PasswordHistoryView
 import com.x8bit.bitwarden.data.platform.repository.model.LocalDataState
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratedCatchAllUsernameResult
@@ -15,6 +16,7 @@ import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratedPlusAd
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratedRandomWordUsernameResult
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratorResult
 import com.x8bit.bitwarden.data.tools.generator.repository.model.PasscodeGenerationOptions
+import com.x8bit.bitwarden.data.tools.generator.repository.model.SshKeyResult
 import com.x8bit.bitwarden.data.tools.generator.repository.model.UsernameGenerationOptions
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -83,6 +85,16 @@ interface GeneratorRepository {
     suspend fun generateForwardedServiceUsername(
         forwardedServiceGeneratorRequest: UsernameGeneratorRequest.Forwarded,
     ): GeneratedForwardedServiceUsernameResult
+
+    /**
+     * Generates a new SSH key of the given [algorithm].
+     */
+    suspend fun generateSshKey(algorithm: KeyAlgorithm): SshKeyResult
+
+    /**
+     * Reads an SSH key from [encodedKey], using [password] if the key is encrypted.
+     */
+    suspend fun importSshKey(encodedKey: String, password: String): SshKeyResult
 
     /**
      * Get the [PasscodeGenerationOptions] for the current user.

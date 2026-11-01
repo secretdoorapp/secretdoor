@@ -42,6 +42,7 @@ import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bitwarden.core.util.persistentListOfNotNull
+import com.bitwarden.ssh.KeyAlgorithm
 import com.bitwarden.ui.platform.base.util.EventsEffect
 import com.bitwarden.ui.platform.base.util.cardStyle
 import com.bitwarden.ui.platform.base.util.standardHorizontalMargin
@@ -57,7 +58,10 @@ import com.bitwarden.ui.platform.components.content.BitwardenErrorContent
 import com.bitwarden.ui.platform.components.content.BitwardenLoadingContent
 import com.bitwarden.ui.platform.components.dialog.BitwardenBasicDialog
 import com.bitwarden.ui.platform.components.dialog.BitwardenLoadingDialog
+import com.bitwarden.ui.platform.components.dialog.BitwardenSelectionDialog
+import com.bitwarden.ui.platform.components.dialog.BitwardenTextEntryDialog
 import com.bitwarden.ui.platform.components.dialog.BitwardenTwoButtonDialog
+import com.bitwarden.ui.platform.components.dialog.row.BitwardenBasicDialogRow
 import com.bitwarden.ui.platform.components.field.BitwardenTextField
 import com.bitwarden.ui.platform.components.model.CardStyle
 import com.bitwarden.ui.platform.components.radio.BitwardenRadioButton
@@ -277,6 +281,15 @@ fun VaultAddEditScreen(
     VaultAddEditItemDialogs(
         dialogState = state.dialog,
         onDismissRequest = { viewModel.trySendAction(VaultAddEditAction.Common.DismissDialog) },
+        onSshKeyAlgorithmSelect = {
+            viewModel.trySendAction(VaultAddEditAction.ItemType.SshKeyType.AlgorithmSelect(it))
+        },
+        onSshKeyImportSubmit = {
+            viewModel.trySendAction(VaultAddEditAction.ItemType.SshKeyType.ImportKeySubmit(it))
+        },
+        onSshKeyPassphraseSubmit = {
+            viewModel.trySendAction(VaultAddEditAction.ItemType.SshKeyType.PassphraseSubmit(it))
+        },
         onAutofillDismissRequest = {
             viewModel.trySendAction(VaultAddEditAction.Common.InitialAutofillDialogDismissed)
         },
@@ -470,6 +483,15 @@ fun VaultAddEditScreen(
     }
 }
 
+private val sshKeyAlgorithmOptions: List<Pair<String, KeyAlgorithm>> = listOf(
+    "Ed25519" to KeyAlgorithm.ED25519,
+    "RSA 3072" to KeyAlgorithm.RSA3072,
+    "RSA 4096" to KeyAlgorithm.RSA4096,
+    "ECDSA P-256" to KeyAlgorithm.ECDSA_P256,
+    "ECDSA P-384" to KeyAlgorithm.ECDSA_P384,
+    "ECDSA P-521" to KeyAlgorithm.ECDSA_P521,
+)
+
 @Suppress("LongMethod")
 @Composable
 private fun VaultAddEditItemDialogs(
@@ -487,6 +509,9 @@ private fun VaultAddEditItemDialogs(
     onDismissFido2Verification: () -> Unit,
     onUpgradeToPremiumClick: () -> Unit,
     onCameraPermissionSettingsClick: () -> Unit,
+    onSshKeyAlgorithmSelect: (KeyAlgorithm) -> Unit,
+    onSshKeyImportSubmit: (String) -> Unit,
+    onSshKeyPassphraseSubmit: (String) -> Unit,
 ) {
     when (dialogState) {
         is VaultAddEditState.DialogState.ArchiveRequiresPremium -> {
@@ -497,6 +522,45 @@ private fun VaultAddEditItemDialogs(
                 dismissButtonText = stringResource(id = BitwardenString.cancel),
                 onConfirmClick = onUpgradeToPremiumClick,
                 onDismissClick = onDismissRequest,
+                onDismissRequest = onDismissRequest,
+            )
+        }
+
+        is VaultAddEditState.DialogState.SshKeyAlgorithmPicker -> {
+            BitwardenSelectionDialog(
+                title = stringResource(id = BitwardenString.algorithm),
+                onDismissRequest = onDismissRequest,
+            ) {
+                sshKeyAlgorithmOptions.forEach { (label, algorithm) ->
+                    BitwardenBasicDialogRow(
+                        text = label,
+                        onClick = { onSshKeyAlgorithmSelect(algorithm) },
+                    )
+                }
+            }
+        }
+
+        is VaultAddEditState.DialogState.SshKeyImport -> {
+            BitwardenTextEntryDialog(
+                title = stringResource(id = BitwardenString.import_a_key),
+                textFieldLabel = stringResource(id = BitwardenString.private_key),
+                onConfirmClick = onSshKeyImportSubmit,
+                onDismissRequest = onDismissRequest,
+                autoFocus = true,
+            )
+        }
+
+        is VaultAddEditState.DialogState.SshKeyPassphrase -> {
+            BitwardenMasterPasswordDialog(
+                title = stringResource(id = BitwardenString.passphrase),
+                message = stringResource(
+                    id = if (dialogState.isRetry) {
+                        BitwardenString.that_passphrase_did_not_unlock_the_key
+                    } else {
+                        BitwardenString.this_key_is_protected_by_a_passphrase
+                    },
+                ),
+                onConfirmClick = onSshKeyPassphraseSubmit,
                 onDismissRequest = onDismissRequest,
             )
         }

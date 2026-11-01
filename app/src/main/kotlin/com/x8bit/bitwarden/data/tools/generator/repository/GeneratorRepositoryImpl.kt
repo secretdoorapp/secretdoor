@@ -6,6 +6,9 @@ import com.bitwarden.core.data.manager.dispatcher.DispatcherManager
 import com.bitwarden.generators.PassphraseGeneratorRequest
 import com.bitwarden.generators.PasswordGeneratorRequest
 import com.bitwarden.generators.UsernameGeneratorRequest
+import com.bitwarden.sdk.BitwardenException
+import com.bitwarden.ssh.KeyAlgorithm
+import com.bitwarden.ssh.SshKeyImportException
 import com.bitwarden.vault.PasswordHistoryView
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
 import com.x8bit.bitwarden.data.platform.manager.ReviewPromptManager
@@ -24,6 +27,7 @@ import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratedPlusAd
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratedRandomWordUsernameResult
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratorResult
 import com.x8bit.bitwarden.data.tools.generator.repository.model.PasscodeGenerationOptions
+import com.x8bit.bitwarden.data.tools.generator.repository.model.SshKeyResult
 import com.x8bit.bitwarden.data.tools.generator.repository.model.UsernameGenerationOptions
 import com.x8bit.bitwarden.data.vault.datasource.sdk.VaultSdkSource
 import kotlinx.coroutines.CoroutineScope
@@ -130,6 +134,22 @@ class GeneratorRepositoryImpl(
                     GeneratedPasswordResult.Success(generatedPassword)
                 },
                 onFailure = { GeneratedPasswordResult.InvalidRequest(error = it) },
+            )
+
+    override suspend fun generateSshKey(algorithm: KeyAlgorithm): SshKeyResult =
+        generatorSdkSource
+            .generateSshKey(algorithm)
+            .fold(
+                onSuccess = { SshKeyResult.Success(sshKey = it) },
+                onFailure = { SshKeyResult.Error(error = it) },
+            )
+
+    override suspend fun importSshKey(encodedKey: String, password: String): SshKeyResult =
+        generatorSdkSource
+            .importSshKey(encodedKey = encodedKey, password = password)
+            .fold(
+                onSuccess = { SshKeyResult.Success(sshKey = it) },
+                onFailure = { it.toSshKeyImportResult() },
             )
 
     override suspend fun generatePassphrase(
@@ -242,3 +262,12 @@ class GeneratorRepositoryImpl(
         passwordHistoryDiskSource.clearPasswordHistories(userId)
     }
 }
+
+private fun Throwable.toSshKeyImportResult(): SshKeyResult =
+    when ((this as? BitwardenException.SshImport)?.v1) {
+        is SshKeyImportException.PasswordRequired -> SshKeyResult.PasswordRequired
+        is SshKeyImportException.WrongPassword -> SshKeyResult.WrongPassword
+        is SshKeyImportException.UnsupportedKeyType -> SshKeyResult.UnsupportedKeyType
+        is SshKeyImportException.Parsing -> SshKeyResult.InvalidKey
+        else -> SshKeyResult.Error(error = this)
+    }

@@ -15,6 +15,7 @@ import com.bitwarden.core.data.manager.toast.ToastManager
 import com.bitwarden.core.data.repository.model.DataState
 import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
 import com.bitwarden.data.repository.model.Environment
+import com.bitwarden.ssh.KeyAlgorithm
 import com.bitwarden.ui.platform.base.BaseViewModelTest
 import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarData
 import com.bitwarden.ui.platform.feature.cardscanner.manager.CardScanManager
@@ -31,6 +32,7 @@ import com.bitwarden.ui.util.asText
 import com.bitwarden.vault.CipherListView
 import com.bitwarden.vault.CipherView
 import com.bitwarden.vault.FolderView
+import com.bitwarden.vault.SshKeyView
 import com.bitwarden.vault.UriMatchType
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.OnboardingStatus
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
@@ -60,6 +62,7 @@ import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.platform.repository.model.UriMatchType as UriMatchTypeModel
 import com.x8bit.bitwarden.data.platform.repository.util.FakeEnvironmentRepository
 import com.x8bit.bitwarden.data.tools.generator.repository.GeneratorRepository
+import com.x8bit.bitwarden.data.tools.generator.repository.model.SshKeyResult
 import com.x8bit.bitwarden.data.tools.generator.repository.util.FakeGeneratorRepository
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createEditCollectionView
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createEditExceptPasswordsCollectionView
@@ -196,7 +199,7 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
             dispatcherManager = FakeDispatcherManager(),
         )
 
-    private val generatorRepository: GeneratorRepository = FakeGeneratorRepository()
+    private val generatorRepository = FakeGeneratorRepository()
 
     private val mutableShouldShowAddLoginCoachMarkFlow = MutableStateFlow(false)
     private val firstTimeActionManager = mockk<FirstTimeActionManager> {
@@ -4054,6 +4057,119 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
             viewModel.trySendAction(action)
 
             assertEquals(expectedState, viewModel.stateFlow.value)
+        }
+
+        @Test
+        fun `GenerateKeyClick and ImportKeyClick should show their dialogs`() {
+            viewModel.trySendAction(VaultAddEditAction.ItemType.SshKeyType.GenerateKeyClick)
+            assertEquals(
+                VaultAddEditState.DialogState.SshKeyAlgorithmPicker,
+                viewModel.stateFlow.value.dialog,
+            )
+            viewModel.trySendAction(VaultAddEditAction.ItemType.SshKeyType.ImportKeyClick)
+            assertEquals(
+                VaultAddEditState.DialogState.SshKeyImport,
+                viewModel.stateFlow.value.dialog,
+            )
+        }
+
+        @Test
+        fun `AlgorithmSelect should fill in the generated key and close the dialog`() {
+            val key = SshKeyView(
+                privateKey = "private",
+                publicKey = "public",
+                fingerprint = "fingerprint",
+            )
+            generatorRepository.setMockGenerateSshKeyResult(SshKeyResult.Success(key))
+
+            viewModel.trySendAction(
+                VaultAddEditAction.ItemType.SshKeyType.AlgorithmSelect(KeyAlgorithm.ED25519),
+            )
+
+            val content = (viewModel.stateFlow.value.viewState as? VaultAddEditState.ViewState.Content)
+            assertEquals(
+                VaultAddEditState.ViewState.Content.ItemType.SshKey(
+                    privateKey = "private",
+                    publicKey = "public",
+                    fingerprint = "fingerprint",
+                ),
+                content?.type,
+            )
+            assertNull(viewModel.stateFlow.value.dialog)
+        }
+
+        @Test
+        fun `ImportKeySubmit with a protected key should ask for the passphrase and retry`() {
+            val key = SshKeyView(privateKey = "p", publicKey = "q", fingerprint = "f")
+            generatorRepository.setMockImportSshKeyResults(
+                SshKeyResult.PasswordRequired,
+                SshKeyResult.WrongPassword,
+                SshKeyResult.Success(key),
+            )
+
+            viewModel.trySendAction(
+                VaultAddEditAction.ItemType.SshKeyType.ImportKeySubmit(keyText = "key text"),
+            )
+            assertEquals(
+                VaultAddEditState.DialogState.SshKeyPassphrase(isRetry = false),
+                viewModel.stateFlow.value.dialog,
+            )
+
+            viewModel.trySendAction(
+                VaultAddEditAction.ItemType.SshKeyType.PassphraseSubmit(passphrase = "wrong"),
+            )
+            assertEquals(
+                VaultAddEditState.DialogState.SshKeyPassphrase(isRetry = true),
+                viewModel.stateFlow.value.dialog,
+            )
+
+            viewModel.trySendAction(
+                VaultAddEditAction.ItemType.SshKeyType.PassphraseSubmit(passphrase = "right"),
+            )
+            assertNull(viewModel.stateFlow.value.dialog)
+            assertEquals(
+                listOf("", "wrong", "right"),
+                generatorRepository.importedSshKeyPasswords,
+            )
+            assertEquals(
+                "p",
+                ((viewModel.stateFlow.value.viewState as? VaultAddEditState.ViewState.Content)?.type as
+                    VaultAddEditState.ViewState.Content.ItemType.SshKey).privateKey,
+            )
+        }
+
+        @Test
+        fun `ImportKeySubmit with an invalid key should show an error`() {
+            generatorRepository.setMockImportSshKeyResults(SshKeyResult.InvalidKey)
+
+            viewModel.trySendAction(
+                VaultAddEditAction.ItemType.SshKeyType.ImportKeySubmit(keyText = "nonsense"),
+            )
+
+            assertEquals(
+                VaultAddEditState.DialogState.Generic(
+                    title = BitwardenString.an_error_has_occurred.asText(),
+                    message = BitwardenString.that_is_not_a_valid_ssh_private_key.asText(),
+                ),
+                viewModel.stateFlow.value.dialog,
+            )
+        }
+
+        @Test
+        fun `SaveClick without a key should ask the user to generate or import one`() {
+            viewModel.trySendAction(
+                VaultAddEditAction.Common.NameTextChange(name = "my key"),
+            )
+
+            viewModel.trySendAction(VaultAddEditAction.Common.SaveClick)
+
+            assertEquals(
+                VaultAddEditState.DialogState.Generic(
+                    title = BitwardenString.an_error_has_occurred.asText(),
+                    message = BitwardenString.generate_or_import_a_key_before_saving.asText(),
+                ),
+                viewModel.stateFlow.value.dialog,
+            )
         }
     }
 

@@ -12,6 +12,7 @@ import com.bitwarden.core.data.manager.toast.ToastManager
 import com.bitwarden.core.data.repository.model.DataState
 import com.bitwarden.core.data.repository.util.takeUntilLoaded
 import com.bitwarden.data.repository.util.baseWebVaultUrlOrDefault
+import com.bitwarden.ssh.KeyAlgorithm
 import com.bitwarden.ui.platform.base.BackgroundEvent
 import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.base.DeferredBackgroundEvent
@@ -54,6 +55,7 @@ import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.platform.repository.model.UriMatchType
 import com.x8bit.bitwarden.data.tools.generator.repository.GeneratorRepository
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratorResult
+import com.x8bit.bitwarden.data.tools.generator.repository.model.SshKeyResult
 import com.x8bit.bitwarden.data.vault.manager.model.GetCipherResult
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.ArchiveCipherResult
@@ -127,7 +129,7 @@ private const val KEY_STATE = "state"
 class VaultAddEditViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     featureFlagManager: FeatureFlagManager,
-    generatorRepository: GeneratorRepository,
+    private val generatorRepository: GeneratorRepository,
     cardScanManager: CardScanManager,
     private val buildInfoManager: BuildInfoManager,
     private val snackbarRelayManager: SnackbarRelayManager<SnackbarRelay>,
@@ -303,6 +305,11 @@ class VaultAddEditViewModel @Inject constructor(
             .onEach(::sendAction)
             .launchIn(viewModelScope)
     }
+
+    /**
+     * The pasted private key, kept out of the saved state while a passphrase is requested.
+     */
+    private var pendingSshKeyText: String? = null
 
     override fun handleAction(action: VaultAddEditAction) {
         when (action) {
@@ -565,6 +572,15 @@ class VaultAddEditViewModel @Inject constructor(
                 },
             )
             true
+        } else if (
+            (content.type as? VaultAddEditState.ViewState.Content.ItemType.SshKey)
+                ?.privateKey
+                ?.isBlank() == true
+        ) {
+            showGenericErrorDialog(
+                message = BitwardenString.generate_or_import_a_key_before_saving.asText(),
+            )
+            true
         } else {
             false
         }
@@ -738,6 +754,7 @@ class VaultAddEditViewModel @Inject constructor(
     }
 
     private fun handleDismissDialog() {
+        pendingSshKeyText = null
         clearDialogState()
     }
 
@@ -1649,6 +1666,118 @@ class VaultAddEditViewModel @Inject constructor(
             is VaultAddEditAction.ItemType.SshKeyType.PrivateKeyVisibilityChange -> {
                 handlePrivateKeyVisibilityChange(action)
             }
+
+            VaultAddEditAction.ItemType.SshKeyType.GenerateKeyClick -> {
+                showDialog(VaultAddEditState.DialogState.SshKeyAlgorithmPicker)
+            }
+
+            VaultAddEditAction.ItemType.SshKeyType.ImportKeyClick -> {
+                showDialog(VaultAddEditState.DialogState.SshKeyImport)
+            }
+
+            is VaultAddEditAction.ItemType.SshKeyType.AlgorithmSelect -> {
+                handleSshAlgorithmSelect(action)
+            }
+
+            is VaultAddEditAction.ItemType.SshKeyType.ImportKeySubmit -> {
+                pendingSshKeyText = action.keyText
+                importPendingSshKey(password = "")
+            }
+
+            is VaultAddEditAction.ItemType.SshKeyType.PassphraseSubmit -> {
+                importPendingSshKey(password = action.passphrase)
+            }
+        }
+    }
+
+    private fun handleSshAlgorithmSelect(
+        action: VaultAddEditAction.ItemType.SshKeyType.AlgorithmSelect,
+    ) {
+        showDialog(
+            VaultAddEditState.DialogState.Loading(BitwardenString.loading.asText()),
+        )
+        viewModelScope.launch {
+            sendAction(
+                VaultAddEditAction.Internal.SshKeyResultReceive(
+                    result = generatorRepository.generateSshKey(action.algorithm),
+                ),
+            )
+        }
+    }
+
+    private fun importPendingSshKey(password: String) {
+        val keyText = pendingSshKeyText?.trim().orEmpty()
+        if (keyText.isEmpty()) {
+            pendingSshKeyText = null
+            showGenericErrorDialog(
+                message = BitwardenString.that_is_not_a_valid_ssh_private_key.asText(),
+            )
+            return
+        }
+        showDialog(
+            VaultAddEditState.DialogState.Loading(BitwardenString.loading.asText()),
+        )
+        viewModelScope.launch {
+            sendAction(
+                VaultAddEditAction.Internal.SshKeyResultReceive(
+                    result = generatorRepository.importSshKey(
+                        encodedKey = keyText,
+                        password = password,
+                    ),
+                ),
+            )
+        }
+    }
+
+    private fun handleSshKeyResultReceive(
+        action: VaultAddEditAction.Internal.SshKeyResultReceive,
+    ) {
+        when (val result = action.result) {
+            is SshKeyResult.Success -> {
+                pendingSshKeyText = null
+                updateSshKeyContent {
+                    it.copy(
+                        privateKey = result.sshKey.privateKey,
+                        publicKey = result.sshKey.publicKey,
+                        fingerprint = result.sshKey.fingerprint,
+                        showPrivateKey = false,
+                    )
+                }
+                clearDialogState()
+            }
+
+            SshKeyResult.PasswordRequired -> {
+                showDialog(VaultAddEditState.DialogState.SshKeyPassphrase(isRetry = false))
+            }
+
+            SshKeyResult.WrongPassword -> {
+                showDialog(VaultAddEditState.DialogState.SshKeyPassphrase(isRetry = true))
+            }
+
+            SshKeyResult.InvalidKey -> {
+                pendingSshKeyText = null
+                showGenericErrorDialog(
+                    message = BitwardenString.that_is_not_a_valid_ssh_private_key.asText(),
+                )
+            }
+
+            SshKeyResult.UnsupportedKeyType -> {
+                pendingSshKeyText = null
+                showGenericErrorDialog(
+                    message = BitwardenString.that_type_of_ssh_key_is_not_supported.asText(),
+                )
+            }
+
+            is SshKeyResult.Error -> {
+                pendingSshKeyText = null
+                showDialog(
+                    VaultAddEditState.DialogState.Generic(
+                        title = BitwardenString.an_error_has_occurred.asText(),
+                        message = BitwardenString.generic_error_message.asText(),
+                        error = result.error,
+                    ),
+                )
+            }
         }
     }
 
@@ -1876,6 +2005,10 @@ class VaultAddEditViewModel @Inject constructor(
 
             is VaultAddEditAction.Internal.PasswordBreachReceive -> {
                 handlePasswordBreachReceive(action)
+            }
+
+            is VaultAddEditAction.Internal.SshKeyResultReceive -> {
+                handleSshKeyResultReceive(action)
             }
 
             is VaultAddEditAction.Internal.Fido2RegisterCredentialResultReceive -> {
@@ -3374,6 +3507,24 @@ data class VaultAddEditState(
         data object ArchiveRequiresPremium : DialogState()
 
         /**
+         * Displays the list of SSH key algorithms to generate.
+         */
+        @Parcelize
+        data object SshKeyAlgorithmPicker : DialogState()
+
+        /**
+         * Displays a text box to paste a private key into.
+         */
+        @Parcelize
+        data object SshKeyImport : DialogState()
+
+        /**
+         * Asks for the passphrase of the key being imported. [isRetry] is true after a wrong one.
+         */
+        @Parcelize
+        data class SshKeyPassphrase(val isRetry: Boolean) : DialogState()
+
+        /**
          * Displays a generic dialog to the user.
          */
         @Parcelize
@@ -4162,6 +4313,31 @@ sealed class VaultAddEditAction {
              * Fired when the private key's visibility has changed.
              */
             data class PrivateKeyVisibilityChange(val isVisible: Boolean) : SshKeyType()
+
+            /**
+             * Fired when the user wants to generate a new key.
+             */
+            data object GenerateKeyClick : SshKeyType()
+
+            /**
+             * Fired when the user wants to import an existing key.
+             */
+            data object ImportKeyClick : SshKeyType()
+
+            /**
+             * Fired when the user picks the algorithm of the key to generate.
+             */
+            data class AlgorithmSelect(val algorithm: KeyAlgorithm) : SshKeyType()
+
+            /**
+             * Fired when the user submits the key text to import.
+             */
+            data class ImportKeySubmit(val keyText: String) : SshKeyType()
+
+            /**
+             * Fired when the user submits the passphrase of the key being imported.
+             */
+            data class PassphraseSubmit(val passphrase: String) : SshKeyType()
         }
 
         /**
@@ -4372,6 +4548,11 @@ sealed class VaultAddEditAction {
          * Indicates that the password breach results have been received.
          */
         data class PasswordBreachReceive(val result: BreachCountResult) : Internal()
+
+        /**
+         * Indicates that an SSH key was generated or imported.
+         */
+        data class SshKeyResultReceive(val result: SshKeyResult) : Internal()
 
         /**
          * Indicates that the vault totp code result has been received.
