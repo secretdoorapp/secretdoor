@@ -73,9 +73,7 @@ import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.ciphermatching.CipherMatchingManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
-import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
-import com.x8bit.bitwarden.data.platform.manager.model.OrganizationEvent
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
 import com.x8bit.bitwarden.data.platform.manager.network.NetworkConnectionManager
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
@@ -231,9 +229,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
         } returns ValidateOriginResult.Success(null)
     }
 
-    private val organizationEventManager = mockk<OrganizationEventManager> {
-        every { trackEvent(event = any()) } just runs
-    }
 
     private val networkConnectionManager: NetworkConnectionManager = mockk {
         every { isNetworkConnected } returns true
@@ -1758,9 +1753,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     text = password,
                     toastDescriptorOverride = BitwardenString.password.asText(),
                 )
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientCopiedPassword(cipherId = cipherId),
-                )
             }
         }
 
@@ -1795,9 +1787,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                 clipboardManager.setText(
                     text = securityCode,
                     toastDescriptorOverride = BitwardenString.security_code.asText(),
-                )
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientCopiedCardCode(cipherId = cipherId),
                 )
             }
         }
@@ -6183,7 +6172,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
             cipherMatchingManager = cipherMatchingManager,
             specialCircumstanceManager = specialCircumstanceManager,
             bitwardenCredentialManager = bitwardenCredentialManager,
-            organizationEventManager = organizationEventManager,
             originManager = originManager,
             networkConnectionManager = networkConnectionManager,
             privilegedAppRepository = privilegedAppRepository,

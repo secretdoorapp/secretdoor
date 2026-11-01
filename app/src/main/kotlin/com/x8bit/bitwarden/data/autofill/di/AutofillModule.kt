@@ -31,7 +31,6 @@ import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
 import com.x8bit.bitwarden.data.platform.manager.ciphermatching.CipherMatchingManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
-import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import dagger.Module
@@ -86,13 +85,11 @@ object AutofillModule {
     fun provideAutofillCompletionManager(
         autofillParser: AutofillParser,
         dispatcherManager: DispatcherManager,
-        organizationEventManager: OrganizationEventManager,
         totpManager: AutofillTotpManager,
     ): AutofillCompletionManager =
         AutofillCompletionManagerImpl(
             autofillParser = autofillParser,
             dispatcherManager = dispatcherManager,
-            organizationEventManager = organizationEventManager,
             totpManager = totpManager,
         )
 

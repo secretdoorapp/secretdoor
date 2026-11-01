@@ -37,9 +37,7 @@ import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
 import com.x8bit.bitwarden.data.platform.manager.ReviewPromptManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
-import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
-import com.x8bit.bitwarden.data.platform.manager.model.OrganizationEvent
 import com.x8bit.bitwarden.data.platform.manager.model.RegisterExportResult
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
 import com.x8bit.bitwarden.data.platform.manager.model.UnregisterExportResult
@@ -200,9 +198,6 @@ class VaultViewModelTest : BaseViewModelTest() {
         } returns GetCipherResult.Success(createMockCipherView(number = 1))
     }
 
-    private val organizationEventManager = mockk<OrganizationEventManager> {
-        every { trackEvent(event = any()) } just runs
-    }
 
     private val reviewPromptManager: ReviewPromptManager = mockk()
 
@@ -3234,9 +3229,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                     text = password,
                     toastDescriptorOverride = BitwardenString.password.asText(),
                 )
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientCopiedPassword(cipherId = cipherId),
-                )
             }
         }
 
@@ -3264,7 +3256,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                     text = any<String>(),
                     toastDescriptorOverride = any<Text>(),
                 )
-                organizationEventManager.trackEvent(event = any())
             }
             assertEquals(
                 DEFAULT_STATE.copy(
@@ -3301,7 +3292,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                     text = any<String>(),
                     toastDescriptorOverride = any<Text>(),
                 )
-                organizationEventManager.trackEvent(event = any())
             }
             assertEquals(
                 DEFAULT_STATE.copy(
@@ -3403,9 +3393,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                     text = securityCode,
                     toastDescriptorOverride = BitwardenString.security_code.asText(),
                 )
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientCopiedCardCode(cipherId = cipherId),
-                )
             }
         }
 
@@ -3433,7 +3420,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                     text = any<String>(),
                     toastDescriptorOverride = any<Text>(),
                 )
-                organizationEventManager.trackEvent(event = any())
             }
             assertEquals(
                 DEFAULT_STATE.copy(
@@ -3470,7 +3456,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                     text = any<String>(),
                     toastDescriptorOverride = any<Text>(),
                 )
-                organizationEventManager.trackEvent(event = any())
             }
             assertEquals(
                 DEFAULT_STATE.copy(
@@ -3679,9 +3664,6 @@ class VaultViewModelTest : BaseViewModelTest() {
                 clipboardManager.setText(
                     text = password,
                     toastDescriptorOverride = BitwardenString.password.asText(),
-                )
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientCopiedPassword(cipherId = cipherId),
                 )
             }
         }
@@ -4478,7 +4460,6 @@ class VaultViewModelTest : BaseViewModelTest() {
             clock = clock,
             settingsRepository = settingsRepository,
             vaultRepository = vaultRepository,
-            organizationEventManager = organizationEventManager,
             firstTimeActionManager = firstTimeActionManager,
             snackbarRelayManager = snackbarRelayManager,
             reviewPromptManager = reviewPromptManager,

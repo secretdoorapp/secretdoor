@@ -33,8 +33,6 @@ import com.x8bit.bitwarden.data.auth.repository.model.UserState
 import com.x8bit.bitwarden.data.billing.manager.PremiumStateManager
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
-import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
-import com.x8bit.bitwarden.data.platform.manager.model.OrganizationEvent
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.platform.util.isActive
@@ -98,7 +96,6 @@ class VaultItemViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val vaultRepository: VaultRepository,
     private val fileManager: FileManager,
-    private val organizationEventManager: OrganizationEventManager,
     private val environmentRepository: EnvironmentRepository,
     private val settingsRepository: SettingsRepository,
     private val snackbarRelayManager: SnackbarRelayManager<SnackbarRelay>,
@@ -139,9 +136,6 @@ class VaultItemViewModel @Inject constructor(
 
     //region Initialization and Overrides
     init {
-        organizationEventManager.trackEvent(
-            event = OrganizationEvent.CipherClientViewed(cipherId = state.vaultItemId),
-        )
         if (savedStateHandle.toVaultItemArgs().showCreatedSnackbar && !hasShownCreatedSnackbar) {
             hasShownCreatedSnackbar = true
             sendEvent(VaultItemEvent.ShowSnackbar(message = state.cipherType.savedSnackbarMessage))
@@ -406,11 +400,6 @@ class VaultItemViewModel @Inject constructor(
     ) {
         onContent { _ ->
             clipboardManager.setText(text = action.field)
-            organizationEventManager.trackEvent(
-                event = OrganizationEvent.CipherClientCopiedHiddenField(
-                    cipherId = state.vaultItemId,
-                ),
-            )
         }
     }
 
@@ -440,13 +429,6 @@ class VaultItemViewModel @Inject constructor(
                                 }
                                 .toImmutableList(),
                         ),
-                    ),
-                )
-            }
-            if (action.isVisible) {
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientToggledHiddenFieldVisible(
-                        cipherId = state.vaultItemId,
                     ),
                 )
             }
@@ -700,9 +682,6 @@ class VaultItemViewModel @Inject constructor(
                 text = requireNotNull(login.passwordData).password,
                 toastDescriptorOverride = BitwardenString.password.asText(),
             )
-            organizationEventManager.trackEvent(
-                event = OrganizationEvent.CipherClientCopiedPassword(cipherId = state.vaultItemId),
-            )
         }
     }
 
@@ -837,13 +816,6 @@ class VaultItemViewModel @Inject constructor(
                     ),
                 )
             }
-            if (action.isVisible) {
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientToggledPasswordVisible(
-                        cipherId = state.vaultItemId,
-                    ),
-                )
-            }
         }
     }
 
@@ -877,13 +849,6 @@ class VaultItemViewModel @Inject constructor(
                                 isVisible = action.isVisible,
                             ),
                         ),
-                    ),
-                )
-            }
-            if (action.isVisible) {
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientToggledCardCodeVisible(
-                        cipherId = state.vaultItemId,
                     ),
                 )
             }
@@ -921,13 +886,6 @@ class VaultItemViewModel @Inject constructor(
                                 isVisible = action.isVisible,
                             ),
                         ),
-                    ),
-                )
-            }
-            if (action.isVisible) {
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientToggledCardNumberVisible(
-                        cipherId = state.vaultItemId,
                     ),
                 )
             }

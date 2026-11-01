@@ -53,10 +53,8 @@ import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
-import com.x8bit.bitwarden.data.platform.manager.event.OrganizationEventManager
 import com.x8bit.bitwarden.data.platform.manager.model.CoachMarkTourType
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
-import com.x8bit.bitwarden.data.platform.manager.model.OrganizationEvent
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.platform.repository.model.UriMatchType as UriMatchTypeModel
@@ -199,9 +197,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
         )
 
     private val generatorRepository: GeneratorRepository = FakeGeneratorRepository()
-    private val organizationEventManager = mockk<OrganizationEventManager> {
-        every { trackEvent(event = any()) } just runs
-    }
 
     private val mutableShouldShowAddLoginCoachMarkFlow = MutableStateFlow(false)
     private val firstTimeActionManager = mockk<FirstTimeActionManager> {
@@ -314,9 +309,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
         )
         verify(exactly = 1) {
             vaultRepository.vaultDataStateFlow
-        }
-        verify(exactly = 0) {
-            organizationEventManager.trackEvent(event = any())
         }
     }
 
@@ -487,9 +479,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
         )
         verify(exactly = 1) {
             vaultRepository.vaultDataStateFlow
-            organizationEventManager.trackEvent(
-                event = OrganizationEvent.CipherClientViewed(cipherId = DEFAULT_ITEM_ID),
-            )
         }
     }
 
@@ -510,9 +499,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
         )
         verify(exactly = 1) {
             vaultRepository.vaultDataStateFlow
-        }
-        verify(exactly = 0) {
-            organizationEventManager.trackEvent(event = any())
         }
     }
 
@@ -3193,13 +3179,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
                     ),
                 )
 
-                verify(exactly = 1) {
-                    organizationEventManager.trackEvent(
-                        event = OrganizationEvent.CipherClientToggledPasswordVisible(
-                            cipherId = "vault_item_id",
-                        ),
-                    )
-                }
             }
 
         @Suppress("MaxLineLength")
@@ -4688,13 +4667,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
                 VaultAddEditAction.ItemType.CardType.NumberVisibilityChange(isVisible = true),
             )
 
-            verify(exactly = 1) {
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientToggledCardNumberVisible(
-                        cipherId = "vault_item_id",
-                    ),
-                )
-            }
         }
 
     @Suppress("MaxLineLength")
@@ -4712,13 +4684,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
                 VaultAddEditAction.ItemType.CardType.SecurityCodeVisibilityChange(isVisible = true),
             )
 
-            verify(exactly = 1) {
-                organizationEventManager.trackEvent(
-                    event = OrganizationEvent.CipherClientToggledCardCodeVisible(
-                        cipherId = "vault_item_id",
-                    ),
-                )
-            }
         }
 
     @Nested
@@ -5299,13 +5264,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
                     VaultAddEditAction.Common.HiddenFieldVisibilityChange(isVisible = true),
                 )
 
-                verify(exactly = 1) {
-                    organizationEventManager.trackEvent(
-                        event = OrganizationEvent.CipherClientToggledHiddenFieldVisible(
-                            cipherId = "vault_item_id",
-                        ),
-                    )
-                }
             }
 
         @Test
@@ -6484,7 +6442,6 @@ class VaultAddEditViewModelTest : BaseViewModelTest() {
             specialCircumstanceManager = specialCircumstanceManager,
             resourceManager = bitwardenResourceManager,
             clock = clock,
-            organizationEventManager = organizationEventManager,
             firstTimeActionManager = firstTimeActionManager,
             environmentRepository = environmentRepository,
             premiumStateManager = premiumStateManager,
