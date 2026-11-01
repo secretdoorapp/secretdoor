@@ -16,6 +16,7 @@ import androidx.core.net.toUri
 import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
 import com.bitwarden.ui.platform.manager.IntentManager
 import com.bitwarden.ui.util.asText
+import com.x8bit.bitwarden.data.platform.util.SecretDoorLinks
 import com.x8bit.bitwarden.ui.platform.base.BitwardenComposeTest
 import io.mockk.every
 import io.mockk.just
@@ -157,7 +158,7 @@ class AboutScreenTest : BitwardenComposeTest() {
     fun `on NavigateToFlightRecorderHelp should call launchUri on IntentManager`() {
         mutableEventFlow.tryEmit(AboutEvent.NavigateToFlightRecorderHelp)
         verify(exactly = 1) {
-            intentManager.launchUri("https://github.com/zcoklin/secretdoor#readme".toUri())
+            intentManager.launchUri(SecretDoorLinks.FLIGHT_RECORDER_URL.toUri())
         }
     }
 
@@ -165,7 +166,7 @@ class AboutScreenTest : BitwardenComposeTest() {
     fun `on NavigateToHelpCenter should call launchUri on IntentManager`() {
         mutableEventFlow.tryEmit(AboutEvent.NavigateToHelpCenter)
         verify {
-            intentManager.launchUri("https://github.com/zcoklin/secretdoor#readme".toUri())
+            intentManager.launchUri(SecretDoorLinks.HELP_CENTER_URL.toUri())
         }
     }
 
@@ -173,25 +174,26 @@ class AboutScreenTest : BitwardenComposeTest() {
     fun `on NavigateToPrivacyPolicy should call launchUri on IntentManager`() {
         mutableEventFlow.tryEmit(AboutEvent.NavigateToPrivacyPolicy)
         verify {
-            intentManager.launchUri("https://github.com/zcoklin/secretdoor#privacy".toUri())
+            intentManager.launchUri(SecretDoorLinks.PRIVACY_URL.toUri())
         }
     }
 
     @Test
-    fun `on NavigateToLearnAboutOrganizations should call launchUri on IntentManager`() {
-        mutableEventFlow.tryEmit(AboutEvent.NavigateToLearnAboutOrganizations)
-        verify {
-            intentManager.launchUri("https://bitwarden.com/help/about-organizations".toUri())
-        }
+    fun `on NavigateToSourceCode should launch the repository`() {
+        mutableEventFlow.tryEmit(AboutEvent.NavigateToSourceCode)
+        verify { intentManager.launchUri(SecretDoorLinks.REPOSITORY_URL.toUri()) }
     }
 
     @Test
-    fun `on NavigateToWebVault should call launchUri on IntentManager`() {
-        val testUrl = "www.testUrl.com"
-        mutableEventFlow.tryEmit(AboutEvent.NavigateToWebVault(testUrl))
-        verify {
-            intentManager.launchUri(testUrl.toUri())
-        }
+    fun `on NavigateToLicense should launch the license`() {
+        mutableEventFlow.tryEmit(AboutEvent.NavigateToLicense)
+        verify { intentManager.launchUri(SecretDoorLinks.LICENSE_URL.toUri()) }
+    }
+
+    @Test
+    fun `on NavigateToNotices should launch the notices`() {
+        mutableEventFlow.tryEmit(AboutEvent.NavigateToNotices)
+        verify { intentManager.launchUri(SecretDoorLinks.NOTICES_URL.toUri()) }
     }
 
     @Test

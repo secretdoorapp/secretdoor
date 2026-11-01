@@ -415,11 +415,9 @@ Proses pindai akan terjadi secara otomatis.</string>
     <string name="export_vault_file_pw_protect_info">Ekspor file ini akan dilindungi sandi dan memerlukan sandi file untuk mendekripsi.</string>
     <string name="export_vault_confirmation_title">Konfirmasi Ekspor Vault</string>
     <string name="warning">Peringatan</string>
-    <string name="export_vault_failure">Terjadi masalah saat mengekspor brankas. Jika masalah terus berlanjut, Anda harus mengekspor dari brankas web.</string>
     <string name="export_vault_success">Vault berhasil diekspor</string>
     <string name="clone">Duplikat</string>
     <string name="password_generator_policy_in_effect">Satu atau beberapa kebijakan organisasi memengaruhi pengaturan pembuat sandi Anda</string>
-    <string name="unable_to_save_attachment">Terjadi masalah saat menyimpan lampiran ini. Jika masalah terus berlanjut, Anda dapat menyimpannya dari brankas web.</string>
     <string name="save_attachment_success">Lampiran berhasil disimpan</string>
     <string name="autofill_tile_accessibility_required">Harap aktifkan \"Layanan Aksesibilitas Isi Otomatis\" dari Pengaturan SecretDoor untuk menggunakan pintasan Isi Otomatis.</string>
     <string name="autofill_tile_uri_not_found">Tidak ada kolom sandi yang terdeteksi</string>
@@ -727,9 +725,7 @@ Apakah Anda ingin beralih ke akun ini?</string>
     <string name="two_step_login_description_long">Amankan akun Anda dengan menyiapkan login dua langkah di aplikasi web SecretDoor.</string>
     <string name="change_master_password_description_long">Anda dapat mengubah sandi utama di aplikasi web SecretDoor.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Pelajari lebih lanjut cara menggunakan SecretDoor di Pusat Bantuan.</string>
-    <string name="privacy_policy_description_long">Lihat kebijakan privasi kami di bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Temukan lebih banyak fitur akun SecretDoor Anda di aplikasi web.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor memungkinkan Anda berbagi item brankas dengan orang lain menggunakan organisasi. Pelajari lebih lanjut di situs web bitwarden.com.</string>
     <string name="created_x">Dibuat %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Organisasi Anda mewajibkan membuat sandi utama.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Atur opsi buka kunci untuk mengubah tindakan batas waktu brankas Anda.</string>
@@ -840,8 +836,6 @@ Apakah Anda ingin beralih ke akun ini?</string>
     <string name="add_login">Tambah login</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Bagikan file dan data dengan aman kepada siapa saja, di platform apa pun. Informasi Anda akan tetap terenkripsi end-to-end sekaligus membatasi risiko terbuka.</string>
     <string name="send_sensitive_information_safely">Kirim informasi sensitif dengan aman</string>
-    <string name="import_saved_logins">Impor login tersimpan</string>
-    <string name="use_a_computer_to_import_logins">Gunakan komputer untuk mengimpor login dari pengelola sandi yang sudah ada</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Anda dapat kembali menyelesaikan langkah ini kapan saja di Pengaturan Brankas.</string>
     <string name="import_logins_later">Impor login nanti</string>
     <string name="import_logins_later_dialog_title">Impor login nanti?</string>
@@ -873,7 +867,6 @@ Apakah Anda ingin beralih ke akun ini?</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Ini bukan server SecretDoor yang dikenali. Anda mungkin perlu memeriksa dengan penyedia atau memperbarui server Anda.</string>
     <string name="syncing_logins_loading_message">Menyinkronkan login…</string>
     <string name="download_the_browser_extension">Unduh ekstensi peramban</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Buka bitwarden.com/download untuk mengintegrasikan SecretDoor ke browser favorit Anda agar pengalaman lebih mulus.</string>
     <string name="use_the_web_app">Gunakan aplikasi web</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Masuk di bitwarden.com untuk mengelola akun dan memperbarui pengaturan dengan mudah.</string>
     <string name="autofill_passwords">Isi otomatis sandi</string>
@@ -1137,9 +1130,7 @@ Apakah Anda ingin beralih ke akun ini?</string>
     <string name="account_synced_from_bitwarden_app">Akun tersinkron dari aplikasi SecretDoor</string>
     <string name="local_codes">Kode lokal (%1$d)</string>
     <string name="required_information_missing">Informasi Wajib Masih Kosong</string>
-    <string name="required_information_missing_message">Informasi yang diperlukan hilang (misalnya: ‘layanan’ atau ‘rahasia’). Periksa file Anda dan coba lagi. Kunjungi bitwarden.com/help untuk dukungan</string>
     <string name="file_could_not_be_processed">File Tidak Dapat Diproses</string>
-    <string name="file_could_not_be_processed_message">File tidak dapat diproses. Pastikan file berformat JSON yang valid lalu coba lagi. Perlu bantuan? Kunjungi bitwarden.com/help</string>
     <string name="get_help">Dapatkan Bantuan</string>
     <string name="error_cannot_decrypt">[kesalahan: tidak bisa mendecrypt]</string>
     <string name="copy_error_report">Salin laporan kesalahan</string>

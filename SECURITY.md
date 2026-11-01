@@ -1,32 +1,37 @@
-Bitwarden believes that working with security researchers across the globe is crucial to keeping our
-users safe. If you believe you've found a security issue in our product or service, we encourage you
-to please submit a report through our [HackerOne Program](https://hackerone.com/bitwarden/). We
-welcome working with you to resolve the issue promptly. Thanks in advance!
+# Security policy
 
-# Disclosure Policy
+SecretDoor protects passwords, so security reports are taken seriously.
 
-- Let us know as soon as possible upon discovery of a potential security issue, and we'll make every
-  effort to quickly resolve the issue.
-- Provide us a reasonable amount of time to resolve the issue before any disclosure to the public or
-  a third-party. We may publicly disclose the issue before resolving it, if appropriate.
-- Make a good faith effort to avoid privacy violations, destruction of data, and interruption or
-  degradation of our service. Only interact with accounts you own or with explicit permission of the
-  account holder.
-- If you would like to encrypt your report, please use the PGP key with long ID
-  `0xDE6887086F892325FEC04CC0D847525B6931381F` (available in the public keyserver pool).
+## Reporting a vulnerability
 
-While researching, we'd like to ask you to refrain from:
+Please **do not** open a public issue for a vulnerability.
 
-- Denial of service
-- Spamming
-- Social engineering (including phishing) of Bitwarden staff or contractors
-- Any physical attempts against Bitwarden property or data centers
+Use GitHub's private reporting instead:
+[Report a vulnerability](https://github.com/secretdoorapp/secretdoor/security/advisories/new).
+Only the maintainers can see the report.
 
-# We want to help you!
+Please include what you found, the steps to reproduce it, the app version (Settings > About) and
+how it could be abused. If you can, say what you think the fix could be.
 
-If you have something that you feel is close to exploitation, or if you'd like some information
-regarding the internal API, or generally have any questions regarding the app that would help in
-your efforts, please email us at https://bitwarden.com/contact and ask for that information. As
-stated above, Bitwarden wants to help you find issues, and is more than willing to help.
+## What to expect
 
-Thank you for helping keep Bitwarden and our users safe!
+- You will get an answer to your report as soon as the maintainers can; this is a small project, so
+  please be patient.
+- We will tell you when the problem is fixed and credit you in the release notes if you wish.
+- Please give us a reasonable amount of time to fix the problem before you tell anyone else.
+
+## Scope
+
+In scope: the SecretDoor Android app in this repository: vault encryption and storage, unlocking,
+backups, autofill, passkeys, and the permissions the app uses.
+
+Out of scope:
+- The Bitwarden SDK itself, `com.bitwarden:sdk-android`, is made by Bitwarden, Inc. and lives in
+  [bitwarden/sdk-internal](https://github.com/bitwarden/sdk-internal). Report problems in it to
+  Bitwarden through their program, and tell us too so that we can update.
+- Attacks that need a rooted or already compromised phone, or physical access to an unlocked phone.
+- Denial of service, spam, and social engineering.
+
+## Supported versions
+
+Only the latest release receives security fixes.

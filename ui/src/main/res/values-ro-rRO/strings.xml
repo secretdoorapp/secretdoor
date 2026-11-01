@@ -419,11 +419,9 @@ Scanarea se va face automat.</string>
     <string name="export_vault_file_pw_protect_info">Acest export va fi protejat cu parolă și necesită parola fișierului pentru decriptare.</string>
     <string name="export_vault_confirmation_title">Confirmare export seif</string>
     <string name="warning">Avertisment</string>
-    <string name="export_vault_failure">A apărut o problemă la exportarea seifului tău. Dacă problema persistă, va trebui să exporti din seiful web.</string>
     <string name="export_vault_success">Seif exportat cu succes</string>
     <string name="clone">Clonare</string>
     <string name="password_generator_policy_in_effect">Una sau mai multe politici organizaționale afectează setările generatorului</string>
-    <string name="unable_to_save_attachment">A apărut o problemă la salvarea acestui atașament. Dacă problema persistă, îl puteți salva din seiful web.</string>
     <string name="save_attachment_success">Atașament salvat cu succes</string>
     <string name="autofill_tile_accessibility_required">Te rugăm să activezi „Serviciul de Accesibilitate pentru Completare Automată” din Setările SecretDoor pentru a utiliza butonul de Completare Automată.</string>
     <string name="autofill_tile_uri_not_found">Nu s-au detectat câmpuri de parolă</string>
@@ -735,9 +733,7 @@ Doriți să comutați la acest cont?</string>
     <string name="two_step_login_description_long">Fă contul mai sigur prin configurarea unei autentificări în doi pași în aplicația web SecretDoor.</string>
     <string name="change_master_password_description_long">Poți schimba parola principală în aplicația web SecretDoor.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Află mai multe despre cum să utilizezi SecretDoor în centrul de ajutor.</string>
-    <string name="privacy_policy_description_long">Consultați politica noastră de confidențialitate pe bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Explorați mai multe caracteristici ale contului dvs. SecretDoor pe aplicația web.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor vă permite să partajați elementele din seif cu alte persoane utilizând o organizație. Aflați mai multe pe site-ul bitwarden.com.</string>
     <string name="created_x">Creat %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Organizația dvs. vă solicită să setați o parolă principală.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Configurați o opțiune de deblocare pentru a vă schimba acțiunea de expirare a seifului.</string>
@@ -850,8 +846,6 @@ Doriți să comutați la acest cont?</string>
     <string name="add_login">Adaugă autentificare</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Distribuie fișiere și date în siguranță cu oricine, pe orice platformă. Informațiile tale vor rămâne criptate end-to-end, limitând expunerea.</string>
     <string name="send_sensitive_information_safely">Trimite informații sensibile, în siguranță</string>
-    <string name="import_saved_logins">Importă autentificări salvate</string>
-    <string name="use_a_computer_to_import_logins">Folosește un computer pentru a importa autentificări dintr-un manager de parole existent</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Poți reveni pentru a finaliza acest pas oricând în Setările Seifului.</string>
     <string name="import_logins_later">Importă autentificări mai târziu</string>
     <string name="import_logins_later_dialog_title">Importi autentificările mai târziu?</string>
@@ -883,7 +877,6 @@ Doriți să comutați la acest cont?</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Acesta nu este un server SecretDoor recunoscut. Poate fi necesar să verifici cu furnizorul tău sau să îți actualizezi serverul.</string>
     <string name="syncing_logins_loading_message">Se sincronizează autentificările…</string>
     <string name="download_the_browser_extension">Descarcă extensia pentru browser</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Accesează bitwarden.com/download pentru a integra SecretDoor în browserul tău preferat pentru o experiență perfectă.</string>
     <string name="use_the_web_app">Folosește aplicația web</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Autentifică-te pe bitwarden.com pentru a-ți gestiona cu ușurință contul și a actualiza setările.</string>
     <string name="autofill_passwords">Completează automat parolele</string>
@@ -1151,9 +1144,7 @@ Doriți să comutați la acest cont?</string>
     <string name="account_synced_from_bitwarden_app">Cont sincronizat din aplicația SecretDoor</string>
     <string name="local_codes">Coduri locale (%1$d)</string>
     <string name="required_information_missing">Lipsesc informații obligatorii</string>
-    <string name="required_information_missing_message">Lipsesc informații obligatorii (de ex., „services” sau „secret”). Verifică fișierul și încearcă din nou. Vizitează bitwarden.com/help pentru asistență</string>
     <string name="file_could_not_be_processed">Fișierul nu a putut fi procesat</string>
-    <string name="file_could_not_be_processed_message">Fișierul nu a putut fi procesat. Asigură-te că este JSON valid și încearcă din nou. Ai nevoie de ajutor? Vizitează bitwarden.com/help</string>
     <string name="get_help">Obținere ajutor</string>
     <string name="error_cannot_decrypt">[eroare: nu se poate decripta]</string>
     <string name="copy_error_report">Copiază raportul de eroare</string>

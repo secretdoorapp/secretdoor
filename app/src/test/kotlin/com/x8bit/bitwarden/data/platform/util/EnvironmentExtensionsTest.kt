@@ -40,7 +40,7 @@ class EnvironmentExtensionsTest {
         )
         assertEquals(
             AuthTabData.CustomScheme(
-                callbackUrl = "bitwarden://duo-callback",
+                callbackUrl = "secretdoor://duo-callback",
                 callbackScheme = "bitwarden",
             ),
             Environment.SelfHosted(DEFAULT_CUSTOM_ENVIRONMENT_URL_DATA).duoAuthTabData,
@@ -79,7 +79,7 @@ class EnvironmentExtensionsTest {
         )
         assertEquals(
             AuthTabData.CustomScheme(
-                callbackUrl = "bitwarden://webauthn-callback",
+                callbackUrl = "secretdoor://webauthn-callback",
                 callbackScheme = "bitwarden",
             ),
             Environment.SelfHosted(DEFAULT_CUSTOM_ENVIRONMENT_URL_DATA).webAuthnAuthTabData,
@@ -118,7 +118,7 @@ class EnvironmentExtensionsTest {
         )
         assertEquals(
             AuthTabData.CustomScheme(
-                callbackUrl = "bitwarden://sso-callback",
+                callbackUrl = "secretdoor://sso-callback",
                 callbackScheme = "bitwarden",
             ),
             Environment.SelfHosted(DEFAULT_CUSTOM_ENVIRONMENT_URL_DATA).ssoAuthTabData,

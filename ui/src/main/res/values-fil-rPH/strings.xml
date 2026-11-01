@@ -417,11 +417,9 @@ Awtomatikong itong magsa-scan.</string>
     <string name="export_vault_file_pw_protect_info">Poprotektahan ng password ang file export na ito at kakailanganin ang password para ma-decrypt ang file.</string>
     <string name="export_vault_confirmation_title">Kumpirmahin ang pag-export ng vault</string>
     <string name="warning">Babala</string>
-    <string name="export_vault_failure">Nagkaroon ng problema sa pag-export ng iyong baul. Kung magpapatuloy ang problema, kakailanganin mong i-export mula sa web vault.</string>
     <string name="export_vault_success">Matagumpay na na-export ang vault</string>
     <string name="clone">Doblehin</string>
     <string name="password_generator_policy_in_effect">Naaapektuhan ng isa o higit pang mga patakaran ng organisasyon mo ang mga setting mo sa tagagawa</string>
-    <string name="unable_to_save_attachment">Nagkaproblema sa pagse-save ng attachment na ito. Kung paulit-ulit nang nagkakaproblema, sa web vault ka dapat mag-save.</string>
     <string name="save_attachment_success">Matagumpay na na-save ang attachment</string>
     <string name="autofill_tile_accessibility_required">Mangyaring i-on ang \"Autofill Accessibility Service\" mula sa SecretDoor Settings upang gamitin ang Autofill tile.</string>
     <string name="autofill_tile_uri_not_found">Walang na-detect na password field</string>
@@ -731,9 +729,7 @@ Gusto mo bang pumunta sa account na ito?</string>
     <string name="two_step_login_description_long">Gawing mas secure ang iyong account sa pamamagitan ng pag-set up ng two-step login sa SecretDoor web app.</string>
     <string name="change_master_password_description_long">Maaari mong baguhin ang iyong master password sa SecretDoor web app.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Matuto pa tungkol sa kung paano gamitin ang SecretDoor sa Help center.</string>
-    <string name="privacy_policy_description_long">Tingnan ang aming patakaran sa privacy sa bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Tuklasin ang higit pang mga feature ng iyong SecretDoor account sa web app.</string>
-    <string name="learn_about_organizations_description_long">Pinapayagan ka ng SecretDoor na ibahagi ang iyong mga item sa baul sa iba sa pamamagitan ng paggamit ng isang organisasyon. Matuto pa sa website ng bitwarden.com.</string>
     <string name="created_x">Nilikha %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Ang iyong organisasyon ay nangangailangan sa iyo na magtakda ng master password.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Mag-set up ng unlock option upang baguhin ang iyong aksyon sa timeout ng baul.</string>
@@ -845,8 +841,6 @@ Gusto mo bang pumunta sa account na ito?</string>
     <string name="add_login">Magdagdag ng login</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Ibahagi ang mga file at data nang ligtas sa sinuman, sa anumang platform. Ang iyong impormasyon ay mananatiling end-to-end na naka-encrypt habang nililimitahan ang exposure.</string>
     <string name="send_sensitive_information_safely">Magpadala ng sensitibong impormasyon, nang ligtas</string>
-    <string name="import_saved_logins">Mag-import ng mga naka-save na login</string>
-    <string name="use_a_computer_to_import_logins">Gumamit ng computer upang mag-import ng mga login mula sa isang umiiral na password manager</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Maaari kang bumalik upang kumpletuhin ang hakbang na ito anumang oras sa Mga Setting ng Baul.</string>
     <string name="import_logins_later">Mag-import ng mga login mamaya</string>
     <string name="import_logins_later_dialog_title">Mag-import ng mga login mamaya?</string>
@@ -878,7 +872,6 @@ Gusto mo bang pumunta sa account na ito?</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Ito ay hindi isang kinikilalang SecretDoor server. Maaaring kailanganin mong suriin sa iyong provider o i-update ang iyong server.</string>
     <string name="syncing_logins_loading_message">Nag-si-sync ng mga login…</string>
     <string name="download_the_browser_extension">I-download ang browser extension</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Pumunta sa bitwarden.com/download upang isama ang SecretDoor sa iyong paboritong browser para sa isang tuloy-tuloy na karanasan.</string>
     <string name="use_the_web_app">Gamitin ang web app</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Mag-log in sa bitwarden.com upang madaling pamahalaan ang iyong account at i-update ang mga setting.</string>
     <string name="autofill_passwords">Autofill ng mga password</string>
@@ -1144,9 +1137,7 @@ Gusto mo bang pumunta sa account na ito?</string>
     <string name="account_synced_from_bitwarden_app">Account na na-sync mula sa SecretDoor app</string>
     <string name="local_codes">Lokal na mga code (%1$d)</string>
     <string name="required_information_missing">Nawawala ang Kinakailangang Impormasyon</string>
-    <string name="required_information_missing_message">Nawawala ang kinakailangang impormasyon (hal., \'services\' o \'secret\'). Suriin ang iyong file at subukan muli. Bisitahin ang bitwarden.com/help para sa suporta</string>
     <string name="file_could_not_be_processed">Hindi Maproseso ang File</string>
-    <string name="file_could_not_be_processed_message">Hindi maproseso ang file. Tiyaking ito ay wastong JSON at subukan muli. Kailangan ng tulong? Bisitahin ang bitwarden.com/help</string>
     <string name="get_help">Kumuha ng Tulong</string>
     <string name="error_cannot_decrypt">[error: hindi ma-decrypt]</string>
     <string name="copy_error_report">Kopyahin ang ulat ng error</string>

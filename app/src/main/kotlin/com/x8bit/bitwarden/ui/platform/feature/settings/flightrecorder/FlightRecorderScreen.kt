@@ -39,6 +39,7 @@ import com.bitwarden.ui.platform.manager.IntentManager
 import com.bitwarden.ui.platform.resource.BitwardenDrawable
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.platform.theme.BitwardenTheme
+import com.x8bit.bitwarden.data.platform.util.SecretDoorLinks
 import com.x8bit.bitwarden.ui.platform.feature.settings.flightrecorder.util.displayText
 import kotlinx.collections.immutable.toImmutableList
 
@@ -57,7 +58,7 @@ fun FlightRecorderScreen(
         when (event) {
             FlightRecorderEvent.NavigateBack -> onNavigateBack()
             FlightRecorderEvent.NavigateToHelpCenter -> {
-                intentManager.launchUri(uri = "https://bitwarden.com/help/flight-recorder".toUri())
+                intentManager.launchUri(uri = SecretDoorLinks.FLIGHT_RECORDER_URL.toUri())
             }
         }
     }

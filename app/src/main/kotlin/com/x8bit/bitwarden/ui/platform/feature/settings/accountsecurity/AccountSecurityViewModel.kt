@@ -10,7 +10,6 @@ import com.bitwarden.ui.util.Text
 import com.bitwarden.ui.util.asText
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.LogoutReason
-import com.x8bit.bitwarden.data.auth.repository.model.UserFingerprintResult
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
@@ -48,7 +47,6 @@ class AccountSecurityViewModel @Inject constructor(
         val userId = userState.activeUserId
         AccountSecurityState(
             dialog = null,
-            fingerprintPhrase = "".asText(), // This will be filled in dynamically
             isUnlockWithBiometricsEnabled = settingsRepository.isUnlockWithBiometricsEnabled &&
                 authRepository.isBiometricIntegrityValid(userId = userId),
             isUnlockWithPasswordEnabled = userState.activeAccount.hasMasterPassword,
@@ -92,25 +90,15 @@ class AccountSecurityViewModel @Inject constructor(
             }
             .onEach(::sendAction)
             .launchIn(viewModelScope)
-
-        viewModelScope.launch {
-            trySendAction(
-                AccountSecurityAction.Internal.FingerprintResultReceive(
-                    fingerprintResult = settingsRepository.getUserFingerprint(),
-                ),
-            )
-        }
     }
 
     override fun handleAction(action: AccountSecurityAction): Unit = when (action) {
-        AccountSecurityAction.AccountFingerprintPhraseClick -> handleAccountFingerprintPhraseClick()
         AccountSecurityAction.BackClick -> handleBackClick()
         AccountSecurityAction.ChangeMasterPasswordClick -> handleChangeMasterPasswordClick()
         AccountSecurityAction.ConfirmLogoutClick -> handleConfirmLogoutClick()
         AccountSecurityAction.DeleteAccountClick -> handleDeleteAccountClick()
         AccountSecurityAction.DismissDialog -> handleDismissDialog()
         AccountSecurityAction.EnableBiometricsClick -> handleEnableBiometricsClick()
-        AccountSecurityAction.FingerPrintLearnMoreClick -> handleFingerPrintLearnMoreClick()
         AccountSecurityAction.LockNowClick -> handleLockNowClick()
         AccountSecurityAction.LogoutClick -> handleLogoutClick()
         is AccountSecurityAction.VaultTimeoutTypeSelect -> handleVaultTimeoutTypeSelect(action)
@@ -137,10 +125,6 @@ class AccountSecurityViewModel @Inject constructor(
 
     private fun handleUnlockCardCtaClick() {
         sendEvent(AccountSecurityEvent.NavigateToSetupUnlockScreen)
-    }
-
-    private fun handleAccountFingerprintPhraseClick() {
-        mutableStateFlow.update { it.copy(dialog = AccountSecurityDialog.FingerprintPhrase) }
     }
 
     private fun handleBackClick() = sendEvent(AccountSecurityEvent.NavigateBack)
@@ -186,10 +170,6 @@ class AccountSecurityViewModel @Inject constructor(
                 }
             }
         dismissUnlockNotificationBadge()
-    }
-
-    private fun handleFingerPrintLearnMoreClick() {
-        sendEvent(AccountSecurityEvent.NavigateToFingerprintPhrase)
     }
 
     private fun handleLockNowClick() {
@@ -295,10 +275,6 @@ class AccountSecurityViewModel @Inject constructor(
                 handleBiometricsKeyResultReceive(action)
             }
 
-            is AccountSecurityAction.Internal.FingerprintResultReceive -> {
-                handleFingerprintResultReceived(action)
-            }
-
 
             is AccountSecurityAction.Internal.ShowUnlockBadgeUpdated -> {
                 handleShowUnlockBadgeUpdated(action)
@@ -370,20 +346,6 @@ class AccountSecurityViewModel @Inject constructor(
         }
     }
 
-    private fun handleFingerprintResultReceived(
-        action: AccountSecurityAction.Internal.FingerprintResultReceive,
-    ) {
-        mutableStateFlow.update {
-            it.copy(
-                fingerprintPhrase = when (val result = action.fingerprintResult) {
-                    is UserFingerprintResult.Success -> result.fingerprint.asText()
-                    // This should never fail for an unlocked account.
-                    is UserFingerprintResult.Error -> "".asText()
-                },
-            )
-        }
-    }
-
     private fun validateVaultTimeoutAction() {
         if (!state.hasUnlockMechanism) {
             setVaultTimeoutAction(VaultTimeoutAction.LOGOUT)
@@ -409,7 +371,6 @@ class AccountSecurityViewModel @Inject constructor(
 @Parcelize
 data class AccountSecurityState(
     val dialog: AccountSecurityDialog?,
-    val fingerprintPhrase: Text,
     val isUnlockWithBiometricsEnabled: Boolean,
     val isUnlockWithPasswordEnabled: Boolean,
     val isUnlockWithPinEnabled: Boolean,
@@ -454,12 +415,6 @@ sealed class AccountSecurityDialog : Parcelable {
     data object ConfirmLogout : AccountSecurityDialog()
 
     /**
-     * Allows the user to view their fingerprint phrase.
-     */
-    @Parcelize
-    data object FingerprintPhrase : AccountSecurityDialog()
-
-    /**
      * Displays a loading dialog.
      */
     @Parcelize
@@ -497,11 +452,6 @@ sealed class AccountSecurityEvent {
     data object NavigateToDeleteAccount : AccountSecurityEvent()
 
     /**
-     * Navigate to fingerprint phrase information.
-     */
-    data object NavigateToFingerprintPhrase : AccountSecurityEvent()
-
-    /**
      * Navigate to the change master password screen.
      */
     data object NavigateToChangeMasterPassword : AccountSecurityEvent()
@@ -524,11 +474,6 @@ sealed class AccountSecurityEvent {
  * Models actions for the account security screen.
  */
 sealed class AccountSecurityAction {
-
-    /**
-     * User clicked account fingerprint phrase.
-     */
-    data object AccountFingerprintPhraseClick : AccountSecurityAction()
 
     /**
      * User clicked back button.
@@ -559,11 +504,6 @@ sealed class AccountSecurityAction {
      * The user clicked to enable biometrics.
      */
     data object EnableBiometricsClick : AccountSecurityAction()
-
-    /**
-     * User clicked fingerprint phrase.
-     */
-    data object FingerPrintLearnMoreClick : AccountSecurityAction()
 
     /**
      * User clicked lock now.
@@ -640,13 +580,6 @@ sealed class AccountSecurityAction {
          */
         data class BiometricsKeyResultReceive(
             val result: BiometricsKeyResult,
-        ) : Internal()
-
-        /**
-         * A fingerprint has been received.
-         */
-        data class FingerprintResultReceive(
-            val fingerprintResult: UserFingerprintResult,
         ) : Internal()
 
         /**

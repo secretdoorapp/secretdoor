@@ -164,7 +164,7 @@ class AccessibilityNodeInfoExtensionsTest {
     @Test
     fun `shouldSkipPackage when packageName is prefixed with secretdoor package should return true`() {
         val accessibilityNodeInfo = mockk<AccessibilityNodeInfo> {
-            every { packageName } returns "io.github.zcoklin.secretdoor.beta"
+            every { packageName } returns "app.secretdoor.beta"
         }
 
         assertTrue(accessibilityNodeInfo.shouldSkipPackage)

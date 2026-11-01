@@ -7,7 +7,6 @@ import com.bitwarden.core.data.manager.BuildInfoManager
 import com.bitwarden.core.data.manager.util.deviceData
 import com.bitwarden.data.datasource.disk.model.FlightRecorderDataSet
 import com.bitwarden.data.repository.ServerConfigRepository
-import com.bitwarden.data.repository.util.baseWebVaultUrlOrDefault
 import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.Text
@@ -15,7 +14,6 @@ import com.bitwarden.ui.util.asText
 import com.bitwarden.ui.util.concat
 import com.x8bit.bitwarden.data.platform.manager.LogsManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
-import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.ui.platform.feature.settings.about.util.getStopsLoggingStringForActiveLog
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,7 +38,6 @@ class AboutViewModel @Inject constructor(
     private val clipboardManager: BitwardenClipboardManager,
     private val clock: Clock,
     private val logsManager: LogsManager,
-    private val environmentRepository: EnvironmentRepository,
     private val settingsRepository: SettingsRepository,
     buildInfoManager: BuildInfoManager,
     serverConfigRepository: ServerConfigRepository,
@@ -70,8 +67,10 @@ class AboutViewModel @Inject constructor(
             flightRecorderSubtext = settingsRepository
                 .flightRecorderData
                 .getStopsLoggingStringForActiveLog(clock = clock),
-            copyrightInfo = ("SecretDoor is based on Bitwarden.\n" +
-                "© Bitwarden Inc. 2015-${Year.now(clock).value}. Licensed under GPLv3.")
+            copyrightInfo = ("SecretDoor is free software under the GNU GPL v3 and comes with " +
+                "ABSOLUTELY NO WARRANTY.\n" +
+                "Based on Bitwarden for Android, © Bitwarden Inc. 2015-${Year.now(clock).value}. " +
+                "SecretDoor is not affiliated with Bitwarden.")
                 .asText(),
         )
     },
@@ -91,10 +90,11 @@ class AboutViewModel @Inject constructor(
         AboutAction.BackClick -> handleBackClick()
         AboutAction.HelpCenterClick -> handleHelpCenterClick()
         AboutAction.PrivacyPolicyClick -> handlePrivacyPolicyClick()
-        AboutAction.LearnAboutOrganizationsClick -> handleLearnAboutOrganizationsClick()
+        AboutAction.SourceCodeClick -> sendEvent(AboutEvent.NavigateToSourceCode)
+        AboutAction.LicenseClick -> sendEvent(AboutEvent.NavigateToLicense)
+        AboutAction.NoticesClick -> sendEvent(AboutEvent.NavigateToNotices)
         is AboutAction.SubmitCrashLogsClick -> handleSubmitCrashLogsClick(action)
         AboutAction.VersionClick -> handleVersionClick()
-        AboutAction.WebVaultClick -> handleWebVaultClick()
         is AboutAction.FlightRecorderCheckedChange -> handleFlightRecorderCheckedChange(action)
         AboutAction.FlightRecorderTooltipClick -> handleFlightRecorderTooltipClick()
         AboutAction.ViewRecordedLogsClick -> handleViewRecordedLogsClick()
@@ -134,10 +134,6 @@ class AboutViewModel @Inject constructor(
         sendEvent(AboutEvent.NavigateToPrivacyPolicy)
     }
 
-    private fun handleLearnAboutOrganizationsClick() {
-        sendEvent(AboutEvent.NavigateToLearnAboutOrganizations)
-    }
-
     private fun handleSubmitCrashLogsClick(action: AboutAction.SubmitCrashLogsClick) {
         logsManager.isEnabled = action.enabled
         mutableStateFlow.update { currentState ->
@@ -157,14 +153,6 @@ class AboutViewModel @Inject constructor(
                 .concat(state.sdkVersion)
                 .concat("\n".asText())
                 .concat(state.serverData),
-        )
-    }
-
-    private fun handleWebVaultClick() {
-        sendEvent(
-            AboutEvent.NavigateToWebVault(
-                vaultUrl = environmentRepository.environment.baseWebVaultUrlOrDefault,
-            ),
         )
     }
 
@@ -237,14 +225,19 @@ sealed class AboutEvent {
     data object NavigateToPrivacyPolicy : AboutEvent()
 
     /**
-     * Navigates to learn about organizations.
+     * Navigates to the source code of the app.
      */
-    data object NavigateToLearnAboutOrganizations : AboutEvent()
+    data object NavigateToSourceCode : AboutEvent()
 
     /**
-     * Navigates to the web vault.
+     * Navigates to the license of the app.
      */
-    data class NavigateToWebVault(val vaultUrl: String) : AboutEvent()
+    data object NavigateToLicense : AboutEvent()
+
+    /**
+     * Navigates to the notices (origin of the code and third-party licenses).
+     */
+    data object NavigateToNotices : AboutEvent()
 }
 
 /**
@@ -267,9 +260,19 @@ sealed class AboutAction {
     data object PrivacyPolicyClick : AboutAction()
 
     /**
-     * User clicked the learn about organizations row.
+     * User clicked the source code row.
      */
-    data object LearnAboutOrganizationsClick : AboutAction()
+    data object SourceCodeClick : AboutAction()
+
+    /**
+     * User clicked the license row.
+     */
+    data object LicenseClick : AboutAction()
+
+    /**
+     * User clicked the notices row.
+     */
+    data object NoticesClick : AboutAction()
 
     /**
      * User clicked the submit crash logs toggle.
@@ -282,11 +285,6 @@ sealed class AboutAction {
      * User clicked the version row.
      */
     data object VersionClick : AboutAction()
-
-    /**
-     * User clicked the web vault row.
-     */
-    data object WebVaultClick : AboutAction()
 
     /**
      * User clicked the flight recorder check box.

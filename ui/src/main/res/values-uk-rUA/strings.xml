@@ -421,11 +421,9 @@
     <string name="export_vault_file_pw_protect_info">Цей експортований файл буде захищений паролем, який необхідно ввести для його розшифрування.</string>
     <string name="export_vault_confirmation_title">Підтвердити експорт сховища</string>
     <string name="warning">Попередження</string>
-    <string name="export_vault_failure">Сталася помилка під час експорту вашого сховища. Якщо проблема не зникне, вам необхідно буде експортувати з вебсховища.</string>
     <string name="export_vault_success">Сховище успішно експортовано</string>
     <string name="clone">Клонувати</string>
     <string name="password_generator_policy_in_effect">На параметри генератора впливають одна чи декілька політик організації</string>
-    <string name="unable_to_save_attachment">Виникла проблема зі збереженням цього вкладення. Якщо проблема не зникне, ви можете зберегти його з вебсховища.</string>
     <string name="save_attachment_success">Вкладення успішно збережено</string>
     <string name="autofill_tile_accessibility_required">Увімкніть \"Службу доступності автозаповнення\" в налаштуваннях SecretDoor, щоб використовувати панель автозаповнення.</string>
     <string name="autofill_tile_uri_not_found">Полів пароля не виявлено</string>
@@ -739,9 +737,7 @@
     <string name="two_step_login_description_long">Додайте вищий рівень захисту облікового запису, налаштувавши двоетапну перевірку у вебпрограмі SecretDoor.</string>
     <string name="change_master_password_description_long">Ви можете змінити головний пароль у вебпрограмі SecretDoor.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Дізнайтеся більше про те, як використовувати SecretDoor в довідковому центрі.</string>
-    <string name="privacy_policy_description_long">Ознайомтеся з нашою політикою приватності на bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Ознайомтеся з іншими функціями вашого облікового запису SecretDoor у вебпрограмі.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor дозволяє доступ до записів сховища спільно з іншими користувачами за допомогою організації. Дізнайтеся більше про це на вебсайті bitwarden.com.</string>
     <string name="created_x">Створено %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Ваша організація вимагає, щоб ви встановили головний пароль.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Налаштуйте спосіб розблокування, щоб змінити час очікування сховища.</string>
@@ -855,8 +851,6 @@
     <string name="add_login">Додати запис</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Безпечно діліться файлами й даними з ким завгодно, на будь-якій платформі. Ваша інформація наскрізно зашифрована та має обмежений доступ.</string>
     <string name="send_sensitive_information_safely">Безпечно надсилайте конфіденційну інформацію</string>
-    <string name="import_saved_logins">Імпортувати збережені записи</string>
-    <string name="use_a_computer_to_import_logins">Використовуйте комп\'ютер для імпорту записів з наявного менеджера паролів</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Ви можете виконати цей крок будь-коли в налаштуваннях сховища.</string>
     <string name="import_logins_later">Імпортувати записи пізніше</string>
     <string name="import_logins_later_dialog_title">Імпортувати записи пізніше?</string>
@@ -888,7 +882,6 @@
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Це не розпізнаний сервер SecretDoor. Можливо, вам необхідно перевірити параметри свого провайдера або оновити свій сервер.</string>
     <string name="syncing_logins_loading_message">Синхронізація записів…</string>
     <string name="download_the_browser_extension">Завантажити розширення браузера</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Відкрийте bitwarden.com/download, щоб інтегрувати SecretDoor у свій браузер для найкращої продуктивності.</string>
     <string name="use_the_web_app">Використовувати вебпрограму</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Увійдіть на bitwarden.com, щоб легко керувати обліковим записом і змінювати налаштування.</string>
     <string name="autofill_passwords">Автозаповнення паролів</string>
@@ -1160,9 +1153,7 @@
     <string name="account_synced_from_bitwarden_app">Обліковий запис синхронізовано з програми SecretDoor</string>
     <string name="local_codes">Локальні коди (%1$d)</string>
     <string name="required_information_missing">Відсутня необхідна інформація</string>
-    <string name="required_information_missing_message">Необхідна інформація відсутня (наприклад, \'services\' або \'secret\'). Перевірте свій файл і повторіть спробу. Відвідайте bitwarden.com/help для підтримки</string>
     <string name="file_could_not_be_processed">Неможливо обробити файл</string>
-    <string name="file_could_not_be_processed_message">Не вдалося обробити файл. Перевірте правильність JSON і повторіть спробу. Потрібна допомога? Відвідайте bitwarden.com/help</string>
     <string name="get_help">Отримати допомогу</string>
     <string name="error_cannot_decrypt">[помилка: неможливо розшифрувати]</string>
     <string name="copy_error_report">Копіювати звіт про помилку</string>

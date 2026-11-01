@@ -17,6 +17,7 @@ import com.bitwarden.data.manager.model.FlightRecorderDuration
 import com.bitwarden.ui.platform.manager.IntentManager
 import com.bitwarden.ui.util.assertNoDialogExists
 import com.bitwarden.ui.util.performCustomAccessibilityAction
+import com.x8bit.bitwarden.data.platform.util.SecretDoorLinks
 import com.x8bit.bitwarden.ui.platform.base.BitwardenComposeTest
 import io.mockk.every
 import io.mockk.just
@@ -125,7 +126,7 @@ class FlightRecorderScreenTest : BitwardenComposeTest() {
     fun `on NavigateToHelpCenter event should launch intent for help center`() {
         mutableEventFlow.tryEmit(FlightRecorderEvent.NavigateToHelpCenter)
         verify(exactly = 1) {
-            intentManager.launchUri(uri = "https://bitwarden.com/help/flight-recorder".toUri())
+            intentManager.launchUri(uri = SecretDoorLinks.FLIGHT_RECORDER_URL.toUri())
         }
     }
 }

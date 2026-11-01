@@ -417,11 +417,9 @@ Skaneerimine toimub automaatselt.</string>
     <string name="export_vault_file_pw_protect_info">See eksporditav fail on parooliga kaitstud ja nõuab dekrüpteerimiseks parooli.</string>
     <string name="export_vault_confirmation_title">Hoidla eksportimise kinnitamine</string>
     <string name="warning">Hoiatus</string>
-    <string name="export_vault_failure">Teie vara eksportimisel tekkis probleem. Kui probleem ei lahene, peate eksportima veebivarast.</string>
     <string name="export_vault_success">Hoidla on edukalt eksporditud</string>
     <string name="clone">Klooni</string>
     <string name="password_generator_policy_in_effect">Organisatsiooni seaded mõjutavad parooli genereerija sätteid</string>
-    <string name="unable_to_save_attachment">Manuse salvestamisel ilmnes tõrge. Probleemi jätkumisel lisa fail läbi veebihoidla.</string>
     <string name="save_attachment_success">Manus on edukalt lisatud</string>
     <string name="autofill_tile_accessibility_required">Automaattäite paani kasutamiseks lülitage SecretDoori seadetes sisse „Automaattäite ligipääsetavusteenus”.</string>
     <string name="autofill_tile_uri_not_found">Paroolivälju ei tuvastatud</string>
@@ -731,9 +729,7 @@ Soovid selle konto peale lülituda?</string>
     <string name="two_step_login_description_long">Muuda oma konto turvalisemaks seadistades brauseris kahe-astmeline sisselogimine.</string>
     <string name="change_master_password_description_long">Ülemparooli saab muuta veebibrauseris.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Uuri teisigi SecretDoori kasutusvõimalusi Abikeskuses.</string>
-    <string name="privacy_policy_description_long">Vaadake meie privaatsuspoliitikat veebilehel bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Uuri ka teisi SecretDoori konto funktsioone veebibrauseris.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor võimaldab sul hoidla sisu teiste kasutajatega jagada, kasutades selleks organisatsiooni kontot. Uuri lähemalt www.bitwarden.com.</string>
     <string name="created_x">Loodud %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Sinu organisatsioon nõuab sult ülemparooli seadistamist.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Hoidla ajalõpu muutmiseks vali esmalt lahtilukustamise meetod.</string>
@@ -845,8 +841,6 @@ Soovid selle konto peale lülituda?</string>
     <string name="add_login">Lisa sisselogimine</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Jagage faile ja andmeid turvaliselt kõigiga, igal platvormil. Teie teave jääb otspunktkrüpteerituks, piirates sellega kokkupuute riski.</string>
     <string name="send_sensitive_information_safely">Tundlike andmete turvaline saatmine</string>
-    <string name="import_saved_logins">Impordi salvestatud sisselogimised</string>
-    <string name="use_a_computer_to_import_logins">Kasutage olemasolevast paroolihaldurist sisselogimiste importimiseks arvutit</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Saate selle sammu lõpule viimiseks igal ajal Vara seadetesse naasta.</string>
     <string name="import_logins_later">Impordi sisselogimised hiljem</string>
     <string name="import_logins_later_dialog_title">Impordi sisselogimised hiljem?</string>
@@ -878,7 +872,6 @@ Soovid selle konto peale lülituda?</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">See ei ole tunnustatud SecretDoori server. Peate võib-olla kontrollima oma teenusepakkujat või uuendama oma serverit.</string>
     <string name="syncing_logins_loading_message">Sisselogimiste sünkroonimine…</string>
     <string name="download_the_browser_extension">Laadige alla brauserilaiendus</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Minge aadressile bitwarden.com/download, et integreerida SecretDoor oma lemmikbrauserisse sujuva kogemuse saamiseks.</string>
     <string name="use_the_web_app">Kasutage veebirakendust</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Logige sisse aadressil bitwarden.com, et hõlpsasti oma kontot hallata ja seadeid uuendada.</string>
     <string name="autofill_passwords">Paroolide automaattäide</string>
@@ -1144,9 +1137,7 @@ Soovid selle konto peale lülituda?</string>
     <string name="account_synced_from_bitwarden_app">Konto sünkroniseeritud SecretDoori rakendusest</string>
     <string name="local_codes">Kohalikud koodid (%1$d)</string>
     <string name="required_information_missing">Puudub nõutud informatsiooni</string>
-    <string name="required_information_missing_message">Puudub nõutud informatsiooni (nt \"teenused\" või \"saladused\"). Kontrolli oma faili ja proovi uuesti. Abi saamiseks külasta bitwarden.com/help</string>
     <string name="file_could_not_be_processed">Faili ei õnnestunud töödelda</string>
-    <string name="file_could_not_be_processed_message">Faili ei õnnestunud töödelda. Kontrolli, et see oleks korrektne JSON ja proovi uuesti. Vajad abi? Külasta bitwarden.com/help</string>
     <string name="get_help">Klienditugi</string>
     <string name="error_cannot_decrypt">[error: dekrüpteerimine ebaõnnestus]</string>
     <string name="copy_error_report">Kopeeri veateade</string>

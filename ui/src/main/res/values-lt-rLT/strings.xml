@@ -421,11 +421,9 @@ Nuskaitymas vyks automatiškai.</string>
     <string name="export_vault_file_pw_protect_info">Šis failo eksportas bus apsaugotas slaptažodžiu, o jo iššifravimui reikės failo slaptažodžio.</string>
     <string name="export_vault_confirmation_title">Patvirtinkite saugyklos eksportavimą</string>
     <string name="warning">Įspėjimas</string>
-    <string name="export_vault_failure">Eksportuojant jūsų saugyklą įvyko problema. Jei problema išlieka, turėsite eksportuoti iš internetinės saugyklos.</string>
     <string name="export_vault_success">Saugykla sėkmingai eksportuota</string>
     <string name="clone">Klonuoti</string>
     <string name="password_generator_policy_in_effect">Viena ar daugiau organizacijos strategijų turi įtakos jūsų generatoriaus nustatymams</string>
-    <string name="unable_to_save_attachment">Išsaugant šį priedą kilo problema. Jei problema išlieka, galite ją išsaugoti žiniatinklio saugykloje.</string>
     <string name="save_attachment_success">Priedas sėkmingai išsaugotas</string>
     <string name="autofill_tile_accessibility_required">Norėdami naudoti automatinio pildymo plytelę, įjunkite „Automatinio pildymo prieinamumo paslaugą“ iš „SecretDoor“ nustatymų.</string>
     <string name="autofill_tile_uri_not_found">Slaptažodžio laukų neaptikta</string>
@@ -739,9 +737,7 @@ Ar norite pereiti prie šios paskyros?</string>
     <string name="two_step_login_description_long">Padidinkite savo paskyros saugumą, nustatydami dviejų veiksnių prisijungimą „SecretDoor“ internetinėje programoje.</string>
     <string name="change_master_password_description_long">Savo pagrindinį slaptažodį galite pakeisti „SecretDoor“ internetinėje programoje.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Sužinokite daugiau apie tai, kaip naudoti „SecretDoor“ pagalbos centre.</string>
-    <string name="privacy_policy_description_long">Peržiūrėkite mūsų privatumo politiką bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Naršykite daugiau „SecretDoor“ paskyros funkcijų internetinėje programoje.</string>
-    <string name="learn_about_organizations_description_long">„SecretDoor“ leidžia dalytis saugyklos elementais su kitais naudojant organizaciją. Daugiau sužinokite bitwarden.com svetainėje.</string>
     <string name="created_x">Sukurta %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Jūsų organizacijos nuostatos reikalauja Jus nustatyti pagrindinį slaptažodį.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Nustatykite atrakinimo būdą, kad pakeistumėte Jūsų saugyklos laiko limito veiksmą.</string>
@@ -855,8 +851,6 @@ Ar norite pereiti prie šios paskyros?</string>
     <string name="add_login">Pridėti prisijungimą</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Saugiai bendrinkite failus ir duomenis su bet kuo, bet kurioje platformoje. Jūsų informacija išliks šifruota nuo galo iki galo, ribojant jos atskleidimą.</string>
     <string name="send_sensitive_information_safely">Siųskite jautrią informaciją saugiai</string>
-    <string name="import_saved_logins">Importuoti išsaugotus prisijungimus</string>
-    <string name="use_a_computer_to_import_logins">Naudokite kompiuterį, kad importuotumėte prisijungimus iš esamos slaptažodžių tvarkyklės</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Galite grįžti ir užbaigti šį veiksmą bet kada saugyklos nustatymuose.</string>
     <string name="import_logins_later">Importuoti prisijungimus vėliau</string>
     <string name="import_logins_later_dialog_title">Importuoti prisijungimus vėliau?</string>
@@ -888,7 +882,6 @@ Ar norite pereiti prie šios paskyros?</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Tai nėra atpažintas „SecretDoor“ serveris. Gali tekti pasitikrinti pas savo teikėją arba atnaujinti savo serverį.</string>
     <string name="syncing_logins_loading_message">Sinchronizuojami prisijungimai…</string>
     <string name="download_the_browser_extension">Atsisiųskite naršyklės plėtinį</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Eikite į bitwarden.com/download, kad integruotumėte „SecretDoor“ į savo mėgstamą naršyklę, kad patirtis būtų sklandi.</string>
     <string name="use_the_web_app">Naudoti internetinę programą</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Prisijunkite bitwarden.com, kad lengvai tvarkytumėte savo paskyrą ir atnaujintumėte nustatymus.</string>
     <string name="autofill_passwords">Automatinis slaptažodžių pildymas</string>
@@ -1158,9 +1151,7 @@ Ar norite pereiti prie šios paskyros?</string>
     <string name="account_synced_from_bitwarden_app">Paskyra sinchronizuota iš „SecretDoor“ programos</string>
     <string name="local_codes">Vietiniai kodai (%1$d)</string>
     <string name="required_information_missing">Trūksta reikalingos informacijos</string>
-    <string name="required_information_missing_message">Trūksta reikalingos informacijos (pvz., „services“ arba „secret“). Patikrinkite savo failą ir bandykite dar kartą. Dėl pagalbos apsilankykite bitwarden.com/help</string>
     <string name="file_could_not_be_processed">Failo nepavyko apdoroti</string>
-    <string name="file_could_not_be_processed_message">Failo nepavyko apdoroti. Įsitikinkite, kad tai tinkamas JSON, ir bandykite dar kartą. Reikia pagalbos? Apsilankykite bitwarden.com/help</string>
     <string name="get_help">Gauti pagalbą</string>
     <string name="error_cannot_decrypt">[klaida: nepavyko iššifruoti]</string>
     <string name="copy_error_report">Kopijuoti klaidų ataskaitą</string>

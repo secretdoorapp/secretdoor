@@ -415,11 +415,9 @@
     <string name="export_vault_file_pw_protect_info">ဤဖိုင် တင်ပို့မှုကို စကားဝှက်ဖြင့် ကာကွယ်ထားမည်ဖြစ်ပြီး ကုဒ်ဖြင့်ဖွင့်ရန် ဖိုင် စကားဝှက် လိုအပ်မည်။</string>
     <string name="export_vault_confirmation_title">ဗော်လ်တ် တင်ပို့မှုကို အတည်ပြုပါ</string>
     <string name="warning">သတိပေးချက်</string>
-    <string name="export_vault_failure">သင့်ဗော်လ်တ်ကို တင်ပို့ရာတွင် ပြဿနာရှိခဲ့သည်။ ပြဿနာ ဆက်ရှိနေပါက၊ ဝဘ်ဗော်လ်တ်မှ တင်ပို့ရန် လိုအပ်ပါမည်။</string>
     <string name="export_vault_success">ဗော်လ်တ် အောင်မြင်စွာ တင်ပို့ပြီးပါပြီ</string>
     <string name="clone">ပွားကူးပါ</string>
     <string name="password_generator_policy_in_effect">တစ်ခု သို့မဟုတ် တစ်ခုထက်ပိုသော အဖွဲ့အစည်းမူဝါဒများသည် သင့်ဂျင်နရေတာ ဆက်တင်များကို သက်ရောက်နေသည်</string>
-    <string name="unable_to_save_attachment">ဤပူးတွဲပစ္စည်းကို သိမ်းဆည်းရာတွင် ပြဿနာရှိခဲ့သည်။ ပြဿနာ ဆက်ရှိနေပါက၊ ဝဘ်ဗော်လ်တ်မှ သိမ်းဆည်းနိုင်သည်။</string>
     <string name="save_attachment_success">ပူးတွဲပစ္စည်း အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ</string>
     <string name="autofill_tile_accessibility_required">Autofill တိုင်ကို သုံးရန် SecretDoor ဆက်တင်များမှ “Autofill Accessibility Service” ကို ဖွင့်ပါ။</string>
     <string name="autofill_tile_uri_not_found">စကားဝှက်အကွက်များ မတွေ့ပါ</string>
@@ -727,9 +725,7 @@
     <string name="two_step_login_description_long">SecretDoor ဝဘ်အက်ပ်တွင် အဆင့်နှစ်ဆင့် ဝင်ရောက်ခြင်းကို သတ်မှတ်ခြင်းဖြင့် သင့်အကောင့်ကို ပိုမိုလုံခြုံအောင်ပြုလုပ်ပါ။</string>
     <string name="change_master_password_description_long">သင်သည် SecretDoor ဝဘ်အက်ပ်တွင် သင့် မာစတာစကားဝှက်ကို ပြောင်းနိုင်သည်။</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Help Center တွင် SecretDoor ကို မည်သို့သုံးရမည်အကြောင်း ပိုမိုလေ့လာပါ။</string>
-    <string name="privacy_policy_description_long">bitwarden.com တွင် ကျွန်ုပ်တို့၏ ကိုယ်ရေးမူဝါဒကို ကြည့်ရှုပါ။</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">သင့် SecretDoor အကောင့်၏ နောက်ထပ် အင်္ဂါရပ်များကို ဝဘ်အက်ပ်တွင် စူးစမ်းပါ။</string>
-    <string name="learn_about_organizations_description_long">SecretDoor သည် အဖွဲ့အစည်းတစ်ခုကို သုံး၍ သင့်ဗော်လ်တ်ပစ္စည်းများကို အခြားသူများနှင့် မျှဝေနိုင်စေသည်။ bitwarden.com ဝဘ်ဆိုက်တွင် ပိုမိုလေ့လာပါ။</string>
     <string name="created_x">ဖန်တီးခဲ့သည် %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">သင့်အဖွဲ့အစည်းက မာစတာစကားဝှက် သတ်မှတ်ရန် လိုအပ်သည်။</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">သင့်ဗော်လ်တ် အချိန်ကုန်ဆုံးသည့် လုပ်ဆောင်ချက်ကို ပြောင်းရန် သော့ဖွင့်ရန် ရွေးချယ်စရာတစ်ခုကို သတ်မှတ်ပါ။</string>
@@ -840,8 +836,6 @@
     <string name="add_login">ဝင်ရောက်မှုထည့်ပါ</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">ဖိုင်များနှင့် ဒေတာများကို မည်သူနှင့်မဆို၊ မည်သည့်ပလက်ဖောင်းပေါ်တွင်မဆို လုံခြုံစွာ မျှဝေပါ။ သင့်အချက်အလက်များသည် ထိတွေ့မှုကို ကန့်သတ်ထားစဉ် end-to-end ကုဒ်ဝှက်ထားခြင်း ရှိနေမည်။</string>
     <string name="send_sensitive_information_safely">အရေးကြီးအချက်အလက်များကို လုံခြုံစွာ ပို့ပါ</string>
-    <string name="import_saved_logins">သိမ်းဆည်းထားသော ဝင်ရောက်မှုများ တင်သွင်းပါ</string>
-    <string name="use_a_computer_to_import_logins">ရှိပြီးသား စကားဝှက်မန်နေဂျာမှ ဝင်ရောက်မှုများကို တင်သွင်းရန် ကွန်ပျူတာကို သုံးပါ</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">သင်သည် ဗော်လ်တ် ဆက်တင်များတွင် အချိန်မရွေး ဤအဆင့်ကို အပြီးသတ်ရန် ပြန်လာနိုင်သည်။</string>
     <string name="import_logins_later">ဝင်ရောက်မှုများကို နောက်မှ တင်သွင်းပါ</string>
     <string name="import_logins_later_dialog_title">ဝင်ရောက်မှုများကို နောက်မှ တင်သွင်းမည်လား?</string>
@@ -873,7 +867,6 @@
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">ဤသည် မှတ်မိသော SecretDoor ဆာဗာ မဟုတ်ပါ။ သင့်ပံ့ပိုးပေးသူနှင့် စစ်ဆေးရန် သို့မဟုတ် သင့်ဆာဗာကို အပ်ဒိတ်လုပ်ရန် လိုအပ်နိုင်သည်။</string>
     <string name="syncing_logins_loading_message">ဝင်ရောက်မှုများ ထပ်တူပြုနေသည်…</string>
     <string name="download_the_browser_extension">ဘရောက်ဆာ တိုးချဲ့မှုကို ဒေါင်းလုဒ်လုပ်ပါ</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">ချောမွေ့သော အတွေ့အကြုံအတွက် SecretDoor ကို သင့်အကြိုက်ဆုံး ဘရောက်ဆာတွင် ပေါင်းစပ်ရန် bitwarden.com/download သို့ သွားပါ။</string>
     <string name="use_the_web_app">ဝဘ်အက်ပ်ကို သုံးပါ</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">သင့်အကောင့်ကို အလွယ်တကူ စီမံခန့်ခွဲရန်နှင့် ဆက်တင်များ အပ်ဒိတ်လုပ်ရန် bitwarden.com တွင် ဝင်ရောက်ပါ။</string>
     <string name="autofill_passwords">စကားဝှက်များ အလိုအလျောက်ဖြည့်ပါ</string>
@@ -1137,9 +1130,7 @@
     <string name="account_synced_from_bitwarden_app">SecretDoor အက်ပ်မှ ထပ်တူပြုထားသော အကောင့်</string>
     <string name="local_codes">ဒေသဆိုင်ရာ ကုဒ်များ (%1$d)</string>
     <string name="required_information_missing">လိုအပ်သောအချက်အလက် ပျောက်နေသည်</string>
-    <string name="required_information_missing_message">လိုအပ်သော အချက်အလက် ပျောက်နေသည် (ဥပမာ ‘services’ သို့မဟုတ် ‘secret’)။ သင့်ဖိုင်ကို စစ်ဆေးပြီး ထပ်စမ်းကြည့်ပါ။ အကူအညီအတွက် bitwarden.com/help သို့ သွားရောက်ပါ။</string>
     <string name="file_could_not_be_processed">ဖိုင်ကို ဆောင်ရွက်၍ မရပါ</string>
-    <string name="file_could_not_be_processed_message">ဖိုင်ကို ဆောင်ရွက်၍ မရပါ။ ၎င်းသည် မှန်ကန်သော JSON ဖြစ်ကြောင်း သေချာပြီး ထပ်စမ်းကြည့်ပါ။ အကူအညီ လိုပါသလား? bitwarden.com/help သို့ သွားရောက်ပါ။</string>
     <string name="get_help">အကူအညီ ရယူပါ</string>
     <string name="error_cannot_decrypt">[အမှား- ကုဒ်ဖြင့်ဖွင့်၍မရ]</string>
     <string name="copy_error_report">အမှားအစီရင်ခံစာ ကူးယူပါ</string>

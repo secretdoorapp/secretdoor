@@ -417,11 +417,9 @@ Skanningen sker automatiskt.</string>
     <string name="export_vault_file_pw_protect_info">Den exporterade filen kommer vara lösenordsskyddad. Du kommer behöva ange fillösenordet för att dekryptera den.</string>
     <string name="export_vault_confirmation_title">Bekräfta export av valv</string>
     <string name="warning">Varning</string>
-    <string name="export_vault_failure">Det gick inte att exportera ditt valv. Om problemet kvarstår, måste du exportera från webbvalvet.</string>
     <string name="export_vault_success">Valvet exporterades</string>
     <string name="clone">Klona</string>
     <string name="password_generator_policy_in_effect">En eller flera organisationspolicyer påverkar dina generatorinställningar</string>
-    <string name="unable_to_save_attachment">Det gick inte att spara bilagan. Om problemet kvarstår kan du spara den från webbvalvet.</string>
     <string name="save_attachment_success">Bilagan sparades</string>
     <string name="autofill_tile_accessibility_required">Slå på ”Autofyllningens tillgänglighetstjänst” i SecretDoor-inställningarna för att använda autofyllningsrutan.</string>
     <string name="autofill_tile_uri_not_found">Inga lösenordsfält hittades</string>
@@ -731,9 +729,7 @@ Vill du byta till detta konto?</string>
     <string name="two_step_login_description_long">Gör ditt konto säkrare genom att konfigurera tvåstegsverifiering i SecretDoors webbapp.</string>
     <string name="change_master_password_description_long">Du kan ändra ditt huvudlösenord i SecretDoors webbapp.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Läs mer om hur du använder SecretDoor i hjälpcentret.</string>
-    <string name="privacy_policy_description_long">Kolla in vår integritetspolicy på bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Utforska fler funktioner i ditt SecretDoor-konto i webbappen.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor låter dig dela objekt i ditt valv med andra med hjälp av en organisation. Läs mer på webbplatsen bitwarden.com.</string>
     <string name="created_x">Skapade %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Din organisation kräver att du anger ett huvudlösenord.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Ställ in ett upplåsningsalternativ för att ändra vad som händer när tidsgränsen uppnås.</string>
@@ -845,8 +841,6 @@ Vill du byta till detta konto?</string>
     <string name="add_login">Lägg till inloggning</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Dela filer och data säkert med vem som helst, på vilken plattform som helst. Din information förblir krypterad från början till slut vid begränsad exponering.</string>
     <string name="send_sensitive_information_safely">Skicka känslig information, säkert</string>
-    <string name="import_saved_logins">Importera sparade inloggningar</string>
-    <string name="use_a_computer_to_import_logins">Använd en dator för att importera inloggningar från en befintlig lösenordshanterare</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Du kan när som helst återgå och slutföra det här steget i valvinställningarna.</string>
     <string name="import_logins_later">Importera inloggningar senare</string>
     <string name="import_logins_later_dialog_title">Importera inloggningar senare?</string>
@@ -878,7 +872,6 @@ Vill du byta till detta konto?</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Detta är inte en erkänd SecretDoor-server. Du kan behöva kontrollera med din leverantör eller uppdatera din server.</string>
     <string name="syncing_logins_loading_message">Synkroniserar inloggningar…</string>
     <string name="download_the_browser_extension">Hämta ner webbläsartillägget</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Gå till bitwarden.com/download för att integrera SecretDoor i din favoritwebbläsare och få en smidig upplevelse.</string>
     <string name="use_the_web_app">Använd webbappen</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Logga in på bitwarden.com för att enkelt hantera ditt konto och uppdatera inställningarna.</string>
     <string name="autofill_passwords">Autofyll lösenord</string>
@@ -1144,9 +1137,7 @@ Vill du byta till detta konto?</string>
     <string name="account_synced_from_bitwarden_app">Konto synkroniserat från SecretDoor-appen</string>
     <string name="local_codes">Lokala koder (%1$d)</string>
     <string name="required_information_missing">Nödvändig information saknas</string>
-    <string name="required_information_missing_message">Nödvändig information saknas (t.ex. ”services” eller ”secret”). Kontrollera din fil och försök igen. Besök bitwarden.com/help för support</string>
     <string name="file_could_not_be_processed">Filen kunde inte behandlas</string>
-    <string name="file_could_not_be_processed_message">Filen kunde inte behandlas. Kontrollera att det är giltig JSON och försök igen. Behöver du hjälp? Besök bitwarden.com/help</string>
     <string name="get_help">Få hjälp</string>
     <string name="error_cannot_decrypt">[fel: kan inte dekryptera]</string>
     <string name="copy_error_report">Kopiera felrapport</string>

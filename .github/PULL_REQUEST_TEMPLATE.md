@@ -1,6 +1,6 @@
 ## 🎟️ Tracking
 
-<!-- Paste the link to the Jira or GitHub issue or otherwise describe / point to where this change is coming from. -->
+<!-- Link the GitHub issue, or describe where this change is coming from. -->
 
 ## 📔 Objective
 

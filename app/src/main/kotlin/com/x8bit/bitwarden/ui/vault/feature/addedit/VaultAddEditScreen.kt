@@ -75,6 +75,7 @@ import com.bitwarden.ui.platform.resource.BitwardenDrawable
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.platform.theme.BitwardenTheme
 import com.bitwarden.ui.util.Text
+import com.x8bit.bitwarden.data.platform.util.SecretDoorLinks
 import com.x8bit.bitwarden.ui.credentials.manager.CredentialProviderCompletionManager
 import com.x8bit.bitwarden.ui.platform.components.dialog.BitwardenMasterPasswordDialog
 import com.x8bit.bitwarden.ui.platform.components.dialog.BitwardenOverwriteCredentialConfirmationDialog
@@ -177,13 +178,13 @@ fun VaultAddEditScreen(
 
             is VaultAddEditEvent.NavigateToTooltipUri -> {
                 intentManager.launchUri(
-                    "https://bitwarden.com/help/managing-items/#protect-individual-items".toUri(),
+                    SecretDoorLinks.MASTER_PASSWORD_REPROMPT_URL.toUri(),
                 )
             }
 
             is VaultAddEditEvent.NavigateToAuthenticatorKeyTooltipUri -> {
                 intentManager.launchUri(
-                    "https://bitwarden.com/help/integrated-authenticator".toUri(),
+                    SecretDoorLinks.AUTHENTICATOR_CODES_URL.toUri(),
                 )
             }
 
@@ -214,7 +215,7 @@ fun VaultAddEditScreen(
             is VaultAddEditEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.data)
 
             VaultAddEditEvent.NavigateToLearnMore -> {
-                intentManager.launchUri("https://bitwarden.com/help/uri-match-detection/".toUri())
+                intentManager.launchUri(SecretDoorLinks.URI_MATCH_DETECTION_URL.toUri())
             }
 
             is VaultAddEditEvent.NavigateToPremium -> {

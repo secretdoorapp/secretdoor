@@ -417,11 +417,9 @@ Escanearase automaticamente.</string>
     <string name="export_vault_file_pw_protect_info">O arquivo exportado estará protexido e requirirá o contrasinal do arquivo para descifralo.</string>
     <string name="export_vault_confirmation_title">Confirmar o exportado da caixa forte</string>
     <string name="warning">Advertencia</string>
-    <string name="export_vault_failure">Houbo un problema ao exportar o teu cofre. Se o problema persiste, terás que exportar desde o cofre web.</string>
     <string name="export_vault_success">Datos exportados con éxito</string>
     <string name="clone">Clonar</string>
     <string name="password_generator_policy_in_effect">As directivas da organización están afectando á configuración do xerador</string>
-    <string name="unable_to_save_attachment">Houbo un problema exportando a caixa forte. Se o problema persiste, terás que exportalo dende a páxina web.</string>
     <string name="save_attachment_success">Anexo gardado</string>
     <string name="autofill_tile_accessibility_required">Por favor habilita o \"Servizo de Accesibilidade de Autoenchido\" de SecretDoor para usar o botón de autoenchido.</string>
     <string name="autofill_tile_uri_not_found">Non se detectan campos de contrasinal</string>
@@ -731,9 +729,7 @@ Queres comprobalo dende esa conta?</string>
     <string name="two_step_login_description_long">Fai a túa conta máis segura activando a verificación en 2 pasos na aplicación web.</string>
     <string name="change_master_password_description_long">Podes cambiar o teu contrasinal mestre na aplicación web de SecretDoor.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Aprende máis de como usar SecretDoor no Centro de Axuda.</string>
-    <string name="privacy_policy_description_long">Revisa a nosa Política de Privacidade en bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Descobre máis funcionalidades da túa conta de SecretDoor na aplicación web.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor permite compartir entradas da caixa forte con outros empregando unha organización. Aprende máis en bitwarden.com.</string>
     <string name="created_x">Creado %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">A túa urbanización require que crees un contrasinal mestre.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Configura un método de desbloqueo para cambiar a acción do temporizador da caixa forte.</string>
@@ -845,8 +841,6 @@ Queres comprobalo dende esa conta?</string>
     <string name="add_login">Engadir inicio de sesión</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Comparte arquivos e datos de forma segura con quen queiras. A información permanecerá cifrada de punto a punto e limitarase a exposición.</string>
     <string name="send_sensitive_information_safely">Envía información sensible de forma segura</string>
-    <string name="import_saved_logins">Importar credenciais gardadas</string>
-    <string name="use_a_computer_to_import_logins">Emprega unha computadora para importar credenciais doutro xestor de contrasinais</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Podes volver a facer este paso en calquera momento dende os Axustes.</string>
     <string name="import_logins_later">Importar credenciais máis tarde</string>
     <string name="import_logins_later_dialog_title">Importar credenciais máis tarde?</string>
@@ -878,7 +872,6 @@ Queres comprobalo dende esa conta?</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Este non é un servidor de SecretDoor recoñecido. Pode que teñas que comprobalo co teu provedor ou actualizar o servidor.</string>
     <string name="syncing_logins_loading_message">Sincronizando credenciais...</string>
     <string name="download_the_browser_extension">Descarga a extensión de navegador</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Visita bitwarden.com/download e integra SecretDoor no teu navegador favorito para unha experiencia completa.</string>
     <string name="use_the_web_app">Usa a aplicación web</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Inicia sesión en bitwarden.com para xestionar a túa conta cómodamente e actualizar os axustes.</string>
     <string name="autofill_passwords">Autoenchido de contrasinais</string>
@@ -1144,9 +1137,7 @@ Queres comprobalo dende esa conta?</string>
     <string name="account_synced_from_bitwarden_app">Conta sincronizada desde a aplicación SecretDoor</string>
     <string name="local_codes">Códigos locais (%1$d)</string>
     <string name="required_information_missing">Falta información obrigatoria</string>
-    <string name="required_information_missing_message">Falta información obrigatoria (p. ex., \'services\' ou \'secret\'). Comproba o teu ficheiro e inténtao de novo. Visita bitwarden.com/help para obter axuda</string>
     <string name="file_could_not_be_processed">Non se puido procesar o ficheiro</string>
-    <string name="file_could_not_be_processed_message">Non se puido procesar o ficheiro. Asegúrate de que sexa JSON válido e inténtao de novo. Necesitas axuda? Visita bitwarden.com/help</string>
     <string name="get_help">Obter axuda</string>
     <string name="error_cannot_decrypt">[erro: non se pode descifrar]</string>
     <string name="copy_error_report">Copiar informe de erro</string>

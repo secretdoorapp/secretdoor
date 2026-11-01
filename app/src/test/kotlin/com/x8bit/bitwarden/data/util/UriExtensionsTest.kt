@@ -350,9 +350,9 @@ class UriExtensionsTest {
 
     @Test
     fun `addSchemeToUriIfNecessary should not add https when custom scheme is already present`() {
-        val uriWithCustomScheme = URI("bitwarden://example.com")
+        val uriWithCustomScheme = URI("secretdoor://example.com")
         assertEquals(
-            URI("bitwarden://example.com"),
+            URI("secretdoor://example.com"),
             uriWithCustomScheme.addSchemeToUriIfNecessary(),
         )
     }

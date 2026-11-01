@@ -425,11 +425,9 @@
     <string name="export_vault_file_pw_protect_info">سيكون تصدير الملف هذا محميًا بكلمة مرور وسيتطلب كلمة مرور الملف لفك تشفيره.</string>
     <string name="export_vault_confirmation_title">تأكيد تصدير الخزنة</string>
     <string name="warning">تحذير</string>
-    <string name="export_vault_failure">كانت هناك مشكلة في تصدير خزنتك. إذا استمرت المشكلة، ستحتاج إلى التصدير من خزنة الويب.</string>
     <string name="export_vault_success">تم تصدير الخزنة بنجاح</string>
     <string name="clone">استنساخ</string>
     <string name="password_generator_policy_in_effect">واحدة أو أكثر من سياسات المؤسسة تؤثر على إعدادات المولد الخاص بك</string>
-    <string name="unable_to_save_attachment">كانت هناك مشكلة في حفظ هذا المرفق. إذا استمرت المشكلة، يمكنك حفظها من خزنة الويب.</string>
     <string name="save_attachment_success">تم حفظ المرفق بنجاح</string>
     <string name="autofill_tile_accessibility_required">الرجاء تمكين \"خدمة الوصول إلى الملء التلقائي\" من إعدادات SecretDoor لاستخدام الملء التلقائي.</string>
     <string name="autofill_tile_uri_not_found">لم يتم الكشف عن أي حقول لكلمة المرور</string>
@@ -747,9 +745,7 @@
     <string name="two_step_login_description_long">اجعل حسابك أكثر أمنا من خلال إعداد تسجيل الدخول بخطوتين في تطبيق SecretDoor على شبكة الإنترنت.</string>
     <string name="change_master_password_description_long">يمكنك تغيير كلمة المرور الرئيسية الخاصة بك على تطبيق ويب SecretDoor.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">تعرف على المزيد حول كيفية استخدام SecretDoor في مركز المساعدة.</string>
-    <string name="privacy_policy_description_long">اطلع على سياستنا للخصوصية على bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">استكشف المزيد من الميزات لحساب SecretDoor الخاص بك على تطبيق الويب.</string>
-    <string name="learn_about_organizations_description_long">يتيح لك SecretDoor مشاركة عناصر خزنتك مع الآخرين باستخدام حساب المنظمة. تعرف على المزيد على موقع bitwarden.com.</string>
     <string name="created_x">تم إنشاء %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">تتطلب مؤسستك تعيين كلمة مرور رئيسية.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">قم بإعداد خيار فتح القفل لتغيير إجراء مهلة انتهاء خزنتك.</string>
@@ -865,8 +861,6 @@
     <string name="add_login">إضافة تسجيل دخول</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">مشاركة الملفات والبيانات بشكل آمن مع أي شخص، على أي منصة. ستبقى معلوماتك مشفرة من النهاية إلى النهاية مع الحد من التعرض.</string>
     <string name="send_sensitive_information_safely">إرسال معلومات حساسة بأمان</string>
-    <string name="import_saved_logins">استيراد تسجيلات الدخول المحفوظة</string>
-    <string name="use_a_computer_to_import_logins">استخدم جهاز كمبيوتر لاستيراد تسجيلات الدخول من مدير كلمات المرور الموجود</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">يمكنك العودة لإكمال هذه الخطوة في أي وقت من إعدادات الخزنة.</string>
     <string name="import_logins_later">استيراد تسجيلات الدخول في وقت لاحق</string>
     <string name="import_logins_later_dialog_title">استيراد تسجيلات الدخول لاحقاً؟</string>
@@ -899,7 +893,6 @@
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">هذا ليس خادم SecretDoor المعترف به. قد تحتاج إلى التحقق مع المزود الخاص بك أو تحديث الخادم الخاص بك.</string>
     <string name="syncing_logins_loading_message">مزامنة تسجيلات الدخول…</string>
     <string name="download_the_browser_extension">تحميل ملحق المتصفح</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">اذهب إلى bitwarden.com/download لدمج SecretDoor في المتصفح المفضل لديك للحصول على تجربة سلسة.</string>
     <string name="use_the_web_app">استخدام تطبيق الويب</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">سجّل الدخول في bitwarden.com لإدارة حسابك بسهولة وتحديث الإعدادات.</string>
     <string name="autofill_passwords">الملء التلقائي لكلمات المرور</string>
@@ -1173,9 +1166,7 @@
     <string name="account_synced_from_bitwarden_app">تمت مزامنة الحساب من تطبيق SecretDoor</string>
     <string name="local_codes">الرموز المحلية (%1$d)</string>
     <string name="required_information_missing">المعلومات المطلوبة غير موجودة</string>
-    <string name="required_information_missing_message">المعلومات المطلوبة مفقودة (على سبيل المثال، \"خدمات\" أو \"سري\"). تحقق من ملفك وحاول مرة أخرى. قم بزيارة bitwarden.com/help للحصول على الدعم</string>
     <string name="file_could_not_be_processed">تعذر معالجة الملف</string>
-    <string name="file_could_not_be_processed_message">تعذر معالجة الملف. تأكد من صلاحيتها JSON وحاول مرة أخرى. بحاجة إلى مساعدة؟ قم بزيارة bitwarden.com/help</string>
     <string name="get_help">الحصول على المساعدة</string>
     <string name="error_cannot_decrypt">[خطأ: لا يمكن فك التشفير]</string>
     <string name="copy_error_report">نسخ تقرير الخطأ</string>

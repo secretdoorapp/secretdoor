@@ -108,14 +108,14 @@ fun VaultSettingsScreen(
                 exit = actionCardExitAnimation(),
             ) {
                 BitwardenActionCard(
-                    cardTitle = stringResource(id = BitwardenString.import_saved_logins),
+                    cardTitle = stringResource(id = BitwardenString.import_your_items),
                     actionButton = BitwardenButtonData(
                         label = BitwardenString.get_started.asText(),
                         onClick = {
                             viewModel.trySendAction(VaultSettingsAction.ImportLoginsCardCtaClick)
                         },
                     ),
-                    cardSubtitle = stringResource(BitwardenString.use_a_computer_to_import_logins),
+                    cardSubtitle = stringResource(BitwardenString.restore_a_backup_or_transfer_from_another_app),
                     onDismissClick = {
                         viewModel.trySendAction(VaultSettingsAction.ImportLoginsCardDismissClick)
                     },

@@ -421,11 +421,9 @@ Skanowanie nastąpi automatycznie.</string>
     <string name="export_vault_file_pw_protect_info">Plik zostanie zaszyfrowany hasłem.</string>
     <string name="export_vault_confirmation_title">Potwierdź eksportowanie sejfu</string>
     <string name="warning">Ostrzeżenie</string>
-    <string name="export_vault_failure">Wystąpił problem z wyeksportowaniem sejfu. Jeśli problem się powtarza, wyeksportuj dane z sejfu internetowego.</string>
     <string name="export_vault_success">Sejf został wyeksportowany</string>
     <string name="clone">Klonuj</string>
     <string name="password_generator_policy_in_effect">Co najmniej jedna zasada organizacji wpływa na ustawienia generatora</string>
-    <string name="unable_to_save_attachment">Wystąpił problem z zapisaniem załącznika. Jeśli problem się powtarza, zapisz plik w sejfie internetowym.</string>
     <string name="save_attachment_success">Załącznik został zapisany</string>
     <string name="autofill_tile_accessibility_required">Aby korzystać z kafelka autouzupełniania, włącz usługę ułatwienia dostępu w ustawieniach SecretDoor.</string>
     <string name="autofill_tile_uri_not_found">Nie znaleziono pól hasła</string>
@@ -738,9 +736,7 @@ Czy chcesz przełączyć się na to konto?</string>
     <string name="two_step_login_description_long">Zwiększ bezpieczeństwo konta, konfigurując logowanie dwustopniowe w aplikacji internetowej SecretDoor.</string>
     <string name="change_master_password_description_long">Możesz zmienić hasło główne w aplikacji internetowej SecretDoor.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Dowiedz się więcej o tym, jak korzystać z centrum pomocy SecretDoor.</string>
-    <string name="privacy_policy_description_long">Sprawdź naszą politykę prywatności na bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Odkryj więcej funkcji konta SecretDoor w aplikacji internetowej.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor pozwala na udostępnianie zawartości sejfu innym użytkownikom za pośrednictwem organizacji. Dowiedz się więcej na stronie bitwarden.com.</string>
     <string name="created_x">Utworzono %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Twoja organizacja wymaga ustawienia hasła głównego.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Ustaw opcje odblokowania, aby zmienić czas blokowania sejfu.</string>
@@ -854,8 +850,6 @@ Czy chcesz przełączyć się na to konto?</string>
     <string name="add_login">Dodaj dane logowania</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Udostępniaj pliki i teksty każdemu na dowolnej platformie. Informacje będę szyfrowane end-to-end, zapewniając poufność.</string>
     <string name="send_sensitive_information_safely">Wysyłaj poufne informacje w bezpieczny sposób</string>
-    <string name="import_saved_logins">Importuj zapisane dane logowania</string>
-    <string name="use_a_computer_to_import_logins">Użyj komputera, aby zaimportować dane logowania z obecnego menedżera haseł</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Możesz wrócić do ustawień sejfu w dowolnym momencie, aby zakończyć ten krok.</string>
     <string name="import_logins_later">Importuj dane logowania później</string>
     <string name="import_logins_later_dialog_title">Zaimportować dane logowania później?</string>
@@ -887,7 +881,6 @@ Czy chcesz przełączyć się na to konto?</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">To nie jest serwer SecretDoor. Sprawdź dostawcę lub zaktualizuj serwer.</string>
     <string name="syncing_logins_loading_message">Synchronizacja danych logowania…</string>
     <string name="download_the_browser_extension">Pobierz rozszerzenie przeglądarki</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Przejdź do bitwarden.com/download, aby zintegrować SecretDoor z ulubioną przeglądarką i cieszyć się płynnym doświadczeniem.</string>
     <string name="use_the_web_app">Użyj aplikacji internetowej</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Zaloguj się na bitwarden.com, aby łatwo zarządzać swoim kontem i aktualizować ustawienia.</string>
     <string name="autofill_passwords">Autouzupełnianie haseł</string>
@@ -1157,9 +1150,7 @@ Czy chcesz przełączyć się na to konto?</string>
     <string name="account_synced_from_bitwarden_app">Konto zostało zsynchronizowane z aplikacji SecretDoor</string>
     <string name="local_codes">Kody lokalne (%1$d)</string>
     <string name="required_information_missing">Brak wymaganych informacji</string>
-    <string name="required_information_missing_message">Brak wymaganych informacji (np. usług lub sekretów). Sprawdź plik i spróbuj ponownie. Odwiedź bitwarden.com/help, aby uzyskać wsparcie</string>
     <string name="file_could_not_be_processed">Plik nie może zostać przetworzony</string>
-    <string name="file_could_not_be_processed_message">Plik nie może być przetworzony. Upewnij się, że plik JSON jest prawidłowy i spróbuj ponownie. Potrzebujesz pomocy? Odwiedź bitwarden.com/help</string>
     <string name="get_help">Uzyskaj pomoc</string>
     <string name="error_cannot_decrypt">[błąd: nie można odszyfrować]</string>
     <string name="copy_error_report">Kopiuj raport błędu</string>

@@ -40,6 +40,7 @@ import com.bitwarden.ui.platform.resource.BitwardenDrawable
 import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.platform.theme.BitwardenTheme
 import com.x8bit.bitwarden.data.autofill.model.browser.BrowserPackage
+import com.x8bit.bitwarden.data.platform.util.SecretDoorLinks
 import com.x8bit.bitwarden.ui.platform.feature.settings.autofill.browser.BrowserAutofillSettingsCard
 import com.x8bit.bitwarden.ui.platform.feature.settings.autofill.browser.model.BrowserAutofillSettingsOption
 import com.x8bit.bitwarden.ui.platform.manager.utils.startBrowserAutofillSettingsActivity
@@ -68,7 +69,7 @@ fun SetupBrowserAutofillScreen(
 
             SetupBrowserAutofillEvent.NavigateToBrowserIntegrationsInfo -> {
                 intentManager.launchUri(
-                    "https://bitwarden.com/help/auto-fill-android/#browser-integrations/".toUri(),
+                    SecretDoorLinks.AUTOFILL_BROWSERS_URL.toUri(),
                 )
             }
         }

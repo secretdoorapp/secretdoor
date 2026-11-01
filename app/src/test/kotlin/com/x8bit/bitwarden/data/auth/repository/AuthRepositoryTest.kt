@@ -1303,7 +1303,7 @@ private val TWO_FACTOR_DATA = TwoFactorDataModel(
 )
 private const val SSO_CODE = "ssoCode"
 private const val SSO_CODE_VERIFIER = "ssoCodeVerifier"
-private const val SSO_REDIRECT_URI = "bitwarden://sso-test"
+private const val SSO_REDIRECT_URI = "secretdoor://sso-test"
 private const val DEVICE_ACCESS_CODE = "accessCode"
 private const val DEVICE_REQUEST_ID = "authRequestId"
 private const val DEVICE_ASYMMETRICAL_KEY = "asymmetricalKey"

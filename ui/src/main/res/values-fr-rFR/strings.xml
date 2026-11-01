@@ -417,11 +417,9 @@ La numérisation se fera automatiquement.</string>
     <string name="export_vault_file_pw_protect_info">L\'export de ce fichier sera protégé par un mot de passe qui sera nécessaire pour pouvoir le déchiffrer.</string>
     <string name="export_vault_confirmation_title">Confirmez l\'export du coffre</string>
     <string name="warning">Avertissement</string>
-    <string name="export_vault_failure">Un problème est survenu lors de l\'exportation de votre coffre. Si le problème persiste, vous devrez exporter depuis le coffre web.</string>
     <string name="export_vault_success">Le coffre a été exporté avec succès</string>
     <string name="clone">Cloner</string>
     <string name="password_generator_policy_in_effect">Une ou plusieurs politiques de sécurité de l\'organisation affectent les paramètres de votre générateur</string>
-    <string name="unable_to_save_attachment">Un problème est survenu lors de l\'enregistrement de cette pièce jointe. Si le problème persiste, vous pouvez l\'enregistrer depuis le coffre web.</string>
     <string name="save_attachment_success">La pièce jointe a été enregistrée avec succès</string>
     <string name="autofill_tile_accessibility_required">Veuillez activer le \"Service d\'Accessibilité de Saisie Automatique\" dans les paramètres de SecretDoor pour utiliser la tuile de Saisie Automatique.</string>
     <string name="autofill_tile_uri_not_found">Aucun champ de mot de passe détecté</string>
@@ -731,9 +729,7 @@ Voulez-vous basculer vers ce compte ?</string>
     <string name="two_step_login_description_long">Rendez votre compte plus sécurisé en configurant l\'authentification à deux facteurs dans l\'application web SecretDoor.</string>
     <string name="change_master_password_description_long">Vous pouvez modifier votre mot de passe principal dans l\'application web SecretDoor.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">En savoir plus sur l\'utilisation de SecretDoor dans le centre d\'aide.</string>
-    <string name="privacy_policy_description_long">Consultez notre politique de confidentialité sur bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Explorez plus de fonctionnalités de votre compte SecretDoor sur l\'application Web.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor vous permet de partager des éléments de votre coffre avec d\'autres personnes en utilisant une organisation. Apprenez-en plus sur le site bitwarden.com.</string>
     <string name="created_x">Créé %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Votre organisation vous demande de définir un mot de passe principal.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Configurez une méthode de déverrouillage pour modifier l\'action après délai d\'expiration de votre coffre.</string>
@@ -845,8 +841,6 @@ Voulez-vous basculer vers ce compte ?</string>
     <string name="add_login">Ajouter un identifiant</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Partagez vos fichiers et données en toute sécurité avec n\'importe qui, sur n\'importe quelle plateforme. Vos informations resteront chiffrées de bout-en-bout tout en limitant leur exposition.</string>
     <string name="send_sensitive_information_safely">Envoyez des informations sensibles, en toute sécurité</string>
-    <string name="import_saved_logins">Importer des identifiants enregistrés</string>
-    <string name="use_a_computer_to_import_logins">Utilisez un ordinateur pour importer des identifiants depuis un gestionnaire de mots de passe existant</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Vous pouvez revenir compléter cette étape à tout moment dans les paramètres du coffre.</string>
     <string name="import_logins_later">Importer les identifiants plus tard</string>
     <string name="import_logins_later_dialog_title">Importer les identifiants plus tard ?</string>
@@ -878,7 +872,6 @@ Voulez-vous basculer vers ce compte ?</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Ce n\'est pas un serveur SecretDoor reconnu. Vous devrez peut-être vérifier auprès de votre fournisseur ou mettre à jour votre serveur.</string>
     <string name="syncing_logins_loading_message">Synchronisation des identifiants…</string>
     <string name="download_the_browser_extension">Téléchargez l\'extension</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Allez sur bitwarden.com/download afin d\'intégrer SecretDoor dans votre navigateur favori pour une expérience fluide.</string>
     <string name="use_the_web_app">Utilisez l\'application web</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Connectez-vous sur bitwarden.com pour gérer facilement votre compte et mettre à jour vos paramètres.</string>
     <string name="autofill_passwords">Saisissez les mots de passe automatiquement</string>
@@ -1144,9 +1137,7 @@ Voulez-vous basculer vers ce compte ?</string>
     <string name="account_synced_from_bitwarden_app">Compte synchronisé depuis l\'application SecretDoor</string>
     <string name="local_codes">Codes locaux (%1$d)</string>
     <string name="required_information_missing">Informations requises manquantes</string>
-    <string name="required_information_missing_message">Les informations requises sont manquantes (par exemple, ‘services’ ou ‘secret’). Vérifiez votre fichier et réessayez. Visitez bitwarden.com/help pour obtenir de l\'aide</string>
     <string name="file_could_not_be_processed">Le fichier n\'a pas pu être traité</string>
-    <string name="file_could_not_be_processed_message">Le fichier n\'a pas pu être traité. Assurez-vous qu\'il s\'agit d\'un JSON valide et réessayez. Besoin d\'aide ? Visitez bitwarden.com/help</string>
     <string name="get_help">Obtenir de l\'aide</string>
     <string name="error_cannot_decrypt">[erreur : impossible de déchiffrer]</string>
     <string name="copy_error_report">Copier le rapport d’erreur</string>

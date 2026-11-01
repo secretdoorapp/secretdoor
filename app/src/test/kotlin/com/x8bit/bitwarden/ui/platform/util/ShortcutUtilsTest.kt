@@ -11,7 +11,7 @@ class ShortcutUtilsTest {
     @Test
     fun `isMyVaultShortcut should return true when dataString is my vault deeplink`() {
         val mockIntent = mockk<Intent> {
-            every { dataString } returns "bitwarden://my_vault"
+            every { dataString } returns "secretdoor://my_vault"
         }
         assertTrue(mockIntent.isMyVaultShortcut)
     }
@@ -19,7 +19,7 @@ class ShortcutUtilsTest {
     @Test
     fun `isMyVaultShortcut should return false when dataString is not my vault deeplink`() {
         val mockIntent = mockk<Intent> {
-            every { dataString } returns "bitwarden://some_other_vault"
+            every { dataString } returns "secretdoor://some_other_vault"
         }
         assertFalse(mockIntent.isMyVaultShortcut)
     }
@@ -35,7 +35,7 @@ class ShortcutUtilsTest {
     @Test
     fun `isPasswordGeneratorShortcut should return true when dataString is my vault deeplink`() {
         val mockIntent = mockk<Intent> {
-            every { dataString } returns "bitwarden://password_generator"
+            every { dataString } returns "secretdoor://password_generator"
         }
         assertTrue(mockIntent.isPasswordGeneratorShortcut)
     }
@@ -44,7 +44,7 @@ class ShortcutUtilsTest {
     @Test
     fun `isPasswordGeneratorShortcut should return false when dataString is not my vault deeplink`() {
         val mockIntent = mockk<Intent> {
-            every { dataString } returns "bitwarden://some_other_generator"
+            every { dataString } returns "secretdoor://some_other_generator"
         }
         assertFalse(mockIntent.isPasswordGeneratorShortcut)
     }
@@ -61,7 +61,7 @@ class ShortcutUtilsTest {
     @Test
     fun `isPremiumCheckoutCallback should return true when dataString is success checkout callback`() {
         val mockIntent = mockk<Intent> {
-            every { dataString } returns "bitwarden://premium-checkout-result?result=success"
+            every { dataString } returns "secretdoor://premium-checkout-result?result=success"
         }
         assertTrue(mockIntent.isPremiumCheckoutCallback)
     }
@@ -70,7 +70,7 @@ class ShortcutUtilsTest {
     @Test
     fun `isPremiumCheckoutCallback should return true when dataString is canceled checkout callback`() {
         val mockIntent = mockk<Intent> {
-            every { dataString } returns "bitwarden://premium-checkout-result?result=canceled"
+            every { dataString } returns "secretdoor://premium-checkout-result?result=canceled"
         }
         assertTrue(mockIntent.isPremiumCheckoutCallback)
     }
@@ -78,7 +78,7 @@ class ShortcutUtilsTest {
     @Test
     fun `isPremiumCheckoutCallback should return false when dataString is not checkout callback`() {
         val mockIntent = mockk<Intent> {
-            every { dataString } returns "bitwarden://some_other_callback"
+            every { dataString } returns "secretdoor://some_other_callback"
         }
         assertFalse(mockIntent.isPremiumCheckoutCallback)
     }

@@ -83,6 +83,7 @@ import com.bitwarden.ui.util.asText
 import com.x8bit.bitwarden.data.platform.manager.model.AppResumeScreenData
 import com.x8bit.bitwarden.data.platform.manager.util.AppResumeStateManager
 import com.x8bit.bitwarden.data.platform.manager.util.RegisterScreenDataOnLifecycleEffect
+import com.x8bit.bitwarden.data.platform.util.SecretDoorLinks
 import com.x8bit.bitwarden.ui.platform.composition.LocalAppResumeStateManager
 import com.x8bit.bitwarden.ui.tools.feature.generator.GeneratorState.MainType.Passphrase.Companion.PASSPHRASE_MAX_NUMBER_OF_WORDS
 import com.x8bit.bitwarden.ui.tools.feature.generator.GeneratorState.MainType.Passphrase.Companion.PASSPHRASE_MIN_NUMBER_OF_WORDS
@@ -179,7 +180,7 @@ fun GeneratorScreen(
 
             is GeneratorEvent.NavigateToTooltip -> {
                 intentManager.launchUri(
-                    "https://bitwarden.com/help/generator/#username-types".toUri(),
+                    SecretDoorLinks.GENERATOR_USERNAME_TYPES_URL.toUri(),
                 )
             }
 

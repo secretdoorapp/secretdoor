@@ -20,6 +20,7 @@ import com.bitwarden.ui.platform.manager.util.startSystemAutofillSettingsActivit
 import com.bitwarden.ui.util.assertNoDialogExists
 import com.x8bit.bitwarden.data.autofill.model.browser.BrowserPackage
 import com.x8bit.bitwarden.data.platform.repository.model.UriMatchType
+import com.x8bit.bitwarden.data.platform.util.SecretDoorLinks
 import com.x8bit.bitwarden.ui.platform.base.BitwardenComposeTest
 import com.x8bit.bitwarden.ui.platform.feature.settings.autofill.browser.model.BrowserAutofillSettingsOption
 import com.x8bit.bitwarden.ui.platform.manager.utils.startBrowserAutofillSettingsActivity
@@ -108,7 +109,7 @@ class AutoFillScreenTest : BitwardenComposeTest() {
         mutableEventFlow.tryEmit(AutoFillEvent.NavigateToAutofillHelp)
         verify(exactly = 1) {
             intentManager.launchUri(
-                uri = "https://bitwarden.com/help/auto-fill-android-troubleshooting/".toUri(),
+                uri = SecretDoorLinks.AUTOFILL_TROUBLESHOOTING_URL.toUri(),
             )
         }
     }
@@ -863,7 +864,7 @@ class AutoFillScreenTest : BitwardenComposeTest() {
     fun `on NavigateToLearnMore should call launchUri`() {
         mutableEventFlow.tryEmit(AutoFillEvent.NavigateToLearnMore)
         verify(exactly = 1) {
-            intentManager.launchUri("https://bitwarden.com/help/uri-match-detection/".toUri())
+            intentManager.launchUri(SecretDoorLinks.URI_MATCH_DETECTION_URL.toUri())
         }
     }
 

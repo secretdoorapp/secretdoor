@@ -416,11 +416,9 @@
     <string name="export_vault_file_pw_protect_info">Ez a fájl exportálás jelszóval védett és a visszafejtéshez a fájl jelszó megadása szükséges.</string>
     <string name="export_vault_confirmation_title">Széf export megerősítése</string>
     <string name="warning">Figyelmeztetés</string>
-    <string name="export_vault_failure">There was a problem exporting your vault.  If the problem persists, you’ll need to export from the web vault.</string>
     <string name="export_vault_success">A széf sikeresen exportálásra került.</string>
     <string name="clone">Klónozás</string>
     <string name="password_generator_policy_in_effect">Egy vagy több szervezet szabályai érintik a generátor beállításokat.</string>
-    <string name="unable_to_save_attachment">Hiba lépett fel a melléklet mentése közben. Ha a hiba továbbra is fennáll, próbáljuk meg menteni a webes felületen.</string>
     <string name="save_attachment_success">A melléklet sikeresen mentésre került.</string>
     <string name="autofill_tile_accessibility_required">Please turn on “Autofill Accessibility Service” from SecretDoor Settings to use the Autofill tile.</string>
     <string name="autofill_tile_uri_not_found">Nincs érzékelt jelszó mező.</string>
@@ -730,9 +728,7 @@ Szeretnénk átváltani erre a fiókra?</string>
     <string name="two_step_login_description_long">Tegyük biztonságosabbá a fiókot a kétlépcsős bejelentkezés beállításával a SecretDoor webalkalmazásban.</string>
     <string name="change_master_password_description_long">A mesterjelszó a SecretDoor webalkalmazásban módosítható.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">További információ a SecretDoor használatáról a Súgó Központban.</string>
-    <string name="privacy_policy_description_long">Az adatvédelmi szabályzat megtekintése a bitwarden.com webhelyen.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Fedezzük fel a SecretDoor-fiók további funkcióit a webalkalmazásban.</string>
-    <string name="learn_about_organizations_description_long">A SecretDoor lehetővé teszi a széf elemeinek megosztását másokkal egy szervezet használatával. További információ a bitwarden.com webhelyen.</string>
     <string name="created_x">Létrehozva: %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">A szervezet megköveteli egy mesterjelszó beállítását.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Állítsunk be egy feloldási módot a széf időkifutási műveletének módosításához.</string>
@@ -844,8 +840,6 @@ Szeretnénk átváltani erre a fiókra?</string>
     <string name="add_login">Bejelentkezés hozzáadása</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Osszon meg biztonságosan fájlokat vagy adatot bárkivel, bármilyen platformon. Információi titkosítva maradnak a végpontokon, limitálva a kitettséget.</string>
     <string name="send_sensitive_information_safely">Küldjön érzékeny információt, biztonságosan</string>
-    <string name="import_saved_logins">Mentett bejelentkezések importálása</string>
-    <string name="use_a_computer_to_import_logins">A számítógép segítségével importáljunk bejelentkezéseket egy meglévő jelszókezelőből.</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Bármikor visszatérhetünk, hogy befejezzük ezt a Széf beállításaiban.</string>
     <string name="import_logins_later">Bejelentkezések importálása később</string>
     <string name="import_logins_later_dialog_title">Bejelentkezések importálása később?</string>
@@ -877,7 +871,6 @@ Szeretnénk átváltani erre a fiókra?</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Ez nem egy felismert SecretDoor szerver. Konzultálhatunk a szolgáltatóval vagy frissítsük a szervert.</string>
     <string name="syncing_logins_loading_message">Bejelentkezések szinkronizálása...</string>
     <string name="download_the_browser_extension">Böngésző bővítmény letöltése</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Keressük fel  a bitwarden.com/download webhelyet és integráljuk a SecretDoort kedvenc böngészőbe a zökkenőmentes élmény érdekében.</string>
     <string name="use_the_web_app">Webalkalmazás használata</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Jelentkezzünk be a bitwarden.com webhelyen, hogy egyszerűen kezeljük a fiókot és frissítsük a beállításokat.</string>
     <string name="autofill_passwords">Jelszavak automatikus kitöltése</string>
@@ -1143,9 +1136,7 @@ Szeretnénk átváltani erre a fiókra?</string>
     <string name="account_synced_from_bitwarden_app">A fiók szinkronizálva lett a SecretDoor alkalmazásból.</string>
     <string name="local_codes">Helyi kódok (%1$d)</string>
     <string name="required_information_missing">Hiányzik a szükséges információ.</string>
-    <string name="required_information_missing_message">Hiányzik a szükséges információ (például ‘services’ vagy ‘secret’). Ellenőrizzük a fájlt és próbáljuk újra. Támogatásért látogassunk el a bitwarden.com/help oldalra</string>
     <string name="file_could_not_be_processed">A fájl nem dolgozható fel.</string>
-    <string name="file_could_not_be_processed_message">A fájlt nem sikerült feldolgozni. Győződjünk meg arról, hogy érvényes a JSON és próbáljuk újra. Segítségre szorulunk? Látogassunk el a bitwarden.com/help oldalra.</string>
     <string name="get_help">Segítségkérés</string>
     <string name="error_cannot_decrypt">[hiba: nem fejlthető vissza]</string>
     <string name="copy_error_report">Hibajelentés másolása</string>

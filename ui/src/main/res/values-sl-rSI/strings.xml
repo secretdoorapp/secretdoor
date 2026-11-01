@@ -421,11 +421,9 @@ Skeniranje bo potekalo samodejno.</string>
     <string name="export_vault_file_pw_protect_info">Ta izvoz bo zaščiten z geslom; to geslo bo potrebno tudi pri uvozu.</string>
     <string name="export_vault_confirmation_title">Potrdi izvoz trezorja</string>
     <string name="warning">Opozorilo</string>
-    <string name="export_vault_failure">Pri izvozu vašega trezorja je prišlo do težave. Če težave ne izgine, boste morali izvoz opraviti prek spletnega trezorja.</string>
     <string name="export_vault_success">Trezor uspešno izvožen</string>
     <string name="clone">Kloniraj</string>
     <string name="password_generator_policy_in_effect">Ena ali več pravilnikov organizacije vpliva na vaše nastavitve generatorja</string>
-    <string name="unable_to_save_attachment">Pri shranjevanju te priponke je prišlo do težave. Če težave ne izgine, jo lahko shranite iz spletnega trezorja.</string>
     <string name="save_attachment_success">Priloga je bila uspešno shranjena.</string>
     <string name="autofill_tile_accessibility_required">Za uporabo ploščice za samodejno izpolnjevanje vklopite »Storitev dostopnosti za samodejno izpolnjevanje« v nastavitvah SecretDoor.</string>
     <string name="autofill_tile_uri_not_found">Ni zaznanih polj za geslo</string>
@@ -739,9 +737,7 @@ Ali želite preklopiti na ta račun?</string>
     <string name="two_step_login_description_long">Naredite svoj račun varnejši z nastavitvijo dvostopenjske prijave v spletni aplikaciji SecretDoor.</string>
     <string name="change_master_password_description_long">Glavno geslo lahko spremenite v spletni aplikaciji SecretDoor.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Več o uporabi SecretDoor izveste v Centru za pomoč.</string>
-    <string name="privacy_policy_description_long">Oglejte si naš pravilnik o zasebnosti na bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Raziščite več funkcij svojega računa SecretDoor v spletni aplikaciji.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor vam omogoča, da predmete iz trezorja delite z drugimi prek organizacije. Več izveste na spletni strani bitwarden.com.</string>
     <string name="created_x">Ustvarjeno %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Vaša organizacija zahteva, da nastavite glavno geslo.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Nastavite možnost odklepanja, da spremenite dejanje ob časovni omejitvi trezorja.</string>
@@ -855,8 +851,6 @@ Ali želite preklopiti na ta račun?</string>
     <string name="add_login">Dodaj prijavo</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Varno delite datoteke in podatke s komer koli na kateri koli platformi. Vaši podatki bodo ostali šifrirani od konca do konca, hkrati pa boste omejili izpostavljenost.</string>
     <string name="send_sensitive_information_safely">Varno pošiljajte občutljive podatke</string>
-    <string name="import_saved_logins">Uvozi shranjene prijave</string>
-    <string name="use_a_computer_to_import_logins">Za uvoz prijav iz obstoječega upravitelja gesel uporabite računalnik</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Ta korak lahko kadar koli dokončate v nastavitvah trezorja.</string>
     <string name="import_logins_later">Uvozi prijave kasneje</string>
     <string name="import_logins_later_dialog_title">Uvozite prijave kasneje?</string>
@@ -888,7 +882,6 @@ Ali želite preklopiti na ta račun?</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">To ni prepoznan strežnik SecretDoor. Morda boste morali preveriti pri svojem ponudniku ali posodobiti strežnik.</string>
     <string name="syncing_logins_loading_message">Sinhronizacija prijav…</string>
     <string name="download_the_browser_extension">Prenesite razširitev za brskalnik</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Obiščite bitwarden.com/download, da vključite SecretDoor v svoj najljubši brskalnik za brezhibno izkušnjo.</string>
     <string name="use_the_web_app">Uporabite spletno aplikacijo</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Prijavite se na bitwarden.com za enostavno upravljanje računa in posodabljanje nastavitev.</string>
     <string name="autofill_passwords">Samodejno izpolni gesla</string>
@@ -1158,9 +1151,7 @@ Ali želite preklopiti na ta račun?</string>
     <string name="account_synced_from_bitwarden_app">Račun sinhroniziran iz aplikacije SecretDoor</string>
     <string name="local_codes">Lokalne kode (%1$d)</string>
     <string name="required_information_missing">Manjkajo obvezne informacije</string>
-    <string name="required_information_missing_message">Manjkajo obvezne informacije (npr. »services« ali »secret«). Preverite svojo datoteko in poskusite znova. Za podporo obiščite bitwarden.com/help</string>
     <string name="file_could_not_be_processed">Datoteke ni bilo mogoče obdelati</string>
-    <string name="file_could_not_be_processed_message">Datoteke ni bilo mogoče obdelati. Prepričajte se, da je veljaven JSON, in poskusite znova. Potrebujete pomoč? Obiščite bitwarden.com/help</string>
     <string name="get_help">Pomoč</string>
     <string name="error_cannot_decrypt">[napaka: ni mogoče dešifrirati]</string>
     <string name="copy_error_report">Kopiraj poročilo o napaki</string>

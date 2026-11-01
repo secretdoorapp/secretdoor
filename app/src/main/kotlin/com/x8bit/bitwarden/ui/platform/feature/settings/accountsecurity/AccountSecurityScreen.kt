@@ -25,10 +25,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bitwarden.ui.platform.base.util.EventsEffect
@@ -54,8 +51,6 @@ import com.bitwarden.ui.platform.manager.IntentManager
 import com.bitwarden.ui.platform.manager.util.startAppSettingsActivity
 import com.bitwarden.ui.platform.resource.BitwardenDrawable
 import com.bitwarden.ui.platform.resource.BitwardenString
-import com.bitwarden.ui.platform.theme.BitwardenTheme
-import com.bitwarden.ui.util.Text
 import com.bitwarden.ui.util.asText
 import com.x8bit.bitwarden.data.platform.repository.model.VaultTimeout
 import com.x8bit.bitwarden.data.platform.repository.model.VaultTimeoutAction
@@ -98,10 +93,6 @@ fun AccountSecurityScreen(
 
             AccountSecurityEvent.NavigateToDeleteAccount -> onNavigateToDeleteAccount()
 
-            AccountSecurityEvent.NavigateToFingerprintPhrase -> {
-                intentManager.launchUri("http://bitwarden.com/help/fingerprint-phrase".toUri())
-            }
-
 
             AccountSecurityEvent.NavigateToChangeMasterPassword -> {
                 onNavigateToChangeMasterPassword()
@@ -130,9 +121,6 @@ fun AccountSecurityScreen(
         onDismissRequest = { viewModel.trySendAction(AccountSecurityAction.DismissDialog) },
         onConfirmLogoutClick = {
             viewModel.trySendAction(AccountSecurityAction.ConfirmLogoutClick)
-        },
-        onFingerprintLearnMore = {
-            viewModel.trySendAction(AccountSecurityAction.FingerPrintLearnMoreClick)
         },
     )
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -273,24 +261,13 @@ fun AccountSecurityScreen(
                     .padding(horizontal = 16.dp),
             )
             Spacer(modifier = Modifier.height(height = 8.dp))
-            BitwardenTextRow(
-                text = stringResource(id = BitwardenString.account_fingerprint_phrase),
-                onClick = {
-                    viewModel.trySendAction(AccountSecurityAction.AccountFingerprintPhraseClick)
-                },
-                cardStyle = CardStyle.Top(),
-                modifier = Modifier
-                    .testTag("AccountFingerprintPhraseLabel")
-                    .standardHorizontalMargin()
-                    .fillMaxWidth(),
-            )
             if (state.isUnlockWithPasswordEnabled) {
                 BitwardenTextRow(
                     text = stringResource(id = BitwardenString.change_master_password),
                     onClick = {
                         viewModel.trySendAction(AccountSecurityAction.ChangeMasterPasswordClick)
                     },
-                    cardStyle = CardStyle.Middle(),
+                    cardStyle = CardStyle.Top(),
                     modifier = Modifier
                         .testTag("ChangeMasterPasswordLabel")
                         .standardHorizontalMargin()
@@ -328,18 +305,11 @@ private fun AccountSecurityDialogs(
     state: AccountSecurityState,
     onDismissRequest: () -> Unit,
     onConfirmLogoutClick: () -> Unit,
-    onFingerprintLearnMore: () -> Unit,
 ) {
     when (val dialogState = state.dialog) {
         AccountSecurityDialog.ConfirmLogout -> BitwardenLogoutConfirmationDialog(
             onDismissRequest = onDismissRequest,
             onConfirmClick = onConfirmLogoutClick,
-        )
-
-        AccountSecurityDialog.FingerprintPhrase -> FingerPrintPhraseDialog(
-            fingerprintPhrase = state.fingerprintPhrase,
-            onDismissRequest = onDismissRequest,
-            onLearnMore = onFingerprintLearnMore,
         )
 
         is AccountSecurityDialog.Loading -> BitwardenLoadingDialog(
@@ -444,31 +414,5 @@ private fun SessionTimeoutActionRow(
         textFieldTestTag = "SessionTimeoutActionStatusLabel",
         cardStyle = cardStyle,
         modifier = modifier,
-    )
-}
-
-@Composable
-private fun FingerPrintPhraseDialog(
-    fingerprintPhrase: Text,
-    onDismissRequest: () -> Unit,
-    onLearnMore: () -> Unit,
-) {
-    BitwardenTwoButtonDialog(
-        title = stringResource(id = BitwardenString.fingerprint_phrase),
-        message = buildAnnotatedString {
-            append("${stringResource(id = BitwardenString.your_accounts_fingerprint)}:\n\n")
-            withStyle(
-                style = BitwardenTheme.typography.sensitiveInfoSmall
-                    .toSpanStyle()
-                    .copy(color = BitwardenTheme.colorScheme.text.codePink),
-            ) {
-                append(fingerprintPhrase())
-            }
-        },
-        confirmButtonText = stringResource(id = BitwardenString.learn_more),
-        dismissButtonText = stringResource(id = BitwardenString.close),
-        onConfirmClick = onLearnMore,
-        onDismissClick = onDismissRequest,
-        onDismissRequest = onDismissRequest,
     )
 }

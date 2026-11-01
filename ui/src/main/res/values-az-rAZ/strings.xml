@@ -417,11 +417,9 @@ Skan prosesi avtomatik baş tutacaq.</string>
     <string name="export_vault_file_pw_protect_info">Bu faylın xaricə köçürülməsi, parolla qorunacaq və şifrəsini açmaq üçün fayl parolu tələb olunacaq.</string>
     <string name="export_vault_confirmation_title">Seyfi xaricə köçürməyi təsdiqlə</string>
     <string name="warning">Xəbərdarlıq</string>
-    <string name="export_vault_failure">Seyfin xaricə köçürülməsi zamanı problem yarandı. Əgər problem davam edərsə, veb seyfinizdən xaricə köçürməli olacaqsınız.</string>
     <string name="export_vault_success">Seyf uğurla xaricə köçürüldü</string>
     <string name="clone">Klonla</string>
     <string name="password_generator_policy_in_effect">Bir və ya daha çox təşkilat siyasətləri yaradıcı seçimlərinizə təsir edir.</string>
-    <string name="unable_to_save_attachment">Bu qoşmanı saxlayarkən problem yarandı. Əgər problem davam edərsə, veb seyfdən saxlaya bilərsiniz.</string>
     <string name="save_attachment_success">Qoşma uğurla saxlanıldı</string>
     <string name="autofill_tile_accessibility_required">Avto-doldurma qutusunu istifadə etmək üçün lütfən SecretDoor ayarlarında “Avto-doldurma Erişiləbilənlik Xidməti”ni işə salın.</string>
     <string name="autofill_tile_uri_not_found">Heç bir parol sahəsi aşkarlanmadı</string>
@@ -730,9 +728,7 @@ Bu hesaba keçmək istəyirsiniz?</string>
     <string name="two_step_login_description_long">SecretDoor veb tətbiqində iki addımlı girişi quraraq hesabınızı daha güvənli edin.</string>
     <string name="change_master_password_description_long">Ana parolunuzu SecretDoor veb tətbiqində dəyişdirə bilərsiniz.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Kömək mərkəzində SecretDoor-in necə istifadə ediləcəyi ilə bağlı ətraflı öyrənin.</string>
-    <string name="privacy_policy_description_long">bitwarden.com saytında məxfilik siyasətimizi nəzərdən keçirin.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Veb tətbiqində SecretDoor hesabınızın daha çox özəlliyini kəşf edin.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor, bir təşkilatı istifadə edərək seyf elementlərinizi başqaları ilə paylaşmağınıza imkan verir. Daha ətraflı məlumat üçün bitwarden.com saytını ziyarət edin.</string>
     <string name="created_x">Yaradıldı: %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Təşkilatınız bir ana parol ayarlamağı tələb edir.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Seyf vaxt bitmə əməliyyatınızı dəyişdirmək üçün bir kilid açma seçənəyi qurun.</string>
@@ -844,8 +840,6 @@ Bu hesaba keçmək istəyirsiniz?</string>
     <string name="add_login">Giriş əlavə et</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">İstənilən platformada faylları və veriləri hər kəslə güvənli şəkildə paylaşın. Məlumatlarınız, ifşa olunmamaq üçün ucdan-uca şifrələnmiş qalacaq.</string>
     <string name="send_sensitive_information_safely">Həssas məlumatları göndər, təhlükəsiz</string>
-    <string name="import_saved_logins">Saxlanılmış girişləri daxilə köçür</string>
-    <string name="use_a_computer_to_import_logins">Mövcud bir parol menecerindən girişləri daxilə köçürmək üçün bir kompüter istifadə edin</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Bu addımı tamamlamaq üçün istənilən vaxt Seyf Ayarlarına gedə bilərsiniz.</string>
     <string name="import_logins_later">Girişləri daha sonra daxilə köçür</string>
     <string name="import_logins_later_dialog_title">Girişlər daha sonra daxilə köçürülsün?</string>
@@ -877,7 +871,6 @@ Bu hesaba keçmək istəyirsiniz?</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Bu, bilinən SecretDoor serveri deyil. Provayderinizi yoxlamağınız və ya serverinizi güncəlləməyiniz lazım gələ bilər.</string>
     <string name="syncing_logins_loading_message">Girişlər sinxronlaşdırılır…</string>
     <string name="download_the_browser_extension">Brauzer uzantısını endir</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Daha problemsiz bir təcrübə üçün SecretDoor-i sevimli brauzerinizə inteqrasiya etmək üçün bitwarden.com/download ünvanına gedin. </string>
     <string name="use_the_web_app">Veb tətbiqi istifadə et</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Hesabınızı asanlıqla idarə etmək və ayarları güncəlləmək üçün bitwarden.com saytında giriş edin.</string>
     <string name="autofill_passwords">Parolları avto-doldur</string>
@@ -1145,9 +1138,7 @@ fəaliyyəti yaxalamaq üçün sizə vaxt verəcək.</string>
     <string name="account_synced_from_bitwarden_app">Hesab, SecretDoor tətbiqindən sinxronlaşdırıldı</string>
     <string name="local_codes">Lokal kodlar (%1$d)</string>
     <string name="required_information_missing">Tələb olunan məlumat əskikdir</string>
-    <string name="required_information_missing_message">Tələb olunan məlumatlar əskikdir (məs. \'xidmətlər\' və ya \'sirr\'). Faylınızı yoxlayıb yenidən sınayın. Dəstək üçün bitwarden.com/help ünvanını ziyarət edin</string>
     <string name="file_could_not_be_processed">Fayl emal oluna bilmədi</string>
-    <string name="file_could_not_be_processed_message">Fayl emal edilə bilmədi. Bunun yararlı JSON faylı olduğuna əmin olub yenidən sınayın. Kömək lazımdır? bitwarden.com/help ünvanını ziyarət edin</string>
     <string name="get_help">Kömək al</string>
     <string name="error_cannot_decrypt">[xəta: şifrə açıla bilmir]</string>
     <string name="copy_error_report">Xəta hesabatını kopyala</string>

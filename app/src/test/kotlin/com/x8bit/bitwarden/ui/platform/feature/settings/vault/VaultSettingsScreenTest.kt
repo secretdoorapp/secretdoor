@@ -114,14 +114,14 @@ class VaultSettingsScreenTest : BitwardenComposeTest() {
     fun `when new show action card is true the import logins card should show`() {
         mutableStateFlow.update { it.copy(showImportActionCard = true) }
         composeTestRule
-            .onNodeWithText("Import saved logins")
+            .onNodeWithText("Import your items")
             .performScrollTo()
             .assertIsDisplayed()
         mutableStateFlow.update {
             it.copy(showImportActionCard = false)
         }
         composeTestRule
-            .onNodeWithText("Import saved logins")
+            .onNodeWithText("Import your items")
             .assertDoesNotExist()
     }
 

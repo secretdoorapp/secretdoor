@@ -101,8 +101,8 @@ fun VaultActionCard(
 
         VaultState.ActionCardState.ImportItems -> {
             BitwardenActionCard(
-                cardTitle = stringResource(id = BitwardenString.import_saved_logins),
-                cardSubtitle = stringResource(id = BitwardenString.use_a_computer_to_import_logins),
+                cardTitle = stringResource(id = BitwardenString.import_your_items),
+                cardSubtitle = stringResource(id = BitwardenString.restore_a_backup_or_transfer_from_another_app),
                 actionButton = BitwardenButtonData(
                     label = BitwardenString.get_started.asText(),
                     onClick = { vaultHandlers.actionCardClick(actionCardState) },

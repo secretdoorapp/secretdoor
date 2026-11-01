@@ -417,11 +417,9 @@
     <string name="export_vault_file_pw_protect_info">Αυτή η εξαγωγή αρχείου θα προστατεύεται με κωδικό πρόσβασης και θα απαιτείται ο κωδικός πρόσβασης του αρχείου για αποκρυπτογράφηση.</string>
     <string name="export_vault_confirmation_title">Επιβεβαίωση εξαγωγής θυσαυ/κίου</string>
     <string name="warning">Προειδοποίηση</string>
-    <string name="export_vault_failure">Παρουσιάστηκε πρόβλημα κατά την εξαγωγή του θησαυροφυλακίου σας. Αν το πρόβλημα παραμένει, θα χρειαστεί να εξαγάγετε από το web vault.</string>
     <string name="export_vault_success">Το θυσαυ/κιο εξάχθηκε με επιτυχία</string>
     <string name="clone">Κλωνοποίηση</string>
     <string name="password_generator_policy_in_effect">Μία ή περισσότερες πολιτικές του οργανισμού επηρεάζουν τις ρυθμίσεις γεννήτριας.</string>
-    <string name="unable_to_save_attachment">Παρουσιάστηκε πρόβλημα κατά την αποθήκευση αυτού του συνημμένου. Εάν το πρόβλημα επιμένει, μπορείτε να το αποθηκεύσετε μέσω web vault.</string>
     <string name="save_attachment_success">Το συνημμένο αποθηκεύτηκε με επιτυχία</string>
     <string name="autofill_tile_accessibility_required">Παρακαλώ ενεργοποιήστε την «Υπηρεσία προσβασιμότητας αυτόματης συμπλήρωσης» από τις Ρυθμίσεις του SecretDoor για να χρησιμοποιήσετε το πλακίδιο αυτόματης συμπλήρωσης.</string>
     <string name="autofill_tile_uri_not_found">Δεν εντοπίστηκαν πεδία κωδικού πρόσβασης</string>
@@ -731,9 +729,7 @@
     <string name="two_step_login_description_long">Κάντε τον λογαριασμό σας πιο ασφαλή με τη ρύθμιση δύο βημάτων σύνδεσης στην εφαρμογή διαδικτύου SecretDoor.</string>
     <string name="change_master_password_description_long">Μπορείτε να αλλάξετε τον κύριο κωδικό πρόσβασης στην εφαρμογή διαδικτύου SecretDoor.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Μάθετε περισσότερα για το πώς να χρησιμοποιήσετε το SecretDoor στο κέντρο βοήθειας.</string>
-    <string name="privacy_policy_description_long">Δείτε την πολιτική απορρήτου μας στο bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Εξερευνήστε περισσότερες δυνατότητες του SecretDoor λογαριασμού σας, στην εφαρμογή διαδικτύου.</string>
-    <string name="learn_about_organizations_description_long">Το SecretDoor σας επιτρέπει να μοιράζεστε τα στοιχεία του vault σας με άλλους, χρησιμοποιώντας έναν λογαριασμό οργανισμού. Μάθετε περισσότερα στην ιστοσελίδα bitwarden.com.</string>
     <string name="created_x">Δημιουργήθηκε %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Ο οργανισμός σας απαιτεί να ορίσετε έναν κύριο κωδικό πρόσβασης.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Ρυθμίστε μια επιλογή κλειδώματος για να αλλάξετε την ενέργεια στη λήξη χρόνου του vault σας.</string>
@@ -845,8 +841,6 @@
     <string name="add_login">Προσθήκη σύνδεσης</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Κοινή χρήση αρχείων και δεδομένων με ασφάλεια σε οποιονδήποτε, σε οποιαδήποτε πλατφόρμα. Οι πληροφορίες σας θα παραμείνουν κρυπτογραφημένες από άκρο σε άκρο, περιορίζοντας την έκθεση.</string>
     <string name="send_sensitive_information_safely">Ασφαλής αποστολή ευαίσθητων πληροφοριών</string>
-    <string name="import_saved_logins">Εισαγωγή αποθηκευμένων συνδέσεων</string>
-    <string name="use_a_computer_to_import_logins">Χρησιμοποιήστε έναν υπολογιστή για την εισαγωγή συνδέσεων από έναν υπάρχοντα διαχειριστή κωδικών πρόσβασης</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">Μπορείτε να επιστρέψετε για να ολοκληρώσετε αυτό το βήμα ανά πάσα στιγμή στις Ρυθμίσεις Κρύπτης.</string>
     <string name="import_logins_later">Εισαγωγή συνδέσεων αργότερα</string>
     <string name="import_logins_later_dialog_title">Εισαγωγή συνδέσεων αργότερα;</string>
@@ -878,7 +872,6 @@
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Αυτός δεν είναι αναγνωρισμένος διακομιστής SecretDoor. Μπορεί να χρειαστεί να ελέγξετε με τον πάροχο σας ή να ενημερώσετε τον διακομιστή σας.</string>
     <string name="syncing_logins_loading_message">Συγχρονισμός συνδέσεων...</string>
     <string name="download_the_browser_extension">Κατεβάστε την επέκταση περιηγητή</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Πηγαίνετε στο bitwarden.com/download για να ενσωματώσετε το SecretDoor στο αγαπημένο σας πρόγραμμα περιήγησης για μια απρόσκοπτη εμπειρία.</string>
     <string name="use_the_web_app">Χρήση της εφαρμογής web</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Συνδεθείτε στο bitwarden.com για να διαχειριστείτε εύκολα το λογαριασμό σας και να ενημερώσετε τις ρυθμίσεις.</string>
     <string name="autofill_passwords">Αυτόματη συμπλήρωση κωδικών πρόσβασης</string>
@@ -1144,9 +1137,7 @@
     <string name="account_synced_from_bitwarden_app">Ο λογαριασμός συγχρονίστηκε από το SecretDoor</string>
     <string name="local_codes">Τοπικοί κωδικοί (%1$d)</string>
     <string name="required_information_missing">Λείπουν απαιτούμενες πληροφορίες</string>
-    <string name="required_information_missing_message">Λείπουν απαιτούμενες πληροφορίες (π.χ. «υπηρεσίες» ή «μυστικό»). Ελέγξτε το αρχείο σας και δοκιμάστε ξανά. Επισκεφτείτε το bitwarden.com/help για υποστήριξη</string>
     <string name="file_could_not_be_processed">Το αρχείο δεν ήταν δυνατό να υποβληθεί σε επεξεργασία</string>
-    <string name="file_could_not_be_processed_message">Το αρχείο δεν ήταν δυνατό να υποβληθεί σε επεξεργασία. Βεβαιωθείτε ότι είναι έγκυρο JSON και δοκιμάστε ξανά. Χρειάζεστε βοήθεια; Επισκεφτείτε το bitwarden.com/help</string>
     <string name="get_help">Λήψη βοήθειας</string>
     <string name="error_cannot_decrypt">[σφάλμα: δεν είναι δυνατή η αποκρυπτογράφηση]</string>
     <string name="copy_error_report">Αντιγραφή αναφοράς σφάλματος</string>

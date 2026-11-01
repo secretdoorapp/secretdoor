@@ -421,11 +421,9 @@ Skenovanie prebehne automaticky.</string>
     <string name="export_vault_file_pw_protect_info">Tento exportovaný súbor bude chránený heslom a na dešifrovanie bude potrebné heslo súboru.</string>
     <string name="export_vault_confirmation_title">Potvrdiť export trezoru</string>
     <string name="warning">Upozornenie</string>
-    <string name="export_vault_failure">Pri exporte vášho trezora došlo k problému. Ak problém pretrváva, budete musieť exportovať z webového trezora.</string>
     <string name="export_vault_success">Trezor bol úspešne exportovaný</string>
     <string name="clone">Klonovať</string>
     <string name="password_generator_policy_in_effect">Jedno alebo viac nastavení organizácie ovplyvňujú vaše nastavenia generátora</string>
-    <string name="unable_to_save_attachment">Nastal problém pri ukladaní prílohy. Ak problém pretrváva, môžete ju uložiť z webového trezora.</string>
     <string name="save_attachment_success">Príloha bola úspešne uložená</string>
     <string name="autofill_tile_accessibility_required">Zapnite \"Služba prístupnosti automatického vypĺňania\" v nastaveniach SecretDooru, aby ste mohli používať dlaždicu na automatické vypĺňanie.</string>
     <string name="autofill_tile_uri_not_found">Nenašli sa žiadne polia pre heslo</string>
@@ -739,9 +737,7 @@ Chcete prepnúť na tento účet?</string>
     <string name="two_step_login_description_long">Zabezpečte svoj účet nastavením dvojstupňového prihlasovania vo webovej aplikácii SecretDoor.</string>
     <string name="change_master_password_description_long">Hlavné heslo si môžete zmeniť vo webovej aplikácii SecretDoor.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Viac informácií o používaní SecretDooru nájdete v centre pomoci.</string>
-    <string name="privacy_policy_description_long">Pozrite si naše zásady ochrany osobných údajov na bitwarden.com.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Preskúmajte ďalšie funkcie svojho účtu na SecretDoor vo webovej aplikácii.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor vám umožňuje zdieľať vaše položky trezora s ostatnými pomocou organizácie. Viac informácií nájdete na webovej stránke bitwarden.com.</string>
     <string name="created_x">Vytvorené: %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Vaša organizácia vyžaduje, aby ste nastavili hlavné heslo.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">Nastavte možnosť odomknutia, aby ste zmenili akciu pri vypršaní času trezoru.</string>
@@ -855,8 +851,6 @@ Chcete prepnúť na tento účet?</string>
     <string name="add_login">Pridať prihlasovacie údaje</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">Bezpečne zdieľajte súbory a údaje s kýmkoľvek a na akejkoľvek platforme. Vaše informácie zostanú end-to-end zašifrované a zároveň sa obmedzí ich odhalenie.</string>
     <string name="send_sensitive_information_safely">Posielajte citlivé informácie bezpečne</string>
-    <string name="import_saved_logins">Importovať uložené prihlasovacie údaje</string>
-    <string name="use_a_computer_to_import_logins">Na importovanie prihlasovacích údajov zo súčasného správcu hesiel použite počítač</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">K dokončeniu tohto kroku sa môžete kedykoľvek vrátiť v nastaveniach trezoru.</string>
     <string name="import_logins_later">Importovať prihlasovacie údaje neskôr</string>
     <string name="import_logins_later_dialog_title">Importovať prihlasovacie údaje neskôr?</string>
@@ -888,7 +882,6 @@ Chcete prepnúť na tento účet?</string>
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">Toto nie je známy SecretDoor server. Možno bude potrebné overiť si to u svojho poskytovateľa alebo aktualizovať server.</string>
     <string name="syncing_logins_loading_message">Synchronizujú sa prihlásenia…</string>
     <string name="download_the_browser_extension">Stiahnuť rozšírenie pre prehliadač</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">Pre pohodlné použivanie prejdite na stránku bitwarden.com/download a integrujte SecretDoor do svojho obľúbeného prehliadača.</string>
     <string name="use_the_web_app">Použiť webovú aplikáciu</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Pre jednoduchú správu vášho účtu a aktualizáciu nastavení sa prihláste na bitwarden.com.</string>
     <string name="autofill_passwords">Automatické vypĺňanie hesiel</string>
@@ -1158,9 +1151,7 @@ Chcete prepnúť na tento účet?</string>
     <string name="account_synced_from_bitwarden_app">Účet je synchronizovaný s apkou SecretDoor</string>
     <string name="local_codes">Miestne kódy (%1$d)</string>
     <string name="required_information_missing">Chýbajúce požadované informácie</string>
-    <string name="required_information_missing_message">Chýbajú požadované informácie (napr. \"services\" alebo \"secret\"). Skontrolujte súbor a skúste to znova. Navštívte stránku bitwarden.com/help, kde nájdete podporu</string>
     <string name="file_could_not_be_processed">Súbor sa nepodarilo spracovať</string>
-    <string name="file_could_not_be_processed_message">Súbor sa nedal spracovať. Uistite sa, že ide o platný JSON, a skúste to znova. Potrebujete pomoc? Navštívte stránku bitwarden.com/help</string>
     <string name="get_help">Získať pomoc</string>
     <string name="error_cannot_decrypt">[chyba: nedá sa dešifrovať]</string>
     <string name="copy_error_report">Kopírovať hlásenie o chybe</string>

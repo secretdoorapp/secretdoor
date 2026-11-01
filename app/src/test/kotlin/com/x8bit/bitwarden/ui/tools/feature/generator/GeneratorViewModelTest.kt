@@ -18,6 +18,7 @@ import com.x8bit.bitwarden.data.platform.manager.ReviewPromptManager
 import com.x8bit.bitwarden.data.platform.manager.clipboard.BitwardenClipboardManager
 import com.x8bit.bitwarden.data.platform.manager.model.CoachMarkTourType
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
+import com.x8bit.bitwarden.data.platform.util.SecretDoorLinks
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratedCatchAllUsernameResult
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratedForwardedServiceUsernameResult
 import com.x8bit.bitwarden.data.tools.generator.repository.model.GeneratedPassphraseResult
@@ -2167,7 +2168,7 @@ class GeneratorViewModelTest : BaseViewModelTest() {
             viewModel.trySendAction(GeneratorAction.UpgradedToPremiumCardClick)
             assertEquals(
                 GeneratorEvent.NavigateToUrl(
-                    url = "https://bitwarden.com/help/password-manager-plans/",
+                    url = SecretDoorLinks.PREMIUM_URL,
                 ),
                 awaitItem(),
             )

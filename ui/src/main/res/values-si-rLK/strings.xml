@@ -417,11 +417,9 @@
     <string name="export_vault_file_pw_protect_info">මෙම ගොනු අපනයනය මුරපද ආරක්ෂිත වන අතර විකේතනය සඳහා ගොනු මුරපදය අවශ්‍ය වේ.</string>
     <string name="export_vault_confirmation_title">සුරක්ෂිතාගාර අපනයනය තහවුරු කරන්න</string>
     <string name="warning">අනතුරු ඇඟවීම</string>
-    <string name="export_vault_failure">ඔබගේ සුරක්ෂිතාගාරය අපනයනය කිරීමේ ගැටළුවක් ඇති විය. ගැටළුව දිගටම පවතින්නේ නම්, ඔබට වෙබ් සුරක්ෂිතාගාරයෙන් අපනයනය කිරීමට සිදුවනු ඇත.</string>
     <string name="export_vault_success">සුරක්ෂිතාගාරය සාර්ථකව අපනයනය කරන ලදී</string>
     <string name="clone">ක්ලෝන කරන්න</string>
     <string name="password_generator_policy_in_effect">එක් හෝ කිහිපයක් සංවිධාන ප්‍රතිපත්ති ඔබගේ උත්පාදක සැකසුම්වලට බලපායි</string>
-    <string name="unable_to_save_attachment">මෙම ඇමුණුම සුරැකීමේ ගැටළුවක් ඇති විය. ගැටළුව දිගටම පවතින්නේ නම්, ඔබට එය වෙබ් සුරක්ෂිතාගාරයෙන් සුරැකිය හැක.</string>
     <string name="save_attachment_success">ඇමුණුම සාර්ථකව සුරකින ලදී</string>
     <string name="autofill_tile_accessibility_required">ස්වයං පිරවුම් ටයිලය භාවිතා කිරීමට කරුණාකර SecretDoor සැකසීම් වලින් “ස්වයං පිරවුම් ප්‍රවේශ්‍යතා සේවාව” ක්‍රියාත්මක කරන්න.</string>
     <string name="autofill_tile_uri_not_found">මුරපද ක්ෂේත්‍ර හඳුනාගෙන නොමැත</string>
@@ -731,9 +729,7 @@
     <string name="two_step_login_description_long">SecretDoor වෙබ් යෙදුමේ පියවර දෙකක පිවිසුම සැකසීමෙන් ඔබගේ ගිණුම වඩාත් ආරක්ෂිත කරන්න.</string>
     <string name="change_master_password_description_long">ඔබට SecretDoor වෙබ් යෙදුමේ ඔබගේ ප්‍රධාන මුරපදය වෙනස් කළ හැක.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">උපකාරක මධ්‍යස්ථානයේ SecretDoor භාවිතා කරන ආකාරය ගැන වැඩිදුර ඉගෙන ගන්න.</string>
-    <string name="privacy_policy_description_long">bitwarden.com හි අපගේ රහස්‍යතා ප්‍රතිපත්තිය බලන්න.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">වෙබ් යෙදුමේ ඔබගේ SecretDoor ගිණුමේ තවත් විශේෂාංග ගවේෂණය කරන්න.</string>
-    <string name="learn_about_organizations_description_long">SecretDoor ඔබට සංවිධානයක් භාවිතයෙන් ඔබගේ සුරක්ෂිතාගාර අයිතම අන් අය සමඟ බෙදා ගැනීමට ඉඩ සලසයි. bitwarden.com වෙබ් අඩවියෙන් වැඩිදුර ඉගෙන ගන්න.</string>
     <string name="created_x">%1$s සාදන ලදී</string>
     <string name="your_organization_requires_you_to_set_a_master_password">ඔබගේ සංවිධානය ඔබට ප්‍රධාන මුරපදයක් සැකසීමට අවශ්‍ය කරයි.</string>
     <string name="set_up_an_unlock_option_to_change_your_vault_timeout_action">ඔබගේ සුරක්ෂිතාගාර කාල සීමා ක්‍රියාව වෙනස් කිරීමට අගුළු ඇරීමේ විකල්පයක් සකසන්න.</string>
@@ -845,8 +841,6 @@
     <string name="add_login">පිවිසුම එක් කරන්න</string>
     <string name="share_files_and_data_securely_with_anyone_on_any_platform">ඕනෑම වේදිකාවක, ඕනෑම අයෙකු සමඟ ගොනු සහ දත්ත ආරක්ෂිතව බෙදාගන්න. ඔබගේ තොරතුරු අන්ත-සිට-අන්ත ගුප්තකේතනය වන අතර නිරාවරණය සීමා කරයි.</string>
     <string name="send_sensitive_information_safely">සංවේදී තොරතුරු ආරක්ෂිතව යවන්න</string>
-    <string name="import_saved_logins">සුරැකි පිවිසුම් ආයාත කරන්න</string>
-    <string name="use_a_computer_to_import_logins">පවතින මුරපද කළමනාකරුවෙකුගෙන් පිවිසුම් ආයාත කිරීමට පරිගණකයක් භාවිතා කරන්න</string>
     <string name="you_can_return_to_complete_this_step_anytime_from_settings">ඔබට ඕනෑම වේලාවක සුරක්ෂිතාගාර සැකසීම් තුළ මෙම පියවර සම්පූර්ණ කිරීමට ආපසු යා හැක.</string>
     <string name="import_logins_later">පසුව පිවිසුම් ආයාත කරන්න</string>
     <string name="import_logins_later_dialog_title">පසුව පිවිසුම් ආයාත කරන්නද?</string>
@@ -878,7 +872,6 @@
     <string name="this_is_not_a_recognized_bitwarden_server_you_may_need_to_check_with_your_provider_or_update_your_server">මෙය හඳුනාගත් SecretDoor සේවාදායකයක් නොවේ. ඔබට ඔබගේ සපයන්නා සමඟ පරීක්ෂා කිරීමට හෝ ඔබගේ සේවාදායකය යාවත්කාලීන කිරීමට අවශ්‍ය විය හැක.</string>
     <string name="syncing_logins_loading_message">පිවිසුම් සමමුහුර්ත කරමින්...</string>
     <string name="download_the_browser_extension">බ්‍රවුසර දිගුව බාගත කරන්න</string>
-    <string name="go_to_bitwarden_com_download_to_integrate_bitwarden_into_browser">බාධාවකින් තොර අත්දැකීමක් සඳහා ඔබගේ ප්‍රියතම බ්‍රවුසරයට SecretDoor ඒකාබද්ධ කිරීමට bitwarden.com/download වෙත යන්න.</string>
     <string name="use_the_web_app">වෙබ් යෙදුම භාවිතා කරන්න</string>
     <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">ඔබගේ ගිණුම පහසුවෙන් කළමනාකරණය කිරීමට සහ සැකසුම් යාවත්කාලීන කිරීමට bitwarden.com හි පිවිසෙන්න.</string>
     <string name="autofill_passwords">මුරපද ස්වයං පිරවුම් කරන්න</string>
@@ -1144,9 +1137,7 @@
     <string name="account_synced_from_bitwarden_app">SecretDoor යෙදුමෙන් සමමුහුර්ත කළ ගිණුම</string>
     <string name="local_codes">දේශීය කේත (%1$d)</string>
     <string name="required_information_missing">අවශ්‍ය තොරතුරු අතුරුදහන්</string>
-    <string name="required_information_missing_message">අවශ්‍ය තොරතුරු අතුරුදහන් වී ඇත (උදා: ‘services’ හෝ ‘secret’). ඔබගේ ගොනුව පරීක්ෂා කර නැවත උත්සාහ කරන්න. සහාය සඳහා bitwarden.com/help වෙත පිවිසෙන්න</string>
     <string name="file_could_not_be_processed">ගොනුව සැකසිය නොහැකි විය</string>
-    <string name="file_could_not_be_processed_message">ගොනුව සැකසිය නොහැකි විය. එය වලංගු JSON බවට සහතික වී නැවත උත්සාහ කරන්න. උදව් අවශ්‍යද? bitwarden.com/help වෙත පිවිසෙන්න</string>
     <string name="get_help">උදව් ලබා ගන්න</string>
     <string name="error_cannot_decrypt">[දෝෂය: විකේතනය කළ නොහැක]</string>
     <string name="copy_error_report">දෝෂ වාර්තාව පිටපත් කරන්න</string>
