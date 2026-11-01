@@ -44,6 +44,7 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.core.net.toUri
 import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
 import com.bitwarden.core.data.util.advanceTimeByAndRunCurrent
+import com.bitwarden.ssh.KeyAlgorithm
 import com.bitwarden.ui.platform.components.snackbar.model.BitwardenSnackbarData
 import com.bitwarden.ui.platform.manager.IntentManager
 import com.bitwarden.ui.platform.manager.exit.ExitManager
@@ -4755,6 +4756,53 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
     }
 
     @Test
+    fun `in ItemType_SshKeys the key fields should be hidden until a key exists`() {
+        mutableStateFlow.value = DEFAULT_STATE_SSH_KEYS.copy(
+            viewState = (DEFAULT_STATE_SSH_KEYS.viewState as VaultAddEditState.ViewState.Content)
+                .copy(type = VaultAddEditState.ViewState.Content.ItemType.SshKey()),
+        )
+
+        composeTestRule.onNodeWithTextAfterScroll(text = "Generate a key").assertExists()
+        composeTestRule.onNodeWithText("Private key").assertDoesNotExist()
+        composeTestRule.onNodeWithText("Public key").assertDoesNotExist()
+    }
+
+    @Test
+    fun `in ItemType_SshKeys the Generate and Import buttons should send their actions`() {
+        mutableStateFlow.value = DEFAULT_STATE_SSH_KEYS
+
+        composeTestRule
+            .onNodeWithTextAfterScroll(text = "Generate a key")
+            .performClick()
+        composeTestRule
+            .onNodeWithTextAfterScroll(text = "Import a key")
+            .performClick()
+
+        verify(exactly = 1) {
+            viewModel.trySendAction(VaultAddEditAction.ItemType.SshKeyType.GenerateKeyClick)
+            viewModel.trySendAction(VaultAddEditAction.ItemType.SshKeyType.ImportKeyClick)
+        }
+    }
+
+    @Test
+    fun `the SSH key algorithm picker should send the chosen algorithm`() {
+        mutableStateFlow.value = DEFAULT_STATE_SSH_KEYS.copy(
+            dialog = VaultAddEditState.DialogState.SshKeyAlgorithmPicker,
+        )
+
+        composeTestRule
+            .onAllNodesWithText(text = "RSA 4096")
+            .filterToOne(hasAnyAncestor(isDialog()))
+            .performClick()
+
+        verify(exactly = 1) {
+            viewModel.trySendAction(
+                VaultAddEditAction.ItemType.SshKeyType.AlgorithmSelect(KeyAlgorithm.RSA4096),
+            )
+        }
+    }
+
+    @Test
     fun `CoachMark tour starts when StartAddLoginItemCoachMarkTour event received`() {
         mutableStateFlow.value = DEFAULT_STATE_LOGIN
         mutableEventFlow.tryEmit(VaultAddEditEvent.StartAddLoginItemCoachMarkTour)
@@ -5427,7 +5475,11 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
             cipherType = VaultItemCipherType.SSH_KEY,
             viewState = VaultAddEditState.ViewState.Content(
                 common = VaultAddEditState.ViewState.Content.Common(),
-                type = VaultAddEditState.ViewState.Content.ItemType.SshKey(),
+                type = VaultAddEditState.ViewState.Content.ItemType.SshKey(
+                    privateKey = "private key",
+                    publicKey = "public key",
+                    fingerprint = "fingerprint",
+                ),
                 isIndividualVaultDisabled = false,
             ),
             dialog = null,
