@@ -43,8 +43,6 @@ import com.bitwarden.sdk.PasswordHistoryClient
 import com.bitwarden.sdk.PlatformClient
 import com.bitwarden.sdk.SendClient
 import com.bitwarden.sdk.VaultClient
-import com.bitwarden.send.Send
-import com.bitwarden.send.SendView
 import com.bitwarden.vault.Attachment
 import com.bitwarden.vault.AttachmentView
 import com.bitwarden.vault.Cipher
@@ -872,33 +870,6 @@ class VaultSdkSourceTest {
         }
 
     @Test
-    fun `decryptSendList should call SDK and return correct data wrapped in a Result`() =
-        runBlocking {
-            val userId = "userId"
-            val mockSend1 = mockk<Send>()
-            val mockSend2 = mockk<Send>()
-            val mockSendView1 = mockk<SendView>()
-            val mockSendView2 = mockk<SendView>()
-            coEvery { clientSends.decrypt(send = mockSend1) } returns mockSendView1
-            coEvery { clientSends.decrypt(send = mockSend2) } returns mockSendView2
-            val result = vaultSdkSource.decryptSendList(
-                userId = userId,
-                sendList = listOf(mockSend1, mockSend2),
-            )
-            assertEquals(
-                listOf(mockSendView1, mockSendView2).asSuccess(),
-                result,
-            )
-            coVerify(exactly = 1) {
-                clientSends.decrypt(send = mockSend1)
-                clientSends.decrypt(send = mockSend2)
-                // It's important that we only fetch the client once
-                sdkClientManager.getOrCreateClient(userId = userId)
-                client.sends()
-            }
-        }
-
-    @Test
     fun `encryptAttachment should call SDK and return correct data wrapped in a Result`() =
         runBlocking {
             val userId = "userId"
@@ -930,44 +901,6 @@ class VaultSdkSourceTest {
                     decryptedFilePath = "",
                     encryptedFilePath = "",
                 )
-            }
-        }
-
-    @Test
-    fun `encryptSend should call SDK and return correct data wrapped in a Result`() = runBlocking {
-        val userId = "userId"
-        val expectedResult = mockk<Send>()
-        val mockSendView = mockk<SendView>()
-        coEvery { clientSends.encrypt(send = mockSendView) } returns expectedResult
-
-        val result = vaultSdkSource.encryptSend(
-            userId = userId,
-            sendView = mockSendView,
-        )
-
-        assertEquals(expectedResult.asSuccess(), result)
-        coVerify {
-            clientSends.encrypt(send = mockSendView)
-        }
-    }
-
-    @Test
-    fun `decryptSend should call SDK and return correct data wrapped in a Result`() =
-        runBlocking {
-            val userId = "userId"
-            val mockSend = mockk<Send>()
-            val expectedResult = mockk<SendView>()
-            coEvery { clientSends.decrypt(send = mockSend) } returns expectedResult
-            val result = vaultSdkSource.decryptSend(
-                userId = userId,
-                send = mockSend,
-            )
-            assertEquals(
-                expectedResult.asSuccess(), result,
-            )
-            coVerify {
-                clientSends.decrypt(send = mockSend)
-                sdkClientManager.getOrCreateClient(userId = userId)
             }
         }
 

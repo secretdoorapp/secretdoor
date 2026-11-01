@@ -128,21 +128,6 @@ interface VaultDiskSource {
     fun getFoldersFlow(userId: String): Flow<List<SyncResponseJson.Folder>>
 
     /**
-     * Saves a Send to the data source for the given [userId].
-     */
-    suspend fun saveSend(userId: String, send: SyncResponseJson.Send)
-
-    /**
-     * Deletes a Send from the data source for the given [userId] and [sendId].
-     */
-    suspend fun deleteSend(userId: String, sendId: String)
-
-    /**
-     * Retrieves all sends from the data source for a given [userId].
-     */
-    fun getSendsFlow(userId: String): Flow<List<SyncResponseJson.Send>>
-
-    /**
      * Replaces all [vault] data for a given [userId] with the new `vault`.
      *
      * This will always cause the [getCiphersFlow], [getCollectionsFlow], and [getFoldersFlow]
@@ -151,8 +136,8 @@ interface VaultDiskSource {
     suspend fun replaceVaultData(userId: String, vault: SyncResponseJson)
 
     /**
-     * Trigger re-emissions from the [getCiphersFlow], [getCollectionsFlow], [getFoldersFlow],
-     * and [getSendsFlow] functions.
+     * Trigger re-emissions from the [getCiphersFlow], [getCollectionsFlow], and [getFoldersFlow]
+     * functions.
      */
     suspend fun resyncVaultData(userId: String)
 
