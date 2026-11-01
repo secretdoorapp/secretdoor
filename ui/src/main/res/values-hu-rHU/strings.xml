@@ -856,7 +856,6 @@ Szeretnénk átváltani erre a fiókra?</string>
     <string name="step_1_of_3">1/3. lépés</string>
     <string name="export_your_saved_logins">Mentett bejelentkezések exportálása</string>
     <string name="delete_this_file_after_import_is_complete">Az importálás befejezése után ez a fájl törölhető.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">A számítógépén nyissunk meg egy új böngészőfület és ugrás a vault.bitwarden.com webcímre.</string>
     <string name="log_in_to_the_bitwarden_web_app">Jelentkezzünk be a SecretDoor webes alkalmazásba.</string>
     <string name="step_2_of_3">2/3. lépés</string>
     <string name="log_in_to_bitwarden">Bejelentkezés a SecretDoorbe</string>
@@ -872,7 +871,6 @@ Szeretnénk átváltani erre a fiókra?</string>
     <string name="syncing_logins_loading_message">Bejelentkezések szinkronizálása...</string>
     <string name="download_the_browser_extension">Böngésző bővítmény letöltése</string>
     <string name="use_the_web_app">Webalkalmazás használata</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Jelentkezzünk be a bitwarden.com webhelyen, hogy egyszerűen kezeljük a fiókot és frissítsük a beállításokat.</string>
     <string name="autofill_passwords">Jelszavak automatikus kitöltése</string>
     <string name="set_up_autofill_on_all_your_devices">Állítsuk be az automatikus kitöltést az összes eszközön, hogy bárhol egyetlen érintéssel bejelentkezhessünk.</string>
     <string name="import_successful">Az Importálás sikeres volt.</string>

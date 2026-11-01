@@ -858,7 +858,6 @@ Hier is hoe:</string>
     <string name="step_1_of_3">Stap 1 van 3</string>
     <string name="export_your_saved_logins">Voer u gestoorde aanmeldings uit</string>
     <string name="delete_this_file_after_import_is_complete">U sal hierdie lêer uitvee nadat die invoer voltooi is.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Op u rekenaar, maak ’n nuwe blaaieroortjie oop en <annotation emphasis="bold">gaan na <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Meld aan by die SecretDoor-webtoep.</string>
     <string name="step_2_of_3">Stap 2 van 3</string>
     <string name="log_in_to_bitwarden">Teken in by SecretDoor</string>
@@ -874,7 +873,6 @@ Hier is hoe:</string>
     <string name="syncing_logins_loading_message">Besig om aanmeldings te sinkroniseer…</string>
     <string name="download_the_browser_extension">Laai die blaaier-uitbreiding af</string>
     <string name="use_the_web_app">Gebruik die webprogram</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Meld aan by bitwarden.com om u rekening maklik te bestuur en instellings by te werk.</string>
     <string name="autofill_passwords">Outovul wagwoorde</string>
     <string name="set_up_autofill_on_all_your_devices">Stel outovul op al u toestelle op om met een tik oral aan te meld.</string>
     <string name="import_successful">Invoer suksesvol!</string>

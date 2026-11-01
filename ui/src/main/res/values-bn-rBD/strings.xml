@@ -857,7 +857,6 @@
     <string name="step_1_of_3">ধাপ 1 এর 3</string>
     <string name="export_your_saved_logins">আপনার সংরক্ষিত লগইন রপ্তানি করুন</string>
     <string name="delete_this_file_after_import_is_complete">আমদানি সম্পূর্ণ হওয়ার পরে আপনি এই ফাইলটি মুছে ফেলবেন।</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">আপনার কম্পিউটারে, একটি নতুন ব্রাউজার ট্যাব খুলুন এবং <annotation emphasis="bold"><annotation arg="0">%1$s</annotation>-এ যান</annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">বিটওয়ার্ডেন ওয়েব অ্যাপে লগ ইন করুন।</string>
     <string name="step_2_of_3">ধাপ 2 এর 3</string>
     <string name="log_in_to_bitwarden">বিটওয়ার্ডেনে লগইন করুন</string>
@@ -873,7 +872,6 @@
     <string name="syncing_logins_loading_message">লগইন সিঙ্ক করা হচ্ছে…</string>
     <string name="download_the_browser_extension">ব্রাউজার এক্সটেনশন ডাউনলোড করুন</string>
     <string name="use_the_web_app">ওয়েব অ্যাপ ব্যবহার করুন</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">আপনার অ্যাকাউন্ট সহজেই পরিচালনা করতে এবং সেটিংস আপডেট করতে bitwarden.com-এ লগ ইন করুন।</string>
     <string name="autofill_passwords">পাসওয়ার্ড অটোফিল করুন</string>
     <string name="set_up_autofill_on_all_your_devices">যেকোনো জায়গায় একটি একক আলতো চাপে লগইন করতে আপনার সমস্ত ডিভাইসে অটোফিল সেট আপ করুন।</string>
     <string name="import_successful">আমদানি সফল হয়েছে!</string>

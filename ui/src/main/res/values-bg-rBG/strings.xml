@@ -857,7 +857,6 @@
     <string name="step_1_of_3">Стъпка 1 от 3</string>
     <string name="export_your_saved_logins">Изнесете своите запазени данни за вписване</string>
     <string name="delete_this_file_after_import_is_complete">Ще можете да изтриете този файл, след като завърши внасянето.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Отворете нов раздел в браузъра на компютъра си и отидете в vault.bitwarden.com</string>
     <string name="log_in_to_the_bitwarden_web_app">Впишете се в приложението по уеб на Битуорден.</string>
     <string name="step_2_of_3">Стъпка 2 от 3</string>
     <string name="log_in_to_bitwarden">Впишете се в Битуорден</string>
@@ -873,7 +872,6 @@
     <string name="syncing_logins_loading_message">Синхронизиране на елементите за вписване…</string>
     <string name="download_the_browser_extension">Свалете добавката за браузър</string>
     <string name="use_the_web_app">Използвайте приложението по уеб</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Впишете се в bitwarden.com, където можете лесно да управлявате регистрацията си и да променяте настройки.</string>
     <string name="autofill_passwords">Автоматично попълване на пароли</string>
     <string name="set_up_autofill_on_all_your_devices">Настройте автоматичното попълвана на всички свои устройства, за да се вписвате навсякъде с едно докосване.</string>
     <string name="import_successful">Внасянето е успешно!</string>

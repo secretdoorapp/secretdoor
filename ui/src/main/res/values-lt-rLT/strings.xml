@@ -867,7 +867,6 @@ Ar norite pereiti prie šios paskyros?</string>
     <string name="step_1_of_3">1 veiksmas iš 3</string>
     <string name="export_your_saved_logins">Eksportuokite savo išsaugotus prisijungimus</string>
     <string name="delete_this_file_after_import_is_complete">Ištrinsite šį failą, kai importas bus baigtas.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Savo kompiuteryje atidarykite naują naršyklės skirtuką ir <annotation emphasis="bold">eikite į <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Prisijunkite prie „SecretDoor“ internetinės programos.</string>
     <string name="step_2_of_3">2 veiksmas iš 3</string>
     <string name="log_in_to_bitwarden">Prisijungti prie „SecretDoor“</string>
@@ -883,7 +882,6 @@ Ar norite pereiti prie šios paskyros?</string>
     <string name="syncing_logins_loading_message">Sinchronizuojami prisijungimai…</string>
     <string name="download_the_browser_extension">Atsisiųskite naršyklės plėtinį</string>
     <string name="use_the_web_app">Naudoti internetinę programą</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Prisijunkite bitwarden.com, kad lengvai tvarkytumėte savo paskyrą ir atnaujintumėte nustatymus.</string>
     <string name="autofill_passwords">Automatinis slaptažodžių pildymas</string>
     <string name="set_up_autofill_on_all_your_devices">Nustatykite automatinį pildymą visuose savo įrenginiuose, kad galėtumėte prisijungti vienu bakstelėjimu bet kur.</string>
     <string name="import_successful">Importas sėkmingas!</string>

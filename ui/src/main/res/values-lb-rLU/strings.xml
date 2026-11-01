@@ -857,7 +857,6 @@ Do you want to switch to this account?</string>
     <string name="step_1_of_3">Step 1 of 3</string>
     <string name="export_your_saved_logins">Export your saved logins</string>
     <string name="delete_this_file_after_import_is_complete">You’ll delete this file after import is complete.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">On your computer, open a new browser tab and <annotation emphasis="bold">go to <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Log in to the SecretDoor web app.</string>
     <string name="step_2_of_3">Step 2 of 3</string>
     <string name="log_in_to_bitwarden">Bei SecretDoor umellen</string>
@@ -873,7 +872,6 @@ Do you want to switch to this account?</string>
     <string name="syncing_logins_loading_message">Syncing logins…</string>
     <string name="download_the_browser_extension">Download the browser extension</string>
     <string name="use_the_web_app">Use the web app</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Log in at bitwarden.com to easily manage your account and update settings.</string>
     <string name="autofill_passwords">Autofill passwords</string>
     <string name="set_up_autofill_on_all_your_devices">Set up autofill on all your devices to login with a single tap anywhere.</string>
     <string name="import_successful">Import Successful!</string>

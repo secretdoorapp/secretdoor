@@ -857,7 +857,6 @@ Vil du bytte til denne kontoen?</string>
     <string name="step_1_of_3">Steg 1 av 3</string>
     <string name="export_your_saved_logins">Eksporter lagra påloggingar</string>
     <string name="delete_this_file_after_import_is_complete">Du vil slette denne fila etter at importen er fullført.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">På datamaskinen, opne ein ny nettlesarfane og <annotation emphasis="bold">gå til <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Logg inn i SecretDoor-nettappen.</string>
     <string name="step_2_of_3">Steg 2 av 3</string>
     <string name="log_in_to_bitwarden">Logg inn til SecretDoor</string>
@@ -873,7 +872,6 @@ Vil du bytte til denne kontoen?</string>
     <string name="syncing_logins_loading_message">Synkroniserer påloggingar…</string>
     <string name="download_the_browser_extension">Last ned nettlesarutvidinga</string>
     <string name="use_the_web_app">Bruk nettappen</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Logg inn på bitwarden.com for enkelt å handsame kontoen din og oppdatere innstillingar.</string>
     <string name="autofill_passwords">Autoutfyll passord</string>
     <string name="set_up_autofill_on_all_your_devices">Set opp autoutfyll på alle einingane dine for å logge inn med eitt trykk overalt.</string>
     <string name="import_successful">Import vellykka!</string>

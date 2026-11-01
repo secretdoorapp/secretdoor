@@ -857,7 +857,6 @@
     <string name="step_1_of_3">ഘട്ടം 1 / 3</string>
     <string name="export_your_saved_logins">നിങ്ങളുടെ സംരക്ഷിച്ച ലോഗിനുകൾ കയറ്റുമതി ചെയ്യുക</string>
     <string name="delete_this_file_after_import_is_complete">ഇംപോർട്ട് പൂർത്തിയായ ശേഷം നിങ്ങൾ ഈ ഫയൽ ഇല്ലാതാക്കും.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">നിങ്ങളുടെ കമ്പ്യൂട്ടറിൽ, ഒരു പുതിയ ബ്രൗസർ ടാബ് തുറന്ന് <annotation emphasis="bold"><annotation arg="0">%1$s</annotation>-ലേക്ക് പോകുക</annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">SecretDoor വെബ് ആപ്പിലേക്ക് ലോഗിൻ ചെയ്യുക.</string>
     <string name="step_2_of_3">ഘട്ടം 2 / 3</string>
     <string name="log_in_to_bitwarden">SecretDoor-ലേക്ക് ലോഗിൻ ചെയ്യുക</string>
@@ -873,7 +872,6 @@
     <string name="syncing_logins_loading_message">ലോഗിനുകൾ സമന്വയിപ്പിക്കുന്നു…</string>
     <string name="download_the_browser_extension">ബ്രൗസർ എക്സ്റ്റൻഷൻ ഡൗൺലോഡ് ചെയ്യുക</string>
     <string name="use_the_web_app">വെബ് ആപ്പ് ഉപയോഗിക്കുക</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">നിങ്ങളുടെ അക്കൗണ്ട് എളുപ്പത്തിൽ നിയന്ത്രിക്കാനും ക്രമീകരണങ്ങൾ അപ്ഡേറ്റ് ചെയ്യാനും bitwarden.com-ൽ ലോഗിൻ ചെയ്യുക.</string>
     <string name="autofill_passwords">പാസ്വേഡുകൾ ഓട്ടോഫിൽ ചെയ്യുക</string>
     <string name="set_up_autofill_on_all_your_devices">എവിടെയും ഒരു ടാപ്പിൽ ലോഗിൻ ചെയ്യുന്നതിന് നിങ്ങളുടെ എല്ലാ ഉപകരണങ്ങളിലും ഓട്ടോഫിൽ സജ്ജീകരിക്കുക.</string>
     <string name="import_successful">ഇംപോർട്ട് വിജയകരം!</string>

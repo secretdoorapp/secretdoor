@@ -866,7 +866,6 @@ Chcete se přepnout na tento účet?</string>
     <string name="step_1_of_3">Krok 1 ze 3</string>
     <string name="export_your_saved_logins">Export Vašich uložených přihlášení</string>
     <string name="delete_this_file_after_import_is_complete">Po dokončení importu tento soubor smažete.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Na Vašem počítači otevřete novou kartu prohlížeče a <annotation emphasis="bold">přejděte na <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Přihlaste se do webové aplikace SecretDoor.</string>
     <string name="step_2_of_3">Krok 2 ze 3</string>
     <string name="log_in_to_bitwarden">Přihlásit se do SecretDooru</string>
@@ -882,7 +881,6 @@ Chcete se přepnout na tento účet?</string>
     <string name="syncing_logins_loading_message">Synchronizování přihlašovacích údajů…</string>
     <string name="download_the_browser_extension">Stáhnout rozšíření prohlížeče</string>
     <string name="use_the_web_app">Použít webovou aplikaci</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Přihlaste se na bitwarden.com a snadno spravujte svůj účet a aktualizujte nastavení.</string>
     <string name="autofill_passwords">Automatické vyplňování hesel</string>
     <string name="set_up_autofill_on_all_your_devices">Nastavte automatické vyplňování na všech Vašich zařízeních pro přihlášení jedním klepnutím kdekoliv.</string>
     <string name="import_successful">Import byl úspěšný!</string>

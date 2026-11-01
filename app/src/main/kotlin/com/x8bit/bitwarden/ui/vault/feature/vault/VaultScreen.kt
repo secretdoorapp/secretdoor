@@ -234,16 +234,14 @@ private fun VaultScreenScaffold(
                     ?.let { TopAppBarDividerStyle.STATIC }
                     ?: TopAppBarDividerStyle.ON_SCROLL,
                 actions = {
-                    // A single local vault has nothing to switch to.
-                    if (state.accountSummaries.size > 1) {
-                        BitwardenAccountActionItem(
-                            initials = state.initials,
-                            color = state.avatarColor,
-                            onClick = {
-                                updateAccountMenuVisibility(!accountMenuVisible)
-                            },
-                        )
-                    }
+                    // Always shown, so the vault's name is visible even with a single vault.
+                    BitwardenAccountActionItem(
+                        initials = state.initials,
+                        color = state.avatarColor,
+                        onClick = {
+                            updateAccountMenuVisibility(!accountMenuVisible)
+                        },
+                    )
                     BitwardenSearchActionItem(
                         contentDescription = stringResource(id = BitwardenString.search_vault),
                         isDisplayed = state.shouldShowSearchIcon,

@@ -856,7 +856,6 @@ Bu hesaba geçmek ister misiniz?</string>
     <string name="step_1_of_3">Adım 1/3</string>
     <string name="export_your_saved_logins">Kayıtlı hesaplarınızı dışa aktarın</string>
     <string name="delete_this_file_after_import_is_complete">İçe aktarma tamamlandıktan sonra bu dosyayı silmelisiniz.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Bilgisayarınızda yeni bir tarayıcı sekmesi açın ve &lt;annotation emphasis="bold"&gt;%1$s&lt;/annotation&gt;&lt;/annotation&gt; adresine gidin</string>
     <string name="log_in_to_the_bitwarden_web_app">SecretDoor web uygulamasına giriş yapın.</string>
     <string name="step_2_of_3">Adım 2/3</string>
     <string name="log_in_to_bitwarden">SecretDoor’a giriş yapın</string>
@@ -872,7 +871,6 @@ Bu hesaba geçmek ister misiniz?</string>
     <string name="syncing_logins_loading_message">Hesaplar eşitleniyor…</string>
     <string name="download_the_browser_extension">Tarayıcı uzantısını indirin</string>
     <string name="use_the_web_app">Web uygulamasını kullanın</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Hesabınızı kolayca yönetmek ve ayarlarınızı güncellemek isterseniz bitwarden.com adresine giriş yapın.</string>
     <string name="autofill_passwords">Parolaları otomatik doldurun</string>
     <string name="set_up_autofill_on_all_your_devices">Her yere tek dokunuşla giriş yapmak için tüm cihazlarınızda otomatik doldurmayı etkinleştirin.</string>
     <string name="import_successful">İçe aktarma başarılı!</string>

@@ -861,7 +861,6 @@ Skeniranje će biti izvršeno automatski.</string>
     <string name="step_1_of_3">Korak 1 od 3</string>
     <string name="export_your_saved_logins">Izvezite svoje spremljene prijave</string>
     <string name="delete_this_file_after_import_is_complete">Obrisat ćete ovu datoteku nakon što uvoz bude završen.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Na svom računaru otvorite novu karticu preglednika i <annotation emphasis="bold">idite na <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Prijavite se u SecretDoor web aplikaciju.</string>
     <string name="step_2_of_3">Korak 2 od 3</string>
     <string name="log_in_to_bitwarden">Prijavi se na SecretDoor</string>
@@ -877,7 +876,6 @@ Skeniranje će biti izvršeno automatski.</string>
     <string name="syncing_logins_loading_message">Sinhronizacija prijava…</string>
     <string name="download_the_browser_extension">Preuzmite proširenje za preglednik</string>
     <string name="use_the_web_app">Koristite web aplikaciju</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Prijavite se na bitwarden.com za jednostavno upravljanje računom i ažuriranje postavki.</string>
     <string name="autofill_passwords">Automatsko popunjavanje lozinki</string>
     <string name="set_up_autofill_on_all_your_devices">Postavite automatsko popunjavanje na svim svojim uređajima za prijavu jednim dodirom bilo gdje.</string>
     <string name="import_successful">Uvoz uspješan!</string>

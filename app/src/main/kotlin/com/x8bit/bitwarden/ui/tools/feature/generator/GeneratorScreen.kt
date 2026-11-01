@@ -1210,7 +1210,9 @@ private fun UsernameOptionsItem(
     usernameTypeHandlers: UsernameTypeHandlers,
     modifier: Modifier = Modifier,
 ) {
+    // Forwarded aliases need an outside service and the network, so they are not offered.
     val possibleSubStates = GeneratorState.MainType.Username.UsernameTypeOption.entries
+        .filter { it != GeneratorState.MainType.Username.UsernameTypeOption.FORWARDED_EMAIL_ALIAS }
     val optionsWithStrings = possibleSubStates.associateWith { stringResource(id = it.labelRes) }
 
     BitwardenMultiSelectButton(

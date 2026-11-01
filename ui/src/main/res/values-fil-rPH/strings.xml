@@ -857,7 +857,6 @@ Gusto mo bang pumunta sa account na ito?</string>
     <string name="step_1_of_3">Hakbang 1 ng 3</string>
     <string name="export_your_saved_logins">I-export ang iyong mga naka-save na login</string>
     <string name="delete_this_file_after_import_is_complete">Buburahin mo ang file na ito pagkatapos makumpleto ang pag-import.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Sa iyong computer, magbukas ng bagong browser tab at <annotation emphasis="bold">pumunta sa <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Mag-log in sa SecretDoor web app.</string>
     <string name="step_2_of_3">Hakbang 2 ng 3</string>
     <string name="log_in_to_bitwarden">Mag-log in sa SecretDoor</string>
@@ -873,7 +872,6 @@ Gusto mo bang pumunta sa account na ito?</string>
     <string name="syncing_logins_loading_message">Nag-si-sync ng mga login…</string>
     <string name="download_the_browser_extension">I-download ang browser extension</string>
     <string name="use_the_web_app">Gamitin ang web app</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Mag-log in sa bitwarden.com upang madaling pamahalaan ang iyong account at i-update ang mga setting.</string>
     <string name="autofill_passwords">Autofill ng mga password</string>
     <string name="set_up_autofill_on_all_your_devices">I-set up ang autofill sa lahat ng iyong device upang mag-log in sa isang tap kahit saan.</string>
     <string name="import_successful">Matagumpay ang Pag-import!</string>

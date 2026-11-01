@@ -866,7 +866,6 @@ Czy chcesz przełączyć się na to konto?</string>
     <string name="step_1_of_3">Krok 1 z 3</string>
     <string name="export_your_saved_logins">Eksportuj zapisane dane logowania</string>
     <string name="delete_this_file_after_import_is_complete">Plik zostanie usunięty po zakończeniu importowania.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Na komputerze otwórz nową kartę w przeglądarce i <annotation emphasis="bold">przejdź do <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Zaloguj się do aplikacji internetowej SecretDoor.</string>
     <string name="step_2_of_3">Krok 2 z 3</string>
     <string name="log_in_to_bitwarden">Zaloguj się do SecretDoor</string>
@@ -882,7 +881,6 @@ Czy chcesz przełączyć się na to konto?</string>
     <string name="syncing_logins_loading_message">Synchronizacja danych logowania…</string>
     <string name="download_the_browser_extension">Pobierz rozszerzenie przeglądarki</string>
     <string name="use_the_web_app">Użyj aplikacji internetowej</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Zaloguj się na bitwarden.com, aby łatwo zarządzać swoim kontem i aktualizować ustawienia.</string>
     <string name="autofill_passwords">Autouzupełnianie haseł</string>
     <string name="set_up_autofill_on_all_your_devices">Skonfiguruj autouzupełnianie na wszystkich swoich urządzeniach, aby logować się jednym kliknięciem.</string>
     <string name="import_successful">Importowanie zakończone!</string>

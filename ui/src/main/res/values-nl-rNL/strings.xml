@@ -857,7 +857,6 @@ Wilt u naar dit account wisselen?</string>
     <string name="step_1_of_3">Stap 1 van 3</string>
     <string name="export_your_saved_logins">Opgeslagen inloggegevens exporteren</string>
     <string name="delete_this_file_after_import_is_complete">Je verwijdert dit bestand zodra de import is afgerond.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">Open op je computer een nieuw browsertabblad en ga naar vault.bitwarden.com</string>
     <string name="log_in_to_the_bitwarden_web_app">Inloggen op de SecretDoor-webapp.</string>
     <string name="step_2_of_3">Stap 2 van 3</string>
     <string name="log_in_to_bitwarden">Inloggen op SecretDoor</string>
@@ -873,7 +872,6 @@ Wilt u naar dit account wisselen?</string>
     <string name="syncing_logins_loading_message">Inloggegevens synchroniseren...</string>
     <string name="download_the_browser_extension">Browserextensie downloaden</string>
     <string name="use_the_web_app">Webapp gebruiken</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Inloggen op bitwarden.com om je account en instellingen te beheren.</string>
     <string name="autofill_passwords">Wachtwoorden automatisch invullen</string>
     <string name="set_up_autofill_on_all_your_devices">Stel automatisch invullen in op al je apparaten zodat je overal met enkele tik kunt inloggen.</string>
     <string name="import_successful">Importeren gelukt!</string>

@@ -858,7 +858,6 @@ seleccione Agregar TOTP para almacenar la clave de forma segura</string>
     <string name="step_1_of_3">Paso 1 de 3</string>
     <string name="export_your_saved_logins">Exportar tus inicios de sesión guardados</string>
     <string name="delete_this_file_after_import_is_complete">Eliminarás este archivo después de que se complete la importación.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">En tu ordenador, abre una nueva pestaña del navegador y <annotation emphasis="bold">ve a <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Inicia sesión en la aplicación web de SecretDoor.</string>
     <string name="step_2_of_3">Paso 2 de 3</string>
     <string name="log_in_to_bitwarden">Iniciar sesión en SecretDoor</string>
@@ -874,7 +873,6 @@ seleccione Agregar TOTP para almacenar la clave de forma segura</string>
     <string name="syncing_logins_loading_message">Sincronizando inicios de sesión...</string>
     <string name="download_the_browser_extension">Descarga la extensión del navegador</string>
     <string name="use_the_web_app">Usa la aplicación web</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Inicia sesión en bitwarden.com para gestionar fácilmente tu cuenta y actualizar los ajustes.</string>
     <string name="autofill_passwords">Autorellenar contraseñas</string>
     <string name="set_up_autofill_on_all_your_devices">Configura el autocompletado en todos tus dispositivos para iniciar sesión con un solo toque en cualquier lugar.</string>
     <string name="import_successful">¡Importación exitosa!</string>

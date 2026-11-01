@@ -857,7 +857,6 @@
     <string name="step_1_of_3">3లో దశ 1</string>
     <string name="export_your_saved_logins">మీ సేవ్ చేసిన లాగిన్‌లను ఎగుమతి చేయి</string>
     <string name="delete_this_file_after_import_is_complete">దిగుమతి పూర్తయిన తర్వాత మీరు ఈ ఫైల్‌ను తొలగిస్తారు.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">మీ కంప్యూటర్‌లో, కొత్త బ్రౌజర్ ట్యాబ్ తెరిచి <annotation emphasis="bold"><annotation arg="0">%1$s</annotation>కి వెళ్ళండి</annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">SecretDoor వెబ్ యాప్‌కు లాగిన్ అవ్వండి.</string>
     <string name="step_2_of_3">3లో దశ 2</string>
     <string name="log_in_to_bitwarden">SecretDoorకు లాగిన్ అవ్వండి</string>
@@ -873,7 +872,6 @@
     <string name="syncing_logins_loading_message">లాగిన్‌లను సింక్ చేస్తోంది…</string>
     <string name="download_the_browser_extension">బ్రౌజర్ పొడిగింపును డౌన్‌లోడ్ చేయి</string>
     <string name="use_the_web_app">వెబ్ యాప్ ఉపయోగించండి</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">bitwarden.comలో మీ ఖాతాను సులభంగా నిర్వహించడానికి మరియు సెట్టింగ్‌లను నవీకరించడానికి లాగిన్ అవ్వండి.</string>
     <string name="autofill_passwords">పాస్వర్డ్‌లను ఆటోఫిల్ చేయి</string>
     <string name="set_up_autofill_on_all_your_devices">ఎక్కడైనా ఒకే ట్యాప్‌తో లాగిన్ అవ్వడానికి మీ అన్ని పరికరాలలో ఆటోఫిల్ సెటప్ చేయండి.</string>
     <string name="import_successful">దిగుమతి విజయవంతమైంది!</string>

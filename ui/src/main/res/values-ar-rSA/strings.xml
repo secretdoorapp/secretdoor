@@ -877,7 +877,6 @@
     <string name="step_1_of_3">الخطوة 1 من 3</string>
     <string name="export_your_saved_logins">تصدير تسجيلاتك المحفوظة</string>
     <string name="delete_this_file_after_import_is_complete">سوف تحذف هذا الملف بعد اكتمال الاستيراد.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">على جهاز الكمبيوتر الخاص بك، افتح علامة تبويب جديدة للمتصفح و <annotation emphasis="bold">اذهب إلى <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">تسجيل الدخول إلى تطبيق ويب SecretDoor.</string>
     <string name="step_2_of_3">الخطوة 2 من 3</string>
     <string name="log_in_to_bitwarden">تسجيل الدخول إلى SecretDoor</string>
@@ -894,7 +893,6 @@
     <string name="syncing_logins_loading_message">مزامنة تسجيلات الدخول…</string>
     <string name="download_the_browser_extension">تحميل ملحق المتصفح</string>
     <string name="use_the_web_app">استخدام تطبيق الويب</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">سجّل الدخول في bitwarden.com لإدارة حسابك بسهولة وتحديث الإعدادات.</string>
     <string name="autofill_passwords">الملء التلقائي لكلمات المرور</string>
     <string name="set_up_autofill_on_all_your_devices">إعدادالملء التلقائي على جميع الأجهزة الخاصة بك لتسجيل الدخول بنقرة واحدة في أي مكان.</string>
     <string name="import_successful">تم الاستيراد بنجاح!</string>

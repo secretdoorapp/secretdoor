@@ -857,7 +857,6 @@
     <string name="step_1_of_3">مرحلهٔ ۱ از ۳</string>
     <string name="export_your_saved_logins">ورودهای ذخیره‌شده را برون ریزی کنید</string>
     <string name="delete_this_file_after_import_is_complete">پس از اتمام درون ریزی، این پرونده را حذف خواهید کرد.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">روی رایانه خود، یک تب جدید در مرورگر باز کنید و <annotation emphasis="bold">به <annotation arg="0">%1$s</annotation></annotation> بروید</string>
     <string name="log_in_to_the_bitwarden_web_app">به برنامه وب SecretDoor وارد شوید.</string>
     <string name="step_2_of_3">مرحلهٔ ۲ از ۳</string>
     <string name="log_in_to_bitwarden">وارد SecretDoor شوید</string>
@@ -873,7 +872,6 @@
     <string name="syncing_logins_loading_message">همگام‌سازی ورودها…</string>
     <string name="download_the_browser_extension">افزونه مرورگر را بارگیری کنید</string>
     <string name="use_the_web_app">از برنامه وب استفاده کنید</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">در bitwarden.com وارد شوید تا به‌راحتی حساب کاربری خود را مدیریت کرده و تنظیمات را به‌روزرسانی کنید.</string>
     <string name="autofill_passwords">پر کردن خودکار کلمات عبور</string>
     <string name="set_up_autofill_on_all_your_devices">تنظیمات پر کردن خودکار را روی همه دستگاه‌های خود فعال کنید تا بتوانید تنها با یک ضربه در هر جایی وارد شوید.</string>
     <string name="import_successful">درون ریزی با موفقیت انجام شد!</string>

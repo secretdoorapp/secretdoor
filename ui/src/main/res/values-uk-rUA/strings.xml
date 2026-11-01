@@ -867,7 +867,6 @@
     <string name="step_1_of_3">Крок 1 з 3</string>
     <string name="export_your_saved_logins">Експортуйте збережені записи</string>
     <string name="delete_this_file_after_import_is_complete">Після завершення імпорту видаліть цей файл.</string>
-    <string name="on_your_computer_open_a_new_browser_tab_and_go_to_vault_bitwarden_com">На вашому комп\'ютері відкрийте нову вкладку браузера і <annotation emphasis="bold">перейдіть до <annotation arg="0">%1$s</annotation></annotation></string>
     <string name="log_in_to_the_bitwarden_web_app">Увійдіть у вебпрограму SecretDoor.</string>
     <string name="step_2_of_3">Крок 2 з 3</string>
     <string name="log_in_to_bitwarden">Увійдіть у SecretDoor</string>
@@ -883,7 +882,6 @@
     <string name="syncing_logins_loading_message">Синхронізація записів…</string>
     <string name="download_the_browser_extension">Завантажити розширення браузера</string>
     <string name="use_the_web_app">Використовувати вебпрограму</string>
-    <string name="log_in_at_bitwarden_com_to_easily_manage_your_account">Увійдіть на bitwarden.com, щоб легко керувати обліковим записом і змінювати налаштування.</string>
     <string name="autofill_passwords">Автозаповнення паролів</string>
     <string name="set_up_autofill_on_all_your_devices">Налаштуйте автозаповнення на всіх пристроях для входу одним дотиком.</string>
     <string name="import_successful">Успішно імпортовано!</string>
