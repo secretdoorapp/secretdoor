@@ -14,7 +14,6 @@ import com.x8bit.bitwarden.data.auth.manager.UserLogoutManager
 import com.x8bit.bitwarden.data.auth.manager.UserLogoutManagerImpl
 import com.x8bit.bitwarden.data.auth.manager.UserStateManager
 import com.x8bit.bitwarden.data.auth.manager.UserStateManagerImpl
-import com.x8bit.bitwarden.data.platform.datasource.disk.PushDiskSource
 import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.data.platform.manager.CredentialExchangeRegistryManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
@@ -54,7 +53,6 @@ object AuthManagerModule {
         authDiskSource: AuthDiskSource,
         generatorDiskSource: GeneratorDiskSource,
         passwordHistoryDiskSource: PasswordHistoryDiskSource,
-        pushDiskSource: PushDiskSource,
         settingsDiskSource: SettingsDiskSource,
         toastManager: ToastManager,
         vaultDiskSource: VaultDiskSource,
@@ -66,7 +64,6 @@ object AuthManagerModule {
             authDiskSource = authDiskSource,
             generatorDiskSource = generatorDiskSource,
             passwordHistoryDiskSource = passwordHistoryDiskSource,
-            pushDiskSource = pushDiskSource,
             settingsDiskSource = settingsDiskSource,
             toastManager = toastManager,
             vaultDiskSource = vaultDiskSource,

@@ -10,7 +10,6 @@ import com.x8bit.bitwarden.data.auth.datasource.disk.model.AccountJson
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.AccountTokensJson
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.UserStateJson
 import com.x8bit.bitwarden.data.auth.repository.model.LogoutReason
-import com.x8bit.bitwarden.data.platform.datasource.disk.PushDiskSource
 import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.data.platform.manager.CredentialExchangeRegistryManager
 import com.x8bit.bitwarden.data.platform.manager.model.UnregisterExportResult
@@ -49,9 +48,6 @@ class UserLogoutManagerTest {
             storeVaultPolicyBannerDismissedDate(userId = any(), dismissalRevisionDate = any())
         } just runs
     }
-    private val pushDiskSource: PushDiskSource = mockk {
-        coEvery { clearData(any()) } just runs
-    }
     private val passwordHistoryDiskSource: PasswordHistoryDiskSource = mockk {
         coEvery { clearPasswordHistories(any()) } just runs
     }
@@ -73,7 +69,6 @@ class UserLogoutManagerTest {
             authDiskSource = authDiskSource,
             generatorDiskSource = generatorDiskSource,
             passwordHistoryDiskSource = passwordHistoryDiskSource,
-            pushDiskSource = pushDiskSource,
             settingsDiskSource = settingsDiskSource,
             toastManager = toastManager,
             vaultDiskSource = vaultDiskSource,
@@ -348,7 +343,6 @@ class UserLogoutManagerTest {
         verify { vaultSdkSource.clearCrypto(userId = userId) }
         verify { authDiskSource.clearData(userId = userId) }
         verify { generatorDiskSource.clearData(userId = userId) }
-        verify { pushDiskSource.clearData(userId = userId) }
         verify { settingsDiskSource.clearData(userId = userId) }
         coVerify { passwordHistoryDiskSource.clearPasswordHistories(userId = userId) }
         coVerify {
