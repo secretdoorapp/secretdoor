@@ -73,20 +73,6 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var debugLaunchManager: DebugMenuLaunchManager
 
-    private val duoLauncher = AuthTabIntent.registerActivityResultLauncher(this) {
-        mainViewModel.trySendAction(MainAction.DuoResult(it))
-    }
-    private val ssoLauncher = AuthTabIntent.registerActivityResultLauncher(this) {
-        mainViewModel.trySendAction(MainAction.SsoResult(it))
-    }
-    private val webAuthnLauncher = AuthTabIntent.registerActivityResultLauncher(this) {
-        mainViewModel.trySendAction(MainAction.WebAuthnResult(it))
-    }
-
-    private val cookieLauncher = AuthTabIntent.registerActivityResultLauncher(this) {
-        mainViewModel.trySendAction(MainAction.CookieAcquisitionResult(it))
-    }
-
     private val premiumCheckoutLauncher = AuthTabIntent.registerActivityResultLauncher(this) {
         mainViewModel.trySendAction(MainAction.PremiumCheckoutResult(it))
     }
@@ -97,10 +83,6 @@ class MainActivity : AppCompatActivity() {
 
     private val authTabLaunchers by lazy {
         AuthTabLaunchers(
-            duo = duoLauncher,
-            sso = ssoLauncher,
-            webAuthn = webAuthnLauncher,
-            cookie = cookieLauncher,
             premiumCheckout = premiumCheckoutLauncher,
             stripePortal = stripePortalLauncher,
         )

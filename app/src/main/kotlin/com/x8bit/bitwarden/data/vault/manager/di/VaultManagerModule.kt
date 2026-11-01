@@ -12,7 +12,6 @@ import com.bitwarden.ui.platform.feature.cardscanner.manager.CardScanManagerImpl
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
 import com.x8bit.bitwarden.data.auth.datasource.sdk.AuthSdkSource
 import com.x8bit.bitwarden.data.auth.manager.KdfManager
-import com.x8bit.bitwarden.data.auth.manager.TrustedDeviceManager
 import com.x8bit.bitwarden.data.auth.manager.UserLogoutManager
 import com.x8bit.bitwarden.data.auth.manager.UserStateManager
 import com.x8bit.bitwarden.data.autofill.manager.FillAssistManager
@@ -154,7 +153,6 @@ object VaultManagerModule {
         appStateManager: AppStateManager,
         userLogoutManager: UserLogoutManager,
         dispatcherManager: DispatcherManager,
-        trustedDeviceManager: TrustedDeviceManager,
         kdfManager: KdfManager,
         pinProtectedUserKeyManager: PinProtectedUserKeyManager,
         passwordPolicyManager: PasswordPolicyManager,
@@ -171,7 +169,6 @@ object VaultManagerModule {
             appStateManager = appStateManager,
             userLogoutManager = userLogoutManager,
             dispatcherManager = dispatcherManager,
-            trustedDeviceManager = trustedDeviceManager,
             kdfManager = kdfManager,
             pinProtectedUserKeyManager = pinProtectedUserKeyManager,
             passwordPolicyManager = passwordPolicyManager,

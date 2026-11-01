@@ -16,7 +16,6 @@ import com.x8bit.bitwarden.ui.credentials.manager.CredentialProviderCompletionMa
 import com.x8bit.bitwarden.ui.platform.composition.LocalManagerProvider
 import com.x8bit.bitwarden.ui.platform.manager.biometrics.BiometricsManager
 import com.x8bit.bitwarden.ui.platform.manager.keychain.KeyChainManager
-import com.x8bit.bitwarden.ui.platform.manager.nfc.NfcManager
 import com.x8bit.bitwarden.ui.platform.manager.permissions.PermissionsManager
 import com.x8bit.bitwarden.ui.platform.manager.review.AppReviewManager
 import com.x8bit.bitwarden.ui.platform.model.AuthTabLaunchers
@@ -45,7 +44,6 @@ abstract class BitwardenComposeTest : BaseComposeTest() {
         intentManager: IntentManager = mockk(),
         credentialProviderCompletionManager: CredentialProviderCompletionManager = mockk(),
         keyChainManager: KeyChainManager = mockk(),
-        nfcManager: NfcManager = mockk(),
         permissionsManager: PermissionsManager = mockk(),
         credentialExchangeImporter: CredentialExchangeImporter = mockk(),
         credentialExchangeCompletionManager: CredentialExchangeCompletionManager = mockk(),
@@ -66,7 +64,6 @@ abstract class BitwardenComposeTest : BaseComposeTest() {
                 intentManager = intentManager,
                 credentialProviderCompletionManager = credentialProviderCompletionManager,
                 keyChainManager = keyChainManager,
-                nfcManager = nfcManager,
                 permissionsManager = permissionsManager,
                 credentialExchangeImporter = credentialExchangeImporter,
                 credentialExchangeCompletionManager = credentialExchangeCompletionManager,

@@ -26,7 +26,6 @@ import com.x8bit.bitwarden.data.auth.datasource.disk.model.ForcePasswordResetRea
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.UserStateJson
 import com.x8bit.bitwarden.data.auth.datasource.sdk.AuthSdkSource
 import com.x8bit.bitwarden.data.auth.manager.KdfManager
-import com.x8bit.bitwarden.data.auth.manager.TrustedDeviceManager
 import com.x8bit.bitwarden.data.auth.manager.UserLogoutManager
 import com.x8bit.bitwarden.data.auth.repository.model.LogoutReason
 import com.x8bit.bitwarden.data.auth.repository.model.UpdateKdfMinimumsResult
@@ -101,7 +100,6 @@ internal class VaultLockManagerImpl(
     private val settingsRepository: SettingsRepository,
     private val appStateManager: AppStateManager,
     private val userLogoutManager: UserLogoutManager,
-    private val trustedDeviceManager: TrustedDeviceManager,
     private val kdfManager: KdfManager,
     private val pinProtectedUserKeyManager: PinProtectedUserKeyManager,
     private val passwordPolicyManager: PasswordPolicyManager,
@@ -267,7 +265,6 @@ internal class VaultLockManagerImpl(
         Timber.d("[Auth] Vault unlocked, method: %s", initUserCryptoMethod.logTag)
         processMasterPassword(initUserCryptoMethod = initUserCryptoMethod, userId = userId)
         clearInvalidUnlockCount(userId = userId)
-        trustedDeviceManager.trustThisDeviceIfNecessary(userId = userId)
         updateKdfIfNeeded(userId = userId, initUserCryptoMethod = initUserCryptoMethod)
         pinProtectedUserKeyManager.migratePinProtectedUserKeyIfNeeded(userId = userId)
         setVaultToUnlocked(userId = userId)

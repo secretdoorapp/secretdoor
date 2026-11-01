@@ -3,14 +3,12 @@ package com.x8bit.bitwarden.ui.platform.feature.overlaynav
 import androidx.lifecycle.viewModelScope
 import com.bitwarden.ui.platform.base.BaseViewModel
 import com.bitwarden.ui.platform.base.DeferredBackgroundEvent
-import com.x8bit.bitwarden.data.platform.manager.CookieAcquisitionRequestManager
 import com.x8bit.bitwarden.data.platform.manager.network.NetworkPermissionManager
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNot
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -21,7 +19,6 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class OverlayNavViewModel @Inject constructor(
-    cookieAcquisitionRequestManager: CookieAcquisitionRequestManager,
     networkPermissionManager: NetworkPermissionManager,
     vaultRepository: VaultRepository,
     settingsRepository: SettingsRepository,
@@ -38,13 +35,6 @@ class OverlayNavViewModel @Inject constructor(
             .isLocalNetworkAccessRequiredStateFlow
             .filter { it }
             .map { OverlayNavAction.Internal.LocalNetworkAccessRequired }
-            .onEach(::sendAction)
-            .launchIn(viewModelScope)
-
-        cookieAcquisitionRequestManager
-            .cookieAcquisitionRequestFlow
-            .filterNotNull()
-            .map { OverlayNavAction.Internal.CookieAcquisitionReady }
             .onEach(::sendAction)
             .launchIn(viewModelScope)
 
@@ -67,7 +57,6 @@ class OverlayNavViewModel @Inject constructor(
                 handleAccessibilityDisclosureRequired()
             }
 
-            OverlayNavAction.Internal.CookieAcquisitionReady -> handleCookieAcquisitionReady()
             OverlayNavAction.Internal.LocalNetworkAccessRequired -> {
                 handleLocalNetworkAccessRequired()
             }
@@ -78,10 +67,6 @@ class OverlayNavViewModel @Inject constructor(
 
     private fun handleAccessibilityDisclosureRequired() {
         sendEvent(OverlayNavEvent.NavigateToAccessibilityDisclosure)
-    }
-
-    private fun handleCookieAcquisitionReady() {
-        sendEvent(OverlayNavEvent.NavigateToCookieAcquisition)
     }
 
     private fun handleLocalNetworkAccessRequired() {
@@ -103,11 +88,6 @@ sealed class OverlayNavEvent {
     data object NavigateToUpdateBiometrics : OverlayNavEvent(), DeferredBackgroundEvent
 
     /**
-     * Navigate to the cookie acquisition screen.
-     */
-    data object NavigateToCookieAcquisition : OverlayNavEvent(), DeferredBackgroundEvent
-
-    /**
      * Navigate to the local network access screen.
      */
     data object NavigateToLocalNetworkAccess : OverlayNavEvent(), DeferredBackgroundEvent
@@ -126,12 +106,6 @@ sealed class OverlayNavAction {
      * Internal ViewModel actions.
      */
     sealed class Internal : OverlayNavAction() {
-
-        /**
-         * Indicates that the cookie acquisition conditions are met and navigation
-         * should proceed.
-         */
-        data object CookieAcquisitionReady : Internal()
 
         /**
          * Indicates that the local network access is required.
