@@ -62,6 +62,26 @@ def rounded_mask(size, radius_px):
     return big.resize((size, size), Image.LANCZOS)
 
 
+BLUE_HUE = 197 / 360  # matches the cyan glow of the Credit Cards / Notes / Identities tiles
+
+
+def blue_tone(art):
+    """Moves the warm (orange/gold) hues of art to blue, leaving greys and alpha alone."""
+    alpha = art.getchannel('A')
+    h, s, v = art.convert('RGB').convert('HSV').split()
+    target = round(BLUE_HUE * 255)
+    sat = s.load()
+    hue = h.load()
+    for y in range(art.height):
+        for x in range(art.width):
+            # Only recolor saturated pixels; grey metal (low saturation) keeps its hue.
+            if sat[x, y] > 40:
+                hue[x, y] = target
+    out = Image.merge('HSV', (h, s, v)).convert('RGB')
+    out.putalpha(alpha)
+    return out
+
+
 def badge(sheet, spec, out_px):
     """Cuts a round badge out of the sheet and returns it as an RGBA square of out_px."""
     cx, cy, r = spec
@@ -185,6 +205,11 @@ def main(argv):
     # Unlock header: Master Key badge, 88dp.
     written += write_density_set(
         UI_RES, 'art_master_key', lambda s: badge(sheet, MASTER_KEY, round(88 * s)),
+    )
+    # SSH key row: the Master Key badge in blue, 36dp.
+    written += write_density_set(
+        UI_RES, 'art_type_ssh_key',
+        lambda s: blue_tone(badge(sheet, MASTER_KEY, round(36 * s))),
     )
     # Vault "Types" rows: 36dp rounded tiles.
     for name in TILES:

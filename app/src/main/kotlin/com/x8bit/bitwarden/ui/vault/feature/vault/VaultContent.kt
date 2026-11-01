@@ -431,6 +431,7 @@ private fun LazyListScope.typesSection(
                 iconRes = BitwardenDrawable.ic_ssh_key,
                 testTag = "SshKeyCipherIcon",
             ),
+            startImageRes = BitwardenDrawable.art_type_ssh_key,
             label = stringResource(id = BitwardenString.type_ssh_key),
             supportingLabel = state.sshKeyItemsCount.toString(),
             onClick = vaultHandlers.sshKeyGroupClick,

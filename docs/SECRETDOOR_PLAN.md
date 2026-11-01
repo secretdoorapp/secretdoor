@@ -170,8 +170,8 @@ stored key material.
     `design/icon-review/sheet_icons_preview.png`): "Access Control / Handle" badge for the
     launcher (all build types), splash and autofill logo, with a vector themed-icon glyph;
     sheet artwork for the vault Types rows (Login, Card, Identity, Secure note), the same four
-    tiles as the empty-vault illustration (replaces `ill_items`), and a Master Key badge above
-    the unlock field. Notification and shield glyphs stay from version 2.
+    tiles as the empty-vault illustration (replaces `ill_items`), a blue-toned Master Key badge
+    for the SSH key row, and the original orange Master Key badge above the unlock field. Notification and shield glyphs stay from version 2.
   - [x] Icons, version 2 (replaced; `design/icon-tools/vault_icon.py`, preview
     `design/icon-review/vault_icon_preview.png`): closed round steel vault door with a glowing
     digital padlock; launcher foreground and themed icon, splash icon, autofill logo,
