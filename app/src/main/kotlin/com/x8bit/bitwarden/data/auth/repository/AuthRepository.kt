@@ -6,6 +6,7 @@ import com.x8bit.bitwarden.data.auth.manager.KdfManager
 import com.x8bit.bitwarden.data.auth.manager.UserStateManager
 import com.x8bit.bitwarden.data.auth.repository.model.BreachCountResult
 import com.x8bit.bitwarden.data.auth.repository.model.ChangeMasterPasswordResult
+import com.x8bit.bitwarden.data.auth.repository.model.DeleteVaultResult
 import com.x8bit.bitwarden.data.auth.repository.model.PasswordStrengthResult
 import com.x8bit.bitwarden.data.auth.repository.model.DeleteAccountResult
 import com.x8bit.bitwarden.data.auth.repository.model.LogoutReason
@@ -31,6 +32,20 @@ interface AuthRepository :
      * passed for the [email] will use the active email of the current active account.
      */
     fun getPasswordStrength(email: String? = null, password: String): PasswordStrengthResult
+
+    /**
+     * Renames the vault with the given [userId] to [name]. A blank [name] clears the name, so the
+     * vault is shown as "My vault" again.
+     */
+    fun renameVault(userId: String, name: String)
+
+    /**
+     * Permanently deletes the vault with the given [userId] and everything stored for it on this
+     * device, after checking that [masterPassword] is that vault's master password. If the vault
+     * was not the active one it becomes the active vault while its password is checked, and the
+     * previously active vault is restored when the password is wrong.
+     */
+    suspend fun deleteVault(userId: String, masterPassword: String): DeleteVaultResult
 
     /**
      * Changes the active vault's master password from [currentPassword] to [newPassword]. The

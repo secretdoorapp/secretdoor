@@ -592,6 +592,12 @@ Scanning will happen automatically.</string>
     <string name="merge_into_this_vault">Merge into this vault</string>
     <string name="add_as_a_separate_vault">Add as a separate vault</string>
     <string name="vault_name">Vault name</string>
+    <string name="manage_vaults">Manage vaults</string>
+    <string name="rename_vault">Rename vault</string>
+    <string name="current_vault">Current vault</string>
+    <string name="create_a_new_vault">Create a new vault</string>
+    <string name="deleting_a_vault_removes_all_its_items_from_this_device_enter_its_master_password_to_confirm">Deleting a vault removes all its items from this device. Enter its master password to confirm.</string>
+    <string name="the_vault_could_not_be_deleted">The vault could not be deleted.</string>
     <string name="vault_x">Vault: %1$s</string>
     <string name="item_saved_but_these_files_could_not_be_attached_x">Item saved, but these files could not be attached: %1$s</string>
     <string name="add_file">Add file</string>

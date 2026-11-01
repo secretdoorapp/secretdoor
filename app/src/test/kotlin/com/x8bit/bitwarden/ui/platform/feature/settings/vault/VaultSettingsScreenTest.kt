@@ -28,6 +28,7 @@ class VaultSettingsScreenTest : BitwardenComposeTest() {
     private var onNavigateBackCalled = false
     private var onNavigateToExportVaultCalled = false
     private var onNavigateToFoldersCalled = false
+    private var onNavigateToManageVaultsCalled = false
     private val mutableEventFlow = bufferedMutableSharedFlow<VaultSettingsEvent>()
     private val mutableStateFlow = MutableStateFlow(DEFAULT_STATE)
 
@@ -47,6 +48,7 @@ class VaultSettingsScreenTest : BitwardenComposeTest() {
                 onNavigateToImportLogins = { onNavigateToImportLoginsCalled = true },
                 onNavigateToImportItems = { onNavigateToImportItemsCalled = true },
                 onNavigateToBackup = {},
+                onNavigateToManageVaults = { onNavigateToManageVaultsCalled = true },
             )
         }
     }
@@ -56,6 +58,18 @@ class VaultSettingsScreenTest : BitwardenComposeTest() {
         every { viewModel.trySendAction(VaultSettingsAction.BackClick) } just runs
         composeTestRule.onNodeWithContentDescription("Back").performClick()
         verify { viewModel.trySendAction(VaultSettingsAction.BackClick) }
+    }
+
+    @Test
+    fun `manage vaults click should send ManageVaultsClick`() {
+        composeTestRule.onNodeWithText("Manage vaults").performClick()
+        verify { viewModel.trySendAction(VaultSettingsAction.ManageVaultsClick) }
+    }
+
+    @Test
+    fun `NavigateToManageVaults should call onNavigateToManageVaults`() {
+        mutableEventFlow.tryEmit(VaultSettingsEvent.NavigateToManageVaults)
+        assertTrue(onNavigateToManageVaultsCalled)
     }
 
     @Test

@@ -51,6 +51,7 @@ import com.x8bit.bitwarden.data.auth.manager.UserStateManager
 import com.x8bit.bitwarden.data.auth.repository.model.BreachCountResult
 import com.x8bit.bitwarden.data.auth.repository.model.ChangeMasterPasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.DeleteAccountResult
+import com.x8bit.bitwarden.data.auth.repository.model.DeleteVaultResult
 import com.x8bit.bitwarden.data.auth.repository.model.LogoutReason
 import com.x8bit.bitwarden.data.auth.repository.model.RegisterResult
 import com.x8bit.bitwarden.data.auth.repository.model.SwitchAccountResult
@@ -675,6 +676,38 @@ class AuthRepositoryTest {
         }
 
     @Test
+    fun `createLocalVault should keep the vaults that already exist and make the new one active`() =
+        runTest {
+            fakeAuthDiskSource.userState = SINGLE_USER_STATE_1
+            coEvery {
+                authSdkSource.makeRegisterKeys(email = any(), password = PASSWORD, kdf = any())
+            } returns RegisterKeyResponse(
+                masterPasswordHash = PASSWORD_HASH,
+                encryptedUserKey = ENCRYPTED_USER_KEY,
+                keys = RsaKeyPair(public = PUBLIC_KEY, private = PRIVATE_KEY),
+            )
+                .asSuccess()
+            coEvery {
+                vaultRepository.unlockVaultWithMasterPassword(masterPassword = PASSWORD)
+            } returns VaultUnlockResult.Success
+
+            val result = repository.createLocalVault(
+                masterPassword = PASSWORD,
+                masterPasswordHint = null,
+                shouldCheckDataBreaches = false,
+                isMasterPasswordStrong = true,
+            )
+
+            assertEquals(RegisterResult.Success, result)
+            val userState = requireNotNull(fakeAuthDiskSource.userState)
+            assertEquals(2, userState.accounts.size)
+            assertEquals(ACCOUNT_1, userState.accounts[USER_ID_1])
+            assertTrue(userState.activeUserId != USER_ID_1)
+            assertTrue(userState.activeUserId in userState.accounts.keys)
+            verify(exactly = 1) { userStateManager.hasPendingAccountAddition = false }
+        }
+
+    @Test
     fun `createLocalVault with unlock failure should return Error`() = runTest {
         val error = Throwable("Fail")
         coEvery {
@@ -791,6 +824,125 @@ class AuthRepositoryTest {
         verify(exactly = 1) {
             userStateManager.hasPendingAccountAddition = false
         }
+    }
+
+    @Test
+    fun `renameVault should store the trimmed name for that vault only`() {
+        fakeAuthDiskSource.userState = MULTI_USER_STATE
+
+        repository.renameVault(userId = USER_ID_2, name = "  Work  ")
+
+        val accounts = requireNotNull(fakeAuthDiskSource.userState).accounts
+        assertEquals("Work", accounts[USER_ID_2]?.profile?.name)
+        assertEquals(ACCOUNT_1, accounts[USER_ID_1])
+    }
+
+    @Test
+    fun `renameVault with a blank name should clear the name`() {
+        fakeAuthDiskSource.userState = MULTI_USER_STATE
+        repository.renameVault(userId = USER_ID_2, name = "Work")
+
+        repository.renameVault(userId = USER_ID_2, name = "   ")
+
+        assertNull(requireNotNull(fakeAuthDiskSource.userState).accounts[USER_ID_2]?.profile?.name)
+    }
+
+    @Test
+    fun `renameVault for an unknown vault should change nothing`() {
+        fakeAuthDiskSource.userState = MULTI_USER_STATE
+
+        repository.renameVault(userId = "unknown", name = "Work")
+
+        assertEquals(MULTI_USER_STATE, fakeAuthDiskSource.userState)
+    }
+
+    @Test
+    fun `deleteVault for the unlocked active vault with the right password should delete it`() =
+        runTest {
+            val passwordHash = "passwordHash"
+            fakeAuthDiskSource.userState = MULTI_USER_STATE
+            fakeAuthDiskSource.storeMasterPasswordHash(
+                userId = USER_ID_1,
+                passwordHash = passwordHash,
+            )
+            every { vaultRepository.isVaultUnlocked(userId = USER_ID_1) } returns true
+            coEvery {
+                vaultSdkSource.validatePassword(
+                    userId = USER_ID_1,
+                    password = PASSWORD,
+                    passwordHash = passwordHash,
+                )
+            } returns true.asSuccess()
+
+            val result = repository.deleteVault(userId = USER_ID_1, masterPassword = PASSWORD)
+
+            assertEquals(DeleteVaultResult.Success, result)
+            verify(exactly = 1) {
+                userLogoutManager.logout(userId = USER_ID_1, reason = LogoutReason.AccountDelete)
+            }
+        }
+
+    @Test
+    fun `deleteVault with the wrong password should delete nothing`() = runTest {
+        val passwordHash = "passwordHash"
+        fakeAuthDiskSource.userState = MULTI_USER_STATE
+        fakeAuthDiskSource.storeMasterPasswordHash(userId = USER_ID_1, passwordHash = passwordHash)
+        every { vaultRepository.isVaultUnlocked(userId = USER_ID_1) } returns true
+        coEvery {
+            vaultSdkSource.validatePassword(
+                userId = USER_ID_1,
+                password = PASSWORD,
+                passwordHash = passwordHash,
+            )
+        } returns false.asSuccess()
+
+        val result = repository.deleteVault(userId = USER_ID_1, masterPassword = PASSWORD)
+
+        assertEquals(DeleteVaultResult.WrongPassword, result)
+        verify(exactly = 0) { userLogoutManager.logout(userId = any(), reason = any()) }
+    }
+
+    @Test
+    fun `deleteVault for another locked vault should unlock it to check the password`() =
+        runTest {
+            fakeAuthDiskSource.userState = MULTI_USER_STATE
+            every { vaultRepository.isVaultUnlocked(userId = USER_ID_2) } returns false
+            coEvery {
+                vaultRepository.unlockVaultWithMasterPassword(masterPassword = PASSWORD)
+            } returns VaultUnlockResult.Success
+
+            val result = repository.deleteVault(userId = USER_ID_2, masterPassword = PASSWORD)
+
+            assertEquals(DeleteVaultResult.Success, result)
+            verify(exactly = 1) {
+                userLogoutManager.logout(userId = USER_ID_2, reason = LogoutReason.AccountDelete)
+            }
+        }
+
+    @Test
+    fun `deleteVault for another vault with the wrong password should restore the active vault`() =
+        runTest {
+            fakeAuthDiskSource.userState = MULTI_USER_STATE
+            every { vaultRepository.isVaultUnlocked(userId = USER_ID_2) } returns false
+            coEvery {
+                vaultRepository.unlockVaultWithMasterPassword(masterPassword = PASSWORD)
+            } returns VaultUnlockResult.AuthenticationError(error = null)
+
+            val result = repository.deleteVault(userId = USER_ID_2, masterPassword = PASSWORD)
+
+            assertEquals(DeleteVaultResult.WrongPassword, result)
+            assertEquals(USER_ID_1, fakeAuthDiskSource.userState?.activeUserId)
+            verify(exactly = 0) { userLogoutManager.logout(userId = any(), reason = any()) }
+        }
+
+    @Test
+    fun `deleteVault for a vault that does not exist should return an error`() = runTest {
+        fakeAuthDiskSource.userState = MULTI_USER_STATE
+
+        val result = repository.deleteVault(userId = "unknown", masterPassword = PASSWORD)
+
+        assertTrue(result is DeleteVaultResult.Error)
+        verify(exactly = 0) { userLogoutManager.logout(userId = any(), reason = any()) }
     }
 
     @Test
