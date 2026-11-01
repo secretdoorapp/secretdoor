@@ -52,3 +52,11 @@ duplicates.txt
 .claude/settings.local.json
 compile.log
 compile.done
+
+# Local developer tooling
+.claude/
+apk.log
+apk.done
+test.log
+tests.done
+subset.*

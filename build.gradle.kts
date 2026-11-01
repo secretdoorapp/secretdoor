@@ -64,8 +64,8 @@ kover {
     merge {
         allProjects()
         createVariant("mergedCoverage") {
-            // Only run tests on the `StandardDebug` variant of the :app module.
-            add("standardDebug", optional = true)
+            // Only run tests on the `FdroidDebug` variant of the :app module.
+            add("fdroidDebug", optional = true)
 
             // Only run tests on the `debug` variants in all other modules.
             add("debug", optional = true)
