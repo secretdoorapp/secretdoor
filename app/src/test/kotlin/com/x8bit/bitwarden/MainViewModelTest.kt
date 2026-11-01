@@ -38,7 +38,6 @@ import com.x8bit.bitwarden.data.auth.repository.util.getDuoCallbackTokenResult
 import com.x8bit.bitwarden.data.auth.repository.util.getSsoCallbackResult
 import com.x8bit.bitwarden.data.auth.repository.util.getWebAuthResult
 import com.x8bit.bitwarden.data.auth.util.getCompleteRegistrationDataIntentOrNull
-import com.x8bit.bitwarden.data.auth.util.getPasswordlessRequestDataIntentOrNull
 import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilitySelectionManager
 import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilitySelectionManagerImpl
 import com.x8bit.bitwarden.data.autofill.manager.AutofillSelectionManager
@@ -63,7 +62,6 @@ import com.x8bit.bitwarden.data.platform.manager.garbage.GarbageCollectionManage
 import com.x8bit.bitwarden.data.platform.manager.model.AppResumeScreenData
 import com.x8bit.bitwarden.data.platform.manager.model.CompleteRegistrationData
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
-import com.x8bit.bitwarden.data.platform.manager.model.PasswordlessRequestData
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
@@ -190,7 +188,6 @@ class MainViewModelTest : BaseViewModelTest() {
     fun setup() {
         mockkStatic(
             Intent::getTotpDataOrNull,
-            Intent::getPasswordlessRequestDataIntentOrNull,
             Intent::getAutofillSaveItemOrNull,
             Intent::getAutofillSelectionDataOrNull,
             Intent::getCompleteRegistrationDataIntentOrNull,
@@ -223,7 +220,6 @@ class MainViewModelTest : BaseViewModelTest() {
     fun tearDown() {
         unmockkStatic(
             Intent::getTotpDataOrNull,
-            Intent::getPasswordlessRequestDataIntentOrNull,
             Intent::getAutofillSaveItemOrNull,
             Intent::getAutofillSelectionDataOrNull,
             Intent::getCompleteRegistrationDataIntentOrNull,
@@ -662,27 +658,6 @@ class MainViewModelTest : BaseViewModelTest() {
 
     @Suppress("MaxLineLength")
     @Test
-    fun `on ReceiveFirstIntent with a passwordless request data should set the special circumstance to PasswordlessRequest`() {
-        val viewModel = createViewModel()
-        val passwordlessRequestData = DEFAULT_PASSWORDLESS_REQUEST_DATA
-        val mockIntent = createMockIntent(mockPasswordlessRequestData = passwordlessRequestData)
-
-        viewModel.trySendAction(
-            MainAction.ReceiveFirstIntent(
-                intent = mockIntent,
-            ),
-        )
-        assertEquals(
-            SpecialCircumstance.PasswordlessRequest(
-                passwordlessRequestData = passwordlessRequestData,
-                shouldFinishWhenComplete = true,
-            ),
-            specialCircumstanceManager.specialCircumstance,
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
     fun `on ReceiveNewIntent with TOTP data should set the special circumstance to AddTotpLoginItem`() {
         val viewModel = createViewModel()
         val totpData = mockk<TotpData>()
@@ -763,27 +738,6 @@ class MainViewModelTest : BaseViewModelTest() {
         assertEquals(
             SpecialCircumstance.AutofillSave(
                 autofillSaveItem = autofillSaveItem,
-            ),
-            specialCircumstanceManager.specialCircumstance,
-        )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `on ReceiveNewIntent with a passwordless auth request data should set the special circumstance to PasswordlessRequest`() {
-        val viewModel = createViewModel()
-        val passwordlessRequestData = DEFAULT_PASSWORDLESS_REQUEST_DATA
-        val mockIntent = createMockIntent(mockPasswordlessRequestData = passwordlessRequestData)
-
-        viewModel.trySendAction(
-            MainAction.ReceiveNewIntent(
-                intent = mockIntent,
-            ),
-        )
-        assertEquals(
-            SpecialCircumstance.PasswordlessRequest(
-                passwordlessRequestData = passwordlessRequestData,
-                shouldFinishWhenComplete = false,
             ),
             specialCircumstanceManager.specialCircumstance,
         )
@@ -992,25 +946,6 @@ class MainViewModelTest : BaseViewModelTest() {
         verify(exactly = 0) {
             settingsRepository.storeUserHasLoggedInValue(userId = DEFAULT_USER_STATE.activeUserId)
         }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `on ReceiveNewIntent with a passwordless auth request data userId that doesn't match activeUserId and the vault is not locked should switchAccount`() {
-        val userId = "userId"
-        val viewModel = createViewModel()
-        val passwordlessRequestData = mockk<PasswordlessRequestData>()
-        val mockIntent = createMockIntent(mockPasswordlessRequestData = passwordlessRequestData)
-        every { vaultRepository.isVaultUnlocked(ACTIVE_USER_ID) } returns false
-        every { passwordlessRequestData.userId } returns userId
-
-        viewModel.trySendAction(
-            MainAction.ReceiveNewIntent(
-                intent = mockIntent,
-            ),
-        )
-
-        verify { authRepository.switchAccount(userId) }
     }
 
     @Suppress("MaxLineLength")
@@ -1363,15 +1298,9 @@ private val DEFAULT_USER_STATE = UserState(
     accounts = listOf(DEFAULT_ACCOUNT),
 )
 
-private val DEFAULT_PASSWORDLESS_REQUEST_DATA = PasswordlessRequestData(
-    userId = "activeUserId",
-    loginRequestId = "",
-)
-
 @Suppress("LongParameterList")
 private fun createMockIntent(
     mockTotpData: TotpData? = null,
-    mockPasswordlessRequestData: PasswordlessRequestData? = null,
     mockAutofillSaveItem: AutofillSaveItem? = null,
     mockAutofillSelectionData: AutofillSelectionData? = null,
     mockCompleteRegistrationData: CompleteRegistrationData? = null,
@@ -1384,7 +1313,6 @@ private fun createMockIntent(
     mockDataUri: Uri? = null,
 ): Intent = mockk<Intent> {
     every { getTotpDataOrNull() } returns mockTotpData
-    every { getPasswordlessRequestDataIntentOrNull() } returns mockPasswordlessRequestData
     every { getAutofillSaveItemOrNull() } returns mockAutofillSaveItem
     every { getAutofillSelectionDataOrNull() } returns mockAutofillSelectionData
     every { getCompleteRegistrationDataIntentOrNull() } returns mockCompleteRegistrationData

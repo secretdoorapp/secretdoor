@@ -85,7 +85,6 @@ fun AccountSecurityScreen(
     onNavigateToDeleteAccount: () -> Unit,
     onNavigateToChangeMasterPassword: () -> Unit,
     onNavigateToSetupUnlockScreen: () -> Unit,
-    onNavigateToManageDevices: () -> Unit,
     viewModel: AccountSecurityViewModel = hiltViewModel(),
     biometricsManager: BiometricsManager = LocalBiometricsManager.current,
     intentManager: IntentManager = LocalIntentManager.current,
@@ -113,8 +112,6 @@ fun AccountSecurityScreen(
             AccountSecurityEvent.NavigateToChangeMasterPassword -> {
                 onNavigateToChangeMasterPassword()
             }
-
-            is AccountSecurityEvent.NavigateToManageDevices -> onNavigateToManageDevices()
 
             is AccountSecurityEvent.ShowBiometricsPrompt -> {
                 showBiometricsPrompt = true
@@ -325,19 +322,6 @@ fun AccountSecurityScreen(
                     .standardHorizontalMargin()
                     .fillMaxWidth(),
             )
-            if (state.isManageDevicesEnabled) {
-                BitwardenTextRow(
-                    text = stringResource(id = BitwardenString.devices),
-                    onClick = {
-                        viewModel.trySendAction(AccountSecurityAction.ManageDevicesClick)
-                    },
-                    cardStyle = CardStyle.Middle(),
-                    modifier = Modifier
-                        .testTag("ManageDevicesLabel")
-                        .standardHorizontalMargin()
-                        .fillMaxWidth(),
-                )
-            }
             if (state.isUnlockWithPasswordEnabled) {
                 BitwardenTextRow(
                     text = stringResource(id = BitwardenString.change_master_password),

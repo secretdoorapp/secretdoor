@@ -69,15 +69,6 @@ class AccountSecurityViewModelTest : BaseViewModelTest() {
         every { isUnlockWithPinEnabledFlow } returns mutablePinUnlockEnabledFlow
     }
 
-    private val mutableManageDevicesFlagFlow = MutableStateFlow(false)
-    private val featureFlagManager: FeatureFlagManager = mockk {
-        every {
-            getFeatureFlag(FlagKey.ManageDevices)
-        } answers {
-            mutableManageDevicesFlagFlow.value
-        }
-        every { getFeatureFlagFlow(FlagKey.ManageDevices) } returns mutableManageDevicesFlagFlow
-    }
 
     private val mutableFirstTimeStateFlow = MutableStateFlow(FirstTimeState())
     private val firstTimeActionManager: FirstTimeActionManager = mockk {
@@ -674,38 +665,16 @@ class AccountSecurityViewModelTest : BaseViewModelTest() {
         )
     }
 
-    @Test
-    fun `on ManageDevicesClick should emit NavigateToManageDevices`() = runTest {
-        val viewModel = createViewModel()
-        viewModel.eventFlow.test {
-            viewModel.trySendAction(AccountSecurityAction.ManageDevicesClick)
-            assertEquals(AccountSecurityEvent.NavigateToManageDevices, awaitItem())
-        }
-    }
-
-    @Test
-    fun `when ManageDevices flag updates, should update isManageDevicesEnabled state`() = runTest {
-        val viewModel = createViewModel()
-        mutableManageDevicesFlagFlow.emit(true)
-        val expectedState = DEFAULT_STATE.copy(isManageDevicesEnabled = true)
-        assertEquals(
-            viewModel.stateFlow.value,
-            expectedState,
-        )
-    }
-
     @Suppress("LongParameterList")
     private fun createViewModel(
         initialState: AccountSecurityState? = DEFAULT_STATE,
         authRepository: AuthRepository = this.authRepository,
         vaultRepository: VaultRepository = this.vaultRepository,
         settingsRepository: SettingsRepository = this.settingsRepository,
-        featureFlagManager: FeatureFlagManager = this.featureFlagManager,
     ): AccountSecurityViewModel = AccountSecurityViewModel(
         authRepository = authRepository,
         vaultRepository = vaultRepository,
         settingsRepository = settingsRepository,
-        featureFlagManager = featureFlagManager,
         savedStateHandle = SavedStateHandle().apply {
             set("state", initialState)
         },
@@ -780,7 +749,6 @@ private val DEFAULT_STATE: AccountSecurityState = AccountSecurityState(
     isUnlockWithBiometricsEnabled = false,
     isUnlockWithPasswordEnabled = true,
     isUnlockWithPinEnabled = false,
-    isManageDevicesEnabled = false,
     userId = DEFAULT_USER_ID,
     vaultTimeout = VaultTimeout.ThirtyMinutes,
     vaultTimeoutAction = VaultTimeoutAction.LOCK,

@@ -18,7 +18,6 @@ import com.x8bit.bitwarden.data.auth.manager.UserStateManager
 import com.x8bit.bitwarden.data.autofill.manager.FillAssistManager
 import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.data.platform.manager.DatabaseSchemeManager
-import com.x8bit.bitwarden.data.platform.manager.PushManager
 import com.x8bit.bitwarden.data.platform.manager.ReviewPromptManager
 import com.x8bit.bitwarden.data.platform.manager.keyrotation.KeyRotationManager
 import com.x8bit.bitwarden.data.platform.manager.policy.PasswordPolicyManager
@@ -217,7 +216,6 @@ object VaultManagerModule {
         vaultLockManager: VaultLockManager,
         clock: Clock,
         databaseSchemeManager: DatabaseSchemeManager,
-        pushManager: PushManager,
         dispatcherManager: DispatcherManager,
     ): VaultSyncManager = VaultSyncManagerImpl(
         fillAssistManager = fillAssistManager,
@@ -231,7 +229,6 @@ object VaultManagerModule {
         vaultLockManager = vaultLockManager,
         clock = clock,
         databaseSchemeManager = databaseSchemeManager,
-        pushManager = pushManager,
         dispatcherManager = dispatcherManager,
     )
 

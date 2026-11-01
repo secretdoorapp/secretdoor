@@ -28,10 +28,6 @@ import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.deleteac
 import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.deleteaccount.navigateToDeleteAccount
 import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.deleteaccountconfirmation.deleteAccountConfirmationDestination
 import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.deleteaccountconfirmation.navigateToDeleteAccountConfirmation
-import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.loginapproval.loginApprovalDestination
-import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.loginapproval.navigateToLoginApproval
-import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.managedevices.manageDevicesDestination
-import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.managedevices.navigateToManageDevices
 import com.x8bit.bitwarden.ui.platform.feature.settings.autofill.privilegedapps.about.aboutPrivilegedAppsDestination
 import com.x8bit.bitwarden.ui.platform.feature.settings.autofill.privilegedapps.about.navigateToAboutPrivilegedAppsScreen
 import com.x8bit.bitwarden.ui.platform.feature.settings.exportvault.exportVaultDestination
@@ -119,7 +115,6 @@ fun NavGraphBuilder.vaultUnlockedGraph(
             onNavigateToSearchVault = { navController.navigateToSearch(searchType = it) },
             onNavigateToDeleteAccount = { navController.navigateToDeleteAccount() },
             onNavigateToChangeMasterPassword = { navController.navigateToChangeMasterPassword() },
-            onNavigateToManageDevices = { navController.navigateToManageDevices() },
             onNavigateToPasswordHistory = {
                 navController.navigateToPasswordHistory(
                     passwordHistoryMode = GeneratorPasswordHistoryMode.Default,
@@ -169,11 +164,6 @@ fun NavGraphBuilder.vaultUnlockedGraph(
         )
         deleteAccountConfirmationDestination(
             onNavigateBack = { navController.popBackStack() },
-        )
-        loginApprovalDestination(onNavigateBack = { navController.popBackStack() })
-        manageDevicesDestination(
-            onNavigateBack = { navController.popBackStack() },
-            onNavigateToLoginApproval = { navController.navigateToLoginApproval(it) },
         )
         vaultAddEditDestination(
             onNavigateToQrCodeScanScreen = {

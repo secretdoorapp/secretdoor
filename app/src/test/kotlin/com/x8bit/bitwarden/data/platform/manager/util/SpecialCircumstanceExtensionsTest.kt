@@ -38,8 +38,6 @@ class SpecialCircumstanceExtensionsTest {
                 shouldFinishWhenComplete = true,
             ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
-            SpecialCircumstance.PasswordlessRequest(
-                passwordlessRequestData = mockk(),
                 shouldFinishWhenComplete = true,
             ),
             SpecialCircumstance.ProviderCreateCredential(
@@ -87,8 +85,6 @@ class SpecialCircumstanceExtensionsTest {
                 autofillSaveItem = mockk(),
             ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
-            SpecialCircumstance.PasswordlessRequest(
-                passwordlessRequestData = mockk(),
                 shouldFinishWhenComplete = true,
             ),
             SpecialCircumstance.ProviderCreateCredential(
@@ -122,8 +118,6 @@ class SpecialCircumstanceExtensionsTest {
                 autofillSaveItem = mockk(),
             ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
-            SpecialCircumstance.PasswordlessRequest(
-                passwordlessRequestData = mockk(),
                 shouldFinishWhenComplete = true,
             ),
             SpecialCircumstance.Fido2Assertion(
@@ -186,8 +180,6 @@ class SpecialCircumstanceExtensionsTest {
                 autofillSaveItem = mockk(),
             ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
-            SpecialCircumstance.PasswordlessRequest(
-                passwordlessRequestData = mockk(),
                 shouldFinishWhenComplete = true,
             ),
             SpecialCircumstance.ProviderGetPasswordRequest(
@@ -231,8 +223,6 @@ class SpecialCircumstanceExtensionsTest {
                 autofillSaveItem = mockk(),
             ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
-            SpecialCircumstance.PasswordlessRequest(
-                passwordlessRequestData = mockk(),
                 shouldFinishWhenComplete = true,
             ),
             SpecialCircumstance.ProviderCreateCredential(
@@ -276,8 +266,6 @@ class SpecialCircumstanceExtensionsTest {
                 autofillSaveItem = mockk(),
             ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
-            SpecialCircumstance.PasswordlessRequest(
-                passwordlessRequestData = mockk(),
                 shouldFinishWhenComplete = true,
             ),
             SpecialCircumstance.ProviderCreateCredential(
@@ -311,7 +299,6 @@ class SpecialCircumstanceExtensionsTest {
         listOf(
             mockk<SpecialCircumstance.AutofillSelection>(),
             mockk<SpecialCircumstance.AutofillSave>(),
-            mockk<SpecialCircumstance.PasswordlessRequest>(),
             mockk<SpecialCircumstance.ProviderCreateCredential>(),
             mockk<SpecialCircumstance.Fido2Assertion>(),
             mockk<SpecialCircumstance.ProviderGetPasswordRequest>(),
@@ -353,8 +340,6 @@ class SpecialCircumstanceExtensionsTest {
                 autofillSaveItem = mockk(),
             ),
             mockk<SpecialCircumstance.AddTotpLoginItem>(),
-            SpecialCircumstance.PasswordlessRequest(
-                passwordlessRequestData = mockk(),
                 shouldFinishWhenComplete = true,
             ),
             SpecialCircumstance.ProviderCreateCredential(

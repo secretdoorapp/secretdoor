@@ -11,10 +11,6 @@ import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
 import com.x8bit.bitwarden.data.auth.datasource.sdk.AuthSdkSource
 import com.x8bit.bitwarden.data.auth.manager.AddTotpItemFromAuthenticatorManager
 import com.x8bit.bitwarden.data.auth.manager.AddTotpItemFromAuthenticatorManagerImpl
-import com.x8bit.bitwarden.data.auth.manager.AuthRequestManager
-import com.x8bit.bitwarden.data.auth.manager.AuthRequestManagerImpl
-import com.x8bit.bitwarden.data.auth.manager.AuthRequestNotificationManager
-import com.x8bit.bitwarden.data.auth.manager.AuthRequestNotificationManagerImpl
 import com.x8bit.bitwarden.data.auth.manager.AuthStateManager
 import com.x8bit.bitwarden.data.auth.manager.AuthStateManagerImpl
 import com.x8bit.bitwarden.data.auth.manager.AuthTokenManager
@@ -35,7 +31,6 @@ import com.x8bit.bitwarden.data.platform.manager.CredentialExchangeRegistryManag
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.FirstTimeActionManager
 import com.x8bit.bitwarden.data.platform.manager.PolicyManager
-import com.x8bit.bitwarden.data.platform.manager.PushManager
 import com.x8bit.bitwarden.data.platform.manager.policy.UserNotificationPolicyManager
 import com.x8bit.bitwarden.data.tools.generator.datasource.disk.GeneratorDiskSource
 import com.x8bit.bitwarden.data.tools.generator.datasource.disk.PasswordHistoryDiskSource
@@ -56,42 +51,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AuthManagerModule {
-
-    @Provides
-    @Singleton
-    fun provideAuthRequestNotificationManager(
-        @ApplicationContext context: Context,
-        authDiskSource: AuthDiskSource,
-        pushManager: PushManager,
-        dispatcherManager: DispatcherManager,
-    ): AuthRequestNotificationManager =
-        AuthRequestNotificationManagerImpl(
-            context = context,
-            authDiskSource = authDiskSource,
-            pushManager = pushManager,
-            dispatcherManager = dispatcherManager,
-        )
-
-    @Provides
-    @Singleton
-    fun provideAuthRequestManager(
-        clock: Clock,
-        authRequestsService: AuthRequestsService,
-        newAuthRequestService: NewAuthRequestService,
-        authSdkSource: AuthSdkSource,
-        vaultSdkSource: VaultSdkSource,
-        authDiskSource: AuthDiskSource,
-        pushManager: PushManager,
-    ): AuthRequestManager =
-        AuthRequestManagerImpl(
-            clock = clock,
-            authRequestsService = authRequestsService,
-            newAuthRequestService = newAuthRequestService,
-            authSdkSource = authSdkSource,
-            vaultSdkSource = vaultSdkSource,
-            authDiskSource = authDiskSource,
-            pushManager = pushManager,
-        )
 
     @Provides
     @Singleton

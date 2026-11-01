@@ -18,7 +18,6 @@ import com.x8bit.bitwarden.data.autofill.manager.FillAssistManager
 import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.data.platform.error.NoActiveUserException
 import com.x8bit.bitwarden.data.platform.manager.DatabaseSchemeManager
-import com.x8bit.bitwarden.data.platform.manager.PushManager
 import com.x8bit.bitwarden.data.platform.repository.util.observeWhenSubscribedAndLoggedIn
 import com.x8bit.bitwarden.data.platform.repository.util.observeWhenSubscribedAndUnlocked
 import com.x8bit.bitwarden.data.vault.datasource.disk.VaultDiskSource
@@ -78,7 +77,6 @@ internal class VaultSyncManagerImpl(
     private val vaultLockManager: VaultLockManager,
     private val clock: Clock,
     databaseSchemeManager: DatabaseSchemeManager,
-    pushManager: PushManager,
     dispatcherManager: DispatcherManager,
 ) : VaultSyncManager {
     private val unconfinedScope = CoroutineScope(dispatcherManager.unconfined)
@@ -187,17 +185,6 @@ internal class VaultSyncManagerImpl(
                 userStateFlow = authDiskSource.userStateFlow,
                 vaultUnlockFlow = vaultLockManager.vaultUnlockDataStateFlow,
             ) { activeUserId -> observeVaultDiskCollections(userId = activeUserId) }
-            .launchIn(unconfinedScope)
-
-        pushManager
-            .fullSyncFlow
-            .onEach { userId ->
-                if (userId == activeUserId) {
-                    sync(forced = false)
-                } else {
-                    settingsDiskSource.storeLastSyncTime(userId = userId, lastSyncTime = null)
-                }
-            }
             .launchIn(unconfinedScope)
 
         databaseSchemeManager

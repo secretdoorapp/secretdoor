@@ -105,10 +105,6 @@ class RootNavViewModel @Inject constructor(
                         )
                     }
 
-                    is SpecialCircumstance.PasswordlessRequest -> {
-                        RootNavState.VaultUnlockedForAuthRequest
-                    }
-
                     is SpecialCircumstance.ProviderCreateCredential -> {
                         val request = specialCircumstance.createCredentialRequest
                         val publicKeyRequest = request.createPublicKeyCredentialRequest
@@ -312,12 +308,6 @@ sealed class RootNavState : Parcelable {
     data class VaultUnlockedForNewTotp(
         val activeUserId: String,
     ) : RootNavState()
-
-    /**
-     * App should show the auth confirmation screen for an unlocked user.
-     */
-    @Parcelize
-    data object VaultUnlockedForAuthRequest : RootNavState()
 
     /**
      * App should show the set up account lock onboarding screen.

@@ -53,7 +53,6 @@ class AccountSecurityScreenTest : BitwardenComposeTest() {
     private var onNavigateToDeleteAccountCalled = false
     private var onNavigateToChangeMasterPasswordCalled = false
     private var onNavigateToUnlockSetupScreenCalled = false
-    private var onNavigateToManageDevicesCalled = false
 
     private val intentManager = mockk<IntentManager> {
         every { launchUri(any()) } just runs
@@ -94,7 +93,6 @@ class AccountSecurityScreenTest : BitwardenComposeTest() {
                 onNavigateToDeleteAccount = { onNavigateToDeleteAccountCalled = true },
                 onNavigateToChangeMasterPassword = { onNavigateToChangeMasterPasswordCalled = true },
                 onNavigateToSetupUnlockScreen = { onNavigateToUnlockSetupScreenCalled = true },
-                onNavigateToManageDevices = { onNavigateToManageDevicesCalled = true },
                 viewModel = viewModel,
             )
         }
@@ -1592,45 +1590,6 @@ class AccountSecurityScreenTest : BitwardenComposeTest() {
         assertTrue(onNavigateToUnlockSetupScreenCalled)
     }
 
-    @Test
-    fun `on NavigateToManageDevices event should call onNavigateToManageDevices`() {
-        mutableEventFlow.tryEmit(AccountSecurityEvent.NavigateToManageDevices)
-        assertTrue(onNavigateToManageDevicesCalled)
-    }
-
-    @Test
-    fun `manage devices row should be visible when isManageDevicesEnabled is true`() {
-        mutableStateFlow.update { it.copy(isManageDevicesEnabled = true) }
-        composeTestRule
-            .onNodeWithText("Devices")
-            .performScrollTo()
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun `manage devices row should not be visible when isManageDevicesEnabled is false`() {
-        composeTestRule
-            .onNodeWithText("Devices")
-            .assertDoesNotExist()
-    }
-
-    @Test
-    fun `pending login requests row should not be visible when isManageDevicesEnabled is true`() {
-        mutableStateFlow.update { it.copy(isManageDevicesEnabled = true) }
-        composeTestRule
-            .onNodeWithText("Pending login requests")
-            .assertDoesNotExist()
-    }
-
-    @Test
-    fun `on manage devices click should send ManageDevicesClick action`() {
-        mutableStateFlow.update { it.copy(isManageDevicesEnabled = true) }
-        composeTestRule
-            .onNodeWithText("Devices")
-            .performScrollTo()
-            .performClick()
-        verify { viewModel.trySendAction(AccountSecurityAction.ManageDevicesClick) }
-    }
 }
 
 private val CIPHER = mockk<Cipher>()
@@ -1642,7 +1601,6 @@ private val DEFAULT_STATE = AccountSecurityState(
     isUnlockWithBiometricsEnabled = false,
     isUnlockWithPasswordEnabled = true,
     isUnlockWithPinEnabled = false,
-    isManageDevicesEnabled = false,
     userId = USER_ID,
     shouldShowEnableAuthenticatorSync = false,
     vaultTimeout = VaultTimeout.ThirtyMinutes,

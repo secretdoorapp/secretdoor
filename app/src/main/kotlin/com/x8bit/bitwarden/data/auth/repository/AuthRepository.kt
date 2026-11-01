@@ -3,7 +3,6 @@ package com.x8bit.bitwarden.data.auth.repository
 import com.bitwarden.network.model.GetTokenResponseJson
 import com.bitwarden.network.model.TwoFactorDataModel
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.OnboardingStatus
-import com.x8bit.bitwarden.data.auth.manager.AuthRequestManager
 import com.x8bit.bitwarden.data.auth.manager.AuthStateManager
 import com.x8bit.bitwarden.data.auth.manager.KdfManager
 import com.x8bit.bitwarden.data.auth.manager.UserStateManager
@@ -45,7 +44,6 @@ import kotlinx.coroutines.flow.Flow
 @Suppress("TooManyFunctions")
 interface AuthRepository :
     AuthenticatorProvider,
-    AuthRequestManager,
     AuthStateManager,
     BiometricsEncryptionManager,
     KdfManager,

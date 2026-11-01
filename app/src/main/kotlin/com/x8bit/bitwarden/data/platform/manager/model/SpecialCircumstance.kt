@@ -45,15 +45,6 @@ sealed class SpecialCircumstance : Parcelable {
     ) : SpecialCircumstance()
 
     /**
-     * The app was launched in order to allow the user to authorize a passwordless login.
-     */
-    @Parcelize
-    data class PasswordlessRequest(
-        val passwordlessRequestData: PasswordlessRequestData,
-        val shouldFinishWhenComplete: Boolean,
-    ) : SpecialCircumstance()
-
-    /**
      * The app was launched via the [CredentialManager] framework in order to allow the user to
      * manually save a credential to their vault.
      */

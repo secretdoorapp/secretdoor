@@ -10,7 +10,6 @@ import com.bitwarden.network.service.IdentityService
 import com.bitwarden.network.service.OrganizationService
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
 import com.x8bit.bitwarden.data.auth.datasource.sdk.AuthSdkSource
-import com.x8bit.bitwarden.data.auth.manager.AuthRequestManager
 import com.x8bit.bitwarden.data.auth.manager.AuthStateManager
 import com.x8bit.bitwarden.data.auth.manager.KdfManager
 import com.x8bit.bitwarden.data.auth.manager.KeyConnectorManager
@@ -23,7 +22,6 @@ import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.data.platform.manager.BiometricsEncryptionManager
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.LogsManager
-import com.x8bit.bitwarden.data.platform.manager.PushManager
 import com.x8bit.bitwarden.data.platform.manager.policy.PasswordPolicyManager
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
@@ -63,10 +61,8 @@ object AuthRepositoryModule {
         vaultRepository: VaultRepository,
         biometricsEncryptionManager: BiometricsEncryptionManager,
         keyConnectorManager: KeyConnectorManager,
-        authRequestManager: AuthRequestManager,
         trustedDeviceManager: TrustedDeviceManager,
         userLogoutManager: UserLogoutManager,
-        pushManager: PushManager,
         passwordPolicyManager: PasswordPolicyManager,
         logsManager: LogsManager,
         userStateManager: UserStateManager,
@@ -92,10 +88,8 @@ object AuthRepositoryModule {
         vaultRepository = vaultRepository,
         biometricsEncryptionManager = biometricsEncryptionManager,
         keyConnectorManager = keyConnectorManager,
-        authRequestManager = authRequestManager,
         trustedDeviceManager = trustedDeviceManager,
         userLogoutManager = userLogoutManager,
-        pushManager = pushManager,
         passwordPolicyManager = passwordPolicyManager,
         logsManager = logsManager,
         userStateManager = userStateManager,

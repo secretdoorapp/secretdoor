@@ -23,7 +23,6 @@ import com.x8bit.bitwarden.data.auth.repository.util.getDuoCallbackTokenResult
 import com.x8bit.bitwarden.data.auth.repository.util.getSsoCallbackResult
 import com.x8bit.bitwarden.data.auth.repository.util.getWebAuthResult
 import com.x8bit.bitwarden.data.auth.util.getCompleteRegistrationDataIntentOrNull
-import com.x8bit.bitwarden.data.auth.util.getPasswordlessRequestDataIntentOrNull
 import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilitySelectionManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillSelectionManager
 import com.x8bit.bitwarden.data.autofill.util.getAutofillSaveItemOrNull
@@ -333,7 +332,6 @@ class MainViewModel @Inject constructor(
         intent: Intent,
         isFirstIntent: Boolean,
     ) {
-        val passwordlessRequestData = intent.getPasswordlessRequestDataIntentOrNull()
         val autofillSaveItem = intent.getAutofillSaveItemOrNull()
         val autofillSelectionData = intent.getAutofillSelectionDataOrNull()
         val totpData: TotpData? =
@@ -359,26 +357,6 @@ class MainViewModel @Inject constructor(
         val credentialProviderRequest =
             credentialProviderRequestManager.getPendingCredentialRequest()
         when {
-            passwordlessRequestData != null -> {
-                authRepository.activeUserId?.let {
-                    if (it != passwordlessRequestData.userId &&
-                        !vaultRepository.isVaultUnlocked(it)
-                    ) {
-                        // We only switch the account here if the current user's vault is not
-                        // unlocked, otherwise prompt the user to allow us to change the account
-                        // in the LoginApprovalScreen
-                        authRepository.switchAccount(passwordlessRequestData.userId)
-                    }
-                }
-                specialCircumstanceManager.specialCircumstance =
-                    SpecialCircumstance.PasswordlessRequest(
-                        passwordlessRequestData = passwordlessRequestData,
-                        // Allow users back into the already-running app when completing the
-                        // autofill task when this is not the first intent.
-                        shouldFinishWhenComplete = isFirstIntent,
-                    )
-            }
-
             completeRegistrationData != null -> {
                 handleCompleteRegistrationData(completeRegistrationData)
             }

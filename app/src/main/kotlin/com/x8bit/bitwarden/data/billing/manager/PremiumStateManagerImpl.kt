@@ -15,7 +15,6 @@ import com.x8bit.bitwarden.data.billing.repository.model.SubscriptionStatusState
 import com.x8bit.bitwarden.data.billing.repository.model.UpgradeLifecycleState
 import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
-import com.x8bit.bitwarden.data.platform.manager.PushManager
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.util.isActive
 import com.x8bit.bitwarden.data.platform.util.scanPairs
@@ -53,7 +52,6 @@ class PremiumStateManagerImpl(
     vaultRepository: VaultRepository,
     featureFlagManager: FeatureFlagManager,
     environmentRepository: EnvironmentRepository,
-    pushManager: PushManager,
     private val clock: Clock,
     dispatcherManager: DispatcherManager,
 ) : PremiumStateManager {
@@ -253,19 +251,6 @@ class PremiumStateManagerImpl(
             )
 
     init {
-        // Personal premium upgrade signaled via push notification (standard flavor only). The
-        // server emits PREMIUM_STATUS_CHANGED with the user's personal isPremium flag.
-        pushManager
-            .premiumStatusChangedFlow
-            .onEach { data ->
-                if (data.isPremium) {
-                    markUpgradedToPremiumCardPending(userId = data.userId)
-                }
-                // Push always re-fetches: a status push can mean either "newly premium" or
-                // "subscription moved into a trouble state" (e.g. past_due → unpaid).
-                subscriptionRefreshTriggerFlow.tryEmit(Unit)
-            }
-            .launchIn(unconfinedScope)
 
         // Sync-delta detection: observe the active user's personal premium flag transitioning
         // false → true (e.g., F-Droid users without push support). Keyed on

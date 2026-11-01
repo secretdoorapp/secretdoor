@@ -64,7 +64,6 @@ import com.x8bit.bitwarden.data.auth.datasource.network.model.DeviceDataModel
 import com.x8bit.bitwarden.data.auth.datasource.sdk.AuthSdkSource
 import com.x8bit.bitwarden.data.auth.datasource.sdk.util.toKdf
 import com.x8bit.bitwarden.data.auth.datasource.sdk.util.toKdfRequestModel
-import com.x8bit.bitwarden.data.auth.manager.AuthRequestManager
 import com.x8bit.bitwarden.data.auth.manager.AuthStateManager
 import com.x8bit.bitwarden.data.auth.manager.KdfManager
 import com.x8bit.bitwarden.data.auth.manager.KeyConnectorManager
@@ -119,7 +118,6 @@ import com.x8bit.bitwarden.data.platform.error.NoActiveUserException
 import com.x8bit.bitwarden.data.platform.manager.BiometricsEncryptionManager
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.LogsManager
-import com.x8bit.bitwarden.data.platform.manager.PushManager
 import com.x8bit.bitwarden.data.platform.manager.policy.PasswordPolicyManager
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
@@ -175,7 +173,6 @@ internal class AuthRepositoryImpl(
     private val environmentRepository: EnvironmentRepository,
     private val settingsRepository: SettingsRepository,
     private val vaultRepository: VaultRepository,
-    private val authRequestManager: AuthRequestManager,
     private val biometricsEncryptionManager: BiometricsEncryptionManager,
     private val keyConnectorManager: KeyConnectorManager,
     private val trustedDeviceManager: TrustedDeviceManager,
@@ -187,10 +184,8 @@ internal class AuthRepositoryImpl(
     authStateManager: AuthStateManager,
     passwordPolicyManager: PasswordPolicyManager,
     logsManager: LogsManager,
-    pushManager: PushManager,
     dispatcherManager: DispatcherManager,
 ) : AuthRepository,
-    AuthRequestManager by authRequestManager,
     AuthStateManager by authStateManager,
     BiometricsEncryptionManager by biometricsEncryptionManager,
     KdfManager by kdfManager,
@@ -293,32 +288,7 @@ internal class AuthRepositoryImpl(
             )
         }
             .launchIn(unconfinedScope)
-        pushManager
-            .syncOrgKeysFlow
-            .onEach { userId ->
-                // This will force the next authenticated request to refresh the auth token.
-                authDiskSource.storeAccountTokens(
-                    userId = userId,
-                    accountTokens = authDiskSource
-                        .getAccountTokens(userId = userId)
-                        ?.copy(expiresAtSec = 0L),
-                )
-                if (userId == activeUserId) {
-                    // We just sync now to get the latest data
-                    vaultRepository.sync(forced = true)
-                } else {
-                    // We clear the last sync time to ensure we sync when we become the active user
-                    settingsDiskSource.storeLastSyncTime(userId = userId, lastSyncTime = null)
-                }
-            }
-            // This requires the ioScope to ensure that refreshAccessTokenSynchronously
-            // happens on a background thread
-            .launchIn(ioScope)
 
-        pushManager
-            .logoutFlow
-            .onEach { logout(userId = it.userId, reason = LogoutReason.Notification) }
-            .launchIn(unconfinedScope)
     }
 
     override suspend fun changeMasterPassword(
@@ -2082,34 +2052,8 @@ internal class AuthRepositoryImpl(
         var vaultUnlockResult: VaultUnlockResult? = null
         val userId = profile.userId
         val deviceKey = authDiskSource.getDeviceKey(userId = userId)
-        if (deviceKey == null) {
-            // A null device key means this device is not trusted.
-            val pendingRequest = authDiskSource
-                .getPendingAuthRequest(userId = userId)
-                ?: return null
-            authRequestManager
-                .getAuthRequestIfApproved(pendingRequest.requestId)
-                .getOrNull()
-                ?.let { request ->
-                    // For approved requests the key will always be present.
-                    val userKey = requireNotNull(request.key)
-                    vaultUnlockResult = unlockVault(
-                        accountCryptographicState = accountKeys.toAccountCryptographicState(
-                            privateKey = privateKey,
-                        ),
-                        accountProfile = profile,
-                        initUserCryptoMethod = InitUserCryptoMethod.AuthRequest(
-                            requestPrivateKey = pendingRequest.requestPrivateKey,
-                            method = AuthRequestMethod.UserKey(protectedUserKey = userKey),
-                        ),
-                    )
-                }
-            authDiskSource.storePendingAuthRequest(
-                userId = userId,
-                pendingAuthRequest = null,
-            )
-            return vaultUnlockResult
-        }
+        // A null device key means this device is not trusted.
+        if (deviceKey == null) return null
 
         val encryptedPrivateKey = options.encryptedPrivateKey
         val encryptedUserKey = options.encryptedUserKey

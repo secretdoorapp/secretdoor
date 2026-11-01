@@ -37,7 +37,6 @@ import com.x8bit.bitwarden.ui.auth.feature.vaultunlock.navigateToVaultUnlock
 import com.x8bit.bitwarden.ui.auth.feature.vaultunlock.vaultUnlockDestination
 import com.x8bit.bitwarden.ui.platform.components.util.rememberBitwardenNavController
 import com.x8bit.bitwarden.ui.platform.feature.rootnav.util.toVaultItemListingType
-import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.loginapproval.navigateToLoginApproval
 import com.x8bit.bitwarden.ui.platform.feature.splash.SplashRoute
 import com.x8bit.bitwarden.ui.platform.feature.splash.navigateToSplash
 import com.x8bit.bitwarden.ui.platform.feature.splash.splashDestination
@@ -102,7 +101,6 @@ fun RootNavScreen(
         is RootNavState.VaultUnlockedForAutofillSave,
         is RootNavState.VaultUnlockedForAutofillSelection,
         is RootNavState.VaultUnlockedForNewTotp,
-        is RootNavState.VaultUnlockedForAuthRequest,
         is RootNavState.VaultUnlockedForFido2Save,
         is RootNavState.VaultUnlockedForFido2Assertion,
         is RootNavState.VaultUnlockedForPasswordGet,
@@ -194,14 +192,6 @@ fun RootNavScreen(
                 navController.navigateToVaultUnlockedGraph(rootNavOptions)
                 navController.navigateToVaultItemListingAsRoot(
                     vaultItemListingType = currentState.type.toVaultItemListingType(),
-                    navOptions = rootNavOptions,
-                )
-            }
-
-            RootNavState.VaultUnlockedForAuthRequest -> {
-                navController.navigateToVaultUnlockedGraph(rootNavOptions)
-                navController.navigateToLoginApproval(
-                    fingerprint = null,
                     navOptions = rootNavOptions,
                 )
             }

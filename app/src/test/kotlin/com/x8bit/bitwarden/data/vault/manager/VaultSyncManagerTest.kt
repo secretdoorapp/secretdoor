@@ -28,7 +28,6 @@ import com.x8bit.bitwarden.data.autofill.manager.FillAssistManager
 import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.data.platform.error.NoActiveUserException
 import com.x8bit.bitwarden.data.platform.manager.DatabaseSchemeManager
-import com.x8bit.bitwarden.data.platform.manager.PushManager
 import com.x8bit.bitwarden.data.vault.datasource.disk.VaultDiskSource
 import com.x8bit.bitwarden.data.vault.datasource.sdk.VaultSdkSource
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockCollectionView
@@ -121,10 +120,6 @@ class VaultSyncManagerTest {
         val blockSlot = slot<suspend () -> SyncVaultDataResult>()
         coEvery { userStateTransaction(capture(blockSlot)) } coAnswers { blockSlot.captured() }
     }
-    private val mutableFullSyncFlow = bufferedMutableSharedFlow<String>()
-    private val pushManager: PushManager = mockk {
-        every { fullSyncFlow } returns mutableFullSyncFlow
-    }
     private val mutableDatabaseSchemeChangeFlow = bufferedMutableSharedFlow<Unit>()
     private val databaseSchemeManager: DatabaseSchemeManager = mockk {
         every { databaseSchemeChangeFlow } returns mutableDatabaseSchemeChangeFlow
@@ -146,7 +141,6 @@ class VaultSyncManagerTest {
         vaultLockManager = vaultLockManager,
         clock = clock,
         databaseSchemeManager = databaseSchemeManager,
-        pushManager = pushManager,
         dispatcherManager = FakeDispatcherManager(),
     )
 
@@ -758,29 +752,6 @@ class VaultSyncManagerTest {
                 assertEquals(DataState.Loading, domainsStateFlow.awaitItem())
             }
         }
-
-    @Test
-    fun `fullSyncFlow emission with active user ID should trigger an unforced sync`() {
-        val userId = "mockId-1"
-        fakeAuthDiskSource.userState = MOCK_USER_STATE
-
-        mutableFullSyncFlow.tryEmit(userId)
-
-        coVerify(exactly = 1) { vaultDiskSource.resyncVaultData(userId = userId) }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `fullSyncFlow emission with non-active user ID should clear last sync time for that user`() {
-        val userId = "mockId-2"
-        fakeAuthDiskSource.userState = MOCK_USER_STATE
-
-        mutableFullSyncFlow.tryEmit(userId)
-
-        coVerify(exactly = 1) {
-            settingsDiskSource.storeLastSyncTime(userId = userId, lastSyncTime = null)
-        }
-    }
 
     @Suppress("MaxLineLength")
     @Test

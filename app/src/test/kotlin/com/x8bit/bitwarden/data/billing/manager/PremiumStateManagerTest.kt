@@ -20,8 +20,6 @@ import com.x8bit.bitwarden.data.billing.repository.model.SubscriptionStatusState
 import com.x8bit.bitwarden.data.billing.repository.model.UpgradeLifecycleState
 import com.x8bit.bitwarden.data.platform.datasource.disk.util.FakeSettingsDiskSource
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
-import com.x8bit.bitwarden.data.platform.manager.PushManager
-import com.x8bit.bitwarden.data.platform.manager.model.PremiumStatusChangedData
 import com.x8bit.bitwarden.data.platform.repository.util.FakeEnvironmentRepository
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockCipherListView
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
@@ -87,11 +85,6 @@ class PremiumStateManagerTest {
 
     private val dispatcherManager = FakeDispatcherManager()
 
-    private val mutablePremiumStatusChangedFlow =
-        MutableSharedFlow<PremiumStatusChangedData>(replay = 0, extraBufferCapacity = 1)
-    private val pushManager: PushManager = mockk(relaxed = true) {
-        every { premiumStatusChangedFlow } returns mutablePremiumStatusChangedFlow
-    }
 
     private fun createManager(): PremiumStateManagerImpl = PremiumStateManagerImpl(
         authDiskSource = fakeAuthDiskSource,
@@ -100,7 +93,6 @@ class PremiumStateManagerTest {
         vaultRepository = vaultRepository,
         featureFlagManager = featureFlagManager,
         environmentRepository = fakeEnvironmentRepository,
-        pushManager = pushManager,
         clock = fixedClock,
         dispatcherManager = dispatcherManager,
     )
@@ -505,31 +497,6 @@ class PremiumStateManagerTest {
             }
         }
 
-    @Test
-    fun `premium-status push with isPremium=true marks the card pending and emits true`() =
-        runTest {
-            // Sync has caught up to the upgrade by the time the push lands — the active user
-            // already holds personal Premium.
-            fakeAuthDiskSource.userState = userStateJsonWith(
-                account = createAccountJson(hasPremiumPersonally = true),
-            )
-            val manager = createManager()
-            manager.isUpgradedToPremiumCardEligibleFlow.test {
-                assertFalse(awaitItem())
-                mutablePremiumStatusChangedFlow.tryEmit(
-                    PremiumStatusChangedData(
-                        userId = ACTIVE_USER_ID,
-                        isPremium = true,
-                    ),
-                )
-                assertTrue(awaitItem())
-                fakeSettingsDiskSource.assertUpgradedToPremiumCardPending(
-                    userId = ACTIVE_USER_ID,
-                    expected = true,
-                )
-            }
-        }
-
     @Suppress("MaxLineLength")
     @Test
     fun `isUpgradedToPremiumCardEligibleFlow emits false when pending is set but the active user lacks personal Premium`() =
@@ -548,26 +515,6 @@ class PremiumStateManagerTest {
             manager.isUpgradedToPremiumCardEligibleFlow.test {
                 assertFalse(awaitItem())
                 expectNoEvents()
-            }
-        }
-
-    @Test
-    fun `premium-status push with isPremium=false should not mark the card pending`() =
-        runTest {
-            val manager = createManager()
-            manager.isUpgradedToPremiumCardEligibleFlow.test {
-                assertFalse(awaitItem())
-                mutablePremiumStatusChangedFlow.tryEmit(
-                    PremiumStatusChangedData(
-                        userId = ACTIVE_USER_ID,
-                        isPremium = false,
-                    ),
-                )
-                expectNoEvents()
-                fakeSettingsDiskSource.assertUpgradedToPremiumCardPending(
-                    userId = ACTIVE_USER_ID,
-                    expected = null,
-                )
             }
         }
 
@@ -630,29 +577,6 @@ class PremiumStateManagerTest {
                 )
             }
         }
-
-    @Test
-    fun `card not re-armed once consumed for the user`() = runTest {
-        fakeSettingsDiskSource.storeUpgradedToPremiumCardConsumed(
-            userId = ACTIVE_USER_ID,
-            isConsumed = true,
-        )
-        val manager = createManager()
-        manager.isUpgradedToPremiumCardEligibleFlow.test {
-            assertFalse(awaitItem())
-            mutablePremiumStatusChangedFlow.tryEmit(
-                PremiumStatusChangedData(
-                    userId = ACTIVE_USER_ID,
-                    isPremium = true,
-                ),
-            )
-            expectNoEvents()
-            fakeSettingsDiskSource.assertUpgradedToPremiumCardPending(
-                userId = ACTIVE_USER_ID,
-                expected = null,
-            )
-        }
-    }
 
     @Test
     fun `dismissUpgradedToPremiumCard marks the card consumed and clears pending`() {
@@ -936,46 +860,6 @@ class PremiumStateManagerTest {
         }
         coVerify(exactly = 2) { billingRepository.getSubscription() }
     }
-
-    @Test
-    fun `subscriptionStatusStateFlow refetches on push when active user is premium`() =
-        runTest {
-            fakeAuthDiskSource.userState = userStateJsonWith(
-                account = createAccountJson(hasPremiumPersonally = true),
-            )
-            coEvery {
-                billingRepository.getSubscription()
-            } returns SubscriptionResult.Success(
-                subscription = createSubscriptionInfo(
-                    status = PremiumSubscriptionStatus.ACTIVE,
-                ),
-            ) andThen SubscriptionResult.Success(
-                subscription = createSubscriptionInfo(
-                    status = PremiumSubscriptionStatus.PAST_DUE,
-                ),
-            )
-            val manager = createManager()
-            manager.subscriptionStatusStateFlow.test {
-                assertEquals(
-                    SubscriptionStatusState.Available(
-                        status = PremiumSubscriptionStatus.ACTIVE,
-                    ),
-                    awaitItem(),
-                )
-                mutablePremiumStatusChangedFlow.tryEmit(
-                    PremiumStatusChangedData(
-                        userId = ACTIVE_USER_ID,
-                        isPremium = true,
-                    ),
-                )
-                assertEquals(
-                    SubscriptionStatusState.Available(
-                        status = PremiumSubscriptionStatus.PAST_DUE,
-                    ),
-                    awaitItem(),
-                )
-            }
-        }
 
     @Test
     fun `subscriptionStatusStateFlow updates when BillingRepository getSubscriptionFlow emits`() =

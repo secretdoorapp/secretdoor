@@ -83,7 +83,6 @@ import com.x8bit.bitwarden.data.auth.datasource.disk.model.UserStateJson
 import com.x8bit.bitwarden.data.auth.datasource.disk.util.FakeAuthDiskSource
 import com.x8bit.bitwarden.data.auth.datasource.sdk.AuthSdkSource
 import com.x8bit.bitwarden.data.auth.datasource.sdk.util.toKdfRequestModel
-import com.x8bit.bitwarden.data.auth.manager.AuthRequestManager
 import com.x8bit.bitwarden.data.auth.manager.AuthStateManager
 import com.x8bit.bitwarden.data.auth.manager.KdfManager
 import com.x8bit.bitwarden.data.auth.manager.KeyConnectorManager
@@ -132,8 +131,6 @@ import com.x8bit.bitwarden.data.platform.datasource.disk.util.FakeSettingsDiskSo
 import com.x8bit.bitwarden.data.platform.error.NoActiveUserException
 import com.x8bit.bitwarden.data.platform.manager.FeatureFlagManager
 import com.x8bit.bitwarden.data.platform.manager.LogsManager
-import com.x8bit.bitwarden.data.platform.manager.PushManager
-import com.x8bit.bitwarden.data.platform.manager.model.NotificationLogoutData
 import com.x8bit.bitwarden.data.platform.manager.policy.PasswordPolicyManager
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
 import com.x8bit.bitwarden.data.platform.repository.util.FakeEnvironmentRepository
@@ -237,7 +234,6 @@ class AuthRepositoryTest {
             getAuthRequestKey(publicKey = PUBLIC_KEY, userId = USER_ID_1)
         } returns "AsymmetricEncString".asSuccess()
     }
-    private val authRequestManager: AuthRequestManager = mockk()
     private val keyConnectorManager: KeyConnectorManager = mockk()
     private val trustedDeviceManager: TrustedDeviceManager = mockk()
     private val userLogoutManager: UserLogoutManager = mockk {
@@ -245,12 +241,6 @@ class AuthRepositoryTest {
         every { softLogout(any(), any()) } just runs
     }
 
-    private val mutableLogoutFlow = bufferedMutableSharedFlow<NotificationLogoutData>()
-    private val mutableSyncOrgKeysFlow = bufferedMutableSharedFlow<String>()
-    private val pushManager: PushManager = mockk {
-        every { logoutFlow } returns mutableLogoutFlow
-        every { syncOrgKeysFlow } returns mutableSyncOrgKeysFlow
-    }
     private val passwordPolicyManager: PasswordPolicyManager = mockk()
     private val logsManager: LogsManager = mockk {
         every { setUserData(userId = any(), environmentType = any()) } just runs
@@ -300,13 +290,11 @@ class AuthRepositoryTest {
         environmentRepository = fakeEnvironmentRepository,
         settingsRepository = settingsRepository,
         vaultRepository = vaultRepository,
-        authRequestManager = authRequestManager,
         biometricsEncryptionManager = mockk(),
         keyConnectorManager = keyConnectorManager,
         trustedDeviceManager = trustedDeviceManager,
         userLogoutManager = userLogoutManager,
         dispatcherManager = dispatcherManager,
-        pushManager = pushManager,
         passwordPolicyManager = passwordPolicyManager,
         logsManager = logsManager,
         userStateManager = userStateManager,
@@ -4452,106 +4440,6 @@ class AuthRepositoryTest {
             }
         }
 
-    @Test
-    @Suppress("MaxLineLength")
-    fun `SSO login get token succeeds without trusted device key should return Success, unlock the vault with pending request, update AuthState, update stored keys, and sync`() =
-        runTest {
-            val pendingAuthRequest = PendingAuthRequestJson(
-                requestId = "requestId",
-                requestPrivateKey = "requestPrivateKey",
-                requestFingerprint = "fingerprint",
-                requestAccessCode = "accessCode",
-            )
-            val successResponse = GET_TOKEN_WITH_ACCOUNT_KEYS_RESPONSE_SUCCESS.copy(
-                key = null,
-                userDecryptionOptions = USER_DECRYPTION_OPTIONS,
-            )
-            val authRequestKey = "key"
-            val authRequest = mockk<AuthRequest> {
-                every { this@mockk.key } returns authRequestKey
-            }
-            coEvery {
-                authRequestManager.getAuthRequestIfApproved(pendingAuthRequest.requestId)
-            } returns authRequest.asSuccess()
-            fakeAuthDiskSource.storePendingAuthRequest(USER_ID_1, pendingAuthRequest)
-            coEvery {
-                vaultRepository.unlockVault(
-                    accountCryptographicState = ACCOUNT_CRYPTOGRAPHIC_STATE_V2,
-                    userId = USER_ID_1,
-                    email = SINGLE_USER_STATE_1.activeAccount.profile.email,
-                    kdf = SINGLE_USER_STATE_1.activeAccount.profile.toSdkParams(),
-                    initUserCryptoMethod = InitUserCryptoMethod.AuthRequest(
-                        requestPrivateKey = pendingAuthRequest.requestPrivateKey,
-                        method = AuthRequestMethod.UserKey(protectedUserKey = authRequestKey),
-                    ),
-                    organizationKeys = null,
-                )
-            } returns VaultUnlockResult.Success
-            coEvery {
-                identityService.getToken(
-                    email = EMAIL,
-                    authModel = IdentityTokenAuthModel.SingleSignOn(
-                        ssoCode = SSO_CODE,
-                        ssoCodeVerifier = SSO_CODE_VERIFIER,
-                        ssoRedirectUri = SSO_REDIRECT_URI,
-                    ),
-                    uniqueAppId = UNIQUE_APP_ID,
-                    deeplinkScheme = DEEPLINK_SCHEME,
-                )
-            } returns successResponse.asSuccess()
-            coEvery { vaultRepository.syncIfNecessary() } just runs
-            every {
-                successResponse.toUserState(
-                    previousUserState = null,
-                    environmentUrlData = EnvironmentUrlDataJson.DEFAULT_US,
-                    passwordPassesPolicy = true,
-                )
-            } returns SINGLE_USER_STATE_1
-
-            val result = repository.login(
-                email = EMAIL,
-                ssoCode = SSO_CODE,
-                ssoCodeVerifier = SSO_CODE_VERIFIER,
-                ssoRedirectUri = SSO_REDIRECT_URI,
-                organizationIdentifier = ORGANIZATION_IDENTIFIER,
-            )
-
-            assertEquals(LoginResult.Success, result)
-            fakeAuthDiskSource.assertAccountCryptographicState(
-                userId = USER_ID_1,
-                accountCryptographicState = ACCOUNT_CRYPTOGRAPHIC_STATE_V2,
-            )
-            fakeAuthDiskSource.assertUserState(userState = SINGLE_USER_STATE_1)
-            coVerify(exactly = 1) {
-                identityService.getToken(
-                    email = EMAIL,
-                    authModel = IdentityTokenAuthModel.SingleSignOn(
-                        ssoCode = SSO_CODE,
-                        ssoCodeVerifier = SSO_CODE_VERIFIER,
-                        ssoRedirectUri = SSO_REDIRECT_URI,
-                    ),
-                    uniqueAppId = UNIQUE_APP_ID,
-                    deeplinkScheme = DEEPLINK_SCHEME,
-                )
-                vaultRepository.unlockVault(
-                    accountCryptographicState = ACCOUNT_CRYPTOGRAPHIC_STATE_V2,
-                    userId = USER_ID_1,
-                    email = SINGLE_USER_STATE_1.activeAccount.profile.email,
-                    kdf = SINGLE_USER_STATE_1.activeAccount.profile.toSdkParams(),
-                    initUserCryptoMethod = InitUserCryptoMethod.AuthRequest(
-                        requestPrivateKey = pendingAuthRequest.requestPrivateKey,
-                        method = AuthRequestMethod.UserKey(protectedUserKey = authRequestKey),
-                    ),
-                    organizationKeys = null,
-                )
-                vaultRepository.syncIfNecessary()
-            }
-            verify(exactly = 1) {
-                userStateManager.hasPendingAccountAddition = false
-                settingsRepository.setDefaultsIfNecessary(userId = USER_ID_1)
-            }
-        }
-
     @Suppress("MaxLineLength")
     @Test
     fun `SSO login get token succeeds when there is an existing user should switch to the new logged in user`() =
@@ -6925,57 +6813,6 @@ class AuthRepositoryTest {
                 )
             }
         }
-
-    @Test
-    fun `logOutFlow emission for action account should call logout on the UserLogoutManager`() {
-        val userId = USER_ID_1
-        fakeAuthDiskSource.userState = MULTI_USER_STATE
-
-        mutableLogoutFlow.tryEmit(NotificationLogoutData(userId = userId))
-
-        coVerify(exactly = 1) {
-            userLogoutManager.logout(userId = userId, reason = LogoutReason.Notification)
-        }
-    }
-
-    @Test
-    fun `syncOrgKeysFlow emissions for active user should refresh access token and force sync`() {
-        fakeAuthDiskSource.userState = MULTI_USER_STATE
-        fakeAuthDiskSource.storeAccountTokens(userId = USER_ID_1, accountTokens = ACCOUNT_TOKENS_1)
-        every { vaultRepository.sync(forced = true) } just runs
-
-        mutableSyncOrgKeysFlow.tryEmit(USER_ID_1)
-
-        verify(exactly = 1) {
-            vaultRepository.sync(forced = true)
-        }
-        fakeAuthDiskSource.assertAccountTokens(
-            userId = USER_ID_1,
-            accountTokens = ACCOUNT_TOKENS_1.copy(expiresAtSec = 0L),
-        )
-    }
-
-    @Test
-    fun `syncOrgKeysFlow emissions for inactive user should clear the last sync time`() {
-        fakeAuthDiskSource.userState = MULTI_USER_STATE
-        fakeAuthDiskSource.storeAccountTokens(userId = USER_ID_2, accountTokens = ACCOUNT_TOKENS_2)
-        fakeSettingsDiskSource.storeLastSyncTime(
-            userId = USER_ID_2,
-            lastSyncTime = FIXED_CLOCK.instant(),
-        )
-        every { vaultRepository.sync(forced = true) } just runs
-
-        mutableSyncOrgKeysFlow.tryEmit(USER_ID_2)
-
-        verify(exactly = 0) {
-            vaultRepository.sync(forced = true)
-        }
-        fakeSettingsDiskSource.assertLastSyncTime(userId = USER_ID_2, null)
-        fakeAuthDiskSource.assertAccountTokens(
-            userId = USER_ID_2,
-            accountTokens = ACCOUNT_TOKENS_2.copy(expiresAtSec = 0L),
-        )
-    }
 
     @Test
     fun `sendVerificationEmail success should return success`() = runTest {

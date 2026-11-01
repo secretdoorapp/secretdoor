@@ -51,8 +51,6 @@ import com.x8bit.bitwarden.data.platform.manager.LogsManager
 import com.x8bit.bitwarden.data.platform.manager.LogsManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.PolicyManager
 import com.x8bit.bitwarden.data.platform.manager.PolicyManagerImpl
-import com.x8bit.bitwarden.data.platform.manager.PushManager
-import com.x8bit.bitwarden.data.platform.manager.PushManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.ResourceCacheManager
 import com.x8bit.bitwarden.data.platform.manager.ResourceCacheManagerImpl
 import com.x8bit.bitwarden.data.platform.manager.ReviewPromptManager
@@ -276,26 +274,6 @@ object PlatformManagerModule {
         settingsDiskSource = settingsDiskSource,
         policyManager = policyManager,
         dispatcherManager = dispatcherManager,
-    )
-
-    @Provides
-    @Singleton
-    fun providePushManager(
-        authDiskSource: AuthDiskSource,
-        pushDiskSource: PushDiskSource,
-        pushService: PushService,
-        dispatcherManager: DispatcherManager,
-        clock: Clock,
-        json: Json,
-        featureFlagManager: FeatureFlagManager,
-    ): PushManager = PushManagerImpl(
-        authDiskSource = authDiskSource,
-        pushDiskSource = pushDiskSource,
-        pushService = pushService,
-        dispatcherManager = dispatcherManager,
-        clock = clock,
-        json = json,
-        featureFlagManager = featureFlagManager,
     )
 
     @Provides
