@@ -10,11 +10,9 @@ import com.x8bit.bitwarden.data.auth.repository.model.PasswordStrengthResult
 import com.x8bit.bitwarden.data.auth.repository.model.DeleteAccountResult
 import com.x8bit.bitwarden.data.auth.repository.model.LogoutReason
 import com.x8bit.bitwarden.data.auth.repository.model.RegisterResult
-import com.x8bit.bitwarden.data.auth.repository.model.RequestOtpResult
 import com.x8bit.bitwarden.data.auth.repository.model.SwitchAccountResult
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePinResult
-import com.x8bit.bitwarden.data.auth.repository.model.VerifyOtpResult
 import com.x8bit.bitwarden.data.platform.datasource.network.authenticator.AuthenticatorProvider
 import com.x8bit.bitwarden.data.platform.manager.BiometricsEncryptionManager
 
@@ -51,27 +49,9 @@ interface AuthRepository :
     suspend fun deleteAccountWithMasterPassword(masterPassword: String): DeleteAccountResult
 
     /**
-     * Attempt to delete the current account using a [oneTimePassword] and log them out
-     * upon success.
-     */
-    suspend fun deleteAccountWithOneTimePassword(oneTimePassword: String): DeleteAccountResult
-
-    /**
      * Log out the current user.
      */
     fun logout(reason: LogoutReason)
-
-    /**
-     * Requests that a one-time passcode be sent to the user's email.
-     */
-    suspend fun requestOneTimePasscode(): RequestOtpResult
-
-    /**
-     * Verifies that the given one-time passcode is correct. A successful result will correspond to
-     * [VerifyOtpResult.Verified], while an error or failure to verify will return
-     * [VerifyOtpResult.NotVerified].
-     */
-    suspend fun verifyOneTimePasscode(oneTimePasscode: String): VerifyOtpResult
 
     /**
      * Switches to the account corresponding to the given [userId] if possible.

@@ -1,7 +1,6 @@
 package com.x8bit.bitwarden.data.auth.datasource.network.di
 
 import com.bitwarden.network.BitwardenServiceClient
-import com.bitwarden.network.service.AccountsService
 import com.bitwarden.network.service.HaveIBeenPwnedService
 import com.bitwarden.network.service.IdentityService
 import dagger.Module
@@ -16,12 +15,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AuthNetworkModule {
-
-    @Provides
-    @Singleton
-    fun providesAccountService(
-        bitwardenServiceClient: BitwardenServiceClient,
-    ): AccountsService = bitwardenServiceClient.accountsService
 
     @Provides
     @Singleton

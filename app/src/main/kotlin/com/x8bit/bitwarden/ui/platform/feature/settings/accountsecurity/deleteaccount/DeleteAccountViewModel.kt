@@ -32,16 +32,7 @@ class DeleteAccountViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel<DeleteAccountState, DeleteAccountEvent, DeleteAccountAction>(
-    initialState = savedStateHandle[KEY_STATE] ?: run {
-        val account = requireNotNull(authRepository.userStateFlow.value).activeAccount
-        DeleteAccountState(
-            dialog = null,
-            isUnlockWithPasswordEnabled = account.hasMasterPassword,
-            isUserManagedByOrganization = account
-                .organizations
-                .any { it.userIsClaimedByOrganization },
-        )
-    },
+    initialState = savedStateHandle[KEY_STATE] ?: DeleteAccountState(dialog = null),
 ) {
 
     init {
@@ -54,7 +45,6 @@ class DeleteAccountViewModel @Inject constructor(
         when (action) {
             DeleteAccountAction.CancelClick -> handleCancelClick()
             DeleteAccountAction.CloseClick -> handleCloseClick()
-            is DeleteAccountAction.DeleteAccountClick -> handleDeleteAccountClick()
             DeleteAccountAction.AccountDeletionConfirm -> handleAccountDeletionConfirm()
             DeleteAccountAction.DismissDialog -> handleDismissDialog()
             is DeleteAccountAction.Internal -> handleInternalActions(action)
@@ -73,10 +63,6 @@ class DeleteAccountViewModel @Inject constructor(
 
             is DeleteAccountAction.Internal.UpdateDialogState -> updateDialogState(action.dialog)
         }
-    }
-
-    private fun handleDeleteAccountClick() {
-        sendEvent(DeleteAccountEvent.NavigateToDeleteAccountConfirmationScreen)
     }
 
     private fun handleCancelClick() {
@@ -162,15 +148,10 @@ class DeleteAccountViewModel @Inject constructor(
  * Models state for the Delete Account screen.
  *
  * @param dialog The dialog for the [DeleteAccountScreen].
- * @param isUnlockWithPasswordEnabled Whether the user is able to unlock the vault with
- * their master password.
- * @param isUserManagedByOrganization Whether the user is managed by an organization.
  */
 @Parcelize
 data class DeleteAccountState(
     val dialog: DeleteAccountDialog?,
-    val isUnlockWithPasswordEnabled: Boolean,
-    val isUserManagedByOrganization: Boolean,
 ) : Parcelable {
 
     /**
@@ -208,11 +189,6 @@ sealed class DeleteAccountEvent {
      * Navigates back.
      */
     data object NavigateBack : DeleteAccountEvent()
-
-    /**
-     * Navigates to the Delete Account Confirmation Screen.
-     */
-    data object NavigateToDeleteAccountConfirmationScreen : DeleteAccountEvent()
 }
 
 /**
@@ -228,11 +204,6 @@ sealed class DeleteAccountAction {
      * The user has clicked the close button.
      */
     data object CloseClick : DeleteAccountAction()
-
-    /**
-     * The user has clicked the delete account button.
-     */
-    data object DeleteAccountClick : DeleteAccountAction()
 
     /**
      * The user has clicked the delete account confirmation dialog button.

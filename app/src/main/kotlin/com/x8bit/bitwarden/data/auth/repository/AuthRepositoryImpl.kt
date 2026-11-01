@@ -10,11 +10,9 @@ import com.bitwarden.crypto.HashPurpose
 import com.bitwarden.crypto.Kdf
 import com.bitwarden.data.repository.util.toEnvironmentUrls
 import com.bitwarden.data.repository.util.toEnvironmentUrlsOrDefault
-import com.bitwarden.network.model.DeleteAccountResponseJson
 import com.bitwarden.network.model.MasterPasswordUnlockDataJson
 import com.bitwarden.network.model.RefreshTokenResponseJson
 import com.bitwarden.network.model.UserDecryptionOptionsJson
-import com.bitwarden.network.service.AccountsService
 import com.bitwarden.network.service.HaveIBeenPwnedService
 import com.bitwarden.network.service.IdentityService
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
@@ -35,11 +33,9 @@ import com.x8bit.bitwarden.data.auth.repository.model.DeleteAccountResult
 import com.x8bit.bitwarden.data.auth.repository.model.LogoutReason
 import com.x8bit.bitwarden.data.auth.repository.model.PasswordStrengthResult
 import com.x8bit.bitwarden.data.auth.repository.model.RegisterResult
-import com.x8bit.bitwarden.data.auth.repository.model.RequestOtpResult
 import com.x8bit.bitwarden.data.auth.repository.model.SwitchAccountResult
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePinResult
-import com.x8bit.bitwarden.data.auth.repository.model.VerifyOtpResult
 import com.x8bit.bitwarden.data.auth.repository.util.toKdfRequestModel
 import com.x8bit.bitwarden.data.auth.util.KdfParamsConstants.DEFAULT_ARGON2_ITERATIONS
 import com.x8bit.bitwarden.data.auth.util.KdfParamsConstants.DEFAULT_ARGON2_MEMORY
@@ -80,7 +76,6 @@ private const val LOCAL_VAULT_EMAIL_SUFFIX: String = "@secretdoor.local"
 @Singleton
 internal class AuthRepositoryImpl(
     private val clock: Clock,
-    private val accountsService: AccountsService,
     private val haveIBeenPwnedService: HaveIBeenPwnedService,
     private val identityService: IdentityService,
     private val authSdkSource: AuthSdkSource,
@@ -200,39 +195,6 @@ internal class AuthRepositoryImpl(
             }
         }
 
-    override suspend fun deleteAccountWithOneTimePassword(
-        oneTimePassword: String,
-    ): DeleteAccountResult {
-        userStateManager.hasPendingAccountDeletion = true
-        return accountsService
-            .deleteAccount(
-                masterPasswordHash = null,
-                oneTimePassword = oneTimePassword,
-            )
-            .finalizeDeleteAccount()
-    }
-
-    private fun Result<DeleteAccountResponseJson>.finalizeDeleteAccount(): DeleteAccountResult =
-        fold(
-            onFailure = {
-                userStateManager.hasPendingAccountDeletion = false
-                DeleteAccountResult.Error(error = it, message = null)
-            },
-            onSuccess = { response ->
-                when (response) {
-                    is DeleteAccountResponseJson.Invalid -> {
-                        userStateManager.hasPendingAccountDeletion = false
-                        DeleteAccountResult.Error(message = response.message, error = null)
-                    }
-
-                    DeleteAccountResponseJson.Success -> {
-                        logout(reason = LogoutReason.AccountDelete)
-                        DeleteAccountResult.Success
-                    }
-                }
-            },
-        )
-
     override fun refreshAccessTokenSynchronously(
         userId: String,
     ): Result<String> {
@@ -303,23 +265,6 @@ internal class AuthRepositoryImpl(
     override fun logout(userId: String, reason: LogoutReason) {
         userLogoutManager.logout(userId = userId, reason = reason)
     }
-
-    override suspend fun requestOneTimePasscode(): RequestOtpResult =
-        accountsService.requestOneTimePasscode()
-            .fold(
-                onFailure = { RequestOtpResult.Error(message = it.message, error = it) },
-                onSuccess = { RequestOtpResult.Success },
-            )
-
-    override suspend fun verifyOneTimePasscode(oneTimePasscode: String): VerifyOtpResult =
-        accountsService
-            .verifyOneTimePasscode(
-                passcode = oneTimePasscode,
-            )
-            .fold(
-                onFailure = { VerifyOtpResult.NotVerified(errorMessage = it.message, error = it) },
-                onSuccess = { VerifyOtpResult.Verified },
-            )
 
     override fun switchAccount(userId: String): SwitchAccountResult {
         val currentUserState = authDiskSource.userState ?: return SwitchAccountResult.NoChange

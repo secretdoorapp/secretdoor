@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,7 +33,6 @@ import com.bitwarden.cxf.validator.CredentialExchangeRequestValidator
 import com.bitwarden.ui.platform.base.util.EventsEffect
 import com.bitwarden.ui.platform.base.util.standardHorizontalMargin
 import com.bitwarden.ui.platform.components.button.BitwardenFilledButton
-import com.bitwarden.ui.platform.components.button.BitwardenOutlinedButton
 import com.bitwarden.ui.platform.components.content.BitwardenErrorContent
 import com.bitwarden.ui.platform.components.content.BitwardenLoadingContent
 import com.bitwarden.ui.platform.components.dialog.BitwardenBasicDialog
@@ -200,18 +198,6 @@ private fun VerifyPasswordContent(
                 .standardHorizontalMargin(),
         )
 
-        viewState.subtext?.let { subtext ->
-            Spacer(Modifier.height(8.dp))
-            Text(
-                text = subtext(),
-                textAlign = TextAlign.Center,
-                style = BitwardenTheme.typography.bodyMedium,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .standardHorizontalMargin(),
-            )
-        }
-
         Spacer(Modifier.height(16.dp))
 
         AccountSummaryListItem(
@@ -225,55 +211,29 @@ private fun VerifyPasswordContent(
 
         Spacer(Modifier.height(16.dp))
 
-        if (viewState.showResendCodeButton) {
-            BitwardenPasswordField(
-                label = stringResource(id = BitwardenString.verification_code),
-                value = viewState.input,
-                onValueChange = handler.onInputChanged,
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done,
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        if (viewState.isContinueButtonEnabled) {
-                            handler.onContinueClick()
-                        } else {
-                            defaultKeyboardAction(ImeAction.Done)
-                        }
-                    },
-                ),
-                autoFocus = true,
-                cardStyle = CardStyle.Full,
-                passwordFieldTestTag = "VerificationCodeEntry",
-                showPasswordTestTag = "VerificationCodeVisibilityToggle",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .standardHorizontalMargin(),
-            )
-        } else {
-            BitwardenPasswordField(
-                label = stringResource(BitwardenString.master_password),
-                value = viewState.input,
-                onValueChange = handler.onInputChanged,
-                showPasswordTestTag = "PasswordVisibilityToggle",
-                imeAction = ImeAction.Done,
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        if (viewState.isContinueButtonEnabled) {
-                            handler.onContinueClick()
-                        } else {
-                            defaultKeyboardAction(ImeAction.Done)
-                        }
-                    },
-                ),
-                autoFocus = true,
-                supportingText = stringResource(BitwardenString.vault_locked_master_password),
-                passwordFieldTestTag = "MasterPasswordEntry",
-                cardStyle = CardStyle.Full,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .standardHorizontalMargin(),
-            )
-        }
+        BitwardenPasswordField(
+            label = stringResource(BitwardenString.master_password),
+            value = viewState.input,
+            onValueChange = handler.onInputChanged,
+            showPasswordTestTag = "PasswordVisibilityToggle",
+            imeAction = ImeAction.Done,
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    if (viewState.isContinueButtonEnabled) {
+                        handler.onContinueClick()
+                    } else {
+                        defaultKeyboardAction(ImeAction.Done)
+                    }
+                },
+            ),
+            autoFocus = true,
+            supportingText = stringResource(BitwardenString.vault_locked_master_password),
+            passwordFieldTestTag = "MasterPasswordEntry",
+            cardStyle = CardStyle.Full,
+            modifier = Modifier
+                .fillMaxWidth()
+                .standardHorizontalMargin(),
+        )
 
         Spacer(Modifier.height(16.dp))
 
@@ -286,17 +246,6 @@ private fun VerifyPasswordContent(
                 .fillMaxWidth()
                 .standardHorizontalMargin(),
         )
-
-        if (viewState.showResendCodeButton) {
-            BitwardenOutlinedButton(
-                label = stringResource(BitwardenString.resend_code),
-                onClick = handler.onSendCodeClick,
-                modifier = Modifier
-                    .testTag("ResendTOTPCodeButton")
-                    .fillMaxWidth()
-                    .standardHorizontalMargin(),
-            )
-        }
 
         Spacer(Modifier.height(12.dp))
         Spacer(Modifier.navigationBarsPadding())
@@ -317,8 +266,6 @@ private fun VerifyPasswordContent_MasterPassword_preview() {
         VerifyPasswordContent(
             viewState = VerifyPasswordState.ViewState.Content(
                 title = BitwardenString.verify_your_master_password.asText(),
-                subtext = null,
-                showResendCodeButton = false,
             ),
             accountSummaryListItem = AccountSelectionListItem(
                 userId = "userId",
@@ -332,33 +279,3 @@ private fun VerifyPasswordContent_MasterPassword_preview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
-@Composable
-private fun VerifyPasswordContent_Otp_preview() {
-    ExportItemsScaffold(
-        navIcon = rememberVectorPainter(id = BitwardenDrawable.ic_back),
-        onNavigationIconClick = {},
-        navigationIconContentDescription = stringResource(BitwardenString.back),
-        scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState()),
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        VerifyPasswordContent(
-            viewState = VerifyPasswordState.ViewState.Content(
-                title = BitwardenString.verify_your_account_email_address.asText(),
-                subtext = BitwardenString
-                    .enter_the_6_digit_code_that_was_emailed_to_the_address_below
-                    .asText(),
-                showResendCodeButton = true,
-            ),
-            accountSummaryListItem = AccountSelectionListItem(
-                userId = "userId",
-                avatarColorHex = "#FF0000",
-                initials = "JD",
-                email = "john.doe@example.com",
-            ),
-            handler = VerifyPasswordHandlers.createEmpty(),
-            modifier = Modifier.fillMaxSize(),
-        )
-    }
-}

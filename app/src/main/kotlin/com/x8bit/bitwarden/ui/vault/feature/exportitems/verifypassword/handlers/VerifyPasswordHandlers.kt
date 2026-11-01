@@ -12,7 +12,6 @@ data class VerifyPasswordHandlers(
     val onNavigateBackClick: () -> Unit,
     val onContinueClick: () -> Unit,
     val onInputChanged: (String) -> Unit,
-    val onSendCodeClick: () -> Unit,
     val onDismissDialog: () -> Unit,
 ) {
 
@@ -35,9 +34,6 @@ data class VerifyPasswordHandlers(
                         VerifyPasswordAction.PasswordInputChangeReceive(it),
                     )
                 },
-                onSendCodeClick = {
-                    viewModel.trySendAction(VerifyPasswordAction.ResendCodeClick)
-                },
                 onDismissDialog = {
                     viewModel.trySendAction(VerifyPasswordAction.DismissDialog)
                 },
@@ -52,7 +48,6 @@ data class VerifyPasswordHandlers(
                 onNavigateBackClick = { },
                 onContinueClick = { },
                 onInputChanged = { },
-                onSendCodeClick = { },
                 onDismissDialog = { },
             )
     }

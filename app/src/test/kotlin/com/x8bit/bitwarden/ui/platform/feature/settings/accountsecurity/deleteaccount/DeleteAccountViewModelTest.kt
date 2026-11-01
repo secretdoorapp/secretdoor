@@ -42,7 +42,7 @@ class DeleteAccountViewModelTest : BaseViewModelTest() {
         }
         val viewModel = createViewModel(state = null)
         assertEquals(
-            DEFAULT_STATE.copy(isUnlockWithPasswordEnabled = false),
+            DEFAULT_STATE,
             viewModel.stateFlow.value,
         )
     }
@@ -105,25 +105,6 @@ class DeleteAccountViewModelTest : BaseViewModelTest() {
             }
             coVerify(exactly = 1) {
                 authRepo.deleteAccountWithMasterPassword(masterPassword)
-            }
-        }
-
-    @Test
-    @Suppress("MaxLineLength")
-    fun `on DeleteAccountClick should emit NavigateToDeleteAccountConfirmationScreen`() =
-        runTest {
-            val viewModel = createViewModel(
-                state = DEFAULT_STATE.copy(
-                    isUnlockWithPasswordEnabled = false,
-                ),
-            )
-
-            viewModel.eventFlow.test {
-                viewModel.trySendAction(DeleteAccountAction.DeleteAccountClick)
-                assertEquals(
-                    DeleteAccountEvent.NavigateToDeleteAccountConfirmationScreen,
-                    awaitItem(),
-                )
             }
         }
 
@@ -257,6 +238,4 @@ private val DEFAULT_USER_STATE: UserState = UserState(
 
 private val DEFAULT_STATE: DeleteAccountState = DeleteAccountState(
     dialog = null,
-    isUnlockWithPasswordEnabled = true,
-    isUserManagedByOrganization = false,
 )
