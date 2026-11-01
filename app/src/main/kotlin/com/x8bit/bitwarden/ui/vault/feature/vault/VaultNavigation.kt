@@ -37,6 +37,7 @@ fun NavGraphBuilder.vaultDestination(
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToAutofillScreen: () -> Unit,
     onNavigateToBackupScreen: (isImport: Boolean) -> Unit,
+    onNavigateToManageVaultsScreen: () -> Unit,
     onNavigateToPlan: () -> Unit,
 ) {
     composableWithRootPushTransitions<VaultRoute> {
@@ -53,6 +54,7 @@ fun NavGraphBuilder.vaultDestination(
             onNavigateToAboutScreen = onNavigateToAboutScreen,
             onNavigateToAutofillScreen = onNavigateToAutofillScreen,
             onNavigateToBackupScreen = onNavigateToBackupScreen,
+            onNavigateToManageVaultsScreen = onNavigateToManageVaultsScreen,
             onNavigateToPlan = onNavigateToPlan,
         )
     }

@@ -98,6 +98,7 @@ fun VaultScreen(
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToAutofillScreen: () -> Unit,
     onNavigateToBackupScreen: (isImport: Boolean) -> Unit,
+    onNavigateToManageVaultsScreen: () -> Unit,
     onNavigateToPlan: () -> Unit,
     intentManager: IntentManager = LocalIntentManager.current,
     appReviewManager: AppReviewManager = LocalAppReviewManager.current,
@@ -181,6 +182,7 @@ fun VaultScreen(
             VaultEvent.NavigateToAutofillSettings -> onNavigateToAutofillScreen()
 
             is VaultEvent.NavigateToBackup -> onNavigateToBackupScreen(event.isImport)
+            VaultEvent.NavigateToManageVaults -> onNavigateToManageVaultsScreen()
 
             VaultEvent.NavigateToUpgradePremium -> onNavigateToPlan()
         }
@@ -256,6 +258,10 @@ private fun VaultScreenScaffold(
                             OverflowMenuItemData(
                                 text = stringResource(id = BitwardenString.import_backup),
                                 onClick = vaultHandlers.importBackupAction,
+                            ),
+                            OverflowMenuItemData(
+                                text = stringResource(id = BitwardenString.manage_vaults),
+                                onClick = vaultHandlers.manageVaultsAction,
                             ),
                             OverflowMenuItemData(
                                 text = stringResource(id = BitwardenString.lock),

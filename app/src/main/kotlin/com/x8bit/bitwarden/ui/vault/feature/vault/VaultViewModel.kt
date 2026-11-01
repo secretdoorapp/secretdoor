@@ -334,6 +334,7 @@ class VaultViewModel @Inject constructor(
             is VaultAction.LockClick -> handleLockClick()
             is VaultAction.BackupClick -> handleBackupClick()
             is VaultAction.ImportBackupClick -> handleImportBackupClick()
+            is VaultAction.ManageVaultsClick -> sendEvent(VaultEvent.NavigateToManageVaults)
             is VaultAction.VaultFilterTypeSelect -> handleVaultFilterTypeSelect(action)
             is VaultAction.SecureNoteGroupClick -> handleSecureNoteClick()
             is VaultAction.SshKeyGroupClick -> handleSshKeyClick()
@@ -2461,6 +2462,11 @@ sealed class VaultEvent {
     data class NavigateToBackup(val isImport: Boolean) : VaultEvent()
 
     /**
+     * Navigate to the manage vaults screen.
+     */
+    data object NavigateToManageVaults : VaultEvent()
+
+    /**
      * Navigate to the premium upgrade plan screen.
      */
     data object NavigateToUpgradePremium : VaultEvent()
@@ -2543,6 +2549,11 @@ sealed class VaultAction {
      * User clicked the Import backup option in the overflow menu.
      */
     data object ImportBackupClick : VaultAction()
+
+    /**
+     * User clicked the manage vaults menu item.
+     */
+    data object ManageVaultsClick : VaultAction()
 
     /**
      * User selected a [VaultFilterType] from the Vault Filter menu.
