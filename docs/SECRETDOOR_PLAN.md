@@ -85,8 +85,8 @@ stored key material.
 - Progress:
   - [x] Send: delete the Send tab, screens, `SendManager`, Send results/data models, Send search
     and listing types, the `ShareNewSend` special circumstance and the `ACTION_SEND` intent filter.
-  - [ ] Send data layer: `VaultDiskSource` Send storage, `VaultSdkSource` Send encrypt/decrypt,
-    `VaultSdkSendExtensions` (goes with the `:network` cleanup).
+  - [x] Send data layer: `VaultDiskSource` Send storage, `VaultSdkSource` Send encrypt/decrypt,
+    `VaultSdkSendExtensions`; the `sends` table is dropped (vault database v11).
   - [x] Organizations/collections UI (not yet compiled or tested): delete Move to organization /
     Collections screen and menu options, Leave organization, Migrate to My Items (and
     `VaultMigrationManager`), the owner picker, owner bottom sheet and collection selector in
@@ -99,11 +99,17 @@ stored key material.
   - [x] Policies removed from all screens (vault, item listing, search, add/edit, import,
     generator, account security). Remaining: the policy managers themselves (`PolicyManager`,
     `PasswordPolicyManager`, `UserNotificationPolicyManager`), which always return nothing.
-  - [ ] Organizations/collections data layer, part 2: policies (`PolicyManager`, used in ~60
-    files), `selectedCollectionId` / owner state in add/edit, collection permission helpers,
-    org/collection SDK extensions. Do this with compiler feedback.
-  - [ ] Room tables `CollectionEntity` and `OrganizationEventEntity`: kept (always empty). Dropping
-    them needs a database migration and a regenerated schema, so do it with a build.
+  - [x] Policies, data layer: `PolicyManager`, `PasswordPolicyManager`,
+    `UserNotificationPolicyManager`, the vault policy banner, `PolicyInformation`, the generator
+    and session-timeout policy states, the weak-password check on unlock and the policy-based
+    export restriction.
+  - [ ] Organizations/collections data layer, part 2: `selectedCollectionId` / owner state in
+    add/edit, collection permission helpers, org/collection SDK extensions. Do this with
+    compiler feedback.
+  - [x] Organization events: the event manager, every `trackEvent` call and the platform
+    database (it only held queued events) are removed.
+  - [ ] Room table `CollectionEntity`: kept (always empty); collections are still read by the
+    vault screens. Drop it together with the collections data layer.
   - [x] Bug fixed: saving an item no longer requires an internet connection
     (`VaultAddEditViewModel` no longer depends on `NetworkConnectionManager`).
   - [x] Sync UI removed: "Sync" overflow items (vault, item listing, verification codes),
@@ -117,10 +123,14 @@ stored key material.
     the server config fetch in `NetworkConfigManagerImpl`.
   - [x] `:authenticator` app module removed; the Authenticator bridge service is no longer exported
     and "Sync with Authenticator" is hidden.
-  - [ ] Delete the unused Authenticator bridge code (`:authenticatorbridge`, bridge
-    repository/processor/service, sync unlock key, key rotation).
-  - [ ] Remaining server code (services in `:network`, push, auth requests, Key Connector,
-    devices, Fill Assist) is unreachable behind the network guard; delete it over time.
+  - [x] Authenticator bridge removed: the `:authenticatorbridge` module, bridge
+    repository/processor/service, add-TOTP-from-Authenticator, the sync toggle and key rotation.
+  - [x] Server login removed: login, SSO, TDE, Key Connector, trusted devices, registration,
+    push notifications, login requests, device management, Fill Assist, push token storage, and
+    the app's providers for unused `:network` services.
+  - [ ] Still left behind the network guard: one-time passcode flows for accounts without a
+    master password (export, delete account), the server environment/region settings, cookie
+    acquisition (wired into the SDK platform API), and the service code inside `:network`.
 
 ### Phase 4: Backup and restore
 - Format (version 2, `.secretdoor`): `SECRETDOOR`, a version byte, the header length and a JSON
