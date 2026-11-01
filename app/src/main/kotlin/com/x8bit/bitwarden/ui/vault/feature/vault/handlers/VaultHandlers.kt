@@ -25,6 +25,7 @@ data class VaultHandlers(
     val lockAction: () -> Unit,
     val backupAction: () -> Unit,
     val importBackupAction: () -> Unit,
+    val manageVaultsAction: () -> Unit,
     val vaultItemClick: (VaultState.ViewState.VaultItem) -> Unit,
     val folderClick: (VaultState.ViewState.FolderItem) -> Unit,
     val verificationCodesClick: () -> Unit,
@@ -89,6 +90,7 @@ data class VaultHandlers(
                 lockAction = { viewModel.trySendAction(VaultAction.LockClick) },
                 backupAction = { viewModel.trySendAction(VaultAction.BackupClick) },
                 importBackupAction = { viewModel.trySendAction(VaultAction.ImportBackupClick) },
+                manageVaultsAction = { viewModel.trySendAction(VaultAction.ManageVaultsClick) },
                 vaultItemClick = { viewModel.trySendAction(VaultAction.VaultItemClick(it)) },
                 folderClick = { viewModel.trySendAction(VaultAction.FolderClick(it)) },
                 verificationCodesClick = {

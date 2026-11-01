@@ -35,6 +35,7 @@ fun NavGraphBuilder.vaultGraph(
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToAutofillScreen: () -> Unit,
     onNavigateToBackupScreen: (isImport: Boolean) -> Unit,
+    onNavigateToManageVaultsScreen: () -> Unit,
     onNavigateToPlan: () -> Unit,
 ) {
     navigation<VaultGraphRoute>(
@@ -55,6 +56,7 @@ fun NavGraphBuilder.vaultGraph(
             onNavigateToAboutScreen = onNavigateToAboutScreen,
             onNavigateToAutofillScreen = onNavigateToAutofillScreen,
             onNavigateToBackupScreen = onNavigateToBackupScreen,
+            onNavigateToManageVaultsScreen = onNavigateToManageVaultsScreen,
             onNavigateToPlan = onNavigateToPlan,
         )
         vaultItemListingDestination(

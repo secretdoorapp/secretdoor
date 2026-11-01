@@ -78,6 +78,7 @@ class VaultScreenTest : BitwardenComposeTest() {
     private var onNavigateToAboutCalled = false
     private var onNavigateToAutofillCalled = false
     private var onNavigateToBackupIsImport: Boolean? = null
+    private var onNavigateToManageVaultsCalled = false
     private var onNavigateToPlanCalled = false
     private var onNavigateToImportLoginsCalled = false
     private var onNavigateToVaultAddItemScreenCalled = false
@@ -124,6 +125,7 @@ class VaultScreenTest : BitwardenComposeTest() {
                 onNavigateToAboutScreen = { onNavigateToAboutCalled = true },
                 onNavigateToAutofillScreen = { onNavigateToAutofillCalled = true },
                 onNavigateToBackupScreen = { onNavigateToBackupIsImport = it },
+                onNavigateToManageVaultsScreen = { onNavigateToManageVaultsCalled = true },
                 onNavigateToPlan = { onNavigateToPlanCalled = true },
             )
         }
@@ -356,6 +358,24 @@ class VaultScreenTest : BitwardenComposeTest() {
             .performClick()
 
         verify { viewModel.trySendAction(VaultAction.ImportBackupClick) }
+    }
+
+    @Test
+    fun `manage vaults click in the overflow menu should send ManageVaultsClick`() {
+        composeTestRule.onNodeWithContentDescription("More options").performClick()
+
+        composeTestRule
+            .onAllNodesWithText("Manage vaults")
+            .filterToOne(hasAnyAncestor(isPopup()))
+            .performClick()
+
+        verify { viewModel.trySendAction(VaultAction.ManageVaultsClick) }
+    }
+
+    @Test
+    fun `when NavigateToManageVaults is sent, it should call onNavigateToManageVaultsScreen`() {
+        mutableEventFlow.tryEmit(VaultEvent.NavigateToManageVaults)
+        assertEquals(true, onNavigateToManageVaultsCalled)
     }
 
     @Test

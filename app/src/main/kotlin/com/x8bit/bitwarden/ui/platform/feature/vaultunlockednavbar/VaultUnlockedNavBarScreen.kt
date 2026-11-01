@@ -27,6 +27,7 @@ import com.x8bit.bitwarden.ui.platform.feature.search.model.SearchType
 import com.x8bit.bitwarden.ui.platform.feature.settings.about.navigateToAbout
 import com.x8bit.bitwarden.ui.platform.feature.settings.autofill.navigateToAutoFill
 import com.x8bit.bitwarden.ui.platform.feature.settings.backup.navigateToBackup
+import com.x8bit.bitwarden.ui.platform.feature.settings.managevaults.navigateToManageVaults
 import com.x8bit.bitwarden.ui.platform.feature.settings.navigateToSettingsGraphRoot
 import com.x8bit.bitwarden.ui.platform.feature.settings.settingsGraph
 import com.x8bit.bitwarden.ui.platform.feature.vaultunlockednavbar.model.VaultUnlockedNavBarTab
@@ -196,6 +197,10 @@ private fun VaultUnlockedNavBarScaffold(
                 onNavigateToBackupScreen = { isImport ->
                     navController.navigateToSettingsGraphRoot()
                     navController.navigateToBackup(isImport = isImport)
+                },
+                onNavigateToManageVaultsScreen = {
+                    navController.navigateToSettingsGraphRoot()
+                    navController.navigateToManageVaults()
                 },
                 onNavigateToPlan = onNavigateToPlan,
             )
