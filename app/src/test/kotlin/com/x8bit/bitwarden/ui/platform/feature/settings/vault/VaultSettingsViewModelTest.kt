@@ -51,6 +51,15 @@ class VaultSettingsViewModelTest : BaseViewModelTest() {
     }
 
     @Test
+    fun `ManageVaultsClick should emit NavigateToManageVaults`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(VaultSettingsAction.ManageVaultsClick)
+            assertEquals(VaultSettingsEvent.NavigateToManageVaults, awaitItem())
+        }
+    }
+
+    @Test
     fun `ExportVaultClick should emit NavigateToExportVault`() = runTest {
         val viewModel = createViewModel()
         viewModel.eventFlow.test {

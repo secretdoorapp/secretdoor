@@ -22,6 +22,7 @@ fun NavGraphBuilder.vaultSettingsDestination(
     onNavigateToImportLogins: () -> Unit,
     onNavigateToImportItems: () -> Unit,
     onNavigateToBackup: () -> Unit,
+    onNavigateToManageVaults: () -> Unit,
 ) {
     composableWithPushTransitions<VaultSettingsRoute> {
         VaultSettingsScreen(
@@ -31,6 +32,7 @@ fun NavGraphBuilder.vaultSettingsDestination(
             onNavigateToImportLogins = onNavigateToImportLogins,
             onNavigateToImportItems = onNavigateToImportItems,
             onNavigateToBackup = onNavigateToBackup,
+            onNavigateToManageVaults = onNavigateToManageVaults,
         )
     }
 }

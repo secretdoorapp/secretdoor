@@ -72,6 +72,9 @@ class CompleteRegistrationViewModel @Inject constructor(
             dialog = null,
             passwordStrengthState = PasswordStrengthState.NONE,
             minimumPasswordLength = MIN_PASSWORD_LENGTH,
+            // With a vault already on the device this screen adds another one, so it can be
+            // cancelled.
+            isAddingVault = authRepository.userStateFlow.value != null,
         )
     },
 ) {
@@ -348,6 +351,10 @@ class CompleteRegistrationViewModel @Inject constructor(
     private fun handleBackClicked() {
         // clear the special circumstance manager as user has elected not to proceed.
         specialCircumstanceManager.specialCircumstance = null
+        if (state.isAddingVault) {
+            // Switching to the current vault ends the pending "add vault" and returns to it.
+            authRepository.activeUserId?.let { authRepository.switchAccount(userId = it) }
+        }
         sendEvent(CompleteRegistrationEvent.NavigateBack)
     }
 
@@ -478,6 +485,7 @@ data class CompleteRegistrationState(
     val dialog: CompleteRegistrationDialog?,
     val passwordStrengthState: PasswordStrengthState,
     val minimumPasswordLength: Int,
+    val isAddingVault: Boolean = false,
 ) : Parcelable {
     /**
      * Whether the provided master password is considered strong.

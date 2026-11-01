@@ -30,6 +30,7 @@ import com.x8bit.bitwarden.data.auth.manager.UserStateManager
 import com.x8bit.bitwarden.data.auth.repository.model.BreachCountResult
 import com.x8bit.bitwarden.data.auth.repository.model.ChangeMasterPasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.DeleteAccountResult
+import com.x8bit.bitwarden.data.auth.repository.model.DeleteVaultResult
 import com.x8bit.bitwarden.data.auth.repository.model.LogoutReason
 import com.x8bit.bitwarden.data.auth.repository.model.PasswordStrengthResult
 import com.x8bit.bitwarden.data.auth.repository.model.RegisterResult
@@ -124,6 +125,55 @@ internal class AuthRepositoryImpl(
             )
         }
             .launchIn(unconfinedScope)
+    }
+
+    override fun renameVault(userId: String, name: String) {
+        val userState = authDiskSource.userState ?: return
+        val account = userState.accounts[userId] ?: return
+        val renamed = account.copy(
+            profile = account.profile.copy(name = name.trim().takeIf { it.isNotEmpty() }),
+        )
+        authDiskSource.userState = userState.copy(
+            accounts = userState.accounts + (userId to renamed),
+        )
+    }
+
+    override suspend fun deleteVault(userId: String, masterPassword: String): DeleteVaultResult {
+        val previousActiveUserId = activeUserId
+        if (userId != previousActiveUserId) {
+            // The password can only be checked against the active vault, so it is made active.
+            if (switchAccount(userId = userId) != SwitchAccountResult.AccountSwitched) {
+                return DeleteVaultResult.Error(
+                    error = IllegalStateException("The vault to delete was not found"),
+                )
+            }
+        }
+        val isPasswordValid = if (vaultRepository.isVaultUnlocked(userId = userId)) {
+            when (val result = validatePassword(password = masterPassword)) {
+                is ValidatePasswordResult.Success -> result.isValid
+                is ValidatePasswordResult.Error -> {
+                    restoreActiveVault(previousActiveUserId = previousActiveUserId, userId = userId)
+                    return DeleteVaultResult.Error(error = result.error)
+                }
+            }
+        } else {
+            // Unlocking only succeeds with the right password, which is the check needed here.
+            vaultRepository
+                .unlockVaultWithMasterPassword(masterPassword = masterPassword) is
+                VaultUnlockResult.Success
+        }
+        if (!isPasswordValid) {
+            restoreActiveVault(previousActiveUserId = previousActiveUserId, userId = userId)
+            return DeleteVaultResult.WrongPassword
+        }
+        logout(userId = userId, reason = LogoutReason.AccountDelete)
+        return DeleteVaultResult.Success
+    }
+
+    private fun restoreActiveVault(previousActiveUserId: String?, userId: String) {
+        if (previousActiveUserId != null && previousActiveUserId != userId) {
+            switchAccount(userId = previousActiveUserId)
+        }
     }
 
     override suspend fun changeMasterPassword(
@@ -394,11 +444,12 @@ internal class AuthRepositoryImpl(
                     refreshToken = null,
                 ),
             )
-            // SecretDoor keeps a single vault per device.
+            // Other vaults on the device are kept; the new one becomes the active vault.
             authDiskSource.userState = UserStateJson(
                 activeUserId = userId,
-                accounts = mapOf(userId to account),
+                accounts = authDiskSource.userState?.accounts.orEmpty() + (userId to account),
             )
+            userStateManager.hasPendingAccountAddition = false
             vaultRepository.unlockVaultWithMasterPassword(masterPassword = masterPassword)
         }
         return when (unlockResult) {

@@ -62,6 +62,10 @@ class VaultSettingsViewModel @Inject constructor(
         VaultSettingsAction.ExportVaultClick -> handleExportVaultClicked()
         VaultSettingsAction.FoldersButtonClick -> handleFoldersButtonClicked()
         VaultSettingsAction.BackupClick -> sendEvent(VaultSettingsEvent.NavigateToBackup)
+        VaultSettingsAction.ManageVaultsClick -> {
+            sendEvent(VaultSettingsEvent.NavigateToManageVaults)
+        }
+
         VaultSettingsAction.ImportItemsClick -> handleImportItemsClicked()
         VaultSettingsAction.ImportLoginsCardCtaClick -> handleImportLoginsCardClicked()
         VaultSettingsAction.ImportLoginsCardDismissClick -> handleImportLoginsCardDismissClicked()
@@ -177,6 +181,11 @@ sealed class VaultSettingsEvent {
     data object NavigateToBackup : VaultSettingsEvent()
 
     /**
+     * Navigate to the manage vaults screen.
+     */
+    data object NavigateToManageVaults : VaultSettingsEvent()
+
+    /**
      * Shows a snackbar with the given [data].
      */
     data class ShowSnackbar(val data: BitwardenSnackbarData) : VaultSettingsEvent(), BackgroundEvent
@@ -205,6 +214,11 @@ sealed class VaultSettingsAction {
      * Indicates that the user clicked the Backup button.
      */
     data object BackupClick : VaultSettingsAction()
+
+    /**
+     * User clicked the manage vaults button.
+     */
+    data object ManageVaultsClick : VaultSettingsAction()
 
     /**
      * Indicates that the user clicked the Import Items button.

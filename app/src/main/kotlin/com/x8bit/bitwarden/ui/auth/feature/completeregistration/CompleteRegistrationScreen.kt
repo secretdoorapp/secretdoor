@@ -36,6 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bitwarden.ui.platform.base.util.EventsEffect
 import com.bitwarden.ui.platform.base.util.standardHorizontalMargin
 import com.bitwarden.ui.platform.components.appbar.BitwardenTopAppBar
+import com.bitwarden.ui.platform.components.appbar.NavigationIcon
 import com.bitwarden.ui.platform.components.button.BitwardenFilledButton
 import com.bitwarden.ui.platform.components.button.BitwardenOutlinedButton
 import com.bitwarden.ui.platform.components.card.BitwardenActionCardSmall
@@ -161,7 +162,17 @@ fun CompleteRegistrationScreen(
             BitwardenTopAppBar(
                 title = stringResource(id = BitwardenString.create_vault),
                 scrollBehavior = scrollBehavior,
-                navigationIcon = null,
+                navigationIcon = if (state.isAddingVault) {
+                    NavigationIcon(
+                        navigationIcon = rememberVectorPainter(id = BitwardenDrawable.ic_close),
+                        navigationIconContentDescription = stringResource(
+                            id = BitwardenString.close,
+                        ),
+                        onNavigationIconClick = handler.onBackClick,
+                    )
+                } else {
+                    null
+                },
             )
         },
         snackbarHost = { BitwardenSnackbarHost(bitwardenHostState = snackbarHostState) },
@@ -182,6 +193,7 @@ fun CompleteRegistrationScreen(
                 nextButtonEnabled = state.validSubmissionReady,
                 callToActionText = stringResource(BitwardenString.create_vault),
                 minimumPasswordLength = state.minimumPasswordLength,
+                isRestoreAvailable = !state.isAddingVault,
             )
             Spacer(modifier = Modifier.height(height = 16.dp))
             Spacer(modifier = Modifier.navigationBarsPadding())
@@ -200,6 +212,7 @@ private fun CompleteRegistrationContent(
     nextButtonEnabled: Boolean,
     minimumPasswordLength: Int,
     callToActionText: String,
+    isRestoreAvailable: Boolean,
     handler: CompleteRegistrationHandler,
     modifier: Modifier = Modifier,
 ) {
@@ -322,15 +335,17 @@ private fun CompleteRegistrationContent(
                 .fillMaxWidth()
                 .standardHorizontalMargin(),
         )
-        Spacer(modifier = Modifier.height(height = 12.dp))
-        BitwardenOutlinedButton(
-            label = stringResource(id = BitwardenString.restore_from_backup),
-            onClick = handler.onRestoreFromBackupClick,
-            modifier = Modifier
-                .testTag("RestoreFromBackupButton")
-                .fillMaxWidth()
-                .standardHorizontalMargin(),
-        )
+        if (isRestoreAvailable) {
+            Spacer(modifier = Modifier.height(height = 12.dp))
+            BitwardenOutlinedButton(
+                label = stringResource(id = BitwardenString.restore_from_backup),
+                onClick = handler.onRestoreFromBackupClick,
+                modifier = Modifier
+                    .testTag("RestoreFromBackupButton")
+                    .fillMaxWidth()
+                    .standardHorizontalMargin(),
+            )
+        }
     }
 }
 
@@ -418,6 +433,7 @@ private fun CompleteRegistrationContentOldUI_preview() {
                 onRestoreMasterPasswordSubmit = {},
             ),
             callToActionText = "Next",
+            isRestoreAvailable = true,
             nextButtonEnabled = true,
             modifier = Modifier.standardHorizontalMargin(),
             minimumPasswordLength = 12,

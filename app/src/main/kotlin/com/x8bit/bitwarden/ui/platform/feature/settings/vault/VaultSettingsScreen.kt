@@ -57,6 +57,7 @@ fun VaultSettingsScreen(
     onNavigateToImportLogins: () -> Unit,
     onNavigateToImportItems: () -> Unit,
     onNavigateToBackup: () -> Unit,
+    onNavigateToManageVaults: () -> Unit,
     viewModel: VaultSettingsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
@@ -68,6 +69,7 @@ fun VaultSettingsScreen(
             VaultSettingsEvent.NavigateToExportVault -> onNavigateToExportVault()
             VaultSettingsEvent.NavigateToFolders -> onNavigateToFolders()
             VaultSettingsEvent.NavigateToBackup -> onNavigateToBackup()
+            VaultSettingsEvent.NavigateToManageVaults -> onNavigateToManageVaults()
             is VaultSettingsEvent.NavigateToImportVault -> onNavigateToImportLogins()
             is VaultSettingsEvent.NavigateToImportItems -> onNavigateToImportItems()
             is VaultSettingsEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.data)
@@ -126,12 +128,23 @@ fun VaultSettingsScreen(
                 )
             }
             BitwardenTextRow(
+                text = stringResource(BitwardenString.manage_vaults),
+                onClick = { viewModel.trySendAction(VaultSettingsAction.ManageVaultsClick) },
+                withDivider = false,
+                cardStyle = CardStyle.Top(),
+                modifier = Modifier
+                    .testTag("ManageVaultsLabel")
+                    .standardHorizontalMargin()
+                    .fillMaxWidth(),
+            )
+
+            BitwardenTextRow(
                 text = stringResource(
                     id = vfo1Foundation(BitwardenString.my_folders, BitwardenString.folders),
                 ),
                 onClick = { viewModel.trySendAction(VaultSettingsAction.FoldersButtonClick) },
                 withDivider = false,
-                cardStyle = CardStyle.Top(),
+                cardStyle = CardStyle.Middle(),
                 modifier = Modifier
                     .testTag("FoldersLabel")
                     .standardHorizontalMargin()

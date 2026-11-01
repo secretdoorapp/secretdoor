@@ -15,6 +15,7 @@ import com.bitwarden.annotation.OmitFromCoverage
 import com.bitwarden.ui.platform.base.util.composableWithRootPushTransitions
 import com.bitwarden.ui.platform.base.util.composableWithSlideTransitions
 import com.bitwarden.ui.platform.util.ParcelableRouteSerializer
+import com.x8bit.bitwarden.ui.platform.feature.premium.plan.planDestination
 import com.x8bit.bitwarden.ui.platform.feature.settings.about.aboutDestination
 import com.x8bit.bitwarden.ui.platform.feature.settings.about.navigateToAbout
 import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.accountSecurityDestination
@@ -33,11 +34,12 @@ import com.x8bit.bitwarden.ui.platform.feature.settings.flightrecorder.flightRec
 import com.x8bit.bitwarden.ui.platform.feature.settings.flightrecorder.navigateToFlightRecorder
 import com.x8bit.bitwarden.ui.platform.feature.settings.flightrecorder.recordedLogs.navigateToRecordedLogs
 import com.x8bit.bitwarden.ui.platform.feature.settings.flightrecorder.recordedLogs.recordedLogsDestination
+import com.x8bit.bitwarden.ui.platform.feature.settings.managevaults.manageVaultsDestination
+import com.x8bit.bitwarden.ui.platform.feature.settings.managevaults.navigateToManageVaults
 import com.x8bit.bitwarden.ui.platform.feature.settings.other.navigateToOther
 import com.x8bit.bitwarden.ui.platform.feature.settings.other.otherDestination
 import com.x8bit.bitwarden.ui.platform.feature.settings.vault.navigateToVaultSettings
 import com.x8bit.bitwarden.ui.platform.feature.settings.vault.vaultSettingsDestination
-import com.x8bit.bitwarden.ui.platform.feature.premium.plan.planDestination
 import com.x8bit.bitwarden.ui.vault.feature.importitems.importItemsDestination
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
@@ -177,8 +179,13 @@ fun NavGraphBuilder.settingsGraph(
             onNavigateToImportLogins = onNavigateToImportLogins,
             onNavigateToImportItems = onNavigateToImportItems,
             onNavigateToBackup = { navController.navigateToBackup() },
+            onNavigateToManageVaults = { navController.navigateToManageVaults() },
         )
         backupDestination(onNavigateBack = { navController.popBackStack() })
+        manageVaultsDestination(
+            onNavigateBack = { navController.popBackStack() },
+            onNavigateToImportBackup = { navController.navigateToBackup(isImport = true) },
+        )
         importItemsDestination(
             onNavigateBack = { navController.popBackStack() },
             onNavigateToImportLogins = onNavigateToImportLogins,

@@ -19,6 +19,7 @@ import com.x8bit.bitwarden.data.auth.datasource.sdk.model.PasswordStrength.LEVEL
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.PasswordStrengthResult
 import com.x8bit.bitwarden.data.auth.repository.model.RegisterResult
+import com.x8bit.bitwarden.data.auth.repository.model.SwitchAccountResult
 import com.x8bit.bitwarden.data.auth.repository.model.UserState
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManagerImpl
@@ -364,6 +365,38 @@ class CompleteRegistrationViewModelTest : BaseViewModelTest() {
         }
 
         assertNull(specialCircumstanceManager.specialCircumstance)
+    }
+
+    @Test
+    fun `isAddingVault should be false when no vault exists yet`() {
+        assertEquals(false, createCompleteRegistrationViewModel().stateFlow.value.isAddingVault)
+    }
+
+    @Test
+    fun `BackClick while adding a vault should return to the active vault`() = runTest {
+        every { mockAuthRepository.activeUserId } returns "activeUserId"
+        every { mockAuthRepository.switchAccount(userId = "activeUserId") } returns
+            SwitchAccountResult.NoChange
+        val viewModel = createCompleteRegistrationViewModel(
+            DEFAULT_STATE.copy(isAddingVault = true),
+        )
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(BackClick)
+            assertEquals(CompleteRegistrationEvent.NavigateBack, awaitItem())
+        }
+
+        verify(exactly = 1) { mockAuthRepository.switchAccount(userId = "activeUserId") }
+    }
+
+    @Test
+    fun `BackClick when not adding a vault should not switch vaults`() = runTest {
+        val viewModel = createCompleteRegistrationViewModel()
+        viewModel.eventFlow.test {
+            viewModel.trySendAction(BackClick)
+            assertEquals(CompleteRegistrationEvent.NavigateBack, awaitItem())
+        }
+
+        verify(exactly = 0) { mockAuthRepository.switchAccount(userId = any()) }
     }
 
     @Test
