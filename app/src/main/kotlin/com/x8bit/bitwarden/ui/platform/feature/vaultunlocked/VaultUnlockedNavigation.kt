@@ -26,8 +26,6 @@ import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.changema
 import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.changemasterpassword.navigateToChangeMasterPassword
 import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.deleteaccount.deleteAccountDestination
 import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.deleteaccount.navigateToDeleteAccount
-import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.deleteaccountconfirmation.deleteAccountConfirmationDestination
-import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.deleteaccountconfirmation.navigateToDeleteAccountConfirmation
 import com.x8bit.bitwarden.ui.platform.feature.settings.autofill.privilegedapps.about.aboutPrivilegedAppsDestination
 import com.x8bit.bitwarden.ui.platform.feature.settings.autofill.privilegedapps.about.navigateToAboutPrivilegedAppsScreen
 import com.x8bit.bitwarden.ui.platform.feature.settings.exportvault.exportVaultDestination
@@ -156,15 +154,7 @@ fun NavGraphBuilder.vaultUnlockedGraph(
             onNavigateBack = { navController.popBackStack() },
         )
         changeMasterPasswordDestination(onNavigateBack = { navController.popBackStack() })
-        deleteAccountDestination(
-            onNavigateBack = { navController.popBackStack() },
-            onNavigateToDeleteAccountConfirmation = {
-                navController.navigateToDeleteAccountConfirmation()
-            },
-        )
-        deleteAccountConfirmationDestination(
-            onNavigateBack = { navController.popBackStack() },
-        )
+        deleteAccountDestination(onNavigateBack = { navController.popBackStack() })
         vaultAddEditDestination(
             onNavigateToQrCodeScanScreen = {
                 navController.navigateToQrCodeScanScreen()

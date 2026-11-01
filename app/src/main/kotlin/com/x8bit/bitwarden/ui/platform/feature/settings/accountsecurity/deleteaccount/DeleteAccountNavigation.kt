@@ -17,12 +17,10 @@ data object DeleteAccountRoute
  */
 fun NavGraphBuilder.deleteAccountDestination(
     onNavigateBack: () -> Unit,
-    onNavigateToDeleteAccountConfirmation: () -> Unit,
 ) {
     composableWithSlideTransitions<DeleteAccountRoute> {
         DeleteAccountScreen(
             onNavigateBack = onNavigateBack,
-            onNavigateToDeleteAccountConfirmation = onNavigateToDeleteAccountConfirmation,
         )
     }
 }

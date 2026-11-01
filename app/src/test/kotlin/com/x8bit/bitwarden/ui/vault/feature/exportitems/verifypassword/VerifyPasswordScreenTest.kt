@@ -136,23 +136,6 @@ class VerifyPasswordScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `otp state should be correct`() = runTest {
-        mockStateFlow.emit(DEFAULT_STATE.copy(viewState = OTP_CONTENT_VIEW_STATE))
-
-        composeTestRule
-            .onNodeWithText("Verify your account email address")
-            .assertIsDisplayed()
-
-        composeTestRule
-            .onNodeWithText("Enter the 6-digit code that was emailed to the address below")
-            .assertIsDisplayed()
-
-        composeTestRule
-            .onNodeWithText("Resend code")
-            .assertIsDisplayed()
-    }
-
-    @Test
     fun `input change should send PasswordInputChangeReceive action`() = runTest {
         composeTestRule
             .onNodeWithText("Master password")
@@ -193,17 +176,6 @@ class VerifyPasswordScreenTest : BitwardenComposeTest() {
             .performClick()
         verify {
             viewModel.trySendAction(VerifyPasswordAction.ContinueClick)
-        }
-    }
-
-    @Test
-    fun `Resend code button should send SendCodeClick action`() = runTest {
-        mockStateFlow.emit(DEFAULT_STATE.copy(viewState = OTP_CONTENT_VIEW_STATE))
-        composeTestRule
-            .onNodeWithText("Resend code")
-            .performClick()
-        verify {
-            viewModel.trySendAction(VerifyPasswordAction.ResendCodeClick)
         }
     }
 
@@ -395,16 +367,6 @@ private val DEFAULT_ACCOUNT_SELECTION_LIST_ITEM = AccountSelectionListItem(
 )
 private val DEFAULT_CONTENT_VIEW_STATE = VerifyPasswordState.ViewState.Content(
     title = BitwardenString.verify_your_master_password.asText(),
-    subtext = null,
-    showResendCodeButton = false,
-    input = "",
-)
-private val OTP_CONTENT_VIEW_STATE = VerifyPasswordState.ViewState.Content(
-    title = BitwardenString.verify_your_account_email_address.asText(),
-    subtext = BitwardenString
-        .enter_the_6_digit_code_that_was_emailed_to_the_address_below
-        .asText(),
-    showResendCodeButton = true,
     input = "",
 )
 private val DEFAULT_STATE = VerifyPasswordState(
@@ -413,5 +375,4 @@ private val DEFAULT_STATE = VerifyPasswordState(
     dialog = null,
     accountSummaryListItem = DEFAULT_ACCOUNT_SELECTION_LIST_ITEM,
     hasOtherAccounts = true,
-    hasMasterPassword = true,
 )

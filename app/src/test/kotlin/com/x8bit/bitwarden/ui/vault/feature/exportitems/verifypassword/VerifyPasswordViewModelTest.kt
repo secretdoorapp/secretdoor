@@ -12,11 +12,9 @@ import com.bitwarden.ui.platform.resource.BitwardenString
 import com.bitwarden.ui.util.asText
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.OnboardingStatus
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
-import com.x8bit.bitwarden.data.auth.repository.model.RequestOtpResult
 import com.x8bit.bitwarden.data.auth.repository.model.SwitchAccountResult
 import com.x8bit.bitwarden.data.auth.repository.model.UserState
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePasswordResult
-import com.x8bit.bitwarden.data.auth.repository.model.VerifyOtpResult
 import com.x8bit.bitwarden.data.auth.repository.model.createMockOrganization
 import com.x8bit.bitwarden.data.platform.manager.SpecialCircumstanceManager
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
@@ -48,7 +46,6 @@ class VerifyPasswordViewModelTest : BaseViewModelTest() {
     private val authRepository = mockk<AuthRepository> {
         every { userStateFlow } returns mutableUserStateFlow
         every { activeUserId } returns DEFAULT_USER_ID
-        coEvery { requestOneTimePasscode() } returns RequestOtpResult.Success
     }
     private val vaultRepository = mockk<VaultRepository> {
         every { isVaultUnlocked(any()) } returns true
@@ -89,35 +86,9 @@ class VerifyPasswordViewModelTest : BaseViewModelTest() {
                             dialog = null,
                             accountSummaryListItem = DEFAULT_ACCOUNT_SELECTION_LIST_ITEM,
                             hasOtherAccounts = true,
-                            hasMasterPassword = true,
                         ),
                         it.stateFlow.value,
                     )
-                    coVerify(exactly = 0) { authRepository.requestOneTimePasscode() }
-                }
-        }
-
-        @Test
-        fun `initial state should be correct when account has no master password`() = runTest {
-            mutableUserStateFlow.value = DEFAULT_USER_STATE.copy(
-                accounts = DEFAULT_USER_STATE.accounts.map {
-                    it.copy(hasMasterPassword = false)
-                },
-            )
-            createViewModel()
-                .also {
-                    assertEquals(
-                        VerifyPasswordState(
-                            importRequest = DEFAULT_IMPORT_REQUEST,
-                            viewState = VerifyPasswordState.ViewState.Loading,
-                            dialog = null,
-                            accountSummaryListItem = DEFAULT_ACCOUNT_SELECTION_LIST_ITEM,
-                            hasOtherAccounts = true,
-                            hasMasterPassword = false,
-                        ),
-                        it.stateFlow.value,
-                    )
-                    coVerify(exactly = 0) { authRepository.requestOneTimePasscode() }
                 }
         }
 
@@ -172,33 +143,6 @@ class VerifyPasswordViewModelTest : BaseViewModelTest() {
                         DEFAULT_LOADING_STATE.copy(viewState = DEFAULT_CONTENT_VIEW_STATE),
                         viewModel.stateFlow.value,
                     )
-                    coVerify(exactly = 0) { authRepository.requestOneTimePasscode() }
-                }
-            }
-
-        @Suppress("MaxLineLength")
-        @Test
-        fun `ValidateImportRequestResultReceive with valid request should show otp content when account has no master password`() =
-            runTest {
-                mutableUserStateFlow.value = DEFAULT_USER_STATE.copy(
-                    accounts = DEFAULT_USER_STATE.accounts.map {
-                        it.copy(hasMasterPassword = false)
-                    },
-                )
-
-                createViewModel().also { viewModel ->
-                    viewModel.trySendAction(
-                        VerifyPasswordAction.ValidateImportRequestResultReceive(isValid = true),
-                    )
-
-                    assertEquals(
-                        DEFAULT_LOADING_STATE.copy(
-                            viewState = OTP_CONTENT_VIEW_STATE,
-                            hasMasterPassword = false,
-                        ),
-                        viewModel.stateFlow.value,
-                    )
-                    coVerify(exactly = 1) { authRepository.requestOneTimePasscode() }
                 }
             }
 
@@ -220,222 +164,13 @@ class VerifyPasswordViewModelTest : BaseViewModelTest() {
                         ),
                         viewModel.stateFlow.value,
                     )
-                    coVerify(exactly = 0) { authRepository.requestOneTimePasscode() }
                 }
             }
 
-        @Suppress("MaxLineLength")
-        @Test
-        fun `ValidateImportRequestResultReceive with invalid request should not request otp code when account has no master password`() =
-            runTest {
-                mutableUserStateFlow.value = DEFAULT_USER_STATE.copy(
-                    accounts = DEFAULT_USER_STATE.accounts.map {
-                        it.copy(hasMasterPassword = false)
-                    },
-                )
-
-                createViewModel().also { viewModel ->
-                    viewModel.trySendAction(
-                        VerifyPasswordAction.ValidateImportRequestResultReceive(isValid = false),
-                    )
-
-                    assertEquals(
-                        DEFAULT_LOADING_STATE.copy(
-                            viewState = VerifyPasswordState.ViewState.Error(
-                                message = BitwardenString
-                                    .the_import_request_could_not_be_processed
-                                    .asText(),
-                            ),
-                            hasMasterPassword = false,
-                        ),
-                        viewModel.stateFlow.value,
-                    )
-                    coVerify(exactly = 0) { authRepository.requestOneTimePasscode() }
-                }
-            }
-
-        @Suppress("MaxLineLength")
-        @Test
-        fun `ValidateImportRequestResultReceive with valid request should show snackbar when otp code is sent`() =
-            runTest {
-                mutableUserStateFlow.value = DEFAULT_USER_STATE.copy(
-                    accounts = DEFAULT_USER_STATE.accounts.map {
-                        it.copy(hasMasterPassword = false)
-                    },
-                )
-                coEvery { authRepository.requestOneTimePasscode() } returns RequestOtpResult.Success
-
-                createViewModel().also { viewModel ->
-                    viewModel.eventFlow.test {
-                        awaitValidateImportRequestEvent()
-
-                        viewModel.trySendAction(
-                            VerifyPasswordAction.ValidateImportRequestResultReceive(isValid = true),
-                        )
-
-                        assertEquals(
-                            VerifyPasswordEvent.ShowSnackbar(BitwardenString.code_sent.asText()),
-                            awaitItem(),
-                        )
-                    }
-                }
-            }
-
-        @Suppress("MaxLineLength")
-        @Test
-        fun `ValidateImportRequestResultReceive with valid request should show error dialog when otp code request fails`() =
-            runTest {
-                mutableUserStateFlow.value = DEFAULT_USER_STATE.copy(
-                    accounts = DEFAULT_USER_STATE.accounts.map {
-                        it.copy(hasMasterPassword = false)
-                    },
-                )
-                coEvery {
-                    authRepository.requestOneTimePasscode()
-                } returns RequestOtpResult.Error(message = "error", error = IllegalStateException())
-
-                createViewModel().also { viewModel ->
-                    viewModel.trySendAction(
-                        VerifyPasswordAction.ValidateImportRequestResultReceive(isValid = true),
-                    )
-
-                    assertEquals(
-                        DEFAULT_LOADING_STATE.copy(
-                            viewState = OTP_CONTENT_VIEW_STATE,
-                            dialog = VerifyPasswordState.DialogState.General(
-                                title = BitwardenString.an_error_has_occurred.asText(),
-                                message = "error".asText(),
-                            ),
-                            hasMasterPassword = false,
-                        ),
-                        viewModel.stateFlow.value,
-                    )
-                }
-            }
     }
 
     @Nested
     inner class ViewActions {
-
-        @Test
-        fun `SendCodeClick should show loading dialog and request otp code`() = runTest {
-            val initialState = DEFAULT_STATE.copy(
-                viewState = OTP_CONTENT_VIEW_STATE,
-                hasMasterPassword = false,
-            )
-            coEvery { authRepository.requestOneTimePasscode() } returns RequestOtpResult.Success
-            createViewModel(state = initialState).also { viewModel ->
-                viewModel.trySendAction(VerifyPasswordAction.ResendCodeClick)
-                coVerify { authRepository.requestOneTimePasscode() }
-            }
-        }
-
-        @Test
-        fun `SendOtpCodeResultReceive success should show snackbar`() = runTest {
-            createViewModel(state = DEFAULT_STATE).also { viewModel ->
-                viewModel.eventFlow.test {
-                    awaitValidateImportRequestEvent()
-
-                    viewModel.trySendAction(
-                        VerifyPasswordAction.Internal.SendOtpCodeResultReceive(
-                            RequestOtpResult.Success,
-                        ),
-                    )
-
-                    assertEquals(
-                        VerifyPasswordEvent.ShowSnackbar(BitwardenString.code_sent.asText()),
-                        awaitItem(),
-                    )
-                }
-            }
-        }
-
-        @Test
-        fun `SendOtpCodeResultReceive error should show dialog`() = runTest {
-            createViewModel(state = DEFAULT_STATE).also { viewModel ->
-                viewModel.trySendAction(
-                    VerifyPasswordAction.Internal.SendOtpCodeResultReceive(
-                        RequestOtpResult.Error(
-                            message = "error",
-                            error = IllegalStateException(),
-                        ),
-                    ),
-                )
-
-                assertEquals(
-                    VerifyPasswordState.DialogState.General(
-                        title = BitwardenString.an_error_has_occurred.asText(),
-                        message = "error".asText(),
-                    ),
-                    viewModel.stateFlow.value.dialog,
-                )
-            }
-        }
-
-        @Test
-        fun `ContinueClick with otp should verify otp`() = runTest {
-            val initialState = DEFAULT_STATE.copy(
-                viewState = OTP_CONTENT_VIEW_STATE.copy(input = "123456"),
-                hasMasterPassword = false,
-            )
-            coEvery {
-                authRepository.verifyOneTimePasscode("123456")
-            } returns VerifyOtpResult.Verified
-
-            createViewModel(state = initialState).also { viewModel ->
-                viewModel.trySendAction(VerifyPasswordAction.ContinueClick)
-
-                coVerify { authRepository.verifyOneTimePasscode("123456") }
-            }
-        }
-
-        @Test
-        fun `VerifyOtpResultReceive verified should send event and clear input`() = runTest {
-            val initialState = DEFAULT_STATE.copy(
-                viewState = DEFAULT_CONTENT_VIEW_STATE.copy(input = "123"),
-            )
-            createViewModel(state = initialState)
-                .also { viewModel ->
-                    viewModel.eventFlow.test {
-                        awaitValidateImportRequestEvent()
-
-                        viewModel.trySendAction(
-                            VerifyPasswordAction.Internal.VerifyOtpResultReceive(
-                                VerifyOtpResult.Verified,
-                            ),
-                        )
-
-                        assertEquals(
-                            VerifyPasswordEvent.PasswordVerified(DEFAULT_USER_ID),
-                            awaitItem(),
-                        )
-                    }
-
-                    assertEquals(DEFAULT_STATE, viewModel.stateFlow.value)
-                }
-        }
-
-        @Test
-        fun `VerifyOtpResultReceive not verified should show dialog`() = runTest {
-            createViewModel(state = DEFAULT_STATE).also { viewModel ->
-                viewModel.trySendAction(
-                    VerifyPasswordAction.Internal.VerifyOtpResultReceive(
-                        VerifyOtpResult.NotVerified(
-                            error = IllegalStateException(),
-                            errorMessage = null,
-                        ),
-                    ),
-                )
-
-                assertEquals(
-                    VerifyPasswordState.DialogState.General(
-                        title = BitwardenString.an_error_has_occurred.asText(),
-                        message = BitwardenString.invalid_verification_code.asText(),
-                    ),
-                    viewModel.stateFlow.value.dialog,
-                )
-            }
-        }
 
         @Test
         fun `NavigateBackClick should send NavigateBack event`() = runTest {
@@ -986,16 +721,6 @@ private val DEFAULT_ACCOUNT_SELECTION_LIST_ITEM = AccountSelectionListItem(
 )
 private val DEFAULT_CONTENT_VIEW_STATE = VerifyPasswordState.ViewState.Content(
     title = BitwardenString.verify_your_master_password.asText(),
-    subtext = null,
-    showResendCodeButton = false,
-    input = "",
-)
-private val OTP_CONTENT_VIEW_STATE = VerifyPasswordState.ViewState.Content(
-    title = BitwardenString.verify_your_account_email_address.asText(),
-    subtext = BitwardenString
-        .enter_the_6_digit_code_that_was_emailed_to_the_address_below
-        .asText(),
-    showResendCodeButton = true,
     input = "",
 )
 private val DEFAULT_LOADING_STATE = VerifyPasswordState(
@@ -1004,7 +729,6 @@ private val DEFAULT_LOADING_STATE = VerifyPasswordState(
     dialog = null,
     accountSummaryListItem = DEFAULT_ACCOUNT_SELECTION_LIST_ITEM,
     hasOtherAccounts = true,
-    hasMasterPassword = true,
 )
 private val DEFAULT_STATE = DEFAULT_LOADING_STATE.copy(
     viewState = DEFAULT_CONTENT_VIEW_STATE,

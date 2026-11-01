@@ -1,7 +1,6 @@
 package com.x8bit.bitwarden.data.auth.repository.di
 
 import com.bitwarden.core.data.manager.dispatcher.DispatcherManager
-import com.bitwarden.network.service.AccountsService
 import com.bitwarden.network.service.HaveIBeenPwnedService
 import com.bitwarden.network.service.IdentityService
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
@@ -36,7 +35,6 @@ object AuthRepositoryModule {
     @Singleton
     fun providesAuthRepository(
         clock: Clock,
-        accountsService: AccountsService,
         identityService: IdentityService,
         haveIBeenPwnedService: HaveIBeenPwnedService,
         authSdkSource: AuthSdkSource,
@@ -54,7 +52,6 @@ object AuthRepositoryModule {
         authStateManager: AuthStateManager,
     ): AuthRepository = AuthRepositoryImpl(
         clock = clock,
-        accountsService = accountsService,
         identityService = identityService,
         authSdkSource = authSdkSource,
         vaultSdkSource = vaultSdkSource,

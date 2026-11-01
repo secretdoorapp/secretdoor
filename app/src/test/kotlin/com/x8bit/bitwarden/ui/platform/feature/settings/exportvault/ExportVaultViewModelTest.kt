@@ -14,10 +14,8 @@ import com.x8bit.bitwarden.data.auth.datasource.disk.model.OnboardingStatus
 import com.x8bit.bitwarden.data.auth.datasource.sdk.model.PasswordStrength
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.PasswordStrengthResult
-import com.x8bit.bitwarden.data.auth.repository.model.RequestOtpResult
 import com.x8bit.bitwarden.data.auth.repository.model.UserState
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePasswordResult
-import com.x8bit.bitwarden.data.auth.repository.model.VerifyOtpResult
 import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.ExportVaultDataResult
@@ -128,68 +126,6 @@ class ExportVaultViewModelTest : BaseViewModelTest() {
                 format = any(),
                 restrictedTypes = listOf(),
             )
-        }
-    }
-
-    @Test
-    fun `ConfirmExportVaultClicked with verified code should call exportVaultDataToString`() {
-        val passcode = "1234"
-        val initialState = DEFAULT_STATE.copy(
-            passwordInput = passcode,
-            showSendCodeButton = true,
-        )
-        coEvery {
-            authRepository.verifyOneTimePasscode(
-                oneTimePasscode = passcode,
-            )
-        } returns VerifyOtpResult.Verified
-
-        val viewModel = createViewModel(initialState)
-
-        viewModel.trySendAction(ExportVaultAction.ConfirmExportVaultClicked)
-
-        assertEquals(
-            initialState.copy(
-                exportData = "data",
-                passwordInput = "",
-            ),
-            viewModel.stateFlow.value,
-        )
-        coVerify {
-            vaultRepository.exportVaultDataToString(any(), emptyList())
-        }
-    }
-
-    @Test
-    fun `ConfirmExportVaultClicked with invalid code should call exportVaultDataToString`() {
-        val passcode = "1234"
-        val initialState = DEFAULT_STATE.copy(
-            passwordInput = passcode,
-            showSendCodeButton = true,
-        )
-        val error = Throwable("Fail!")
-        coEvery {
-            authRepository.verifyOneTimePasscode(
-                oneTimePasscode = passcode,
-            )
-        } returns VerifyOtpResult.NotVerified(errorMessage = "Wrong", error = error)
-
-        val viewModel = createViewModel(initialState)
-
-        viewModel.trySendAction(ExportVaultAction.ConfirmExportVaultClicked)
-
-        assertEquals(
-            initialState.copy(
-                dialogState = ExportVaultState.DialogState.Error(
-                    title = BitwardenString.an_error_has_occurred.asText(),
-                    message = BitwardenString.generic_error_message.asText(),
-                    error = error,
-                ),
-            ),
-            viewModel.stateFlow.value,
-        )
-        coVerify(exactly = 0) {
-            vaultRepository.exportVaultDataToString(any(), emptyList())
         }
     }
 
@@ -501,63 +437,6 @@ class ExportVaultViewModelTest : BaseViewModelTest() {
         )
     }
 
-    @Suppress("MaxLineLength")
-    @Test
-    fun `SendCodeClick should call requestOneTimePasscode and update dialog state to sending then back to null when request completes and send correct event on success`() =
-        runTest {
-            val viewModel = createViewModel()
-            coEvery { authRepository.requestOneTimePasscode() } returns RequestOtpResult.Success
-            viewModel.stateEventFlow(backgroundScope) { stateTurbine, eventTurbine ->
-                assertEquals(DEFAULT_STATE, stateTurbine.awaitItem())
-                viewModel.trySendAction(ExportVaultAction.SendCodeClick)
-                assertEquals(
-                    DEFAULT_STATE.copy(
-                        dialogState = ExportVaultState.DialogState.Loading(
-                            message = BitwardenString.sending.asText(),
-                        ),
-                    ),
-                    stateTurbine.awaitItem(),
-                )
-                assertEquals(DEFAULT_STATE, stateTurbine.awaitItem())
-                assertEquals(
-                    ExportVaultEvent.ShowSnackbar(message = BitwardenString.code_sent.asText()),
-                    eventTurbine.awaitItem(),
-                )
-            }
-            coVerify { authRepository.requestOneTimePasscode() }
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `SendCodeClick should call requestOneTimePasscode and update dialog state to sending then back to null when request completes and send correct event on error`() =
-        runTest {
-            val error = Throwable("Fail!")
-            val viewModel = createViewModel()
-            coEvery {
-                authRepository.requestOneTimePasscode()
-            } returns RequestOtpResult.Error(message = null, error = error)
-            viewModel.stateEventFlow(backgroundScope) { stateTurbine, eventTurbine ->
-                assertEquals(DEFAULT_STATE, stateTurbine.awaitItem())
-                viewModel.trySendAction(ExportVaultAction.SendCodeClick)
-                assertEquals(
-                    DEFAULT_STATE.copy(
-                        dialogState = ExportVaultState.DialogState.Loading(
-                            message = BitwardenString.sending.asText(),
-                        ),
-                    ),
-                    stateTurbine.awaitItem(),
-                )
-                assertEquals(DEFAULT_STATE, stateTurbine.awaitItem())
-                assertEquals(
-                    ExportVaultEvent.ShowSnackbar(
-                        message = BitwardenString.generic_error_message.asText(),
-                    ),
-                    eventTurbine.awaitItem(),
-                )
-            }
-            coVerify { authRepository.requestOneTimePasscode() }
-        }
-
     @Test
     fun `ReceiveExportVaultDataToStringResult should update state to error if result is error`() {
         val viewModel = createViewModel()
@@ -813,5 +692,4 @@ private val DEFAULT_STATE = ExportVaultState(
     passwordInput = "",
     exportData = null,
     passwordStrengthState = PasswordStrengthState.NONE,
-    showSendCodeButton = false,
 )

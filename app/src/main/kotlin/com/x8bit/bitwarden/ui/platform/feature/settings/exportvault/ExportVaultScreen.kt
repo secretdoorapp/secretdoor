@@ -24,8 +24,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -164,7 +162,6 @@ fun ExportVaultScreen(
             onPasswordInputChanged = {
                 viewModel.trySendAction(ExportVaultAction.PasswordInputChanged(it))
             },
-            onSendCodeClicked = { viewModel.trySendAction(ExportVaultAction.SendCodeClick) },
             onExportVaultClick = { shouldShowConfirmationDialog = true },
             modifier = Modifier.fillMaxSize(),
         )
@@ -179,7 +176,6 @@ private fun ExportVaultScreenContent(
     onExportFormatOptionSelected: (ExportVaultFormat) -> Unit,
     onFilePasswordInputChanged: (String) -> Unit,
     onPasswordInputChanged: (String) -> Unit,
-    onSendCodeClicked: () -> Unit,
     onExportVaultClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -252,59 +248,20 @@ private fun ExportVaultScreenContent(
             )
         }
 
-        if (state.showSendCodeButton) {
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = stringResource(id = BitwardenString.send_verification_code_to_email),
-                textAlign = TextAlign.Start,
-                style = BitwardenTheme.typography.bodyMedium,
-                color = BitwardenTheme.colorScheme.text.primary,
-                modifier = Modifier
-                    .standardHorizontalMargin()
-                    .fillMaxWidth(),
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            BitwardenOutlinedButton(
-                label = stringResource(BitwardenString.send_code),
-                onClick = onSendCodeClicked,
-                modifier = Modifier
-                    .testTag("SendTOTPCodeButton")
-                    .standardHorizontalMargin()
-                    .fillMaxWidth(),
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            BitwardenPasswordField(
-                label = stringResource(id = BitwardenString.verification_code),
-                value = state.passwordInput,
-                supportingText = stringResource(id = BitwardenString.confirm_your_identity),
-                onValueChange = onPasswordInputChanged,
-                keyboardType = KeyboardType.Number,
-                cardStyle = CardStyle.Full,
-                modifier = Modifier
-                    .standardHorizontalMargin()
-                    .fillMaxWidth(),
-            )
-        } else {
-            Spacer(modifier = Modifier.height(height = 8.dp))
-            BitwardenPasswordField(
-                label = stringResource(id = BitwardenString.master_password),
-                supportingText = stringResource(
-                    id = BitwardenString.export_vault_master_password_description,
-                ),
-                value = state.passwordInput,
-                onValueChange = onPasswordInputChanged,
-                passwordFieldTestTag = "MasterPasswordEntry",
-                cardStyle = CardStyle.Full,
-                modifier = Modifier
-                    .standardHorizontalMargin()
-                    .fillMaxWidth(),
-            )
-        }
+        Spacer(modifier = Modifier.height(height = 8.dp))
+        BitwardenPasswordField(
+            label = stringResource(id = BitwardenString.master_password),
+            supportingText = stringResource(
+                id = BitwardenString.export_vault_master_password_description,
+            ),
+            value = state.passwordInput,
+            onValueChange = onPasswordInputChanged,
+            passwordFieldTestTag = "MasterPasswordEntry",
+            cardStyle = CardStyle.Full,
+            modifier = Modifier
+                .standardHorizontalMargin()
+                .fillMaxWidth(),
+        )
 
         Spacer(modifier = Modifier.height(height = 16.dp))
         BitwardenOutlinedButton(

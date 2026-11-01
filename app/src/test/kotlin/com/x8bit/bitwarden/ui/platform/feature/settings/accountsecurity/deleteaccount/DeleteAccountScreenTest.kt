@@ -26,7 +26,6 @@ import org.junit.Test
 class DeleteAccountScreenTest : BitwardenComposeTest() {
 
     private var onNavigateBackCalled = false
-    private var onNavigateToDeleteAccountConfirmationScreenCalled = false
 
     private val mutableEventFlow = bufferedMutableSharedFlow<DeleteAccountEvent>()
     private val mutableStateFlow = MutableStateFlow(DEFAULT_STATE)
@@ -40,9 +39,6 @@ class DeleteAccountScreenTest : BitwardenComposeTest() {
         setContent {
             DeleteAccountScreen(
                 onNavigateBack = { onNavigateBackCalled = true },
-                onNavigateToDeleteAccountConfirmation = {
-                    onNavigateToDeleteAccountConfirmationScreenCalled = true
-                },
                 viewModel = viewModel,
             )
         }
@@ -52,13 +48,6 @@ class DeleteAccountScreenTest : BitwardenComposeTest() {
     fun `on NavigateBack should call onNavigateBack`() {
         mutableEventFlow.tryEmit(DeleteAccountEvent.NavigateBack)
         assertTrue(onNavigateBackCalled)
-    }
-
-    @Test
-    @Suppress("MaxLineLength")
-    fun `NavigateToDeleteAccountConfirmationScreen should call onNavigateToDeleteAccountConfirmationScreenCalled`() {
-        mutableEventFlow.tryEmit(DeleteAccountEvent.NavigateToDeleteAccountConfirmationScreen)
-        assertTrue(onNavigateToDeleteAccountConfirmationScreenCalled)
     }
 
     @Test
@@ -214,51 +203,8 @@ class DeleteAccountScreenTest : BitwardenComposeTest() {
         }
     }
 
-    @Suppress("MaxLineLength")
-    @Test
-    fun `if isUserManagedByOrganization should display cannot delete message and hide delete button`() {
-        composeTestRule
-            .onNodeWithText("Cannot delete your account")
-            .assertDoesNotExist()
-
-        composeTestRule
-            .onNodeWithText(
-                text = "This action cannot be completed because your account " +
-                    "is owned by an organization. " +
-                    "Contact your organization administrator for additional details.",
-            )
-            .assertDoesNotExist()
-
-        composeTestRule
-            .onAllNodesWithText("Delete vault")
-            .filterToOne(hasClickAction())
-            .assertExists()
-
-        mutableStateFlow.update {
-            it.copy(isUserManagedByOrganization = true)
-        }
-
-        composeTestRule
-            .onNodeWithText("Cannot delete your account")
-            .assertExists()
-
-        composeTestRule
-            .onNodeWithText(
-                text = "This action cannot be completed because your account " +
-                    "is owned by an organization. " +
-                    "Contact your organization administrator for additional details.",
-            )
-            .assertExists()
-
-        composeTestRule
-            .onAllNodesWithText("Delete vault")
-            .filterToOne(hasClickAction())
-            .assertDoesNotExist()
-    }
 }
 
 private val DEFAULT_STATE: DeleteAccountState = DeleteAccountState(
     dialog = null,
-    isUnlockWithPasswordEnabled = true,
-    isUserManagedByOrganization = false,
 )

@@ -15,9 +15,7 @@ import com.bitwarden.vault.CipherType
 import com.x8bit.bitwarden.data.auth.datasource.sdk.model.PasswordStrength
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.PasswordStrengthResult
-import com.x8bit.bitwarden.data.auth.repository.model.RequestOtpResult
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePasswordResult
-import com.x8bit.bitwarden.data.auth.repository.model.VerifyOtpResult
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.ExportVaultDataResult
 import com.x8bit.bitwarden.ui.auth.feature.completeregistration.PasswordStrengthState
@@ -58,11 +56,6 @@ class ExportVaultViewModel @Inject constructor(
             filePasswordInput = "",
             passwordInput = "",
             passwordStrengthState = PasswordStrengthState.NONE,
-            showSendCodeButton = authRepository
-                .userStateFlow
-                .value
-                ?.activeAccount
-                ?.hasMasterPassword == false,
         ),
 ) {
     /**
@@ -90,7 +83,6 @@ class ExportVaultViewModel @Inject constructor(
             is ExportVaultAction.FilePasswordInputChange -> handleFilePasswordInputChanged(action)
             is ExportVaultAction.ExportFormatOptionSelect -> handleExportFormatOptionSelect(action)
             is ExportVaultAction.PasswordInputChanged -> handlePasswordInputChanged(action)
-            ExportVaultAction.SendCodeClick -> handleSendCodeClick()
             is ExportVaultAction.ExportLocationReceive -> handleExportLocationReceive(action)
 
             is ExportVaultAction.Internal.ReceiveValidatePasswordResult -> {
@@ -109,26 +101,7 @@ class ExportVaultViewModel @Inject constructor(
                 handleExportDataFinishedSavingToDisk(action)
             }
 
-            is ExportVaultAction.Internal.ReceiveVerifyOneTimePasscodeResult -> {
-                handleReceiveVerifyOneTimePasscodeResult(action)
-            }
-
-            is ExportVaultAction.Internal.OtpCodeResult -> handleOtpCodeResult(action)
         }
-    }
-
-    private fun handleOtpCodeResult(action: ExportVaultAction.Internal.OtpCodeResult) {
-        mutableStateFlow.update {
-            it.copy(dialogState = null)
-        }
-        val message = when (val result = action.result) {
-            is RequestOtpResult.Error -> {
-                result.message?.asText() ?: BitwardenString.generic_error_message.asText()
-            }
-
-            RequestOtpResult.Success -> BitwardenString.code_sent.asText()
-        }
-        sendEvent(ExportVaultEvent.ShowSnackbar(message = message))
     }
 
     /**
@@ -180,19 +153,11 @@ class ExportVaultViewModel @Inject constructor(
         // Otherwise, validate the password.
         viewModelScope.launch {
             sendAction(
-                if (state.showSendCodeButton) {
-                    ExportVaultAction.Internal.ReceiveVerifyOneTimePasscodeResult(
-                        result = authRepository.verifyOneTimePasscode(
-                            oneTimePasscode = state.passwordInput,
-                        ),
-                    )
-                } else {
-                    ExportVaultAction.Internal.ReceiveValidatePasswordResult(
-                        result = authRepository.validatePassword(
-                            password = state.passwordInput,
-                        ),
-                    )
-                },
+                ExportVaultAction.Internal.ReceiveValidatePasswordResult(
+                    result = authRepository.validatePassword(
+                        password = state.passwordInput,
+                    ),
+                ),
             )
         }
     }
@@ -274,23 +239,6 @@ class ExportVaultViewModel @Inject constructor(
     private fun handlePasswordInputChanged(action: ExportVaultAction.PasswordInputChanged) {
         mutableStateFlow.update {
             it.copy(passwordInput = action.input)
-        }
-    }
-
-    private fun handleSendCodeClick() {
-        mutableStateFlow.update {
-            it.copy(
-                dialogState = ExportVaultState.DialogState.Loading(
-                    message = BitwardenString.sending.asText(),
-                ),
-            )
-        }
-        viewModelScope.launch {
-            sendAction(
-                ExportVaultAction.Internal.OtpCodeResult(
-                    result = authRepository.requestOneTimePasscode(),
-                ),
-            )
         }
     }
 
@@ -396,21 +344,6 @@ class ExportVaultViewModel @Inject constructor(
         sendEvent(ExportVaultEvent.ShowSnackbar(BitwardenString.export_vault_success.asText()))
     }
 
-    private fun handleReceiveVerifyOneTimePasscodeResult(
-        action: ExportVaultAction.Internal.ReceiveVerifyOneTimePasscodeResult,
-    ) {
-        when (val result = action.result) {
-            VerifyOtpResult.Verified -> exportVaultData()
-
-            is VerifyOtpResult.NotVerified -> {
-                updateStateWithError(
-                    message = BitwardenString.generic_error_message.asText(),
-                    error = result.error,
-                )
-            }
-        }
-    }
-
     /**
      * Handles exporting the vault data after all validation has finished.
      */
@@ -467,7 +400,6 @@ data class ExportVaultState(
     val filePasswordInput: String,
     val passwordInput: String,
     val passwordStrengthState: PasswordStrengthState,
-    val showSendCodeButton: Boolean,
 ) : Parcelable {
     /**
      * Represents the current state of any dialogs on the screen.
@@ -577,11 +509,6 @@ sealed class ExportVaultAction {
     data class PasswordInputChanged(val input: String) : ExportVaultAction()
 
     /**
-     * Indicates that the user pressed the button to send a code in place of entering a password.
-     */
-    data object SendCodeClick : ExportVaultAction()
-
-    /**
      * Models actions that the [ExportVaultViewModel] might send itself.
      */
     sealed class Internal : ExportVaultAction() {
@@ -613,17 +540,5 @@ sealed class ExportVaultAction {
         data class ReceiveValidatePasswordResult(
             val result: ValidatePasswordResult,
         ) : Internal()
-
-        /**
-         * Indicates that a result for verifying the one-time passcode has been received.
-         */
-        data class ReceiveVerifyOneTimePasscodeResult(
-            val result: VerifyOtpResult,
-        ) : Internal()
-
-        /**
-         * Indicates that a result for requesting the one-time passcode has been received.
-         */
-        data class OtpCodeResult(val result: RequestOtpResult) : Internal()
     }
 }

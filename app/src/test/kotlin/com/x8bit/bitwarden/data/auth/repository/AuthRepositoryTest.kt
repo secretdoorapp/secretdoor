@@ -22,7 +22,6 @@ import com.bitwarden.data.datasource.disk.model.EnvironmentUrlDataJson
 import com.bitwarden.data.datasource.disk.model.ServerConfig
 import com.bitwarden.data.repository.model.Environment
 import com.bitwarden.network.model.ConfigResponseJson
-import com.bitwarden.network.model.DeleteAccountResponseJson
 import com.bitwarden.network.model.GetTokenResponseJson
 import com.bitwarden.network.model.KdfJson
 import com.bitwarden.network.model.KdfTypeJson
@@ -35,7 +34,6 @@ import com.bitwarden.network.model.TwoFactorDataModel
 import com.bitwarden.network.model.UserDecryptionOptionsJson
 import com.bitwarden.network.model.createMockAccountKeysJson
 import com.bitwarden.network.model.createMockAccountKeysJsonWithNullFields
-import com.bitwarden.network.service.AccountsService
 import com.bitwarden.network.service.HaveIBeenPwnedService
 import com.bitwarden.network.service.IdentityService
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.AccountJson
@@ -55,12 +53,10 @@ import com.x8bit.bitwarden.data.auth.repository.model.ChangeMasterPasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.DeleteAccountResult
 import com.x8bit.bitwarden.data.auth.repository.model.LogoutReason
 import com.x8bit.bitwarden.data.auth.repository.model.RegisterResult
-import com.x8bit.bitwarden.data.auth.repository.model.RequestOtpResult
 import com.x8bit.bitwarden.data.auth.repository.model.SwitchAccountResult
 import com.x8bit.bitwarden.data.auth.repository.model.UpdateKdfMinimumsResult
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePinResult
-import com.x8bit.bitwarden.data.auth.repository.model.VerifyOtpResult
 import com.x8bit.bitwarden.data.auth.repository.model.createMockWrappedAccountCryptographicState
 import com.x8bit.bitwarden.data.auth.repository.util.toKdfRequestModel
 import com.x8bit.bitwarden.data.auth.repository.util.toSdkParams
@@ -105,7 +101,6 @@ import java.time.ZoneOffset
 class AuthRepositoryTest {
 
     private val dispatcherManager: DispatcherManager = FakeDispatcherManager()
-    private val accountsService: AccountsService = mockk()
     private val identityService: IdentityService = mockk()
     private val haveIBeenPwnedService: HaveIBeenPwnedService = mockk()
     private val mutableVaultUnlockDataStateFlow = MutableStateFlow(VAULT_UNLOCK_DATA)
@@ -195,7 +190,6 @@ class AuthRepositoryTest {
 
     private val repository: AuthRepository = AuthRepositoryImpl(
         clock = FIXED_CLOCK,
-        accountsService = accountsService,
         identityService = identityService,
         haveIBeenPwnedService = haveIBeenPwnedService,
         authSdkSource = authSdkSource,
@@ -374,33 +368,6 @@ class AuthRepositoryTest {
                 userLogoutManager.logout(userId = any(), reason = any())
             }
         }
-
-    @Test
-    fun `deleteAccountWithOneTimePassword succeeds`() = runTest {
-        val oneTimePassword = "123456"
-        fakeAuthDiskSource.userState = SINGLE_USER_STATE_1
-        coEvery {
-            accountsService.deleteAccount(
-                masterPasswordHash = null,
-                oneTimePassword = oneTimePassword,
-            )
-        } returns DeleteAccountResponseJson.Success.asSuccess()
-
-        val result = repository.deleteAccountWithOneTimePassword(
-            oneTimePassword = oneTimePassword,
-        )
-
-        assertEquals(DeleteAccountResult.Success, result)
-        verify(exactly = 1) {
-            userStateManager.hasPendingAccountDeletion = true
-        }
-        coVerify {
-            accountsService.deleteAccount(
-                masterPasswordHash = null,
-                oneTimePassword = oneTimePassword,
-            )
-        }
-    }
 
     @Test
     fun `refreshAccessTokenSynchronously returns failure if not logged in`() = runTest {
@@ -759,59 +726,6 @@ class AuthRepositoryTest {
         repository.logout(userId = userId, reason = reason)
 
         verify { userLogoutManager.logout(userId = userId, reason = reason) }
-    }
-
-    @Test
-    fun `requestOneTimePasscode with success response should return Success`() = runTest {
-        coEvery {
-            accountsService.requestOneTimePasscode()
-        } returns Unit.asSuccess()
-
-        val result = repository.requestOneTimePasscode()
-
-        assertEquals(RequestOtpResult.Success, result)
-    }
-
-    @Test
-    fun `requestOneTimePasscode with error response should return Error`() = runTest {
-        val errorMessage = "Error message"
-        val error = Throwable(errorMessage)
-        coEvery {
-            accountsService.requestOneTimePasscode()
-        } returns error.asFailure()
-
-        val result = repository.requestOneTimePasscode()
-
-        assertEquals(RequestOtpResult.Error(message = errorMessage, error = error), result)
-    }
-
-    @Test
-    fun `verifyOneTimePasscode with success response should return Verified result`() = runTest {
-        val passcode = "passcode"
-        coEvery {
-            accountsService.verifyOneTimePasscode(passcode)
-        } returns Unit.asSuccess()
-
-        val result = repository.verifyOneTimePasscode(passcode)
-
-        assertEquals(VerifyOtpResult.Verified, result)
-    }
-
-    @Test
-    fun `verifyOneTimePasscode with error response should return NotVerified result`() = runTest {
-        val errorMessage = "Error message"
-        val passcode = "passcode"
-        val error = Throwable(errorMessage)
-        coEvery {
-            accountsService.verifyOneTimePasscode(passcode)
-        } returns error.asFailure()
-
-        val result = repository.verifyOneTimePasscode(passcode)
-
-        assertEquals(
-            VerifyOtpResult.NotVerified(errorMessage = errorMessage, error = error),
-            result,
-        )
     }
 
     @Test
