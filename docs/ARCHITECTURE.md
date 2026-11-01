@@ -51,7 +51,6 @@ These libraries provide foundational capabilities utilized by application module
 
 These libraries offer more targeted functionalities:
 
-* **`Bitwarden.authenticatorbridge`**: Serves as an interface or bridge facilitating communication and integration between the `Bitwarden.authenticator` module's functionalities and the`Bitwarden.app` module. This allows for controlled interaction while maintaining modular decoupling.
 * **`Bitwarden.annotation`**: Contains custom Java/Kotlin annotations used throughout the project. These annotations support compile-time code generation (e.g., for dependency injection with Dagger Hilt, or database schema generation with Room) and provide metadata for other development tools.
 
 ### Supporting Modules (Source Sets and Test Fixtures)

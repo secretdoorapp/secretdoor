@@ -27,7 +27,6 @@ import com.x8bit.bitwarden.data.platform.repository.model.VaultTimeout
 import com.x8bit.bitwarden.data.platform.repository.model.VaultTimeoutAction
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.ui.platform.components.toggle.UnlockWithPinState
-import com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity.AccountSecurityAction.AuthenticatorSyncToggle
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -59,7 +58,6 @@ class AccountSecurityViewModelTest : BaseViewModelTest() {
     private val mutableBiometricsUnlockEnabledFlow = bufferedMutableSharedFlow<Boolean>()
     private val mutablePinUnlockEnabledFlow = bufferedMutableSharedFlow<Boolean>()
     private val settingsRepository: SettingsRepository = mockk {
-        every { isAuthenticatorSyncEnabled } returns false
         every { isUnlockWithBiometricsEnabled } returns false
         every { isUnlockWithPinEnabled } returns false
         every { vaultTimeout } returns VaultTimeout.ThirtyMinutes
@@ -111,20 +109,6 @@ class AccountSecurityViewModelTest : BaseViewModelTest() {
         }
         coVerify { settingsRepository.getUserFingerprint() }
     }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `on AuthenticatorSyncToggle should update SettingsRepository and isAuthenticatorSyncChecked`() =
-        runTest {
-            val viewModel = createViewModel()
-            every { settingsRepository.isAuthenticatorSyncEnabled = true } just runs
-            viewModel.stateFlow.test {
-                assertEquals(DEFAULT_STATE, awaitItem())
-                viewModel.trySendAction(AuthenticatorSyncToggle(enabled = true))
-                assertEquals(DEFAULT_STATE.copy(isAuthenticatorSyncChecked = true), awaitItem())
-            }
-            verify { settingsRepository.isAuthenticatorSyncEnabled = true }
-        }
 
     @Test
     fun `on FingerprintResultReceive should update the fingerprint phrase`() = runTest {
@@ -745,13 +729,11 @@ private val DEFAULT_USER_STATE = UserState(
 private val DEFAULT_STATE: AccountSecurityState = AccountSecurityState(
     dialog = null,
     fingerprintPhrase = FINGERPRINT.asText(),
-    isAuthenticatorSyncChecked = false,
     isUnlockWithBiometricsEnabled = false,
     isUnlockWithPasswordEnabled = true,
     isUnlockWithPinEnabled = false,
     userId = DEFAULT_USER_ID,
     vaultTimeout = VaultTimeout.ThirtyMinutes,
     vaultTimeoutAction = VaultTimeoutAction.LOCK,
-    shouldShowEnableAuthenticatorSync = false,
     shouldShowUnlockActionCard = false,
 )

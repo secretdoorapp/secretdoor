@@ -1,7 +1,6 @@
 package com.x8bit.bitwarden.data.platform.repository
 
 import android.view.autofill.AutofillManager
-import com.bitwarden.authenticatorbridge.util.generateSecretKey
 import com.bitwarden.core.data.manager.BuildInfoManager
 import com.bitwarden.core.data.manager.dispatcher.DispatcherManager
 import com.bitwarden.data.manager.flightrecorder.FlightRecorderManager
@@ -20,7 +19,6 @@ import com.x8bit.bitwarden.data.platform.repository.model.UriMatchType
 import com.x8bit.bitwarden.data.platform.repository.model.VaultSection
 import com.x8bit.bitwarden.data.platform.repository.model.VaultTimeout
 import com.x8bit.bitwarden.data.platform.repository.model.VaultTimeoutAction
-import com.x8bit.bitwarden.data.vault.datasource.sdk.VaultSdkSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,7 +46,6 @@ class SettingsRepositoryImpl(
     private val authDiskSource: AuthDiskSource,
     private val buildInfoManager: BuildInfoManager,
     private val settingsDiskSource: SettingsDiskSource,
-    private val vaultSdkSource: VaultSdkSource,
     flightRecorderManager: FlightRecorderManager,
     accessibilityEnabledManager: AccessibilityEnabledManager,
     dispatcherManager: DispatcherManager,
@@ -126,40 +123,6 @@ class SettingsRepositoryImpl(
                     )
             }
             ?: MutableStateFlow(value = null)
-
-    override var isAuthenticatorSyncEnabled: Boolean
-        // Authenticator sync is enabled if there is an authenticator sync unlock key for
-        // the current active user:
-        get() = activeUserId
-            ?.let { authDiskSource.getAuthenticatorSyncUnlockKey(userId = it) != null }
-            ?: false
-        set(value) {
-            val userId = activeUserId ?: return
-            // When turning off authenticator sync, set authenticator sync unlock key to
-            // null for the current active user:
-            if (!value) {
-                authDiskSource.storeAuthenticatorSyncUnlockKey(
-                    userId = userId,
-                    authenticatorSyncUnlockKey = null,
-                )
-                return
-            }
-            // When turning on authenticator sync, get a user encryption key from the vault SDK
-            // and store it as a authenticator sync unlock key. Also, generate a
-            // symmetric sync key if needed:
-            generateSymmetricSyncKeyIfNecessary()
-            unconfinedScope.launch {
-                vaultSdkSource
-                    .getUserEncryptionKey(userId = userId)
-                    .getOrNull()
-                    ?.let {
-                        authDiskSource.storeAuthenticatorSyncUnlockKey(
-                            userId = userId,
-                            authenticatorSyncUnlockKey = it,
-                        )
-                    }
-            }
-        }
 
     // SecretDoor never downloads website icons: each request would tell the icon server which
     // websites the user has logins for.
@@ -705,20 +668,6 @@ class SettingsRepositoryImpl(
                     .getAppRegisteredForExport()
                     ?: false,
             )
-    }
-
-    /**
-     * If there isn't already one generated, generate a symmetric sync key that would be used
-     * for communicating via IPC.
-     */
-    private fun generateSymmetricSyncKeyIfNecessary() {
-        // If there is already an authenticator sync symmetric key, do nothing:
-        if (authDiskSource.authenticatorSyncSymmetricKey != null) {
-            return
-        }
-        // Otherwise, generate and store a key:
-        val secretKey = generateSecretKey().getOrNull() ?: return
-        authDiskSource.authenticatorSyncSymmetricKey = secretKey.encoded
     }
 }
 

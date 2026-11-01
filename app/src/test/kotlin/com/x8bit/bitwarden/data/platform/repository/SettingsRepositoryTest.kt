@@ -2,7 +2,6 @@ package com.x8bit.bitwarden.data.platform.repository
 
 import android.view.autofill.AutofillManager
 import app.cash.turbine.test
-import com.bitwarden.authenticatorbridge.util.generateSecretKey
 import com.bitwarden.core.EnrollPinResponse
 import com.bitwarden.core.data.manager.BuildInfoManager
 import com.bitwarden.core.data.manager.dispatcher.FakeDispatcherManager
@@ -44,7 +43,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -72,7 +70,6 @@ class SettingsRepositoryTest {
         autofillEnabledManager = autofillEnabledManager,
         authDiskSource = fakeAuthDiskSource,
         settingsDiskSource = fakeSettingsDiskSource,
-        vaultSdkSource = vaultSdkSource,
         accessibilityEnabledManager = fakeAccessibilityEnabledManager,
         dispatcherManager = FakeDispatcherManager(),
         flightRecorderManager = flightRecorderManager,
@@ -1310,11 +1307,6 @@ class SettingsRepositoryTest {
     }
 
     @Test
-    fun `isAuthenticatorSyncEnabled should default to false`() {
-        assertFalse(settingsRepository.isAuthenticatorSyncEnabled)
-    }
-
-    @Test
     fun `getUserHasLoggedInValue should default to false if no value exists`() {
         assertFalse(settingsRepository.getUserHasLoggedInValue(userId = "userId"))
     }
@@ -1332,96 +1324,6 @@ class SettingsRepositoryTest {
         settingsRepository.storeUserHasLoggedInValue(userId = userId)
         assertTrue(fakeSettingsDiskSource.getUserHasSignedInPreviously(userId = userId))
     }
-
-    @Test
-    @Suppress("MaxLineLength")
-    fun `isAuthenticatorSyncEnabled set to true should generate an authenticator sync key and also a symmetric key if none exists`() =
-        runTest {
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-            coEvery { vaultSdkSource.getUserEncryptionKey(USER_ID) }
-                .returns(AUTHENTICATION_SYNC_KEY.asSuccess())
-            fakeAuthDiskSource.authenticatorSyncSymmetricKey = null
-            assertNull(fakeAuthDiskSource.getAuthenticatorSyncUnlockKey(USER_ID))
-
-            settingsRepository.isAuthenticatorSyncEnabled = true
-
-            assertTrue(settingsRepository.isAuthenticatorSyncEnabled)
-            assertEquals(
-                AUTHENTICATION_SYNC_KEY,
-                fakeAuthDiskSource.getAuthenticatorSyncUnlockKey(USER_ID),
-            )
-            assertNotNull(fakeAuthDiskSource.authenticatorSyncSymmetricKey)
-            coVerify { vaultSdkSource.getUserEncryptionKey(USER_ID) }
-        }
-
-    @Test
-    @Suppress("MaxLineLength")
-    fun `isAuthenticatorSyncEnabled set to true should generate an authenticator sync key and leave symmetric key untouched if already set`() =
-        runTest {
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-            coEvery { vaultSdkSource.getUserEncryptionKey(USER_ID) }
-                .returns(AUTHENTICATION_SYNC_KEY.asSuccess())
-            val symmetricKey = generateSecretKey().getOrThrow().encoded
-            fakeAuthDiskSource.authenticatorSyncSymmetricKey = symmetricKey
-            assertNull(fakeAuthDiskSource.getAuthenticatorSyncUnlockKey(USER_ID))
-
-            settingsRepository.isAuthenticatorSyncEnabled = true
-
-            assertTrue(settingsRepository.isAuthenticatorSyncEnabled)
-            assertEquals(
-                AUTHENTICATION_SYNC_KEY,
-                fakeAuthDiskSource.getAuthenticatorSyncUnlockKey(USER_ID),
-            )
-            fakeAuthDiskSource.authenticatorSyncSymmetricKey.contentEquals(symmetricKey)
-            coVerify { vaultSdkSource.getUserEncryptionKey(USER_ID) }
-        }
-
-    @Test
-    @Suppress("MaxLineLength")
-    fun `isAuthenticatorSyncEnabled set to false should clear authenticator sync key and leave symmetric sync key untouched`() =
-        runTest {
-            val syncSymmetricKey = generateSecretKey().getOrThrow().encoded
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-            fakeAuthDiskSource.authenticatorSyncSymmetricKey = syncSymmetricKey
-            fakeAuthDiskSource.storeAuthenticatorSyncUnlockKey(USER_ID, AUTHENTICATION_SYNC_KEY)
-
-            assertTrue(settingsRepository.isAuthenticatorSyncEnabled)
-
-            settingsRepository.isAuthenticatorSyncEnabled = false
-
-            assertFalse(settingsRepository.isAuthenticatorSyncEnabled)
-            assertNull(fakeAuthDiskSource.getAuthenticatorSyncUnlockKey(USER_ID))
-            assertTrue(
-                fakeAuthDiskSource.authenticatorSyncSymmetricKey.contentEquals(syncSymmetricKey),
-            )
-        }
-
-    @Test
-    fun `isAuthenticatorSyncEnabled should be true when there exists an authenticator sync key`() =
-        runTest {
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-            assertFalse(settingsRepository.isAuthenticatorSyncEnabled)
-            fakeAuthDiskSource.storeAuthenticatorSyncUnlockKey(
-                userId = USER_ID,
-                authenticatorSyncUnlockKey = "fakeKey",
-            )
-            assertTrue(settingsRepository.isAuthenticatorSyncEnabled)
-        }
-
-    @Test
-    fun `isAuthenticatorSyncEnabled should be false when there is no active user`() =
-        runTest {
-            fakeAuthDiskSource.userState = null
-            assertFalse(settingsRepository.isAuthenticatorSyncEnabled)
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `isAuthenticatorSyncEnabled should be false when the active user has no authenticator sync key set`() =
-        runTest {
-            fakeAuthDiskSource.userState = MOCK_USER_STATE
-            assertFalse(settingsRepository.isAuthenticatorSyncEnabled)
-        }
 
     @Test
     fun `isUnlockWithBiometricsEnabledFlow should react to changes in AuthDiskSource`() = runTest {

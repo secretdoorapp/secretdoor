@@ -3,7 +3,6 @@ package com.x8bit.bitwarden.ui.platform.feature.settings.accountsecurity
 import android.content.res.Resources
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,7 +48,6 @@ import com.bitwarden.ui.platform.components.header.BitwardenListHeaderText
 import com.bitwarden.ui.platform.components.model.CardStyle
 import com.bitwarden.ui.platform.components.row.BitwardenTextRow
 import com.bitwarden.ui.platform.components.scaffold.BitwardenScaffold
-import com.bitwarden.ui.platform.components.toggle.BitwardenSwitch
 import com.bitwarden.ui.platform.components.util.rememberVectorPainter
 import com.bitwarden.ui.platform.composition.LocalIntentManager
 import com.bitwarden.ui.platform.manager.IntentManager
@@ -223,15 +221,6 @@ fun AccountSecurityScreen(
                     .standardHorizontalMargin(),
             )
             Spacer(Modifier.height(16.dp))
-            if (state.shouldShowEnableAuthenticatorSync) {
-                SyncWithAuthenticatorRow(
-                    isChecked = state.isAuthenticatorSyncChecked,
-                    onCheckedChange = {
-                        viewModel.trySendAction(AccountSecurityAction.AuthenticatorSyncToggle(it))
-                    },
-                )
-                Spacer(Modifier.height(16.dp))
-            }
             BitwardenListHeaderText(
                 label = stringResource(id = BitwardenString.session_timeout),
                 modifier = Modifier
@@ -455,30 +444,6 @@ private fun SessionTimeoutActionRow(
         textFieldTestTag = "SessionTimeoutActionStatusLabel",
         cardStyle = cardStyle,
         modifier = modifier,
-    )
-}
-
-@Composable
-private fun ColumnScope.SyncWithAuthenticatorRow(
-    isChecked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-) {
-    BitwardenListHeaderText(
-        label = stringResource(BitwardenString.authenticator_sync),
-        modifier = Modifier
-            .fillMaxWidth()
-            .standardHorizontalMargin()
-            .padding(horizontal = 16.dp),
-    )
-    Spacer(modifier = Modifier.height(height = 8.dp))
-    BitwardenSwitch(
-        label = stringResource(BitwardenString.allow_bitwarden_authenticator_syncing),
-        onCheckedChange = onCheckedChange,
-        isChecked = isChecked,
-        cardStyle = CardStyle.Full,
-        modifier = Modifier
-            .fillMaxWidth()
-            .standardHorizontalMargin(),
     )
 }
 

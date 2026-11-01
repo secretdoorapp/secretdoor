@@ -6,8 +6,6 @@ import com.bitwarden.core.data.manager.toast.ToastManager
 import com.bitwarden.network.service.AuthRequestsService
 import com.bitwarden.network.service.NewAuthRequestService
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
-import com.x8bit.bitwarden.data.auth.manager.AddTotpItemFromAuthenticatorManager
-import com.x8bit.bitwarden.data.auth.manager.AddTotpItemFromAuthenticatorManagerImpl
 import com.x8bit.bitwarden.data.auth.manager.AuthStateManager
 import com.x8bit.bitwarden.data.auth.manager.AuthStateManagerImpl
 import com.x8bit.bitwarden.data.auth.manager.AuthTokenManager
@@ -78,11 +76,6 @@ object AuthManagerModule {
             dispatcherManager = dispatcherManager,
             credentialExchangeRegistryManager = credentialExchangeRegistryManager,
         )
-
-    @Provides
-    @Singleton
-    fun providesAddTotpItemFromAuthenticatorManager(): AddTotpItemFromAuthenticatorManager =
-        AddTotpItemFromAuthenticatorManagerImpl()
 
     @Provides
     @Singleton

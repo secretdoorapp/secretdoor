@@ -17,20 +17,6 @@ internal class KeyRotationManagerImpl(
     private val mutableShouldRotateBiometricKey = bufferedMutableSharedFlow<Unit>()
     override val shouldRotateBiometricKey: Flow<Unit> = mutableShouldRotateBiometricKey
 
-    override suspend fun rotateAuthenticatorSyncKey(userId: String) {
-        authDiskSource
-            .getAuthenticatorSyncUnlockKey(userId = userId)
-            ?.let { getRotatedKeyIfNecessary(userId = userId, keyToRotate = it) }
-            ?.let {
-                Timber.i("Rotating Authenticator Sync Unlock Key")
-                // Store the new key to disk for future usage.
-                authDiskSource.storeAuthenticatorSyncUnlockKey(
-                    userId = userId,
-                    authenticatorSyncUnlockKey = it,
-                )
-            }
-    }
-
     override suspend fun rotateAutoUnlockKey(userId: String) {
         authDiskSource
             .getUserAutoUnlockKey(userId = userId)

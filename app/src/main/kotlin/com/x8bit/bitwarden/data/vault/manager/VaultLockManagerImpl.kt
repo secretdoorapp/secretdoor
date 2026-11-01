@@ -265,7 +265,6 @@ internal class VaultLockManagerImpl(
         pinProtectedUserKeyManager.migratePinProtectedUserKeyIfNeeded(userId = userId)
         setVaultToUnlocked(userId = userId)
         keyRotationManager.rotateAutoUnlockKey(userId = userId)
-        keyRotationManager.rotateAuthenticatorSyncKey(userId = userId)
     }
 
     /**

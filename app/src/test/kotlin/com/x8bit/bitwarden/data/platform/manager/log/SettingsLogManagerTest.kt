@@ -25,7 +25,6 @@ class SettingsLogManagerTest {
         every { isUnlockWithBiometricsEnabled } returns false
         every { isUnlockWithPinEnabled } returns false
         every { isPasswordOnRestartRequiredWithPin } returns false
-        every { isAuthenticatorSyncEnabled } returns false
         every { vaultTimeout } returns VaultTimeout.FifteenMinutes
         every { vaultTimeoutAction } returns VaultTimeoutAction.LOCK
         every { isInlineAutofillEnabled } returns false
@@ -72,7 +71,6 @@ class SettingsLogManagerTest {
             Account Security:
               Unlock with Biometrics: Disabled
               Unlock with PIN: Disabled
-              Allow authenticator sync: Disabled
               Session timeout: FifteenMinutes
               Session timeout action: LOCK
             Autofill:
@@ -105,7 +103,6 @@ class SettingsLogManagerTest {
         every { settingsRepository.isUnlockWithBiometricsEnabled } returns true
         every { settingsRepository.isUnlockWithPinEnabled } returns true
         every { settingsRepository.isPasswordOnRestartRequiredWithPin } returns true
-        every { settingsRepository.isAuthenticatorSyncEnabled } returns true
         every { settingsRepository.vaultTimeout } returns VaultTimeout.Never
         every { settingsRepository.vaultTimeoutAction } returns VaultTimeoutAction.LOGOUT
         every { settingsRepository.isInlineAutofillEnabled } returns true
@@ -139,7 +136,6 @@ class SettingsLogManagerTest {
               Unlock with Biometrics: Enabled
               Unlock with PIN: Enabled
                 Requires MP on restart: Enabled
-              Allow authenticator sync: Enabled
               Session timeout: Never
               Session timeout action: LOGOUT
             Autofill:
@@ -186,7 +182,6 @@ class SettingsLogManagerTest {
               Unlock with Biometrics: Disabled
               Unlock with PIN: Enabled
                 Requires MP on restart: Disabled
-              Allow authenticator sync: Disabled
               Session timeout: FifteenMinutes
               Session timeout action: LOCK
             Autofill:
@@ -225,7 +220,6 @@ class SettingsLogManagerTest {
             Account Security:
               Unlock with Biometrics: Disabled
               Unlock with PIN: Disabled
-              Allow authenticator sync: Disabled
               Session timeout: FifteenMinutes
               Session timeout action: LOCK
             Autofill:
@@ -265,7 +259,6 @@ class SettingsLogManagerTest {
             Account Security:
               Unlock with Biometrics: Disabled
               Unlock with PIN: Disabled
-              Allow authenticator sync: Disabled
               Session timeout: FifteenMinutes
               Session timeout action: LOCK
             Autofill:
@@ -318,7 +311,6 @@ class SettingsLogManagerTest {
             Account Security:
               Unlock with Biometrics: Disabled
               Unlock with PIN: Disabled
-              Allow authenticator sync: Disabled
               Session timeout: FifteenMinutes
               Session timeout action: LOCK
             Autofill:

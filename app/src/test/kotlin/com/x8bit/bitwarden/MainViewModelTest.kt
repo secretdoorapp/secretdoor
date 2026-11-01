@@ -25,7 +25,6 @@ import com.bitwarden.ui.platform.manager.share.model.ShareData
 import com.bitwarden.ui.platform.model.TotpData
 import com.bitwarden.vault.CipherView
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.OnboardingStatus
-import com.x8bit.bitwarden.data.auth.manager.AddTotpItemFromAuthenticatorManagerImpl
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.SwitchAccountResult
 import com.x8bit.bitwarden.data.auth.repository.model.UserState
@@ -55,7 +54,6 @@ import com.x8bit.bitwarden.data.platform.manager.model.FirstTimeState
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
-import com.x8bit.bitwarden.data.platform.util.isAddTotpLoginItemFromAuthenticator
 import com.x8bit.bitwarden.data.vault.manager.model.VaultStateEvent
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.ui.platform.util.isAccountSecurityShortcut
@@ -93,7 +91,6 @@ class MainViewModelTest : BaseViewModelTest() {
     private val autofillSelectionManager: AutofillSelectionManager = AutofillSelectionManagerImpl()
     private val accessibilitySelectionManager: AccessibilitySelectionManager =
         AccessibilitySelectionManagerImpl()
-    private val addTotpItemAuthenticatorManager = AddTotpItemFromAuthenticatorManagerImpl()
     private val mutableUserStateFlow = MutableStateFlow<UserState?>(null)
     private val mutableAppThemeFlow = MutableStateFlow(AppTheme.DEFAULT)
     private val mutableAppLanguageFlow = MutableStateFlow(AppLanguage.DEFAULT)
@@ -175,7 +172,6 @@ class MainViewModelTest : BaseViewModelTest() {
             Intent::getTotpDataOrNull,
             Intent::getAutofillSaveItemOrNull,
             Intent::getAutofillSelectionDataOrNull,
-            Intent::isAddTotpLoginItemFromAuthenticator,
             Intent::getProviderImportCredentialsRequest,
             AuthTabIntent.AuthResult::getPremiumCheckoutCallbackResult,
         )
@@ -203,7 +199,6 @@ class MainViewModelTest : BaseViewModelTest() {
             Intent::getTotpDataOrNull,
             Intent::getAutofillSaveItemOrNull,
             Intent::getAutofillSelectionDataOrNull,
-            Intent::isAddTotpLoginItemFromAuthenticator,
             Intent::getProviderImportCredentialsRequest,
             AuthTabIntent.AuthResult::getPremiumCheckoutCallbackResult,
         )
@@ -420,38 +415,6 @@ class MainViewModelTest : BaseViewModelTest() {
 
     @Suppress("MaxLineLength")
     @Test
-    fun `on ReceiveFirstIntent with TOTP data from Authenticator app should set the special circumstance to AddTotpLoginItem and clear pendingAddTotpLoginItemData`() {
-        val viewModel = createViewModel()
-        val totpData = mockk<TotpData>()
-        val mockIntent = createMockIntent(
-            mockIsAddTotpLoginItemFromAuthenticator = true,
-        )
-        addTotpItemAuthenticatorManager.pendingAddTotpLoginItemData = totpData
-
-        viewModel.trySendAction(MainAction.ReceiveFirstIntent(intent = mockIntent))
-        assertEquals(
-            SpecialCircumstance.AddTotpLoginItem(data = totpData),
-            specialCircumstanceManager.specialCircumstance,
-        )
-        assertNull(addTotpItemAuthenticatorManager.pendingAddTotpLoginItemData)
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `on ReceiveFirstIntent when intent is from Authenticator app but pending item is null should not set special circumstance`() {
-        val viewModel = createViewModel()
-        val mockIntent = createMockIntent(
-            mockIsAddTotpLoginItemFromAuthenticator = true,
-        )
-        addTotpItemAuthenticatorManager.pendingAddTotpLoginItemData = null
-
-        viewModel.trySendAction(MainAction.ReceiveFirstIntent(intent = mockIntent))
-        assertNull(specialCircumstanceManager.specialCircumstance)
-        assertNull(addTotpItemAuthenticatorManager.pendingAddTotpLoginItemData)
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
     fun `on ReceiveFirstIntent with autofill data should set the special circumstance to AutofillSelection`() {
         val viewModel = createViewModel()
         val autofillSelectionData = mockk<AutofillSelectionData>()
@@ -503,38 +466,6 @@ class MainViewModelTest : BaseViewModelTest() {
             SpecialCircumstance.AddTotpLoginItem(data = totpData),
             specialCircumstanceManager.specialCircumstance,
         )
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `on ReceiveNewIntent with TOTP data from Authenticator app should set the special circumstance to AddTotpLoginItem and clear pendingAddTotpLoginItemData`() {
-        val viewModel = createViewModel()
-        val totpData = mockk<TotpData>()
-        val mockIntent = createMockIntent(
-            mockIsAddTotpLoginItemFromAuthenticator = true,
-        )
-        addTotpItemAuthenticatorManager.pendingAddTotpLoginItemData = totpData
-
-        viewModel.trySendAction(MainAction.ReceiveNewIntent(intent = mockIntent))
-        assertEquals(
-            SpecialCircumstance.AddTotpLoginItem(data = totpData),
-            specialCircumstanceManager.specialCircumstance,
-        )
-        assertNull(addTotpItemAuthenticatorManager.pendingAddTotpLoginItemData)
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `on ReceiveNewIntent when intent is from Authenticator app but pending item is null should not set special circumstance`() {
-        val viewModel = createViewModel()
-        val mockIntent = createMockIntent(
-            mockIsAddTotpLoginItemFromAuthenticator = true,
-        )
-        addTotpItemAuthenticatorManager.pendingAddTotpLoginItemData = null
-
-        viewModel.trySendAction(MainAction.ReceiveNewIntent(intent = mockIntent))
-        assertNull(specialCircumstanceManager.specialCircumstance)
-        assertNull(addTotpItemAuthenticatorManager.pendingAddTotpLoginItemData)
     }
 
     @Suppress("MaxLineLength")
@@ -1027,7 +958,6 @@ class MainViewModelTest : BaseViewModelTest() {
         initialSpecialCircumstance: SpecialCircumstance? = null,
     ): MainViewModel = MainViewModel(
         accessibilitySelectionManager = accessibilitySelectionManager,
-        addTotpItemFromAuthenticatorManager = addTotpItemAuthenticatorManager,
         autofillSelectionManager = autofillSelectionManager,
         specialCircumstanceManager = specialCircumstanceManager,
         garbageCollectionManager = garbageCollectionManager,
@@ -1097,7 +1027,6 @@ private fun createMockIntent(
     mockIsPasswordGeneratorShortcut: Boolean = false,
     mockIsAccountSecurityShortcut: Boolean = false,
     mockIsPremiumCheckoutCallback: Boolean = false,
-    mockIsAddTotpLoginItemFromAuthenticator: Boolean = false,
     mockProviderImportCredentialsRequest: ProviderImportCredentialsRequest? = null,
     mockDataUri: Uri? = null,
 ): Intent = mockk<Intent> {
@@ -1108,7 +1037,6 @@ private fun createMockIntent(
     every { isPasswordGeneratorShortcut } returns mockIsPasswordGeneratorShortcut
     every { isAccountSecurityShortcut } returns mockIsAccountSecurityShortcut
     every { isPremiumCheckoutCallback } returns mockIsPremiumCheckoutCallback
-    every { isAddTotpLoginItemFromAuthenticator() } returns mockIsAddTotpLoginItemFromAuthenticator
     every { getProviderImportCredentialsRequest() } returns mockProviderImportCredentialsRequest
     every { data } returns mockDataUri
 }

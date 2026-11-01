@@ -14,7 +14,6 @@ import com.bitwarden.ui.platform.feature.settings.appearance.model.AppLanguage
 import com.bitwarden.ui.platform.feature.settings.appearance.model.AppTheme
 import com.bitwarden.ui.platform.model.TotpData
 import com.bitwarden.vault.CipherView
-import com.x8bit.bitwarden.data.auth.manager.AddTotpItemFromAuthenticatorManager
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilitySelectionManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillSelectionManager
@@ -31,7 +30,6 @@ import com.x8bit.bitwarden.data.platform.manager.model.AppResumeScreenData
 import com.x8bit.bitwarden.data.platform.manager.model.SpecialCircumstance
 import com.x8bit.bitwarden.data.platform.repository.EnvironmentRepository
 import com.x8bit.bitwarden.data.platform.repository.SettingsRepository
-import com.x8bit.bitwarden.data.platform.util.isAddTotpLoginItemFromAuthenticator
 import com.x8bit.bitwarden.data.vault.manager.model.VaultStateEvent
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.ui.platform.feature.rootnav.RootNavViewModel
@@ -70,7 +68,6 @@ private const val ANIMATION_DEBOUNCE_DELAY_MS = 500L
 class MainViewModel @Inject constructor(
     accessibilitySelectionManager: AccessibilitySelectionManager,
     autofillSelectionManager: AutofillSelectionManager,
-    private val addTotpItemFromAuthenticatorManager: AddTotpItemFromAuthenticatorManager,
     private val specialCircumstanceManager: SpecialCircumstanceManager,
     private val garbageCollectionManager: GarbageCollectionManager,
     private val credentialProviderRequestManager: CredentialProviderRequestManager,
@@ -302,20 +299,7 @@ class MainViewModel @Inject constructor(
     ) {
         val autofillSaveItem = intent.getAutofillSaveItemOrNull()
         val autofillSelectionData = intent.getAutofillSelectionDataOrNull()
-        val totpData: TotpData? =
-            // First grab TOTP URI directly from the intent data:
-            intent.getTotpDataOrNull()
-                ?: run {
-                    // Then check to see if the intent is coming from the Authenticator app:
-                    if (intent.isAddTotpLoginItemFromAuthenticator()) {
-                        addTotpItemFromAuthenticatorManager.pendingAddTotpLoginItemData.also {
-                            // Clear pending add TOTP data so it is only handled once:
-                            addTotpItemFromAuthenticatorManager.pendingAddTotpLoginItemData = null
-                        }
-                    } else {
-                        null
-                    }
-                }
+        val totpData: TotpData? = intent.getTotpDataOrNull()
         val hasGeneratorShortcut = intent.isPasswordGeneratorShortcut
         val hasVaultShortcut = intent.isMyVaultShortcut
         val hasAccountSecurityShortcut = intent.isAccountSecurityShortcut
