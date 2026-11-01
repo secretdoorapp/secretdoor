@@ -25,7 +25,6 @@ import com.bitwarden.sdk.BitwardenException
 import com.bitwarden.sdk.Fido2CredentialStore
 import com.bitwarden.sdk.VaultClient
 import com.bitwarden.send.Send
-import com.bitwarden.send.SendView
 import com.bitwarden.vault.Attachment
 import com.bitwarden.vault.AttachmentView
 import com.bitwarden.vault.Cipher
@@ -48,8 +47,6 @@ import com.x8bit.bitwarden.data.vault.datasource.sdk.model.Fido2CredentialRegist
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.Fido2CredentialSearchUserInterfaceImpl
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.InitializeCryptoResult
 import com.x8bit.bitwarden.data.vault.datasource.sdk.model.RegisterFido2CredentialRequest
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
@@ -256,30 +253,6 @@ class VaultSdkSourceImpl(
             }
         }
 
-    override suspend fun encryptSend(
-        userId: String,
-        sendView: SendView,
-    ): Result<Send> =
-        runCatchingWithLogs {
-            getClient(userId = userId)
-                .sends()
-                .encrypt(send = sendView)
-        }
-
-    override suspend fun encryptBuffer(
-        userId: String,
-        send: Send,
-        fileBuffer: ByteArray,
-    ): Result<ByteArray> =
-        runCatchingWithLogs {
-            getClient(userId = userId)
-                .sends()
-                .encryptBuffer(
-                    send = send,
-                    buffer = fileBuffer,
-                )
-        }
-
     override suspend fun encryptFile(
         userId: String,
         send: Send,
@@ -369,27 +342,6 @@ class VaultSdkSourceImpl(
                 .vault()
                 .collections()
                 .decryptList(collections = collectionList)
-        }
-
-    override suspend fun decryptSend(
-        userId: String,
-        send: Send,
-    ): Result<SendView> =
-        runCatchingWithLogs {
-            getClient(userId = userId)
-                .sends()
-                .decrypt(send = send)
-        }
-
-    override suspend fun decryptSendList(
-        userId: String,
-        sendList: List<Send>,
-    ): Result<List<SendView>> =
-        runCatchingWithLogs {
-            val sends = getClient(userId = userId).sends()
-            withContext(dispatcherManager.default) {
-                sendList.map { async { sends.decrypt(send = it) } }.awaitAll()
-            }
         }
 
     override suspend fun encryptFolder(

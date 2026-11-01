@@ -19,7 +19,6 @@ import com.bitwarden.fido.PublicKeyCredentialAuthenticatorAssertionResponse
 import com.bitwarden.fido.PublicKeyCredentialAuthenticatorAttestationResponse
 import com.bitwarden.sdk.Fido2CredentialStore
 import com.bitwarden.send.Send
-import com.bitwarden.send.SendView
 import com.bitwarden.vault.Attachment
 import com.bitwarden.vault.AttachmentEncryptResult
 import com.bitwarden.vault.AttachmentView
@@ -255,31 +254,6 @@ interface VaultSdkSource {
     ): Result<List<CollectionView>>
 
     /**
-     * Encrypts a [SendView] for the user with the given [userId], returning a [Send] wrapped
-     * in a [Result].
-     *
-     * This should only be called after a successful call to [initializeCrypto] for the associated
-     * user.
-     */
-    suspend fun encryptSend(
-        userId: String,
-        sendView: SendView,
-    ): Result<Send>
-
-    /**
-     * Encrypts a [ByteArray] file buffer for the user with the given [userId], returning an
-     * encrypted [ByteArray] wrapped in a [Result].
-     *
-     * This should only be called after a successful call to [initializeCrypto] for the associated
-     * user.
-     */
-    suspend fun encryptBuffer(
-        userId: String,
-        send: Send,
-        fileBuffer: ByteArray,
-    ): Result<ByteArray>
-
-    /**
      * Encrypts a file at [path] for the user with the given [userId], returning the
      * encrypted [File] as a [Result].
      *
@@ -292,30 +266,6 @@ interface VaultSdkSource {
         path: String,
         destinationFilePath: String,
     ): Result<File>
-
-    /**
-     * Decrypts a [Send] for the user with the given [userId], returning a [SendView] wrapped in a
-     * [Result].
-     *
-     * This should only be called after a successful call to [initializeCrypto] for the associated
-     * user.
-     */
-    suspend fun decryptSend(
-        userId: String,
-        send: Send,
-    ): Result<SendView>
-
-    /**
-     * Decrypts a list of [Send]s for the user with the given [userId], returning a list of
-     * [SendView] wrapped in a [Result].
-     *
-     * This should only be called after a successful call to [initializeCrypto] for the associated
-     * user.
-     */
-    suspend fun decryptSendList(
-        userId: String,
-        sendList: List<Send>,
-    ): Result<List<SendView>>
 
     /**
      * Encrypts a [FolderView] for the user with the given [userId], returning a [Folder] wrapped

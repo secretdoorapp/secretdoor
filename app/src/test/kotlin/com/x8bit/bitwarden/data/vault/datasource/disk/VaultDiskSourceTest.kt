@@ -15,12 +15,10 @@ import com.x8bit.bitwarden.data.vault.datasource.disk.dao.FakeCiphersDao
 import com.x8bit.bitwarden.data.vault.datasource.disk.dao.FakeCollectionsDao
 import com.x8bit.bitwarden.data.vault.datasource.disk.dao.FakeDomainsDao
 import com.x8bit.bitwarden.data.vault.datasource.disk.dao.FakeFoldersDao
-import com.x8bit.bitwarden.data.vault.datasource.disk.dao.FakeSendsDao
 import com.x8bit.bitwarden.data.vault.datasource.disk.entity.CipherEntity
 import com.x8bit.bitwarden.data.vault.datasource.disk.entity.CollectionEntity
 import com.x8bit.bitwarden.data.vault.datasource.disk.entity.DomainsEntity
 import com.x8bit.bitwarden.data.vault.datasource.disk.entity.FolderEntity
-import com.x8bit.bitwarden.data.vault.datasource.disk.entity.SendEntity
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -41,7 +39,6 @@ class VaultDiskSourceTest {
     private lateinit var collectionsDao: FakeCollectionsDao
     private lateinit var domainsDao: FakeDomainsDao
     private lateinit var foldersDao: FakeFoldersDao
-    private lateinit var sendsDao: FakeSendsDao
 
     private lateinit var vaultDiskSource: VaultDiskSource
 
@@ -51,13 +48,11 @@ class VaultDiskSourceTest {
         collectionsDao = FakeCollectionsDao()
         domainsDao = FakeDomainsDao()
         foldersDao = FakeFoldersDao()
-        sendsDao = FakeSendsDao()
         vaultDiskSource = VaultDiskSourceImpl(
             ciphersDao = ciphersDao,
             collectionsDao = collectionsDao,
             domainsDao = domainsDao,
             foldersDao = foldersDao,
-            sendsDao = sendsDao,
             json = json,
             dispatcherManager = dispatcherManager,
         )
@@ -321,55 +316,11 @@ class VaultDiskSourceTest {
     }
 
     @Test
-    fun `saveSend should call insertSend`() = runTest {
-        assertFalse(sendsDao.insertSendsCalled)
-        assertEquals(0, sendsDao.storedSends.size)
-
-        vaultDiskSource.saveSend(USER_ID, SEND_1)
-
-        // Verify the sends dao is updated
-        assertTrue(sendsDao.insertSendsCalled)
-        assertEquals(1, sendsDao.storedSends.size)
-        val storedSendEntity = sendsDao.storedSends.first()
-        // We cannot compare the JSON strings directly because of formatting differences
-        // So we split that off into its own assertion.
-        assertEquals(SEND_ENTITY.copy(sendJson = ""), storedSendEntity.copy(sendJson = ""))
-        assertJsonEquals(SEND_ENTITY.sendJson, storedSendEntity.sendJson)
-    }
-
-    @Test
-    fun `DeleteSend should call deleteSend`() = runTest {
-        assertFalse(sendsDao.deleteSendCalled)
-        sendsDao.storedSends.add(SEND_ENTITY)
-        assertEquals(1, sendsDao.storedSends.size)
-
-        vaultDiskSource.deleteSend(USER_ID, SEND_1.id)
-
-        assertTrue(sendsDao.deleteSendCalled)
-        assertEquals(emptyList<SendEntity>(), sendsDao.storedSends)
-    }
-
-    @Test
-    fun `getSendsFlow should emit all SendsDao updates`() = runTest {
-        val sendEntities = listOf(SEND_ENTITY)
-        val sends = listOf(SEND_1)
-
-        vaultDiskSource
-            .getSendsFlow(USER_ID)
-            .test {
-                assertEquals(emptyList<SyncResponseJson.Send>(), awaitItem())
-                sendsDao.insertSends(sendEntities)
-                assertEquals(sends, awaitItem())
-            }
-    }
-
-    @Test
     fun `replaceVaultData should clear the daos and insert the new vault data`() = runTest {
         assertEquals(ciphersDao.storedCiphers, emptyList<CipherEntity>())
         assertEquals(collectionsDao.storedCollections, emptyList<CollectionEntity>())
         assertNull(domainsDao.storedDomains)
         assertEquals(foldersDao.storedFolders, emptyList<FolderEntity>())
-        assertEquals(sendsDao.storedSends, emptyList<SendEntity>())
 
         vaultDiskSource.replaceVaultData(USER_ID, VAULT_DATA)
 
@@ -400,14 +351,6 @@ class VaultDiskSourceTest {
 
         // Verify the folders dao is updated
         assertEquals(listOf(FOLDER_ENTITY), foldersDao.storedFolders)
-
-        assertEquals(1, sendsDao.storedSends.size)
-        // Verify the ciphers dao is updated
-        val storedSendEntity = sendsDao.storedSends.first()
-        // We cannot compare the JSON strings directly because of formatting differences
-        // So we split that off into its own assertion.
-        assertEquals(SEND_ENTITY.copy(sendJson = ""), storedSendEntity.copy(sendJson = ""))
-        assertJsonEquals(SEND_ENTITY.sendJson, storedSendEntity.sendJson)
     }
 
     @Test
@@ -416,13 +359,11 @@ class VaultDiskSourceTest {
         assertFalse(collectionsDao.deleteCollectionsCalled)
         assertFalse(domainsDao.deleteDomainsCalled)
         assertFalse(foldersDao.deleteFoldersCalled)
-        assertFalse(sendsDao.deleteSendsCalled)
         vaultDiskSource.deleteVaultData(USER_ID)
         assertTrue(ciphersDao.deleteCiphersCalled)
         assertTrue(collectionsDao.deleteCollectionsCalled)
         assertTrue(domainsDao.deleteDomainsCalled)
         assertTrue(foldersDao.deleteFoldersCalled)
-        assertTrue(sendsDao.deleteSendsCalled)
     }
 
     @Test
@@ -686,41 +627,4 @@ private val FOLDER_ENTITY = FolderEntity(
     userId = USER_ID,
     name = "mockName-2",
     revisionDate = Instant.parse("2023-10-27T12:00:00Z"),
-)
-
-private const val SEND_JSON = """
-{
-  "accessCount": 1,
-  "notes": "mockNotes-1",
-  "revisionDate": "2023-10-27T12:00:00.000Z",
-  "maxAccessCount": 1,
-  "hideEmail": false,
-  "type": 1,
-  "accessId": "mockAccessId-1",
-  "password": "mockPassword-1",
-  "file": {
-    "fileName": "mockFileName-1",
-    "size": 1,
-    "sizeName": "mockSizeName-1",
-    "id": "mockId-1"
-  },
-  "deletionDate": "2023-10-27T12:00:00.000Z",
-  "name": "mockName-1",
-  "disabled": false,
-  "id": "mockId-1",
-  "text": {
-    "hidden": false,
-    "text": "mockText-1"
-  },
-  "key": "mockKey-1",
-  "expirationDate": "2023-10-27T12:00:00.000Z",
-  "authType": 1
-}
-"""
-
-private val SEND_ENTITY = SendEntity(
-    id = "mockId-1",
-    userId = USER_ID,
-    sendType = "1",
-    sendJson = SEND_JSON,
 )
