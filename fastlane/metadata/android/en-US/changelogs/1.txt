@@ -1,0 +1,1 @@
+First SecretDoor release: an offline password manager with encrypted, scheduled backups.
