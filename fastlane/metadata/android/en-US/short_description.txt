@@ -1,0 +1,1 @@
+Offline password manager. Your vault stays on your phone. No account, no server.

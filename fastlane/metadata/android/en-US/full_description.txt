@@ -1,0 +1,30 @@
+SecretDoor is a password manager that keeps your vault on your phone and nowhere else. There is no account, no server, no sync service and no tracking.
+
+YOUR VAULT STAYS WITH YOU
+• Everything is encrypted on your device with a key only your master password can unlock
+• No account, no sign-up, no analytics, no crash reporting
+• Unlock with your master password, a PIN or fingerprint/face
+• Free and open source (GPLv3), so anyone can inspect the code
+
+STORE MORE THAN PASSWORDS
+• Logins, cards, identities, secure notes and SSH keys
+• Passkeys, with support for Android Credential Manager
+• Built-in authenticator codes (TOTP) for two-step verification
+• Folders, favorites, search and attachments
+
+FILL IT IN FOR YOU
+• Autofill in apps and browsers
+• Optional accessibility method for apps that do not support autofill
+• Strong password and passphrase generator
+
+BACKUPS YOU CONTROL
+• Export an encrypted backup file whenever you like
+• Schedule automatic daily or weekly backups to a file or cloud folder you choose, such as Google Drive
+• Restore your vault from a backup on a new phone
+• Import from other password managers
+
+PRIVATE BY DESIGN
+• The only optional network use is a password breach check that is off by default and never sends your password
+• Website icons are never downloaded, so no server learns which sites you use
+
+SecretDoor is based on the open source Bitwarden Android app and is not affiliated with or endorsed by Bitwarden Inc.
