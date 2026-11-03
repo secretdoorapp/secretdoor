@@ -60,3 +60,9 @@ apk.done
 test.log
 tests.done
 subset.*
+
+# Release signing secrets
+/keystore.properties
+keystore.properties
+*.jks
+*.keystore.bak

@@ -83,6 +83,22 @@ configure<ApplicationExtension> {
     }
 
     signingConfigs {
+        // Release signing reads the key password from the SECRETDOOR_KEYSTORE_PASSWORD
+        // environment variable, so no secret is stored in the project. Without it the release
+        // build stays unsigned and nobody needs the key to build the app.
+        val keystorePassword: String? = System.getenv("SECRETDOOR_KEYSTORE_PASSWORD")
+        if (!keystorePassword.isNullOrEmpty()) {
+            create("release") {
+                val home = System.getProperty("user.home")
+                storeFile = file(
+                    System.getenv("SECRETDOOR_KEYSTORE_FILE")
+                        ?: "$home/secretdoor-keys/secretdoor-upload.jks",
+                )
+                storePassword = keystorePassword
+                keyAlias = System.getenv("SECRETDOOR_KEY_ALIAS") ?: "secretdoor-upload"
+                keyPassword = keystorePassword
+            }
+        }
         getByName("debug") {
             keyAlias = "androiddebugkey"
             keyPassword = "android"
@@ -118,6 +134,7 @@ configure<ApplicationExtension> {
             buildConfigField(type = "boolean", name = "HAS_LOGS_ENABLED", value = "false")
         }
         release {
+            signingConfigs.findByName("release")?.let { signingConfig = it }
             isDebuggable = false
             isMinifyEnabled = true
             isShrinkResources = true
