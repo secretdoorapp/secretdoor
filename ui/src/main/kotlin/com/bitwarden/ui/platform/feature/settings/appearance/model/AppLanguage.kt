@@ -151,6 +151,10 @@ enum class AppLanguage(
         localeName = "sk",
         text = "slovenčina".asText(),
     ),
+    SERBIAN_LATIN(
+        localeName = "sr-Latn",
+        text = "srpski (latinica)".asText(),
+    ),
     SWEDISH(
         localeName = "sv",
         text = "svenska".asText(),
