@@ -66,3 +66,7 @@ subset.*
 keystore.properties
 *.jks
 *.keystore.bak
+
+# Editor swap files
+*.swp
+*.swo
