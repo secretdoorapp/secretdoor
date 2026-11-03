@@ -59,5 +59,5 @@ uninstall the app. Backup files you saved elsewhere stay where you saved them un
 
 ## Contact
 
-Questions about privacy can be raised as an issue in the
+Questions about privacy can be sent to <contact@secretdoor.fyi> or raised as an issue in the
 [project repository](https://github.com/secretdoorapp/secretdoor/issues).

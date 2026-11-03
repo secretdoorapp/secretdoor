@@ -17,7 +17,7 @@ account (one-time US$25 fee, identity verification).
 
 ## Console answers
 
-- **App category**: Tools (alternative: Productivity). **Contact email**: required, public.
+- **App category**: Tools (alternative: Productivity). **Contact email**: `contact@secretdoor.fyi` (required, public).
 - **Content rating**: questionnaire answers are all "No"; expect Everyone.
 - **Target audience**: 18 and over. **Ads**: none.
 - **Data safety**: no data collected, no data shared. The vault never leaves the device, and the
