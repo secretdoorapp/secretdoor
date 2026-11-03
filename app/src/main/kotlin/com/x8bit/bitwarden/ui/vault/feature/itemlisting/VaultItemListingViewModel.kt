@@ -74,6 +74,7 @@ import com.x8bit.bitwarden.data.platform.util.getSignatureFingerprintAsHexString
 import com.x8bit.bitwarden.data.vault.manager.model.GetCipherResult
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.ArchiveCipherResult
+import com.x8bit.bitwarden.data.vault.repository.model.DeleteCipherResult
 import com.x8bit.bitwarden.data.vault.repository.model.GenerateTotpResult
 import com.x8bit.bitwarden.data.vault.repository.model.UnarchiveCipherResult
 import com.x8bit.bitwarden.data.vault.repository.model.VaultData
@@ -286,6 +287,8 @@ class VaultItemListingViewModel @Inject constructor(
             is VaultItemListingsAction.BackClick -> handleBackClick()
             is VaultItemListingsAction.FolderClick -> handleFolderClick(action)
             is VaultItemListingsAction.LockClick -> handleLockClick()
+            is VaultItemListingsAction.EmptyTrashClick -> handleEmptyTrashClick()
+            is VaultItemListingsAction.ConfirmEmptyTrashClick -> handleConfirmEmptyTrashClick()
             is VaultItemListingsAction.SyncClick -> handleSyncClick()
             is VaultItemListingsAction.SearchIconClick -> handleSearchIconClick()
             is VaultItemListingsAction.OverflowOptionClick -> handleOverflowOptionClick(action)
@@ -1414,6 +1417,67 @@ class VaultItemListingViewModel @Inject constructor(
         vaultRepository.lockVaultForCurrentUser(isUserInitiated = true)
     }
 
+    private fun handleEmptyTrashClick() {
+        if (state.itemListingType != VaultItemListingState.ItemListingType.Vault.Trash) return
+        mutableStateFlow.update {
+            it.copy(dialogState = VaultItemListingState.DialogState.ConfirmEmptyTrash)
+        }
+    }
+
+    private fun handleConfirmEmptyTrashClick() {
+        if (state.itemListingType != VaultItemListingState.ItemListingType.Vault.Trash) return
+        val cipherIds = (state.viewState as? VaultItemListingState.ViewState.Content)
+            ?.displayItemList
+            ?.map { it.id }
+            .orEmpty()
+        mutableStateFlow.update {
+            it.copy(
+                dialogState = VaultItemListingState.DialogState.Loading(
+                    message = BitwardenString.emptying_trash.asText(),
+                ),
+            )
+        }
+        viewModelScope.launch {
+            var result: DeleteCipherResult = DeleteCipherResult.Success
+            for (cipherId in cipherIds) {
+                val deleteResult = vaultRepository.hardDeleteCipher(cipherId = cipherId)
+                if (deleteResult is DeleteCipherResult.Error) {
+                    result = deleteResult
+                    break
+                }
+            }
+            sendAction(VaultItemListingsAction.Internal.EmptyTrashReceive(result = result))
+        }
+    }
+
+    private fun handleEmptyTrashReceive(
+        action: VaultItemListingsAction.Internal.EmptyTrashReceive,
+    ) {
+        when (val result = action.result) {
+            is DeleteCipherResult.Error -> {
+                mutableStateFlow.update {
+                    it.copy(
+                        dialogState = VaultItemListingState.DialogState.Error(
+                            title = BitwardenString.an_error_has_occurred.asText(),
+                            message = result.errorMessage?.asText()
+                                ?: BitwardenString.unable_to_empty_the_trash.asText(),
+                            throwable = result.error,
+                        ),
+                    )
+                }
+            }
+
+            DeleteCipherResult.Success -> {
+                mutableStateFlow.update { it.copy(dialogState = null) }
+                sendEvent(
+                    VaultItemListingEvent.ShowSnackbar(
+                        message = BitwardenString.trash_emptied.asText(),
+                    ),
+                )
+            }
+        }
+    }
+
     private fun handleSyncClick() {
         if (networkConnectionManager.isNetworkConnected) {
             mutableStateFlow.update {
@@ -1591,6 +1655,10 @@ class VaultItemListingViewModel @Inject constructor(
 
             is VaultItemListingsAction.Internal.ArchiveCipherReceive -> {
                 handleArchiveCipherReceive(action)
+            }
+
+            is VaultItemListingsAction.Internal.EmptyTrashReceive -> {
+                handleEmptyTrashReceive(action)
             }
 
             is VaultItemListingsAction.Internal.UnarchiveCipherReceive -> {
@@ -2817,6 +2885,13 @@ data class VaultItemListingState(
         get() = !isAutofill && !isCredentialManagerCreation && !isTotp
 
     /**
+     * Whether the "Empty trash" overflow option should be shown.
+     */
+    val shouldShowEmptyTrashOption: Boolean
+        get() = itemListingType == ItemListingType.Vault.Trash &&
+            (viewState as? ViewState.Content)?.displayItemList?.isNotEmpty() == true
+
+    /**
      * Represents the current state of any dialogs on the screen.
      */
     sealed class DialogState : Parcelable {
@@ -2947,6 +3022,12 @@ data class VaultItemListingState(
          */
         @Parcelize
         data object ArchiveRequiresPremium : DialogState()
+
+        /**
+         * Displays a dialog asking the user to confirm permanently deleting all trash items.
+         */
+        @Parcelize
+        data object ConfirmEmptyTrash : DialogState()
 
     }
 
@@ -3455,6 +3536,16 @@ sealed class VaultItemListingsAction {
     data object LockClick : VaultItemListingsAction()
 
     /**
+     * Click the "Empty trash" overflow option.
+     */
+    data object EmptyTrashClick : VaultItemListingsAction()
+
+    /**
+     * Confirm permanently deleting every item in the trash.
+     */
+    data object ConfirmEmptyTrashClick : VaultItemListingsAction()
+
+    /**
      * Click to share cipher decryption error details.
      */
     data class ShareCipherDecryptionErrorClick(
@@ -3591,6 +3682,13 @@ sealed class VaultItemListingsAction {
          */
         data class ArchiveCipherReceive(
             val result: ArchiveCipherResult,
+        ) : Internal()
+
+        /**
+         * Indicates that the result of emptying the trash has been received.
+         */
+        data class EmptyTrashReceive(
+            val result: DeleteCipherResult,
         ) : Internal()
 
         /**

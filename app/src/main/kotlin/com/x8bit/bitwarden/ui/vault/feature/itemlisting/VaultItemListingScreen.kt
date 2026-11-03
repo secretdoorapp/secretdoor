@@ -64,7 +64,7 @@ import com.x8bit.bitwarden.ui.vault.feature.itemlisting.handlers.VaultItemListin
 import com.x8bit.bitwarden.ui.vault.feature.itemlisting.handlers.VaultItemListingUserVerificationHandlers
 import com.x8bit.bitwarden.ui.vault.model.VaultAddEditType
 import com.x8bit.bitwarden.ui.vault.model.VaultItemListingType
-import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 
 /**
  * Displays the vault item listing screen.
@@ -384,6 +384,20 @@ private fun VaultItemListingDialogs(
             )
         }
 
+        is VaultItemListingState.DialogState.ConfirmEmptyTrash -> {
+            BitwardenTwoButtonDialog(
+                title = stringResource(id = BitwardenString.empty_trash),
+                message = stringResource(
+                    id = BitwardenString.permanently_delete_all_trash_items_this_cannot_be_undone,
+                ),
+                confirmButtonText = stringResource(id = BitwardenString.delete),
+                dismissButtonText = stringResource(id = BitwardenString.cancel),
+                onConfirmClick = vaultItemListingHandlers.confirmEmptyTrashClick,
+                onDismissClick = vaultItemListingHandlers.dismissDialogRequest,
+                onDismissRequest = vaultItemListingHandlers.dismissDialogRequest,
+            )
+        }
+
         null -> Unit
     }
 }
@@ -428,12 +442,22 @@ private fun VaultItemListingScaffold(
                     )
                     BitwardenOverflowActionItem(
                         isVisible = state.shouldShowOverflowMenu,
-                        menuItemDataList = persistentListOf(
-                            OverflowMenuItemData(
-                                text = stringResource(id = BitwardenString.lock),
-                                onClick = vaultItemListingHandlers.lockClick,
-                            ),
-                        ),
+                        menuItemDataList = buildList {
+                            if (state.shouldShowEmptyTrashOption) {
+                                add(
+                                    OverflowMenuItemData(
+                                        text = stringResource(id = BitwardenString.empty_trash),
+                                        onClick = vaultItemListingHandlers.emptyTrashClick,
+                                    ),
+                                )
+                            }
+                            add(
+                                OverflowMenuItemData(
+                                    text = stringResource(id = BitwardenString.lock),
+                                    onClick = vaultItemListingHandlers.lockClick,
+                                ),
+                            )
+                        }.toImmutableList(),
                     )
                 },
             )

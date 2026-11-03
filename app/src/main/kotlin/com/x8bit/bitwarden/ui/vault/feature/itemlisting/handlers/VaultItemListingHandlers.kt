@@ -26,6 +26,8 @@ data class VaultItemListingHandlers(
     val refreshClick: () -> Unit,
     val syncClick: () -> Unit,
     val lockClick: () -> Unit,
+    val emptyTrashClick: () -> Unit,
+    val confirmEmptyTrashClick: () -> Unit,
     val overflowItemClick: (action: ListingItemOverflowAction) -> Unit,
     val dismissDialogRequest: () -> Unit,
     val dismissCredentialManagerErrorDialog: (Text) -> Unit,
@@ -86,6 +88,12 @@ data class VaultItemListingHandlers(
                 refreshClick = { viewModel.trySendAction(VaultItemListingsAction.RefreshClick) },
                 syncClick = { viewModel.trySendAction(VaultItemListingsAction.SyncClick) },
                 lockClick = { viewModel.trySendAction(VaultItemListingsAction.LockClick) },
+                emptyTrashClick = {
+                    viewModel.trySendAction(VaultItemListingsAction.EmptyTrashClick)
+                },
+                confirmEmptyTrashClick = {
+                    viewModel.trySendAction(VaultItemListingsAction.ConfirmEmptyTrashClick)
+                },
                 overflowItemClick = {
                     viewModel.trySendAction(VaultItemListingsAction.OverflowOptionClick(it))
                 },
