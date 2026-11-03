@@ -436,6 +436,11 @@ Scanning will happen automatically.</string>
     <string name="restoring">Restoring…</string>
     <string name="item_restored">Item restored</string>
     <string name="trash">Trash</string>
+    <string name="empty_trash">Empty trash</string>
+    <string name="permanently_delete_all_trash_items_this_cannot_be_undone">Permanently delete all trash items? This cannot be undone.</string>
+    <string name="emptying_trash">Emptying trash…</string>
+    <string name="trash_emptied">Trash emptied</string>
+    <string name="unable_to_empty_the_trash">Unable to empty the trash.</string>
     <string name="do_you_really_want_to_permanently_delete_cipher">Do you really want to permanently delete? This cannot be undone.</string>
     <string name="do_you_really_want_to_restore_cipher">Do you really want to restore this item?</string>
     <string name="do_you_really_want_to_soft_delete_cipher">Do you really want to send to the trash?</string>

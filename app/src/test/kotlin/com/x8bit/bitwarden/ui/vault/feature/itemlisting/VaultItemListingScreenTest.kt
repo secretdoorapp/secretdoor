@@ -7,6 +7,7 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.isPopup
 import androidx.compose.ui.test.onAllNodesWithContentDescription
@@ -1108,6 +1109,54 @@ class VaultItemListingScreenTest : BitwardenComposeTest() {
         verify {
             viewModel.trySendAction(VaultItemListingsAction.LockClick)
         }
+    }
+
+    @Test
+    fun `empty trash option should only show in a trash listing with items`() {
+        composeTestRule
+            .onNodeWithContentDescription(label = "More options")
+            .performClick()
+        composeTestRule
+            .onAllNodesWithText(text = "Empty trash")
+            .filterToOne(hasAnyAncestor(isPopup()))
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `on empty trash click should send EmptyTrashClick`() {
+        mutableStateFlow.update {
+            it.copy(
+                itemListingType = VaultItemListingState.ItemListingType.Vault.Trash,
+                viewState = VaultItemListingState.ViewState.Content(
+                    displayItemList = listOf(createCipherDisplayItem(number = 1)),
+                    displayFolderList = emptyList(),
+                ),
+            )
+        }
+        composeTestRule
+            .onAllNodesWithContentDescription(label = "More options")
+            .filterToOne(!hasTestTag(testTag = "CipherOptionsButton"))
+            .performClick()
+
+        composeTestRule
+            .onAllNodesWithText(text = "Empty trash")
+            .filterToOne(hasAnyAncestor(isPopup()))
+            .performClick()
+
+        verify { viewModel.trySendAction(VaultItemListingsAction.EmptyTrashClick) }
+    }
+
+    @Test
+    fun `confirm empty trash dialog should send ConfirmEmptyTrashClick on delete`() {
+        mutableStateFlow.update {
+            it.copy(dialogState = VaultItemListingState.DialogState.ConfirmEmptyTrash)
+        }
+        composeTestRule
+            .onAllNodesWithText(text = "Delete")
+            .filterToOne(hasAnyAncestor(isDialog()))
+            .performClick()
+
+        verify { viewModel.trySendAction(VaultItemListingsAction.ConfirmEmptyTrashClick) }
     }
 
     @Test

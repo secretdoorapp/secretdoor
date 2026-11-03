@@ -93,6 +93,7 @@ import com.x8bit.bitwarden.data.vault.datasource.sdk.model.createMockSdkFido2Cre
 import com.x8bit.bitwarden.data.vault.manager.model.GetCipherResult
 import com.x8bit.bitwarden.data.vault.repository.VaultRepository
 import com.x8bit.bitwarden.data.vault.repository.model.ArchiveCipherResult
+import com.x8bit.bitwarden.data.vault.repository.model.DeleteCipherResult
 import com.x8bit.bitwarden.data.vault.repository.model.GenerateTotpResult
 import com.x8bit.bitwarden.data.vault.repository.model.UnarchiveCipherResult
 import com.x8bit.bitwarden.data.vault.repository.model.VaultData
@@ -489,6 +490,110 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
             viewModel.trySendAction(VaultItemListingsAction.SearchIconClick)
             assertEquals(VaultItemListingEvent.NavigateToSearchScreen(searchType), awaitItem())
         }
+    }
+
+    @Test
+    fun `EmptyTrashClick in the trash listing should show the confirmation dialog`() {
+        val viewModel = createVaultItemListingViewModel(
+            savedStateHandle = createSavedStateHandleWithVaultItemListingType(
+                vaultItemListingType = VaultItemListingType.Trash,
+            ),
+        )
+
+        viewModel.trySendAction(VaultItemListingsAction.EmptyTrashClick)
+
+        assertEquals(
+            VaultItemListingState.DialogState.ConfirmEmptyTrash,
+            viewModel.stateFlow.value.dialogState,
+        )
+    }
+
+    @Test
+    fun `EmptyTrashClick outside the trash listing should do nothing`() {
+        val viewModel = createVaultItemListingViewModel()
+
+        viewModel.trySendAction(VaultItemListingsAction.EmptyTrashClick)
+
+        assertNull(viewModel.stateFlow.value.dialogState)
+    }
+
+    @Test
+    fun `ConfirmEmptyTrashClick should hard delete every trash item and show a snackbar`() =
+        runTest {
+            setupMockUri()
+            coEvery {
+                vaultRepository.hardDeleteCipher(cipherId = any())
+            } returns DeleteCipherResult.Success
+            val viewModel = createVaultItemListingViewModel(
+                savedStateHandle = createSavedStateHandleWithVaultItemListingType(
+                    vaultItemListingType = VaultItemListingType.Trash,
+                ),
+            )
+            mutableVaultDataStateFlow.value = DataState.Loaded(
+                data = VaultData(
+                    decryptCipherListResult = createMockDecryptCipherListResult(
+                        number = 1,
+                        successes = listOf(
+                            createMockCipherListView(number = 1, isDeleted = true),
+                            createMockCipherListView(number = 2, isDeleted = true),
+                        ),
+                    ),
+                    folderViewList = emptyList(),
+                    collectionViewList = emptyList(),
+                ),
+            )
+
+            viewModel.trySendAction(VaultItemListingsAction.ConfirmEmptyTrashClick)
+
+            viewModel.eventFlow.test {
+                assertEquals(
+                    VaultItemListingEvent.ShowSnackbar(
+                        message = BitwardenString.trash_emptied.asText(),
+                    ),
+                    awaitItem(),
+                )
+            }
+
+            coVerify(exactly = 1) { vaultRepository.hardDeleteCipher(cipherId = "mockId-1") }
+            coVerify(exactly = 1) { vaultRepository.hardDeleteCipher(cipherId = "mockId-2") }
+            assertNull(viewModel.stateFlow.value.dialogState)
+        }
+
+    @Test
+    fun `ConfirmEmptyTrashClick with a delete error should show an error dialog`() = runTest {
+        setupMockUri()
+        val error = IllegalStateException("boom")
+        coEvery {
+            vaultRepository.hardDeleteCipher(cipherId = any())
+        } returns DeleteCipherResult.Error(error = error, errorMessage = null)
+        val viewModel = createVaultItemListingViewModel(
+            savedStateHandle = createSavedStateHandleWithVaultItemListingType(
+                vaultItemListingType = VaultItemListingType.Trash,
+            ),
+        )
+        mutableVaultDataStateFlow.value = DataState.Loaded(
+            data = VaultData(
+                decryptCipherListResult = createMockDecryptCipherListResult(
+                    number = 1,
+                    successes = listOf(
+                        createMockCipherListView(number = 1, isDeleted = true),
+                    ),
+                ),
+                folderViewList = emptyList(),
+                collectionViewList = emptyList(),
+            ),
+        )
+
+        viewModel.trySendAction(VaultItemListingsAction.ConfirmEmptyTrashClick)
+
+        assertEquals(
+            VaultItemListingState.DialogState.Error(
+                title = BitwardenString.an_error_has_occurred.asText(),
+                message = BitwardenString.unable_to_empty_the_trash.asText(),
+                throwable = error,
+            ),
+            viewModel.stateFlow.value.dialogState,
+        )
     }
 
     @Test
