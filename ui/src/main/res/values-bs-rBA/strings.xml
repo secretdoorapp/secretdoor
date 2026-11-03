@@ -375,7 +375,7 @@ Skeniranje će biti izvršeno automatski.</string>
     <string name="pin">PIN</string>
     <string name="unlock">Otključaj</string>
     <string name="thirty_minutes">30 minuta</string>
-    <string name="set_pin_description">Postavite vaš PIN kod za otključavanje BitWarden. Vaše podešen PIN postavke će biti resetovane ako se ikada sasvim odjavite iz aplikacije.</string>
+    <string name="set_pin_description">Postavite vaš PIN kod za otključavanje SecretDoor. Vaše podešen PIN postavke će biti resetovane ako se ikada sasvim odjavite iz aplikacije.</string>
     <string name="logged_in_as_on">Prijavljen kao %1$s na %2$s.</string>
     <string name="vault_locked_master_password">Vaš trezor je zaključan. Potvrdite glavnu lozinku da nastavite.</string>
     <string name="vault_locked_pin">Vaš trezor je zaključan. Potvrdite vaš PIN da nastavite.</string>

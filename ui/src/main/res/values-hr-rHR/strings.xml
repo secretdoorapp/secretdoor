@@ -422,7 +422,7 @@
     <string name="clone">Kloniraj</string>
     <string name="password_generator_policy_in_effect">Jedno ili više pravila organizacije utječe na postavke generatora.</string>
     <string name="save_attachment_success">Privitak uspješno spremljen</string>
-    <string name="autofill_tile_accessibility_required">Za korištenje pločice auto-ispune: BItwarden postavke -> „Auto-ispuna” uključi opciju „Koristi pristupačnost”.</string>
+    <string name="autofill_tile_accessibility_required">Za korištenje pločice auto-ispune: SecretDoor postavke -> „Auto-ispuna” uključi opciju „Koristi pristupačnost”.</string>
     <string name="autofill_tile_uri_not_found">Nema pronađenih polja za unos lozinke</string>
     <string name="soft_deleting">Slanje u smeće…</string>
     <string name="item_soft_deleted">Stavka je poslana u smeće.</string>
