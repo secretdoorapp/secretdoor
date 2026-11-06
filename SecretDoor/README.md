@@ -21,21 +21,30 @@ be restored on the other.
 - Backups: save a backup file anywhere; automatic daily/weekly backups to a folder you pick (for
   example in iCloud Drive); import a backup into the current vault (merge) or as a separate vault.
 - Several vaults, each with its own master password; change master password; delete vault.
+- AutoFill in Safari and other apps (extension `SecretDoorAutoFill`): unlock with Face ID or the
+  master password, logins matching the website first (Bitwarden URI match detection), search,
+  master password re-prompt, optional copying of the verification code, and optional
+  suggestions above the keyboard (iOS gets usernames and websites of the unlocked vault, never
+  passwords). Turn it on in Settings > General > AutoFill & Passwords.
 
-Not yet on iPhone: AutoFill in Safari and other apps, PIN unlock, passkeys (passkeys stored by
-the Android app are kept), import from other password managers and export to CSV/JSON.
+Not yet on iPhone: PIN unlock, passkeys (passkeys stored by the Android app are kept), import
+from other password managers and export to CSV/JSON.
 
 ## Building
 
 Requires Xcode 26 or later. Open `SecretDoor.xcodeproj`, choose an iPhone simulator and press
-Run. To install on your own iPhone, select your team under *Signing & Capabilities*.
+Run. To install on your own iPhone, select your team under *Signing & Capabilities* for both
+targets, `SecretDoor` and `SecretDoorAutoFill`. Both use the App Group `group.app.secretdoor`,
+a shared Keychain group and the AutoFill credential provider capability
+(`Config/*.entitlements`); Xcode registers them for your team.
 
 The Debug configuration is built with optimization (`-O`) because the Argon2id key derivation is
 far too slow without it (several seconds instead of about half a second).
 
 ## Code layout
 
-- `SecretDoor/Core`: everything that does not need UIKit, tested on the Mac:
+- `Shared/Core`: everything that does not need UIKit, tested on the Mac (also compiled into the
+  AutoFill extension):
   - `Crypto`: AES, HMAC, HKDF, PBKDF2, BLAKE2b and Argon2id (Swift implementation, checked
     against the RFC 9106 test vector), Bitwarden encrypted strings (`2.iv|data|mac`), master key
     derivation and user key unwrapping.
@@ -43,12 +52,16 @@ far too slow without it (several seconds instead of about half a second).
     unchanged) and a small ZIP reader/writer.
   - `Backup`: the `.secretdoor` file format (header, AES-256-GCM chunks in the STREAM
     construction), the same as `VaultBackupManagerImpl.kt` and `BackupCrypto.kt`.
-  - `Vault`: item models, item encryption/decryption, vault files on the device, restore and
-    merge.
+  - `Vault`: item models, item encryption/decryption, vault files on the device, restore,
+    merge and website matching for AutoFill.
   - `Tools`: TOTP and the generator.
-- `SecretDoor/App`: app state, Keychain (Face ID key, automatic backup key), automatic backups.
+- `Shared/Platform`: Keychain (Face ID key, automatic backup key), the shared App Group
+  container and settings, AutoFill suggestions.
+- `SecretDoor/App`: app state and automatic backups.
 - `SecretDoor/Views`: SwiftUI screens.
-- `CoreTests`: a Swift package that compiles `SecretDoor/Core` (through a symlink) and tests it:
+- `SecretDoorAutoFill`: the AutoFill extension.
+- `Config`: Info.plist files and entitlements.
+- `CoreTests`: a Swift package that compiles `Shared/Core` (through a symlink) and tests it:
 
   ```sh
   cd CoreTests && swift test
@@ -56,7 +69,8 @@ far too slow without it (several seconds instead of about half a second).
 
 ## Storage
 
-Each vault is a folder in Application Support (`Vaults/<vault id>/`) holding the same encrypted
+Each vault is a folder in the App Group container (`Vaults/<vault id>/`; versions before
+AutoFill used Application Support and are moved on first launch) holding the same encrypted
 records as the Android app: `account.json`, `account_keys.json`, `folders.json`, `ciphers.json`
 and `attachments/<item id>/<attachment id>`. Everything in them is encrypted with the vault's
 user key. Only `meta.json` (vault name, hint, last backup) is plain.
