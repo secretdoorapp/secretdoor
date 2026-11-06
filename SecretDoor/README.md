@@ -81,4 +81,5 @@ locked.
 
 ## License
 
-GNU GPL v3, like the rest of SecretDoor. See `../LICENSE.txt` and `../NOTICE.md`.
+GNU GPL v3 with an additional permission to distribute the app through Apple's App Store and
+TestFlight. See [`LICENSE.md`](LICENSE.md), `../LICENSE.txt` and `../NOTICE.md`.
