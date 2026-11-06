@@ -13,6 +13,11 @@ nonisolated public enum CipherType: Int, CaseIterable, Identifiable, Sendable {
 
     public var id: Int { rawValue }
 
+    /// The order the vault screen lists types in (the same as the Android app).
+    public static let displayOrder: [CipherType] = [
+        .login, .card, .identity, .secureNote, .sshKey, .bankAccount, .driversLicense, .passport,
+    ]
+
     /// The JSON key of this type's section (`login`, `card`, …).
     public var sectionKey: String {
         switch self {

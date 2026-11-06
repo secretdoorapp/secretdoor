@@ -90,7 +90,7 @@ struct VaultHomeView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
-                        ForEach(CipherType.allCases) { type in
+                        ForEach(CipherType.displayOrder) { type in
                             Button {
                                 newItemType = type
                             } label: {
@@ -130,7 +130,7 @@ struct VaultHomeView: View {
             }
         }
         Section("Types") {
-            ForEach(CipherType.allCases) { type in
+            ForEach(CipherType.displayOrder) { type in
                 let count = active.filter { $0.type == type }.count
                 if count > 0 || [.login, .card, .identity, .secureNote].contains(type) {
                     NavigationLink(value: VaultRoute.list(.type(type))) {
