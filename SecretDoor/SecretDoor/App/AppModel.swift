@@ -65,16 +65,16 @@ final class AppModel {
     var clipboardClearSeconds: Int {
         get {
             access(keyPath: \.clipboardClearSeconds)
-            return UserDefaults.standard.object(forKey: "clipboardClearSeconds") as? Int ?? 90
+            return SharedContainer.clipboardClearSeconds
         }
         set {
             withMutation(keyPath: \.clipboardClearSeconds) {
-                UserDefaults.standard.set(newValue, forKey: "clipboardClearSeconds")
+                SharedContainer.clipboardClearSeconds = newValue
             }
         }
     }
 
-    init(storage: VaultStorage = VaultStorage(root: VaultStorage.defaultRoot(appGroup: nil))) {
+    init(storage: VaultStorage? = nil) {
         #if DEBUG
         // Development builds started with `-SDDemoVault` open a vault of sample items, kept in a
         // separate folder so real vaults are not touched (used for screenshots).
@@ -85,7 +85,8 @@ final class AppModel {
             return
         }
         #endif
-        self.storage = storage
+        SharedContainer.migrateVaultsIfNeeded()
+        self.storage = storage ?? SharedContainer.vaultStorage()
         reload()
     }
 
@@ -168,6 +169,13 @@ final class AppModel {
             try? Keychain.storeBackupKey(BackupFileKey.new(userKey: userKey), userId: meta.userId)
         }
         refreshBiometricState()
+        updateAutoFillSuggestions()
+    }
+
+    /// Offers the unlocked vault's logins above the keyboard (see `AutoFillIdentities`).
+    func updateAutoFillSuggestions() {
+        guard let session else { return }
+        AutoFillIdentities.update(userId: session.userId, ciphers: session.ciphers)
     }
 
     func lock() {
@@ -219,6 +227,7 @@ final class AppModel {
         }
         try storage.deleteVault(userId: userId)
         Keychain.deleteAll(userId: userId)
+        AutoFillIdentities.removeAll()
         autoBackup.removeSettings(userId: userId)
         reload()
     }
@@ -261,6 +270,7 @@ final class AppModel {
     }
 
     private func vaultDidChange() {
+        updateAutoFillSuggestions()
         runAutoBackupIfDue(afterChange: true)
     }
 
@@ -275,11 +285,7 @@ final class AppModel {
     /// Copies `value`, kept off other devices (Universal Clipboard) and removed after the
     /// configured time.
     func copy(_ value: String) {
-        var options: [UIPasteboard.OptionsKey: Any] = [.localOnly: true]
-        if clipboardClearSeconds > 0 {
-            options[.expirationDate] = Date().addingTimeInterval(Double(clipboardClearSeconds))
-        }
-        UIPasteboard.general.setItems([[UTType.plainText.identifier: value]], options: options)
+        AutoFillIdentities.copyToClipboard(value)
     }
 }
 

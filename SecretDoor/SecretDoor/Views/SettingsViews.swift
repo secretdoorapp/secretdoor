@@ -1,3 +1,4 @@
+import AuthenticationServices
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -47,6 +48,14 @@ struct SettingsView: View {
                         model.lock()
                     } label: {
                         Label("Lock now", systemImage: "lock")
+                    }
+                }
+
+                Section {
+                    NavigationLink {
+                        AutoFillSettingsView()
+                    } label: {
+                        Label("AutoFill", systemImage: "key.viewfinder")
                     }
                 }
 
@@ -487,5 +496,60 @@ struct AboutView: View {
             }
         }
         .navigationTitle("Privacy and license")
+    }
+}
+
+struct AutoFillSettingsView: View {
+    @Environment(AppModel.self) private var model
+    @State private var isEnabled: Bool?
+    @State private var showsSuggestions = SharedContainer.showsKeyboardSuggestions
+    @State private var copiesTotp = SharedContainer.copiesTotpAfterFill
+    @Environment(\.scenePhase) private var scenePhase
+
+    var body: some View {
+        Form {
+            Section {
+                LabeledContent("Status") {
+                    switch isEnabled {
+                    case true?: Label("On", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+                    case false?: Text("Off").foregroundStyle(.secondary)
+                    case nil: ProgressView()
+                    }
+                }
+                if isEnabled == false {
+                    Button {
+                        ASSettingsHelper.openCredentialProviderAppSettings { _ in }
+                    } label: {
+                        Label("Turn on AutoFill", systemImage: "gear")
+                    }
+                }
+            } footer: {
+                Text("To fill passwords in Safari and other apps, open Settings > General > AutoFill & Passwords and turn on SecretDoor. Then tap a password field and choose SecretDoor, or use the key button above the keyboard.")
+            }
+
+            Section {
+                Toggle("Suggest logins above the keyboard", isOn: $showsSuggestions)
+                    .onChange(of: showsSuggestions) { _, value in
+                        SharedContainer.showsKeyboardSuggestions = value
+                        if value { model.updateAutoFillSuggestions() } else { AutoFillIdentities.removeAll() }
+                    }
+            } footer: {
+                Text("iOS then knows the usernames and websites of the unlocked vault (never the passwords) and shows matching logins above the keyboard. With this off, open SecretDoor from the key button instead.")
+            }
+
+            Section {
+                Toggle("Copy verification code after filling", isOn: $copiesTotp)
+                    .onChange(of: copiesTotp) { _, value in SharedContainer.copiesTotpAfterFill = value }
+            } footer: {
+                Text("For logins with an authenticator key, the current code is copied so you can paste it on the next page.")
+            }
+        }
+        .navigationTitle("AutoFill")
+        .task(id: scenePhase) { await refreshState() }
+    }
+
+    private func refreshState() async {
+        let state = await ASCredentialIdentityStore.shared.state()
+        isEnabled = state.isEnabled
     }
 }

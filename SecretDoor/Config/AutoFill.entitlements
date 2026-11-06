@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Fill passwords in other apps (AutoFill credential provider). -->
+	<key>com.apple.developer.authentication-services.autofill-credential-provider</key>
+	<true/>
+	<!-- The vaults live in this shared container so the AutoFill extension can read them. -->
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.app.secretdoor</string>
+	</array>
+	<!-- One Keychain group for both, so Face ID unlock also works in AutoFill. The first entry
+	     is the default group, the same as the app used before (its own app identifier). -->
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)app.secretdoor</string>
+	</array>
+</dict>
+</plist>
