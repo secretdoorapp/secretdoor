@@ -490,9 +490,10 @@ struct AboutView: View {
             }
             .font(.subheadline)
             Section("License") {
-                Text("SecretDoor is free software under the GNU General Public License v3. It is based on Bitwarden and is not affiliated with or endorsed by Bitwarden Inc. Passphrases use the EFF long wordlist (CC BY 3.0 US).")
+                Text("SecretDoor is free software under the GNU General Public License v3, with an additional permission to distribute it through Apple's App Store. It uses the same formats as SecretDoor for Android, which is based on Bitwarden; it is not affiliated with or endorsed by Bitwarden Inc. Passphrases use the EFF long wordlist (CC BY 3.0 US).")
                     .font(.subheadline)
                 Link("GNU GPL v3", destination: URL(string: "https://www.gnu.org/licenses/gpl-3.0.html")!)
+                Link("License of SecretDoor for iPhone", destination: URL(string: "https://github.com/secretdoorapp/secretdoor/blob/main/SecretDoor/LICENSE.md")!)
             }
         }
         .navigationTitle("Privacy and license")

@@ -12,6 +12,13 @@ Source code: <https://github.com/secretdoorapp/secretdoor>
 SecretDoor is an independent project. It is **not affiliated with, endorsed by or sponsored by
 Bitwarden, Inc.**
 
+## SecretDoor for iPhone
+
+The iPhone app in [`SecretDoor/`](SecretDoor/) is licensed under the GNU GPL version 3 **with an
+additional permission** (GPL v3 section 7) to distribute it through Apple's App Store and
+TestFlight. See [`SecretDoor/LICENSE.md`](SecretDoor/LICENSE.md). It was written for SecretDoor
+and contains no code copied from Bitwarden; it only uses the same data formats as the Android app.
+
 ## Based on Bitwarden for Android
 
 SecretDoor is a fork, and therefore a modified (derivative) version, of the
@@ -124,7 +131,10 @@ the exact version they received, with no extra restrictions.
 - Tag every release in the repository and publish the matching source. Give the store listing a
   link to the repository.
 - Do not add terms that forbid copying, modifying or redistributing the app.
-- Apple's App Store terms are generally considered incompatible with the GPL; do not publish there.
+- Apple's App Store terms are generally considered incompatible with the GPL; do not publish the
+  Android code (or anything containing Bitwarden's code) there. The iPhone app has an explicit
+  App Store permission, see [`SecretDoor/LICENSE.md`](SecretDoor/LICENSE.md); its source must still
+  be published for every release.
 - If you add code of your own, it must be released under the GPL v3 too.
 - Anyone can build the app from the source, so what you sell is the convenience (a signed build,
   updates, support, a hosted service), not exclusivity.
