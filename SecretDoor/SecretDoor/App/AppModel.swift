@@ -75,6 +75,16 @@ final class AppModel {
     }
 
     init(storage: VaultStorage = VaultStorage(root: VaultStorage.defaultRoot(appGroup: nil))) {
+        #if DEBUG
+        // Development builds started with `-SDDemoVault` open a vault of sample items, kept in a
+        // separate folder so real vaults are not touched (used for screenshots).
+        if ProcessInfo.processInfo.arguments.contains("-SDDemoVault") {
+            self.storage = DemoVault.storage
+            reload()
+            if let (meta, userKey) = try? DemoVault.create(in: self.storage) { try? open(meta: meta, userKey: userKey) }
+            return
+        }
+        #endif
         self.storage = storage
         reload()
     }
