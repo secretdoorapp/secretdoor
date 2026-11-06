@@ -44,31 +44,22 @@ struct VaultHomeView: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            List {
-                if search.isEmpty {
-                    homeSections
+            Group {
+                if session.ciphers.isEmpty {
+                    emptyVault
                 } else {
-                    let results = session.activeCiphers.filter { $0.searchText.contains(search.lowercased()) }
-                    if results.isEmpty {
-                        ContentUnavailableView.search(text: search)
-                    }
-                    ForEach(results) { cipher in
-                        NavigationLink(value: VaultRoute.item(cipher.id)) { ItemRow(cipher: cipher) }
-                    }
-                }
-            }
-            .overlay {
-                if session.ciphers.isEmpty, search.isEmpty {
-                    ContentUnavailableView {
-                        VStack(spacing: 12) {
-                            Image("ArtVaultItems")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 128, height: 128)
-                            Text("No items yet")
+                    List {
+                        if search.isEmpty {
+                            homeSections
+                        } else {
+                            let results = session.activeCiphers.filter { $0.searchText.contains(search.lowercased()) }
+                            if results.isEmpty {
+                                ContentUnavailableView.search(text: search)
+                            }
+                            ForEach(results) { cipher in
+                                NavigationLink(value: VaultRoute.item(cipher.id)) { ItemRow(cipher: cipher) }
+                            }
                         }
-                    } description: {
-                        Text("Add your first login, card or note with the + button.")
                     }
                 }
             }
@@ -109,6 +100,44 @@ struct VaultHomeView: View {
                 .environment(session)
             }
         }
+    }
+
+    /// Shown instead of the list while the vault has no items (as on Android).
+    private var emptyVault: some View {
+        VStack(spacing: 20) {
+            Spacer()
+            Image("ArtVaultItems")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 160, height: 160)
+                .accessibilityHidden(true)
+            VStack(spacing: 8) {
+                Text("Your vault is empty")
+                    .font(.title2.bold())
+                Text("Save logins, cards, identities and notes. Everything stays encrypted on this iPhone.")
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.secondary)
+            }
+            Menu {
+                ForEach(CipherType.displayOrder) { type in
+                    Button {
+                        newItemType = type
+                    } label: {
+                        Label(type.title, systemImage: type.systemImage)
+                    }
+                }
+            } label: {
+                Label("Add item", systemImage: "plus")
+                    .frame(maxWidth: 280)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            Spacer()
+            Spacer()
+        }
+        .padding(.horizontal, 32)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(.systemGroupedBackground))
     }
 
     private func newCipher(type: CipherType) -> CipherView {

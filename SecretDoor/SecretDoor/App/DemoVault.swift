@@ -1,7 +1,8 @@
 #if DEBUG
 import Foundation
 
-/// Sample vault for development builds (`-SDDemoVault` launch argument). Never in release builds.
+/// Sample vault for development builds (`-SDDemoVault` launch argument, plus `-SDDemoEmpty` for
+/// an empty one). Never in release builds.
 enum DemoVault {
     static let password = "demo vault password"
 
@@ -14,6 +15,8 @@ enum DemoVault {
     static func create(in storage: VaultStorage) throws -> (VaultMeta, SymmetricKey64) {
         for meta in storage.vaults() { try? storage.deleteVault(userId: meta.userId) }
         let (meta, key) = try storage.createVault(masterPassword: password, hint: nil, name: "Demo")
+        // `-SDDemoEmpty`: an empty vault, to check the empty state.
+        if ProcessInfo.processInfo.arguments.contains("-SDDemoEmpty") { return (meta, key) }
         let work = FolderView(name: "Work")
         let personal = FolderView(name: "Personal")
         try storage.saveFolders([work, personal].map { try CipherCrypto.encryptFolder($0, userKey: key) }, userId: meta.userId)
