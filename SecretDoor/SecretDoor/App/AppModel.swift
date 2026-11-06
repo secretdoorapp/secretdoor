@@ -47,6 +47,8 @@ final class AppModel {
     let autoBackup = AutoBackupManager()
 
     private var backgroundedAt: Date?
+    /// The debug demo vault (never registered for AutoFill).
+    private var isDemo = false
 
     var autoLockTimeout: AutoLockTimeout {
         get {
@@ -80,6 +82,7 @@ final class AppModel {
         // separate folder so real vaults are not touched (used for screenshots).
         if ProcessInfo.processInfo.arguments.contains("-SDDemoVault") {
             self.storage = DemoVault.storage
+            isDemo = true
             reload()
             if let (meta, userKey) = try? DemoVault.create(in: self.storage) { try? open(meta: meta, userKey: userKey) }
             return
@@ -174,7 +177,7 @@ final class AppModel {
 
     /// Offers the unlocked vault's logins above the keyboard (see `AutoFillIdentities`).
     func updateAutoFillSuggestions() {
-        guard let session else { return }
+        guard let session, !isDemo else { return }
         AutoFillIdentities.update(userId: session.userId, ciphers: session.ciphers)
     }
 

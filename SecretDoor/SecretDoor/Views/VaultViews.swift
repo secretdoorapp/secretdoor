@@ -159,12 +159,9 @@ struct VaultHomeView: View {
             }
         }
         Section("Types") {
-            ForEach(CipherType.displayOrder) { type in
-                let count = active.filter { $0.type == type }.count
-                if count > 0 || [.login, .card, .identity, .secureNote].contains(type) {
-                    NavigationLink(value: VaultRoute.list(.type(type))) {
-                        CountRow(title: type.title, systemImage: type.systemImage, count: count, type: type)
-                    }
+            ForEach(CipherType.vaultListOrder) { type in
+                NavigationLink(value: VaultRoute.list(.type(type))) {
+                    CountRow(title: type.title, systemImage: type.systemImage, count: active.filter { $0.type == type }.count, type: type)
                 }
             }
             let codes = active.filter { ItemFilter.verificationCodes.matches($0) }.count
