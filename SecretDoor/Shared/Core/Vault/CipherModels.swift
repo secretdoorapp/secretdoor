@@ -13,9 +13,14 @@ nonisolated public enum CipherType: Int, CaseIterable, Identifiable, Sendable {
 
     public var id: Int { rawValue }
 
-    /// The order the vault screen lists types in (the same as the Android app).
+    /// The order of the "Add item" menu (the same as the Android app).
     public static let displayOrder: [CipherType] = [
         .login, .card, .identity, .secureNote, .sshKey, .bankAccount, .driversLicense, .passport,
+    ]
+
+    /// The order of the vault screen's Types list (the same as the Android app).
+    public static let vaultListOrder: [CipherType] = [
+        .login, .card, .bankAccount, .identity, .driversLicense, .passport, .secureNote, .sshKey,
     ]
 
     /// The JSON key of this type's section (`login`, `card`, …).

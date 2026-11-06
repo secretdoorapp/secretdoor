@@ -94,7 +94,6 @@ class FlagKeyTest {
                 FlagKey.V2EncryptionKeyConnector,
                 FlagKey.V2EncryptionPassword,
                 FlagKey.V2EncryptionTde,
-                FlagKey.NewItemTypes,
                 FlagKey.FillAssistTargetingRules,
                 FlagKey.ManageDevices,
                 FlagKey.FedRamp,
@@ -108,5 +107,7 @@ class FlagKeyTest {
                 !it.defaultValue
             },
         )
+        // SecretDoor enables the new item types (bank account, driver's license, passport).
+        assertTrue(FlagKey.NewItemTypes.defaultValue)
     }
 }

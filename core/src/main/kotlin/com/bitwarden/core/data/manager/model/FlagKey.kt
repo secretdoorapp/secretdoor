@@ -145,10 +145,13 @@ sealed class FlagKey<out T : Any> {
     /**
      * Data object holding the feature flag key for new vault item types
      * (Bank Account, Driver's License, Passport).
+     *
+     * SecretDoor turns them on: there is no server to enable the flag remotely, and SecretDoor for
+     * iPhone offers these types too.
      */
     data object NewItemTypes : FlagKey<Boolean>() {
         override val keyName: String = "pm-32009-new-item-types"
-        override val defaultValue: Boolean = false
+        override val defaultValue: Boolean = true
     }
 
     /**
