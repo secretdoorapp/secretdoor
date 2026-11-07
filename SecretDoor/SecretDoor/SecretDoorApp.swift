@@ -25,6 +25,7 @@ struct SecretDoorApp: App {
         WindowGroup {
             RootView()
                 .environment(model)
+                .preferredColorScheme(model.theme.colorScheme)
         }
         .onChange(of: scenePhase) { _, phase in
             model.scenePhaseChanged(to: phase)

@@ -4,6 +4,28 @@ import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
 
+enum AppTheme: String, CaseIterable, Identifiable {
+    case system, light, dark
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .system: return String(localized: "Default (System)")
+        case .light: return String(localized: "Light")
+        case .dark: return String(localized: "Dark")
+        }
+    }
+
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system: return nil
+        case .light: return .light
+        case .dark: return .dark
+        }
+    }
+}
+
 /// When the vault locks after the app leaves the screen.
 enum AutoLockTimeout: Int, CaseIterable, Identifiable {
     case immediately = 0
@@ -61,6 +83,20 @@ final class AppModel {
         set {
             withMutation(keyPath: \.autoLockTimeout) {
                 UserDefaults.standard.set(newValue.rawValue, forKey: "autoLockTimeout")
+            }
+        }
+    }
+
+    /// The color theme: follow the system, or always light or dark.
+    var theme: AppTheme {
+        get {
+            access(keyPath: \.theme)
+            let stored = UserDefaults.standard.string(forKey: "theme")
+            return stored.flatMap(AppTheme.init(rawValue:)) ?? .system
+        }
+        set {
+            withMutation(keyPath: \.theme) {
+                UserDefaults.standard.set(newValue.rawValue, forKey: "theme")
             }
         }
     }
