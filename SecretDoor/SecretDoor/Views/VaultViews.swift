@@ -79,6 +79,25 @@ struct VaultHomeView: View {
                         Label("Lock", systemImage: "lock")
                     }
                 }
+                if model.vaults.count > 1 {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Menu {
+                            ForEach(model.vaults, id: \.userId) { meta in
+                                Button {
+                                    if meta.userId != session.userId { model.switchVault(to: meta.userId) }
+                                } label: {
+                                    if meta.userId == session.userId {
+                                        Label(meta.displayName, systemImage: "checkmark")
+                                    } else {
+                                        Text(meta.displayName)
+                                    }
+                                }
+                            }
+                        } label: {
+                            Label("Switch vault", systemImage: "person.2.circle")
+                        }
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         ForEach(CipherType.displayOrder) { type in

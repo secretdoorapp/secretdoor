@@ -25,7 +25,7 @@ struct SettingsView: View {
                     Picker(selection: $model.autoLockTimeout) {
                         ForEach(AutoLockTimeout.allCases) { Text($0.title).tag($0) }
                     } label: {
-                        Label("Lock after", systemImage: "timer")
+                        Label("Session timeout", systemImage: "timer")
                     }
                     Picker(selection: $model.clipboardClearSeconds) {
                         Text("10 seconds").tag(10)
