@@ -15,7 +15,7 @@ nonisolated public enum CipherType: Int, CaseIterable, Identifiable, Sendable {
 
     /// The order of the "Add item" menu (the same as the Android app).
     public static let displayOrder: [CipherType] = [
-        .login, .card, .identity, .secureNote, .sshKey, .bankAccount, .driversLicense, .passport,
+        .login, .card, .bankAccount, .identity, .driversLicense, .passport, .secureNote, .sshKey,
     ]
 
     /// The order of the vault screen's Types list (the same as the Android app).
