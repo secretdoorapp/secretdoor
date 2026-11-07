@@ -2618,8 +2618,8 @@ class VaultScreenTest : BitwardenComposeTest() {
             )
         }
         composeTestRule
-            .onNodeWithTextAfterScroll("License")
-            .assertTextEquals("License", count.toString())
+            .onNodeWithTextAfterScroll("Driver’s license")
+            .assertTextEquals("Driver’s license", count.toString())
             .assertIsDisplayed()
     }
 
@@ -2642,7 +2642,7 @@ class VaultScreenTest : BitwardenComposeTest() {
 
     @Test
     fun `clicking a license group should send LicenseGroupClick action`() {
-        val rowText = "License"
+        val rowText = "Driver’s license"
         mutableStateFlow.update {
             it.copy(
                 viewState = DEFAULT_CONTENT_VIEW_STATE.copy(
