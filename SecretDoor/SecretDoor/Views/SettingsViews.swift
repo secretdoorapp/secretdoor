@@ -101,8 +101,170 @@ struct VaultSettingsView: View {
             } label: {
                 Label("Backup", systemImage: "externaldrive.badge.checkmark")
             }
+            NavigationLink {
+                ExportVaultView()
+            } label: {
+                Label("Export vault", systemImage: "square.and.arrow.up")
+            }
         }
         .navigationTitle("Vault")
+    }
+}
+
+/// A JSON or CSV file produced by `VaultExport`.
+struct ExportDocument: FileDocument {
+    static var readableContentTypes: [UTType] { [.json, .commaSeparatedText] }
+    static var writableContentTypes: [UTType] { [.json, .commaSeparatedText] }
+
+    let data: Data
+    let contentType: UTType
+
+    init(data: Data, contentType: UTType) {
+        self.data = data
+        self.contentType = contentType
+    }
+
+    init(configuration: ReadConfiguration) throws {
+        data = configuration.file.regularFileContents ?? Data()
+        contentType = configuration.contentType
+    }
+
+    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+        FileWrapper(regularFileWithContents: data)
+    }
+}
+
+/// Settings > Vault > Export vault: the items as JSON, CSV or password-protected JSON, like Android.
+struct ExportVaultView: View {
+    private enum Choice: String, CaseIterable, Identifiable {
+        case json, csv, encryptedJson
+        var id: String { rawValue }
+        var title: String {
+            switch self {
+            case .json: return ".json"
+            case .csv: return ".csv"
+            case .encryptedJson: return String(localized: ".json (Password protected)")
+            }
+        }
+    }
+
+    @Environment(AppModel.self) private var model
+    @Environment(VaultSession.self) private var session
+    @State private var choice = Choice.json
+    @State private var masterPassword = ""
+    @State private var filePassword = ""
+    @State private var fileConfirmation = ""
+    @State private var isWorking = false
+    @State private var document: ExportDocument?
+    @State private var isExporting = false
+    @State private var skippedItems = 0
+    @State private var message: String?
+    @State private var error: String?
+
+    private var canExport: Bool {
+        guard !masterPassword.isEmpty, !isWorking else { return false }
+        return choice != .encryptedJson || (!filePassword.isEmpty && filePassword == fileConfirmation)
+    }
+
+    var body: some View {
+        Form {
+            Section {
+                Picker("File format", selection: $choice) {
+                    ForEach(Choice.allCases) { Text($0.title).tag($0) }
+                }
+            }
+            Section {
+                PasswordField("Master password", text: $masterPassword)
+            } footer: {
+                Text("Enter your master password to export your vault data.")
+            }
+            if choice == .encryptedJson {
+                Section {
+                    PasswordField("File password", text: $filePassword, isNewPassword: true)
+                    PasswordField("Confirm file password", text: $fileConfirmation, isNewPassword: true)
+                } footer: {
+                    Text("This file export will be password protected and require the file password to decrypt.")
+                }
+            }
+            Section {
+                Button {
+                    export()
+                } label: {
+                    HStack {
+                        Text("Export vault")
+                        if isWorking { Spacer(); ProgressView() }
+                    }
+                }
+                .disabled(!canExport)
+            } footer: {
+                Text("For your security, don\u{2019}t share or send this file over unsecured channels (like email), and delete it when you\u{2019}re done.")
+            }
+        }
+        .navigationTitle("Export vault")
+        .fileExporter(
+            isPresented: $isExporting,
+            document: document,
+            contentType: document?.contentType ?? .json,
+            defaultFilename: "secretdoor-export-\(Self.stamp())"
+        ) { result in
+            switch result {
+            case .success:
+                masterPassword = ""
+                filePassword = ""
+                fileConfirmation = ""
+                var text = String(localized: "Vault exported successfully")
+                if skippedItems > 0 {
+                    text += "\n\n" + String(localized: "\(skippedItems) items (cards, identities and other types) are not included in a CSV file. Use JSON to export everything.")
+                }
+                message = text
+            case let .failure(failure):
+                error = failure.displayMessage
+            }
+            document = nil
+        }
+        .alert("Export vault", isPresented: Binding(get: { message != nil }, set: { if !$0 { message = nil } })) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(message ?? "")
+        }
+        .errorAlert($error)
+    }
+
+    private static func stamp() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyyMMddHHmmss"
+        return formatter.string(from: Date())
+    }
+
+    private func export() {
+        let ciphers = session.ciphers
+        let folders = session.folders
+        let format: VaultExport.Format
+        let contentType: UTType
+        switch choice {
+        case .json: (format, contentType) = (.json, .json)
+        case .csv: (format, contentType) = (.csv, .commaSeparatedText)
+        case .encryptedJson: (format, contentType) = (.encryptedJson(filePassword: filePassword), .json)
+        }
+        isWorking = true
+        Task {
+            defer { isWorking = false }
+            guard await model.verifyMasterPassword(masterPassword) else {
+                error = VaultError.wrongPassword.displayMessage
+                return
+            }
+            do {
+                let output = try await Task.detached(priority: .userInitiated) {
+                    try VaultExport.export(ciphers: ciphers, folders: folders, format: format)
+                }.value
+                document = ExportDocument(data: output.data, contentType: contentType)
+                skippedItems = output.skippedItems
+                isExporting = true
+            } catch {
+                self.error = error.displayMessage
+            }
+        }
     }
 }
 
