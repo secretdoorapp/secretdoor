@@ -40,6 +40,8 @@ final class AppModel {
     private(set) var phase: Phase = .setup
     private(set) var vaults: [VaultMeta] = []
     private(set) var activeMeta: VaultMeta?
+    /// Makes the setup screen open "Restore from backup" straight away (Manage vaults > Import backup).
+    var setupOpensRestore = false
     private(set) var session: VaultSession?
     /// Covers the screen while the app is in the app switcher.
     var isObscured = false
@@ -204,7 +206,8 @@ final class AppModel {
     }
 
     /// Shows the setup screen to add another vault (the current one stays on the device).
-    func startAddingVault() {
+    func startAddingVault(restoringBackup: Bool = false) {
+        setupOpensRestore = restoringBackup
         session = nil
         phase = .setup
     }
@@ -213,26 +216,34 @@ final class AppModel {
         reload()
     }
 
-    func renameVault(_ name: String) throws {
-        guard var meta = activeMeta else { return }
+    /// Renames any vault (an empty name falls back to "My vault").
+    func renameVault(userId: String, name: String) throws {
+        guard var meta = vaults.first(where: { $0.userId == userId }) else { return }
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         meta.name = trimmed.isEmpty ? nil : trimmed
         try storage.saveMeta(meta)
-        activeMeta = meta
-        session?.meta = meta
         vaults = storage.vaults()
+        if activeMeta?.userId == userId { activeMeta = meta }
+        if session?.userId == userId { session?.meta = meta }
     }
 
-    /// Erases the active vault after checking its master password.
-    func deleteVault(masterPassword: String) async throws {
-        guard await verifyMasterPassword(masterPassword), let userId = session?.userId else {
-            throw VaultError.wrongPassword
-        }
+    /// Erases a vault after checking that vault's own master password. Deleting the open vault
+    /// returns to the unlock (or setup) screen; deleting another one leaves the open vault alone.
+    func deleteVault(userId: String, masterPassword: String) async throws {
+        let storage = storage
+        _ = try await Task.detached(priority: .userInitiated) {
+            try storage.unlock(userId: userId, masterPassword: masterPassword)
+        }.value
         try storage.deleteVault(userId: userId)
         Keychain.deleteAll(userId: userId)
         AutoFillIdentities.removeAll()
         autoBackup.removeSettings(userId: userId)
-        reload()
+        if session?.userId == userId || session == nil {
+            reload()
+        } else {
+            vaults = storage.vaults()
+            updateAutoFillSuggestions()
+        }
     }
 
     func changeMasterPassword(current: String, new: String, hint: String?) async throws {
