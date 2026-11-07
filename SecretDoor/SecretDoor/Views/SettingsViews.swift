@@ -2,94 +2,167 @@ import AuthenticationServices
 import SwiftUI
 import UniformTypeIdentifiers
 
+/// Settings is a list of screens in the same order as SecretDoor for Android.
 struct SettingsView: View {
+    var body: some View {
+        NavigationStack {
+            List {
+                NavigationLink {
+                    AccountSecurityView()
+                } label: {
+                    Label("Account security", systemImage: "lock.shield")
+                }
+                NavigationLink {
+                    AutoFillSettingsView()
+                } label: {
+                    Label("Autofill", systemImage: "key.viewfinder")
+                }
+                NavigationLink {
+                    VaultSettingsView()
+                } label: {
+                    Label("Vault", systemImage: "lock.rectangle.stack")
+                }
+                NavigationLink {
+                    AppearanceView()
+                } label: {
+                    Label("Appearance", systemImage: "paintbrush")
+                }
+                NavigationLink {
+                    OtherSettingsView()
+                } label: {
+                    Label("Other", systemImage: "ellipsis.circle")
+                }
+                NavigationLink {
+                    AboutSettingsView()
+                } label: {
+                    Label("About", systemImage: "info.circle")
+                }
+            }
+            .navigationTitle("Settings")
+        }
+    }
+}
+
+struct AccountSecurityView: View {
     @Environment(AppModel.self) private var model
-    @Environment(VaultSession.self) private var session
     @State private var error: String?
 
     var body: some View {
         @Bindable var model = model
-        NavigationStack {
-            Form {
-                Section("Security") {
-                    if Biometrics.available != .none {
-                        Toggle(isOn: Binding(
-                            get: { model.isBiometricUnlockEnabled },
-                            set: { enabled in
-                                do { try model.setBiometricUnlock(enabled) } catch { self.error = error.displayMessage }
-                            }
-                        )) {
-                            Label("Unlock with \(Biometrics.available.title)", systemImage: Biometrics.available.systemImage)
+        Form {
+            Section {
+                if Biometrics.available != .none {
+                    Toggle(isOn: Binding(
+                        get: { model.isBiometricUnlockEnabled },
+                        set: { enabled in
+                            do { try model.setBiometricUnlock(enabled) } catch { self.error = error.displayMessage }
                         }
-                    }
-                    Picker(selection: $model.autoLockTimeout) {
-                        ForEach(AutoLockTimeout.allCases) { Text($0.title).tag($0) }
-                    } label: {
-                        Label("Session timeout", systemImage: "timer")
-                    }
-                    Picker(selection: $model.clipboardClearSeconds) {
-                        Text("10 seconds").tag(10)
-                        Text("30 seconds").tag(30)
-                        Text("1 minute").tag(60)
-                        Text("90 seconds").tag(90)
-                        Text("5 minutes").tag(300)
-                        Text("Never").tag(0)
-                    } label: {
-                        Label("Clear clipboard", systemImage: "doc.on.clipboard")
-                    }
-                    NavigationLink {
-                        ChangePasswordView()
-                    } label: {
-                        Label("Change master password", systemImage: "key")
-                    }
-                    Button {
-                        model.lock()
-                    } label: {
-                        Label("Lock now", systemImage: "lock")
+                    )) {
+                        Label("Unlock with \(Biometrics.available.title)", systemImage: Biometrics.available.systemImage)
                     }
                 }
-
-                Section {
-                    NavigationLink {
-                        AutoFillSettingsView()
-                    } label: {
-                        Label("AutoFill", systemImage: "key.viewfinder")
-                    }
+                Picker(selection: $model.autoLockTimeout) {
+                    ForEach(AutoLockTimeout.allCases) { Text($0.title).tag($0) }
+                } label: {
+                    Label("Session timeout", systemImage: "timer")
                 }
-
-                Section("Vault") {
-                    NavigationLink {
-                        ManageVaultsView()
-                    } label: {
-                        Label("Manage vaults", systemImage: "lock.rectangle.stack")
-                    }
-                    NavigationLink {
-                        FoldersView()
-                    } label: {
-                        Label("Folders", systemImage: "folder")
-                    }
-                    NavigationLink {
-                        BackupSettingsView()
-                    } label: {
-                        Label("Backup", systemImage: "externaldrive.badge.checkmark")
-                    }
+                NavigationLink {
+                    ChangePasswordView()
+                } label: {
+                    Label("Change master password", systemImage: "key")
                 }
-
-                Section("About") {
-                    LabeledContent("Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
-                    Link(destination: URL(string: "https://github.com/secretdoorapp/secretdoor")!) {
-                        Label("Source code", systemImage: "chevron.left.forwardslash.chevron.right")
-                    }
-                    NavigationLink {
-                        AboutView()
-                    } label: {
-                        Label("Privacy and license", systemImage: "hand.raised")
-                    }
+                Button {
+                    model.lock()
+                } label: {
+                    Label("Lock now", systemImage: "lock")
                 }
             }
-            .navigationTitle("Settings")
-            .errorAlert($error)
         }
+        .navigationTitle("Account security")
+        .errorAlert($error)
+    }
+}
+
+struct VaultSettingsView: View {
+    var body: some View {
+        List {
+            NavigationLink {
+                ManageVaultsView()
+            } label: {
+                Label("Manage vaults", systemImage: "lock.rectangle.stack")
+            }
+            NavigationLink {
+                FoldersView()
+            } label: {
+                Label("Folders", systemImage: "folder")
+            }
+            NavigationLink {
+                BackupSettingsView()
+            } label: {
+                Label("Backup", systemImage: "externaldrive.badge.checkmark")
+            }
+        }
+        .navigationTitle("Vault")
+    }
+}
+
+struct AppearanceView: View {
+    @Environment(AppModel.self) private var model
+
+    var body: some View {
+        @Bindable var model = model
+        Form {
+            Section {
+                Picker("Theme", selection: $model.theme) {
+                    ForEach(AppTheme.allCases) { Text($0.title).tag($0) }
+                }
+            } footer: {
+                Text("Change the application\u{2019}s color theme")
+            }
+        }
+        .navigationTitle("Appearance")
+    }
+}
+
+struct OtherSettingsView: View {
+    @Environment(AppModel.self) private var model
+
+    var body: some View {
+        @Bindable var model = model
+        Form {
+            Section {
+                Picker(selection: $model.clipboardClearSeconds) {
+                    Text("10 seconds").tag(10)
+                    Text("30 seconds").tag(30)
+                    Text("1 minute").tag(60)
+                    Text("90 seconds").tag(90)
+                    Text("5 minutes").tag(300)
+                    Text("Never").tag(0)
+                } label: {
+                    Label("Clear clipboard", systemImage: "doc.on.clipboard")
+                }
+            }
+        }
+        .navigationTitle("Other")
+    }
+}
+
+struct AboutSettingsView: View {
+    var body: some View {
+        Form {
+            Section {
+                LabeledContent("Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
+                Link(destination: URL(string: "https://github.com/secretdoorapp/secretdoor")!) {
+                    Label("Source code", systemImage: "chevron.left.forwardslash.chevron.right")
+                }
+                NavigationLink {
+                    AboutView()
+                } label: {
+                    Label("Privacy and license", systemImage: "hand.raised")
+                }
+            }
+        }
+        .navigationTitle("About")
     }
 }
 
@@ -542,7 +615,7 @@ struct AutoFillSettingsView: View {
                 Text("For logins with an authenticator key, the current code is copied so you can paste it on the next page.")
             }
         }
-        .navigationTitle("AutoFill")
+        .navigationTitle("Autofill")
         .task(id: scenePhase) { await refreshState() }
     }
 
