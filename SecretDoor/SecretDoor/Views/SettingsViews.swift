@@ -378,6 +378,7 @@ struct BackupSettingsView: View {
     @State private var picking = Picking.backup
     @State private var isPicking = false
     @State private var importData: Data?
+    @State private var asksImportMode = false
     @State private var message: String?
     @State private var error: String?
 
@@ -446,16 +447,23 @@ struct BackupSettingsView: View {
 
             Section {
                 Button {
-                    picking = .backup
-                    isPicking = true
+                    asksImportMode = true
                 } label: {
                     Label("Import backup", systemImage: "square.and.arrow.up.on.square")
                 }
             } footer: {
-                Text("Adds the items of a backup to this vault. Folders with the same name are merged, items that already exist are skipped and older copies are replaced by newer ones. To keep a backup separate, use Settings > Manage vaults > Import backup.")
+                Text("Adds the items of a backup to this vault. Folders with the same name are merged, items that already exist are skipped and older copies are replaced by newer ones. Or add the backup as a separate vault.")
             }
         }
         .navigationTitle("Backup")
+        .confirmationDialog("Import backup", isPresented: $asksImportMode, titleVisibility: .visible) {
+            Button("Merge into this vault") {
+                picking = .backup
+                isPicking = true
+            }
+            Button("Add as a separate vault") { model.startAddingVault(restoringBackup: true) }
+            Button("Cancel", role: .cancel) {}
+        }
         .fileExporter(
             isPresented: $isExporting,
             document: exportDocument,
