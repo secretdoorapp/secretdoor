@@ -39,6 +39,12 @@ struct SetupView: View {
                 }
             }
             .padding(24)
+            .onAppear {
+                if model.setupOpensRestore {
+                    model.setupOpensRestore = false
+                    path = [.restore]
+                }
+            }
             .navigationDestination(for: Route.self) { route in
                 switch route {
                 case .create: CreateVaultView()

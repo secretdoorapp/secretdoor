@@ -6,8 +6,6 @@ struct SettingsView: View {
     @Environment(AppModel.self) private var model
     @Environment(VaultSession.self) private var session
     @State private var error: String?
-    @State private var showsRename = false
-    @State private var newName = ""
 
     var body: some View {
         @Bindable var model = model
@@ -61,6 +59,11 @@ struct SettingsView: View {
 
                 Section("Vault") {
                     NavigationLink {
+                        ManageVaultsView()
+                    } label: {
+                        Label("Manage vaults", systemImage: "lock.rectangle.stack")
+                    }
+                    NavigationLink {
                         FoldersView()
                     } label: {
                         Label("Folders", systemImage: "folder")
@@ -70,49 +73,6 @@ struct SettingsView: View {
                     } label: {
                         Label("Backup", systemImage: "externaldrive.badge.checkmark")
                     }
-                    Button {
-                        newName = session.meta.name ?? ""
-                        showsRename = true
-                    } label: {
-                        LabeledContent {
-                            Text(session.meta.displayName)
-                        } label: {
-                            Label("Vault name", systemImage: "character.cursor.ibeam")
-                        }
-                    }
-                }
-
-                Section {
-                    if model.vaults.count > 1 {
-                        ForEach(model.vaults, id: \.userId) { meta in
-                            Button {
-                                if meta.userId != session.userId { model.switchVault(to: meta.userId) }
-                            } label: {
-                                HStack {
-                                    Label(meta.displayName, systemImage: "lock.rectangle")
-                                    Spacer()
-                                    if meta.userId == session.userId {
-                                        Image(systemName: "checkmark").foregroundStyle(.tint)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    Button {
-                        model.startAddingVault()
-                    } label: {
-                        Label("Add vault", systemImage: "plus.rectangle.on.rectangle")
-                    }
-                    NavigationLink {
-                        DeleteVaultView()
-                    } label: {
-                        Label("Delete vault", systemImage: "trash")
-                            .foregroundStyle(.red)
-                    }
-                } header: {
-                    Text("Vaults")
-                } footer: {
-                    Text("Each vault has its own master password. Switching locks the current vault.")
                 }
 
                 Section("About") {
@@ -128,13 +88,6 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
-            .alert("Vault name", isPresented: $showsRename) {
-                TextField("My vault", text: $newName)
-                Button("Save") {
-                    do { try model.renameVault(newName) } catch { self.error = error.displayMessage }
-                }
-                Button("Cancel", role: .cancel) {}
-            }
             .errorAlert($error)
         }
     }
@@ -207,38 +160,82 @@ struct ChangePasswordView: View {
     }
 }
 
-struct DeleteVaultView: View {
+/// Lists every vault on the device; each one can be renamed or deleted, as in SecretDoor for Android.
+struct ManageVaultsView: View {
     @Environment(AppModel.self) private var model
-    @Environment(VaultSession.self) private var session
+    @State private var renaming: VaultMeta?
+    @State private var newName = ""
+    @State private var deleting: VaultMeta?
     @State private var password = ""
     @State private var isWorking = false
     @State private var error: String?
-    @State private var showsConfirmation = false
 
     var body: some View {
-        Form {
+        List {
             Section {
-                Text("This erases \(session.meta.displayName) and everything in it from this iPhone. Backup files are not affected. This cannot be undone.")
+                ForEach(model.vaults, id: \.userId) { meta in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(meta.displayName)
+                            if meta.userId == model.activeMeta?.userId {
+                                Text("Current vault").font(.footnote).foregroundStyle(.secondary)
+                            }
+                        }
+                        Spacer()
+                        Menu {
+                            Button("Rename vault") {
+                                newName = meta.name ?? ""
+                                renaming = meta
+                            }
+                            Button("Delete vault", role: .destructive) {
+                                password = ""
+                                deleting = meta
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
+                        }
+                    }
+                }
+            } footer: {
+                Text("Each vault has its own master password. Switching locks the current vault.")
             }
             Section {
-                PasswordField("Master password", text: $password)
-            }
-            Section {
-                Button("Delete vault", role: .destructive) { showsConfirmation = true }
-                    .disabled(password.isEmpty || isWorking)
+                Button("Create a new vault") { model.startAddingVault() }
+                Button("Import backup") { model.startAddingVault(restoringBackup: true) }
             }
         }
-        .navigationTitle("Delete vault")
-        .confirmationDialog("Delete this vault permanently?", isPresented: $showsConfirmation, titleVisibility: .visible) {
-            Button("Delete vault", role: .destructive) {
-                isWorking = true
-                Task {
-                    defer { isWorking = false }
-                    do { try await model.deleteVault(masterPassword: password) } catch { self.error = error.displayMessage }
+        .navigationTitle("Manage vaults")
+        .alert("Rename vault", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
+            TextField("Vault name", text: $newName)
+            Button("Save") {
+                if let renaming {
+                    do { try model.renameVault(userId: renaming.userId, name: newName) } catch { self.error = error.displayMessage }
                 }
+                renaming = nil
             }
+            Button("Cancel", role: .cancel) { renaming = nil }
+        }
+        .alert(
+            "Delete vault",
+            isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } })
+        ) {
+            SecureField("Master password", text: $password)
+            Button("Delete vault", role: .destructive) { delete() }
+                .disabled(isWorking)
+            Button("Cancel", role: .cancel) { deleting = nil }
+        } message: {
+            Text("This erases \(deleting?.displayName ?? "") and everything in it from this iPhone. Backup files are not affected. This cannot be undone. Enter its master password to continue.")
         }
         .errorAlert($error)
+    }
+
+    private func delete() {
+        guard let meta = deleting, !password.isEmpty else { return }
+        isWorking = true
+        Task {
+            defer { isWorking = false; deleting = nil }
+            do { try await model.deleteVault(userId: meta.userId, masterPassword: password) } catch { self.error = error.displayMessage }
+        }
     }
 }
 
@@ -382,7 +379,7 @@ struct BackupSettingsView: View {
                     Label("Import backup", systemImage: "square.and.arrow.up.on.square")
                 }
             } footer: {
-                Text("Adds the items of a backup to this vault. Folders with the same name are merged, items that already exist are skipped and older copies are replaced by newer ones. To keep a backup separate, use Settings > Add vault > Restore from backup.")
+                Text("Adds the items of a backup to this vault. Folders with the same name are merged, items that already exist are skipped and older copies are replaced by newer ones. To keep a backup separate, use Settings > Manage vaults > Import backup.")
             }
         }
         .navigationTitle("Backup")
