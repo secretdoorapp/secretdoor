@@ -43,3 +43,9 @@ SecretDoor for iPhone was written for SecretDoor and does not contain code copie
 It reads and writes the same data formats as SecretDoor for Android (a modified version of
 Bitwarden for Android) so that vaults can move between the two. Bitwarden is a trademark of
 Bitwarden Inc.; SecretDoor is not affiliated with or endorsed by Bitwarden Inc.
+
+## No responsibility for data and security
+
+SecretDoor for iPhone is provided "as is", without warranty. The authors and distributors are not
+liable for any loss, or disclosure or unauthorized access, of personal or unencrypted data resulting
+from use of the app. See [`../NOTICE.md`](../NOTICE.md#no-responsibility-for-data-and-security).

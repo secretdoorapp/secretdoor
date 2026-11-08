@@ -9,6 +9,30 @@ fitness for a particular purpose. See the license for details.
 
 Source code: <https://github.com/secretdoorapp/secretdoor>
 
+### No responsibility for data and security
+
+By installing or using SecretDoor you accept the following, to the fullest extent permitted by law
+(this restates and does not replace sections 15 and 16 of the GNU GPL v3 in [LICENSE.txt](LICENSE.txt)):
+
+- SecretDoor is provided **"as is"**, with no warranty of any kind, including that it is free of
+  security flaws, bugs or vulnerabilities, or that it will protect your data.
+- The authors, contributors and distributors of SecretDoor are **not liable** for any loss, damage,
+  or disclosure or unauthorized access of personal, private or unencrypted data (yours or anyone
+  else's) that results from the use, misuse or inability to use the app. This includes data exposed
+  through a lost, rooted, infected or otherwise compromised device, a weak or forgotten master
+  password, plaintext exports (JSON or CSV), backup files you store or share, cloud services you
+  choose, screenshots or screen capture you allow, the clipboard, other apps you grant access to
+  (for example autofill or accessibility services), or bugs and vulnerabilities in SecretDoor, the
+  Bitwarden SDK or any third-party component.
+- You are responsible for your own data: keep your own backups, choose a strong master password
+  (it cannot be recovered), and protect your device and any exported or backup files.
+- You are responsible for the personal data of other people that you store in the app, and for
+  complying with the laws that apply to it.
+
+This notice is not a substitute for legal advice. If you distribute SecretDoor commercially, have it
+reviewed by a lawyer for your jurisdiction, because some places do not allow certain liability
+limits.
+
 SecretDoor is an independent project. It is **not affiliated with, endorsed by or sponsored by
 Bitwarden, Inc.**
 

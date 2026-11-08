@@ -115,6 +115,10 @@ Bitwarden Android app it is based on. It is a modified version of that app; see
 third-party license ([full list](docs/THIRD_PARTY_LICENSES.md)). The app links to its source code,
 license and notices on its About screen.
 
+**No responsibility:** SecretDoor is provided "as is", without warranty. The authors are not liable
+for any loss or unauthorized access to personal data resulting from use of the app; see
+[NOTICE.md](NOTICE.md#no-responsibility-for-data-and-security).
+
 Bitwarden is a trademark of Bitwarden Inc.; SecretDoor is an independent project and is not
 affiliated with Bitwarden.
 
