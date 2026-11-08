@@ -476,7 +476,7 @@ class CipherViewExtensionsTest {
                 common = createCommonContent(
                     isEmpty = false,
                     isPremiumUser = true,
-                    iconResId = BitwardenDrawable.ic_note,
+                    iconResId = BitwardenDrawable.ic_drivers_license,
                 )
                     .copy(currentCipher = cipherView),
                 type = VaultItemState.ViewState.Content.ItemType.DriversLicense(
@@ -520,7 +520,7 @@ class CipherViewExtensionsTest {
                 common = createCommonContent(
                     isEmpty = true,
                     isPremiumUser = true,
-                    iconResId = BitwardenDrawable.ic_note,
+                    iconResId = BitwardenDrawable.ic_drivers_license,
                 )
                     .copy(currentCipher = cipherView),
                 type = VaultItemState.ViewState.Content.ItemType.DriversLicense(
@@ -643,7 +643,7 @@ class CipherViewExtensionsTest {
             CipherType.CARD to BitwardenDrawable.ic_payment_card,
             CipherType.SECURE_NOTE to BitwardenDrawable.ic_note,
             CipherType.SSH_KEY to BitwardenDrawable.ic_ssh_key,
-            CipherType.BANK_ACCOUNT to BitwardenDrawable.ic_payment_card,
+            CipherType.BANK_ACCOUNT to BitwardenDrawable.ic_bank_account,
         )
             .forEach {
                 val cipherView = createCipherView(type = it.key, isEmpty = false)

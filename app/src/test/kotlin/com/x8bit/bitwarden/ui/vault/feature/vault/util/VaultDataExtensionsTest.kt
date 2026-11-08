@@ -1385,7 +1385,7 @@ private fun createMockBankAccountVaultItem(
             ),
             ListingItemOverflowAction.VaultAction.ArchiveClick(cipherId = "mockId-$number"),
         ),
-        startIcon = IconData.Local(iconRes = BitwardenDrawable.ic_payment_card),
+        startIcon = IconData.Local(iconRes = BitwardenDrawable.ic_bank_account),
         startIconTestTag = "BankAccountCipherIcon",
         extraIconList = persistentListOf(
             IconData.Local(
@@ -1422,7 +1422,7 @@ private fun createMockLicenseVaultItem(
             ),
             ListingItemOverflowAction.VaultAction.ArchiveClick(cipherId = "mockId-$number"),
         ),
-        startIcon = IconData.Local(iconRes = BitwardenDrawable.ic_id_card),
+        startIcon = IconData.Local(iconRes = BitwardenDrawable.ic_drivers_license),
         startIconTestTag = "LicenseCipherIcon",
         extraIconList = persistentListOf(
             IconData.Local(

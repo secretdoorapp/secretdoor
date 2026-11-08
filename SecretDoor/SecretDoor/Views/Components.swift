@@ -206,7 +206,8 @@ extension Error {
 }
 
 extension CipherType {
-    /// Artwork from the Android app's icon sheet (`design/icon-source`), where there is some.
+    /// Artwork shared with the Android app: its icon sheet (`design/icon-source`) and the tiles drawn
+    /// for bank accounts, driver's licenses and passports.
     var artName: String? {
         switch self {
         case .login: return "ArtLogin"
@@ -214,7 +215,9 @@ extension CipherType {
         case .identity: return "ArtIdentity"
         case .secureNote: return "ArtNote"
         case .sshKey: return "ArtSshKey"
-        case .bankAccount, .driversLicense, .passport: return nil
+        case .bankAccount: return "ArtBankAccount"
+        case .driversLicense: return "ArtLicense"
+        case .passport: return "ArtPassport"
         }
     }
 }

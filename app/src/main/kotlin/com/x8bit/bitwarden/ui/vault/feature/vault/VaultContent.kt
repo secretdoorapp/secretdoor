@@ -331,13 +331,14 @@ private fun LazyListScope.typesSection(
         item(key = "bank_accounts_group") {
             BitwardenGroupItem(
                 startIcon = IconData.Local(
-                    iconRes = BitwardenDrawable.ic_payment_card,
+                    iconRes = BitwardenDrawable.ic_bank_account,
                     testTag = "BankAccountCipherIcon",
                 ),
+                startImageRes = BitwardenDrawable.art_type_bank_accounts,
                 label = stringResource(id = BitwardenString.type_bank_account),
                 supportingLabel = state.bankAccountItemsCount.toString(),
                 onClick = vaultHandlers.bankAccountGroupClick,
-                cardStyle = CardStyle.Middle(dividerPadding = 56.dp),
+                cardStyle = CardStyle.Middle(dividerPadding = 68.dp),
                 modifier = Modifier
                     .animateItem()
                     .fillMaxWidth()
@@ -370,13 +371,14 @@ private fun LazyListScope.typesSection(
         item(key = "licenses_group") {
             BitwardenGroupItem(
                 startIcon = IconData.Local(
-                    iconRes = BitwardenDrawable.ic_id_card,
+                    iconRes = BitwardenDrawable.ic_drivers_license,
                     testTag = "LicenseCipherIcon",
                 ),
+                startImageRes = BitwardenDrawable.art_type_licenses,
                 label = stringResource(id = BitwardenString.type_license),
                 supportingLabel = state.licenseItemsCount.toString(),
                 onClick = vaultHandlers.licenseGroupClick,
-                cardStyle = CardStyle.Middle(dividerPadding = 56.dp),
+                cardStyle = CardStyle.Middle(dividerPadding = 68.dp),
                 modifier = Modifier
                     .animateItem()
                     .fillMaxWidth()
@@ -393,10 +395,11 @@ private fun LazyListScope.typesSection(
                     iconRes = BitwardenDrawable.ic_passport,
                     testTag = "PassportCipherIcon",
                 ),
+                startImageRes = BitwardenDrawable.art_type_passports,
                 label = stringResource(id = BitwardenString.type_passport),
                 supportingLabel = state.passportItemsCount.toString(),
                 onClick = vaultHandlers.passportGroupClick,
-                cardStyle = CardStyle.Middle(dividerPadding = 56.dp),
+                cardStyle = CardStyle.Middle(dividerPadding = 68.dp),
                 modifier = Modifier
                     .animateItem()
                     .fillMaxWidth()
