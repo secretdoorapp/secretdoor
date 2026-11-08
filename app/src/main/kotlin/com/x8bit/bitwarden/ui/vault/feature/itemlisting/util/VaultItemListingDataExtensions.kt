@@ -505,8 +505,8 @@ private val CipherListViewType.iconRes: Int
         is CipherListViewType.Card -> BitwardenDrawable.ic_payment_card
         CipherListViewType.Identity -> BitwardenDrawable.ic_id_card
         CipherListViewType.SshKey -> BitwardenDrawable.ic_ssh_key
-        is CipherListViewType.BankAccount -> BitwardenDrawable.ic_payment_card
-        CipherListViewType.DriversLicense -> BitwardenDrawable.ic_note
+        is CipherListViewType.BankAccount -> BitwardenDrawable.ic_bank_account
+        CipherListViewType.DriversLicense -> BitwardenDrawable.ic_drivers_license
         CipherListViewType.Passport -> BitwardenDrawable.ic_passport
     }
 

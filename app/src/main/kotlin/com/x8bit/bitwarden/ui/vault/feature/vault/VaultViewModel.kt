@@ -2180,7 +2180,7 @@ data class VaultState(
                 override val id: String,
                 override val name: Text,
                 override val startIcon: IconData = IconData.Local(
-                    iconRes = BitwardenDrawable.ic_payment_card,
+                    iconRes = BitwardenDrawable.ic_bank_account,
                 ),
                 override val startIconTestTag: String = "BankAccountCipherIcon",
                 override val extraIconList: ImmutableList<IconData> = persistentListOf(),
@@ -2200,7 +2200,7 @@ data class VaultState(
                 override val id: String,
                 override val name: Text,
                 override val startIcon: IconData = IconData.Local(
-                    iconRes = BitwardenDrawable.ic_id_card,
+                    iconRes = BitwardenDrawable.ic_drivers_license,
                 ),
                 override val startIconTestTag: String = "LicenseCipherIcon",
                 override val extraIconList: ImmutableList<IconData> = persistentListOf(),

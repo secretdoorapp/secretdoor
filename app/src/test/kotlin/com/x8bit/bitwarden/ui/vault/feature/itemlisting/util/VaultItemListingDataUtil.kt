@@ -285,7 +285,7 @@ fun createMockDisplayItemForCipher(
                 secondSubtitleTestTag = secondSubtitleTestTag,
                 subtitle = subtitle,
                 subtitleTestTag = subtitleTestTag,
-                iconData = IconData.Local(BitwardenDrawable.ic_payment_card),
+                iconData = IconData.Local(BitwardenDrawable.ic_bank_account),
                 extraIconList = persistentListOf(
                     IconData.Local(
                         iconRes = BitwardenDrawable.ic_shared_folder,
@@ -329,7 +329,7 @@ fun createMockDisplayItemForCipher(
                 secondSubtitleTestTag = secondSubtitleTestTag,
                 subtitle = subtitle,
                 subtitleTestTag = subtitleTestTag,
-                iconData = IconData.Local(BitwardenDrawable.ic_note),
+                iconData = IconData.Local(BitwardenDrawable.ic_drivers_license),
                 extraIconList = persistentListOf(
                     IconData.Local(
                         iconRes = BitwardenDrawable.ic_shared_folder,
@@ -373,7 +373,7 @@ fun createMockDisplayItemForCipher(
                 secondSubtitleTestTag = secondSubtitleTestTag,
                 subtitle = subtitle,
                 subtitleTestTag = subtitleTestTag,
-                iconData = IconData.Local(BitwardenDrawable.ic_note),
+                iconData = IconData.Local(BitwardenDrawable.ic_passport),
                 extraIconList = persistentListOf(
                     IconData.Local(
                         iconRes = BitwardenDrawable.ic_shared_folder,

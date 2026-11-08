@@ -360,8 +360,8 @@ private val CipherType.iconRes: Int
         CipherType.IDENTITY -> BitwardenDrawable.ic_id_card
         CipherType.SSH_KEY -> BitwardenDrawable.ic_ssh_key
         CipherType.LOGIN -> BitwardenDrawable.ic_globe
-        CipherType.BANK_ACCOUNT -> BitwardenDrawable.ic_payment_card
-        CipherType.DRIVERS_LICENSE -> BitwardenDrawable.ic_note
+        CipherType.BANK_ACCOUNT -> BitwardenDrawable.ic_bank_account
+        CipherType.DRIVERS_LICENSE -> BitwardenDrawable.ic_drivers_license
         CipherType.PASSPORT -> BitwardenDrawable.ic_passport
     }
 
