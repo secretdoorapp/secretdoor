@@ -248,6 +248,19 @@ private fun AboutScreenContent(
                 .fillMaxWidth()
                 .testTag("CopyAboutInfoRow"),
         )
+        Text(
+            modifier = Modifier
+                .standardHorizontalMargin()
+                .fillMaxWidth()
+                .padding(vertical = 12.dp)
+                .testTag(tag = "DisclaimerText"),
+            text = stringResource(
+                id = BitwardenString
+                    .secretdoor_is_provided_as_is_without_warranty,
+            ),
+            style = BitwardenTheme.typography.bodySmall,
+            color = BitwardenTheme.colorScheme.text.secondary,
+        )
         Box(
             modifier = Modifier
                 .defaultMinSize(minHeight = 60.dp)

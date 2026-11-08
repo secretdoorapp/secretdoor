@@ -418,7 +418,8 @@ Scanning will happen automatically.</string>
     <string name="send_verification_code_to_email">Send a verification code to your email</string>
     <string name="code_sent">Code sent!</string>
     <string name="confirm_your_identity">Confirm your identity to continue.</string>
-    <string name="export_vault_warning">For your security, don’t share or send this file over unsecured channels (like email), and delete it when you’re done.</string>
+    <string name="export_vault_warning">This file is not encrypted: anyone who gets it can read all of your passwords and private data. Don’t share it or send it over unsecured channels (like email), and delete it when you’re done. You are responsible for keeping it safe.</string>
+    <string name="secretdoor_is_provided_as_is_without_warranty">SecretDoor is provided “as is”, without warranty. The authors are not liable for any loss, or exposure or unauthorized access, of your personal data that results from using the app. Keep your own backups and protect your device, master password and exported files.</string>
     <string name="export_vault_file_pw_protect_info">This file export will be password protected and require the file password to decrypt.</string>
     <string name="export_vault_confirmation_title">Confirm vault export</string>
     <string name="warning">Warning</string>
