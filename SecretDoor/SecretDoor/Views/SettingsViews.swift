@@ -197,7 +197,11 @@ struct ExportVaultView: View {
                 }
                 .disabled(!canExport)
             } footer: {
-                Text("For your security, don\u{2019}t share or send this file over unsecured channels (like email), and delete it when you\u{2019}re done.")
+                if choice == .encryptedJson {
+                    Text("For your security, don\u{2019}t share or send this file over unsecured channels (like email), and delete it when you\u{2019}re done.")
+                } else {
+                    Text("This file is not encrypted: anyone who gets it can read all of your passwords and private data. Don\u{2019}t share it or send it over unsecured channels (like email), and delete it when you\u{2019}re done. You are responsible for keeping it safe.")
+                }
             }
         }
         .navigationTitle("Export vault")
@@ -729,6 +733,10 @@ struct AboutView: View {
                 Label("Backups go only where you save them.", systemImage: "externaldrive")
             }
             .font(.subheadline)
+            Section("No responsibility") {
+                Text("SecretDoor is provided \u{201C}as is\u{201D}, without warranty. The authors are not liable for any loss, or exposure or unauthorized access, of your personal data that results from using the app. Keep your own backups and protect your device, master password and exported files.")
+                    .font(.subheadline)
+            }
             Section("License") {
                 Text("SecretDoor is free software under the GNU General Public License v3, with an additional permission to distribute it through Apple's App Store. It uses the same formats as SecretDoor for Android, which is based on Bitwarden; it is not affiliated with or endorsed by Bitwarden Inc. Passphrases use the EFF long wordlist (CC BY 3.0 US).")
                     .font(.subheadline)
