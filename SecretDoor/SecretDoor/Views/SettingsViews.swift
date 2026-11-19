@@ -318,6 +318,15 @@ struct AboutSettingsView: View {
         Form {
             Section {
                 LabeledContent("Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
+                Link(destination: URL(string: "https://secretdoor.fyi/manual/")!) {
+                    Label("Manual", systemImage: "book")
+                }
+                Link(destination: URL(string: "https://secretdoor.fyi/privacy/")!) {
+                    Label("Privacy policy", systemImage: "lock.shield")
+                }
+                Link(destination: URL(string: "https://secretdoor.fyi/support/")!) {
+                    Label("Support", systemImage: "questionmark.circle")
+                }
                 Link(destination: URL(string: "https://github.com/secretdoorapp/secretdoor")!) {
                     Label("Source code", systemImage: "chevron.left.forwardslash.chevron.right")
                 }

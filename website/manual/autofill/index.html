@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Autofill · SecretDoor</title>
+  <meta name="description" content="Fill logins and cards in apps and browsers.">
+  <link rel="canonical" href="https://secretdoor.fyi/manual/autofill/">
+  <meta property="og:title" content="Autofill · SecretDoor">
+  <meta property="og:description" content="Fill logins and cards in apps and browsers.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://secretdoor.fyi/manual/autofill/">
+  <meta property="og:image" content="https://secretdoor.fyi/assets/img/og.png">
+  <meta name="theme-color" content="#14171c">
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+  <link rel="apple-touch-icon" href="/assets/img/icon-180.png">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="bar">
+      <a class="brand" href="/"><img src="/assets/img/favicon.png" alt="" width="32" height="32"><span>SecretDoor</span></a>
+      <nav aria-label="Main">
+        <a href="/">Home</a>
+        <a href="/manual/" aria-current="page">Manual</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="/support/">Support</a>
+        <a class="ext" href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main" class="">
+
+    <article class="doc">
+      <p class="crumbs"><a href="/manual/">Manual</a> &rsaquo; Autofill</p>
+      <h1>Autofill</h1>
+      <p>Autofill lets SecretDoor fill your logins and cards into other apps and websites. You set it up once in Android's settings. The vault must be unlocked to fill.</p>
+<h2 id="set-up-autofill">Set up autofill</h2>
+<ol><li>Open <strong>Settings &gt; Autofill</strong> and turn on <strong>Autofill services</strong>.</li><li>In Android's dialog, choose <strong>SecretDoor</strong> as the autofill service.</li><li>Optionally use the inline suggestions option on the same screen to see suggestions in the keyboard.</li></ol>
+<p>SecretDoor can also be set up as a <strong>credential provider</strong> (passkeys and passwords in Android Credential Manager) from the same screen.</p>
+<h2 id="browsers">Browsers</h2>
+<p>Most browsers fill through Android's autofill service once it is set up. Some browsers need an extra setting before they allow third-party autofill:</p>
+<ol><li>Open <strong>Settings &gt; Autofill</strong> and use <strong>Turn on browser autofill integration</strong> (shown when a supported browser is installed).</li><li>Follow the prompt to open the browser's settings and enable "Autofill services" or "Third-party autofill".</li></ol>
+<p>If your browser is not supported, the optional <strong>accessibility</strong> method can fill it. See below.</p>
+<h2 id="accessibility-optional">Accessibility (optional)</h2>
+<p>The accessibility service is a second way to fill apps and browsers that do not support Android's autofill. It reads what is on the screen to find login fields, so Android shows a warning when you turn it on. SecretDoor only uses it to detect login fields and fill them. Leave it off if autofill works for you.</p>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul><li><strong>No suggestions appear.</strong> Check that SecretDoor is the selected autofill service in Android's settings and that the vault is unlocked. Check the login's website matches (<a href="/manual/uri-match-detection/">URI match detection</a>).</li><li><strong>It works in some apps but not others.</strong> Some apps block autofill on purpose, mostly banking apps. Use the accessibility method, or copy and paste from the item.</li><li><strong>The browser ignores autofill.</strong> Enable third-party autofill in the browser's settings (see above), and restart the browser.</li><li><strong>Suggestions show for the wrong site.</strong> Tighten the login's <a href="/manual/uri-match-detection/">match detection</a> or add the correct website.</li><li><strong>Autofill stops after a while.</strong> Some phones stop background services to save battery. Exclude SecretDoor from battery optimization in Android's settings.</li><li><strong>Never fill on a site.</strong> Add it under <strong>Settings &gt; Autofill &gt; Block autofill</strong>.</li></ul>
+<h2 id="related">Related</h2>
+<ul><li><a href="/manual/master-password-reprompt/">Master password re-prompt</a></li><li><a href="/manual/authenticator-codes/">Authenticator codes</a></li></ul>
+      <p class="back"><a href="/manual/">&larr; Back to the manual</a></p>
+    </article>
+    
+  </main>
+  <footer class="site-footer">
+    <div class="bar">
+      <p><strong>SecretDoor</strong> is free software under the
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html" rel="noopener">GNU GPL v3</a>.
+        <a href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code on GitHub</a>.</p>
+      <p>It is based on the open source Bitwarden apps and is not affiliated with or endorsed by
+        Bitwarden Inc. SecretDoor is provided &ldquo;as is&rdquo;, without warranty. The authors are
+        not liable for any loss, exposure or unauthorized access of your personal data that results
+        from using the app. Keep your own backups.</p>
+      <p><a href="/manual/">Manual</a> · <a href="/privacy/">Privacy</a> ·
+        <a href="/support/">Support</a> · <a href="mailto:contact@secretdoor.fyi">contact@secretdoor.fyi</a></p>
+    </div>
+  </footer>
+</body>
+</html>

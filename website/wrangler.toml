@@ -1,0 +1,16 @@
+# secretdoor.fyi: a static site served by Cloudflare (Workers static assets).
+# Deploy from this folder:  npx wrangler deploy
+# (log in once with:        npx wrangler login)
+name = "secretdoor"
+compatibility_date = "2025-09-01"
+
+# Custom domains: Cloudflare creates the DNS records for these itself.
+routes = [
+  { pattern = "secretdoor.fyi", custom_domain = true },
+  { pattern = "www.secretdoor.fyi", custom_domain = true },
+]
+
+[assets]
+directory = "."
+html_handling = "auto-trailing-slash"
+not_found_handling = "404-page"

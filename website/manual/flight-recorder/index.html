@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flight recorder · SecretDoor</title>
+  <meta name="description" content="Diagnostic logs for bug reports.">
+  <link rel="canonical" href="https://secretdoor.fyi/manual/flight-recorder/">
+  <meta property="og:title" content="Flight recorder · SecretDoor">
+  <meta property="og:description" content="Diagnostic logs for bug reports.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://secretdoor.fyi/manual/flight-recorder/">
+  <meta property="og:image" content="https://secretdoor.fyi/assets/img/og.png">
+  <meta name="theme-color" content="#14171c">
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+  <link rel="apple-touch-icon" href="/assets/img/icon-180.png">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="bar">
+      <a class="brand" href="/"><img src="/assets/img/favicon.png" alt="" width="32" height="32"><span>SecretDoor</span></a>
+      <nav aria-label="Main">
+        <a href="/">Home</a>
+        <a href="/manual/" aria-current="page">Manual</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="/support/">Support</a>
+        <a class="ext" href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main" class="">
+
+    <article class="doc">
+      <p class="crumbs"><a href="/manual/">Manual</a> &rsaquo; Flight recorder</p>
+      <h1>Flight recorder</h1>
+      <p>The flight recorder writes diagnostic information about what the app is doing to a log file <strong>on your phone</strong>. If SecretDoor misbehaves, a recorded log helps a developer find out why.</p>
+<h2 id="what-it-records">What it records</h2>
+<ul><li>The app's log messages: errors, warnings and notes about what the app is doing.</li><li>Basic device and app version information.</li></ul>
+<p>The recorder is meant to avoid secrets such as your master password, vault items and encryption keys, but it is a diagnostic log, so read it before you share it (see below).</p>
+<h2 id="how-to-use-it">How to use it</h2>
+<ol><li>Open <strong>Settings &gt; About</strong> and switch on <strong>Flight recorder</strong>.</li><li>Choose how long it should record: 1 hour, 8 hours, 24 hours or 1 week. It stops by itself.</li><li>Reproduce the problem.</li><li>Open <strong>View recorded logs</strong> to share or delete a log.</li></ol>
+<p>While it is on, a banner reminds you and shows when it will stop.</p>
+<h2 id="privacy">Privacy</h2>
+<p>Nothing is uploaded. The log stays on your phone until you share it yourself, for example by attaching it to a bug report. Delete recorded logs from the same screen when you no longer need them.</p>
+      <p class="back"><a href="/manual/">&larr; Back to the manual</a></p>
+    </article>
+    
+  </main>
+  <footer class="site-footer">
+    <div class="bar">
+      <p><strong>SecretDoor</strong> is free software under the
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html" rel="noopener">GNU GPL v3</a>.
+        <a href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code on GitHub</a>.</p>
+      <p>It is based on the open source Bitwarden apps and is not affiliated with or endorsed by
+        Bitwarden Inc. SecretDoor is provided &ldquo;as is&rdquo;, without warranty. The authors are
+        not liable for any loss, exposure or unauthorized access of your personal data that results
+        from using the app. Keep your own backups.</p>
+      <p><a href="/manual/">Manual</a> · <a href="/privacy/">Privacy</a> ·
+        <a href="/support/">Support</a> · <a href="mailto:contact@secretdoor.fyi">contact@secretdoor.fyi</a></p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -800,7 +800,7 @@ Do you want to switch to this account?</string>
     <string name="two_step_login_description_long">Make your account more secure by setting up two-step login in the SecretDoor web app.</string>
     <string name="change_master_password_description_long">You can change your master password on the SecretDoor web app.</string>
     <string name="learn_more_about_how_to_use_bitwarden_on_the_help_center">Learn more about how to use SecretDoor on the Help center.</string>
-    <string name="privacy_policy_description_long">Read how SecretDoor handles your data in the privacy policy on GitHub.</string>
+    <string name="privacy_policy_description_long">Read how SecretDoor handles your data in the privacy policy on the SecretDoor website.</string>
     <string name="explore_more_features_of_your_bitwarden_account_on_the_web_app">Explore more features of your SecretDoor account on the web app.</string>
     <string name="created_x">Created %1$s</string>
     <string name="your_organization_requires_you_to_set_a_master_password">Your organization requires you to set a master password.</string>
@@ -1213,9 +1213,9 @@ Do you want to switch to this account?</string>
     <string name="local_codes">Local codes (%1$d)</string>
     <string name="local_codes_header">Local codes</string>
     <string name="required_information_missing">Required Information Missing</string>
-    <string name="required_information_missing_message">Required info is missing (e.g., ‘services’ or ‘secret’). Check your file and try again. See the help pages on GitHub for support.</string>
+    <string name="required_information_missing_message">Required info is missing (e.g., ‘services’ or ‘secret’). Check your file and try again. See the help pages on the SecretDoor website for support.</string>
     <string name="file_could_not_be_processed">File Could Not Be Processed</string>
-    <string name="file_could_not_be_processed_message">File could not be processed. Ensure it’s valid JSON and try again. Need help? See the help pages on GitHub.</string>
+    <string name="file_could_not_be_processed_message">File could not be processed. Ensure it’s valid JSON and try again. Need help? See the help pages on the SecretDoor website.</string>
     <string name="get_help">Get Help</string>
     <string name="error_cannot_decrypt">[error: cannot decrypt]</string>
     <string name="copy_error_report">Copy error report</string>

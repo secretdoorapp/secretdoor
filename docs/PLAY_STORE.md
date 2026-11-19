@@ -12,7 +12,7 @@ Listing text and graphics live in `fastlane/metadata/android/en-US/` (also reada
 | `changelogs/<versionCode>.txt` | Release notes (max 500) |
 
 Still needed from you: phone screenshots (2 to 8, in `images/phoneScreenshots/`), a public
-privacy policy URL (publish `docs/PRIVACY.md`, for example via GitHub Pages), and a developer
+privacy policy URL (`https://secretdoor.fyi/privacy/`, generated from `docs/PRIVACY.md` by `website/build.py`), and a developer
 account (one-time US$25 fee, identity verification).
 
 ## Console answers

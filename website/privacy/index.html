@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy policy · SecretDoor</title>
+  <meta name="description" content="What SecretDoor stores on your phone, what can leave it (almost nothing) and which permissions it asks for.">
+  <link rel="canonical" href="https://secretdoor.fyi/privacy/">
+  <meta property="og:title" content="Privacy policy · SecretDoor">
+  <meta property="og:description" content="What SecretDoor stores on your phone, what can leave it (almost nothing) and which permissions it asks for.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://secretdoor.fyi/privacy/">
+  <meta property="og:image" content="https://secretdoor.fyi/assets/img/og.png">
+  <meta name="theme-color" content="#14171c">
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+  <link rel="apple-touch-icon" href="/assets/img/icon-180.png">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="bar">
+      <a class="brand" href="/"><img src="/assets/img/favicon.png" alt="" width="32" height="32"><span>SecretDoor</span></a>
+      <nav aria-label="Main">
+        <a href="/">Home</a>
+        <a href="/manual/">Manual</a>
+        <a href="/privacy/" aria-current="page">Privacy</a>
+        <a href="/support/">Support</a>
+        <a class="ext" href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main" class="">
+
+    <article class="doc">
+      <h1>Privacy policy</h1>
+      <p>SecretDoor keeps your vault on your phone and nowhere else. This page lists exactly what is stored, what can leave the device and what permissions the app asks for.</p>
+<h2 id="what-is-stored-on-your-phone">What is stored on your phone</h2>
+<ul><li><strong>Your vault</strong>: logins, cards, identities, notes, SSH keys, passkeys, folders and attachments. Everything is encrypted with a key that only your master password can unlock (see <a href="/manual/security/">Security</a>). The vault never exists in readable form on disk.</li><li><strong>Settings</strong>: your preferences (theme, timeout, autofill options and so on).</li><li><strong>Unlock helpers you choose to turn on</strong>: a PIN or biometric unlock keeps an encrypted copy of the vault key protected by the Android keystore.</li><li><strong>Backups you create</strong>: encrypted files saved wherever you choose.</li></ul>
+<h2 id="what-can-leave-your-phone">What can leave your phone</h2>
+<p>SecretDoor has no account, no server, no sync, no analytics and no crash reporting. The app refuses every network connection except the two below.</p>
+<ol><li><strong>Known-breach check for a new master password (optional, off by default).</strong> If you tick "Check known data breaches" when creating a vault, the app sends the first 5 characters of the SHA-1 hash of the password to <a href="https://haveibeenpwned.com/API/v3#PwnedPasswords" rel="noopener">Have I Been Pwned</a>. The service answers with a list of hash endings, and the comparison happens on your phone. Your password is never sent.</li><li><strong>Passkeys for apps.</strong> When an app (not a browser) asks you to create or use a passkey, SecretDoor asks Google's <a href="https://developers.google.com/digital-asset-links" rel="noopener">Digital Asset Links</a> service whether the app belongs to the website. Only the website, the app's package name and its signing certificate fingerprint are sent. No vault data is included.</li></ol>
+<p>Website icons are never downloaded, because each icon request would tell a server which sites you have logins for.</p>
+<p>If you choose to save backups to a cloud folder (for example Google Drive), that cloud service receives the encrypted backup file, as you would expect. The file is encrypted before it leaves the app.</p>
+<h2 id="permissions">Permissions</h2>
+<div class="table-wrap"><table><thead><tr><th>Permission</th><th>Why</th></tr></thead><tbody><tr><td>Internet</td><td>Only for the two cases above.</td></tr><tr><td>Network state</td><td>Used to avoid network requests when there is no connection.</td></tr><tr><td>Camera</td><td>Scan a QR code that contains an authenticator key. Used only while the scanner is open.</td></tr><tr><td>Biometrics</td><td>Unlock with fingerprint or face if you turn it on.</td></tr><tr><td>Local network</td><td>Declared by the upstream app for self-hosted servers. SecretDoor does not use it.</td></tr></tbody></table></div>
+<p>SecretDoor can also act as an Android <strong>autofill service</strong>, an <strong>accessibility service</strong> (an optional way to fill apps and browsers that do not support autofill) and a <strong>credential provider</strong> (passkeys and passwords through Android Credential Manager). Each of these is switched on by you in Android's settings, and you can switch it off there at any time.</p>
+<h2 id="your-data-and-the-law">Your data and the law</h2>
+<p>SecretDoor does not collect personal data, so there is nothing to request, correct or delete on a server. To remove your data, delete the vault in the app (Settings &gt; Vault &gt; Manage vaults) or uninstall the app. Backup files you saved elsewhere stay where you saved them until you delete them.</p>
+<h2 id="contact">Contact</h2>
+<p>Questions about privacy can be sent to <a href="mailto:contact@secretdoor.fyi">contact@secretdoor.fyi</a> or raised as an issue in the <a href="https://github.com/secretdoorapp/secretdoor/issues" rel="noopener">project repository</a>.</p>
+    </article>
+    
+  </main>
+  <footer class="site-footer">
+    <div class="bar">
+      <p><strong>SecretDoor</strong> is free software under the
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html" rel="noopener">GNU GPL v3</a>.
+        <a href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code on GitHub</a>.</p>
+      <p>It is based on the open source Bitwarden apps and is not affiliated with or endorsed by
+        Bitwarden Inc. SecretDoor is provided &ldquo;as is&rdquo;, without warranty. The authors are
+        not liable for any loss, exposure or unauthorized access of your personal data that results
+        from using the app. Keep your own backups.</p>
+      <p><a href="/manual/">Manual</a> · <a href="/privacy/">Privacy</a> ·
+        <a href="/support/">Support</a> · <a href="mailto:contact@secretdoor.fyi">contact@secretdoor.fyi</a></p>
+    </div>
+  </footer>
+</body>
+</html>

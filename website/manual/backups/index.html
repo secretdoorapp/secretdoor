@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Backups · SecretDoor</title>
+  <meta name="description" content="Protect yourself against losing your phone.">
+  <link rel="canonical" href="https://secretdoor.fyi/manual/backups/">
+  <meta property="og:title" content="Backups · SecretDoor">
+  <meta property="og:description" content="Protect yourself against losing your phone.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://secretdoor.fyi/manual/backups/">
+  <meta property="og:image" content="https://secretdoor.fyi/assets/img/og.png">
+  <meta name="theme-color" content="#14171c">
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+  <link rel="apple-touch-icon" href="/assets/img/icon-180.png">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="bar">
+      <a class="brand" href="/"><img src="/assets/img/favicon.png" alt="" width="32" height="32"><span>SecretDoor</span></a>
+      <nav aria-label="Main">
+        <a href="/">Home</a>
+        <a href="/manual/" aria-current="page">Manual</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="/support/">Support</a>
+        <a class="ext" href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main" class="">
+
+    <article class="doc">
+      <p class="crumbs"><a href="/manual/">Manual</a> &rsaquo; Backups</p>
+      <h1>Backups</h1>
+      <p>Your vault exists only on your phone. If you lose the phone, reset it or uninstall SecretDoor without a backup, <strong>the vault is gone</strong>, and SecretDoor cannot recover it for you because it has no copy. Make a backup, and keep it somewhere other than the phone.</p>
+<h2 id="what-a-backup-is">What a backup is</h2>
+<p>A backup is one file with the extension <code>.secretdoor</code>. It contains your whole vault (items, folders and attachments) and is encrypted as a whole: without your master password it is just random-looking data. The master password is <strong>not</strong> stored in the file.</p>
+<p>You need the master password of the vault to restore a backup. If you later change the master password, older backups still need the old one.</p>
+<h2 id="save-a-backup-by-hand">Save a backup by hand</h2>
+<p><strong>Settings &gt; Vault &gt; Backup &gt; Save backup file.</strong> Pick where to save it, for example a folder in Google Drive, a USB drive or another phone. The file name is the vault name, the date and the time.</p>
+<h2 id="automatic-backups">Automatic backups</h2>
+<p><strong>Settings &gt; Vault &gt; Backup &gt; Automatic backup.</strong> Pick a file once and a frequency (off, daily or weekly). SecretDoor then rewrites that file on schedule, even when the vault is locked. A cloud folder that keeps earlier versions (Google Drive does) gives you several restore points.</p>
+<p>Automatic backups use the vault's own key, so they need no password at backup time.</p>
+<h2 id="restore">Restore</h2>
+<ul><li><strong>New phone or fresh install</strong>: on the Create vault screen choose <strong>Restore from backup</strong>.</li><li><strong>Another vault on the same phone</strong>: <strong>Import backup</strong>, then add it to the current vault or as a separate vault. See <a href="/manual/importing-data/">Importing data</a> and <a href="/manual/managing-vaults/">Managing vaults</a>.</li></ul>
+<h2 id="good-habits">Good habits</h2>
+<ul><li>Keep at least one backup that is not on the phone.</li><li>Test a restore after you set things up.</li><li>Remember that anyone with the file can try to guess the master password. Use a long master password. See <a href="/manual/security/">Security</a>.</li></ul>
+      <p class="back"><a href="/manual/">&larr; Back to the manual</a></p>
+    </article>
+    
+  </main>
+  <footer class="site-footer">
+    <div class="bar">
+      <p><strong>SecretDoor</strong> is free software under the
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html" rel="noopener">GNU GPL v3</a>.
+        <a href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code on GitHub</a>.</p>
+      <p>It is based on the open source Bitwarden apps and is not affiliated with or endorsed by
+        Bitwarden Inc. SecretDoor is provided &ldquo;as is&rdquo;, without warranty. The authors are
+        not liable for any loss, exposure or unauthorized access of your personal data that results
+        from using the app. Keep your own backups.</p>
+      <p><a href="/manual/">Manual</a> · <a href="/privacy/">Privacy</a> ·
+        <a href="/support/">Support</a> · <a href="mailto:contact@secretdoor.fyi">contact@secretdoor.fyi</a></p>
+    </div>
+  </footer>
+</body>
+</html>

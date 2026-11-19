@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Security · SecretDoor</title>
+  <meta name="description" content="How the vault is encrypted and what it cannot protect you from.">
+  <link rel="canonical" href="https://secretdoor.fyi/manual/security/">
+  <meta property="og:title" content="Security · SecretDoor">
+  <meta property="og:description" content="How the vault is encrypted and what it cannot protect you from.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://secretdoor.fyi/manual/security/">
+  <meta property="og:image" content="https://secretdoor.fyi/assets/img/og.png">
+  <meta name="theme-color" content="#14171c">
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+  <link rel="apple-touch-icon" href="/assets/img/icon-180.png">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="bar">
+      <a class="brand" href="/"><img src="/assets/img/favicon.png" alt="" width="32" height="32"><span>SecretDoor</span></a>
+      <nav aria-label="Main">
+        <a href="/">Home</a>
+        <a href="/manual/" aria-current="page">Manual</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="/support/">Support</a>
+        <a class="ext" href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main" class="">
+
+    <article class="doc">
+      <p class="crumbs"><a href="/manual/">Manual</a> &rsaquo; Security</p>
+      <h1>Security</h1>
+      <p>This page explains how SecretDoor protects your vault and where the limits are.</p>
+<h2 id="encryption">Encryption</h2>
+<p>SecretDoor uses the same encryption library as Bitwarden (the Bitwarden SDK), which has been through third-party security audits for Bitwarden. SecretDoor itself, and the changes made to turn it into an offline app, have not been independently audited.</p>
+<ol><li>You choose a <strong>master password</strong> when you create a vault.</li><li>A <strong>master key</strong> is derived from the password with <strong>Argon2id</strong> (3 iterations, 64 MiB of memory, 4 lanes). This is deliberately slow and memory-hungry to make guessing expensive.</li><li>The master key unlocks a random <strong>vault key</strong> (an AES-256 encryption key plus an HMAC authentication key), which encrypts every item. The vault key is stored on the phone only in encrypted form.</li><li>Items are stored in the phone's database as encrypted text. Item names, notes, usernames and everything else are encrypted; the app keeps only a few non-secret values in the clear (such as which folder an item is in).</li></ol>
+<p>Your master password is never stored. If you forget it and have no unlock method turned on, the vault cannot be opened, and nobody, including the developers, can recover it.</p>
+<h2 id="unlocking">Unlocking</h2>
+<ul><li><strong>Master password</strong>: always works.</li><li><strong>PIN</strong> and <strong>biometrics</strong> (optional): the app keeps a copy of the vault key encrypted with a key held in the Android hardware keystore. These are convenient but weaker than the master password; for example, someone who knows your PIN and has your phone can unlock. SecretDoor locks the vault after the timeout you pick in <strong>Settings &gt; Account security</strong>.</li></ul>
+<h2 id="backups">Backups</h2>
+<p>Backup files are encrypted as a whole with AES-256-GCM, using a key derived from your vault key and a per-vault random salt. The format is described in the source code (<code>data/vault/manager/VaultBackupManagerImpl.kt</code> and <code>BackupCrypto.kt</code>). Because someone with a backup file can try guessing offline, <strong>a long master password matters</strong>.</p>
+<h2 id="what-secretdoor-does-not-protect-against">What SecretDoor does not protect against</h2>
+<ul><li>A phone that is already compromised (malware that can read the screen or the clipboard, or an accessibility service you did not intend to enable).</li><li>Someone looking over your shoulder, or a weak master password.</li><li>Items you copy to the clipboard: other apps may be able to read the clipboard on some Android versions, so paste sensitive values promptly.</li><li>Backups you leave unprotected next to the phone.</li></ul>
+<h2 id="reporting-a-vulnerability">Reporting a vulnerability</h2>
+<p>Please do not post vulnerabilities in a public issue. Use the repository's private <a href="https://github.com/secretdoorapp/secretdoor/security/advisories/new" rel="noopener">security advisory</a> form.</p>
+      <p class="back"><a href="/manual/">&larr; Back to the manual</a></p>
+    </article>
+    
+  </main>
+  <footer class="site-footer">
+    <div class="bar">
+      <p><strong>SecretDoor</strong> is free software under the
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html" rel="noopener">GNU GPL v3</a>.
+        <a href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code on GitHub</a>.</p>
+      <p>It is based on the open source Bitwarden apps and is not affiliated with or endorsed by
+        Bitwarden Inc. SecretDoor is provided &ldquo;as is&rdquo;, without warranty. The authors are
+        not liable for any loss, exposure or unauthorized access of your personal data that results
+        from using the app. Keep your own backups.</p>
+      <p><a href="/manual/">Manual</a> · <a href="/privacy/">Privacy</a> ·
+        <a href="/support/">Support</a> · <a href="mailto:contact@secretdoor.fyi">contact@secretdoor.fyi</a></p>
+    </div>
+  </footer>
+</body>
+</html>

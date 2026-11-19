@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SSH keys · SecretDoor</title>
+  <meta name="description" content="Generate or import SSH keys.">
+  <link rel="canonical" href="https://secretdoor.fyi/manual/ssh-keys/">
+  <meta property="og:title" content="SSH keys · SecretDoor">
+  <meta property="og:description" content="Generate or import SSH keys.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://secretdoor.fyi/manual/ssh-keys/">
+  <meta property="og:image" content="https://secretdoor.fyi/assets/img/og.png">
+  <meta name="theme-color" content="#14171c">
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+  <link rel="apple-touch-icon" href="/assets/img/icon-180.png">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="bar">
+      <a class="brand" href="/"><img src="/assets/img/favicon.png" alt="" width="32" height="32"><span>SecretDoor</span></a>
+      <nav aria-label="Main">
+        <a href="/">Home</a>
+        <a href="/manual/" aria-current="page">Manual</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="/support/">Support</a>
+        <a class="ext" href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main" class="">
+
+    <article class="doc">
+      <p class="crumbs"><a href="/manual/">Manual</a> &rsaquo; SSH keys</p>
+      <h1>SSH keys</h1>
+      <p>SecretDoor can keep SSH keys in your vault, encrypted like every other item. Use them to store the key pair you use to sign in to servers, Git hosts and other SSH services, so that it is backed up and available on your phone.</p>
+<p>SecretDoor on Android does <strong>not</strong> act as an SSH agent: it stores and shows the key. Copy the public key to the server, or copy the private key into the app that needs it.</p>
+<h2 id="add-an-ssh-key">Add an SSH key</h2>
+<ol><li>On <strong>My vault</strong>, tap <strong>+</strong> and choose <strong>SSH key</strong>.</li><li>Give it a name.</li><li>Either <strong>generate</strong> a new key pair or <strong>import</strong> one you already have (see below).</li><li>Save.</li></ol>
+<p>The item then shows the <strong>public key</strong>, the <strong>fingerprint</strong> and the <strong>private key</strong>. The private key is hidden until you tap the eye button.</p>
+<h2 id="generate-a-key">Generate a key</h2>
+<p>Choose <strong>Generate key</strong> and pick the type:</p>
+<div class="table-wrap"><table><thead><tr><th>Type</th><th>Notes</th></tr></thead><tbody><tr><td><strong>Ed25519</strong> (default)</td><td>Short, fast and secure. Supported by all modern servers.</td></tr><tr><td><strong>RSA 3072</strong> / <strong>RSA 4096</strong></td><td>Older servers sometimes only accept RSA. 4096 is slower to generate.</td></tr><tr><td><strong>ECDSA P-256 / P-384 / P-521</strong></td><td>Elliptic curve keys.</td></tr></tbody></table></div>
+<p>The key is made on your phone and is not sent anywhere.</p>
+<h2 id="import-a-key">Import a key</h2>
+<p>Choose <strong>Import key</strong> and paste the private key text, for example <code>-----BEGIN OPENSSH PRIVATE KEY-----</code>. If the key is protected by a passphrase, enter it when asked. SecretDoor reads the key, then stores the private key (without the passphrase), the matching public key and the fingerprint. If the app cannot read the key it tells you so and nothing is saved.</p>
+<p>&gt; The stored private key is <strong>not</strong> protected by its old passphrase any more; it is protected by &gt; your vault's encryption.</p>
+<h2 id="use-the-key">Use the key</h2>
+<ul><li>Copy the <strong>public key</strong> and add it to the server or service (for example the "SSH keys" page of your Git host).</li><li>Copy the <strong>private key</strong> only when you need to place it into another app. Treat it like a password, and consider turning on <a href="/manual/master-password-reprompt/">master password re-prompt</a> for the item.</li></ul>
+<h2 id="related">Related</h2>
+<ul><li><a href="/manual/backups/">Backups</a>: SSH keys are part of your backups.</li><li><a href="/manual/security/">Security</a></li></ul>
+      <p class="back"><a href="/manual/">&larr; Back to the manual</a></p>
+    </article>
+    
+  </main>
+  <footer class="site-footer">
+    <div class="bar">
+      <p><strong>SecretDoor</strong> is free software under the
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html" rel="noopener">GNU GPL v3</a>.
+        <a href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code on GitHub</a>.</p>
+      <p>It is based on the open source Bitwarden apps and is not affiliated with or endorsed by
+        Bitwarden Inc. SecretDoor is provided &ldquo;as is&rdquo;, without warranty. The authors are
+        not liable for any loss, exposure or unauthorized access of your personal data that results
+        from using the app. Keep your own backups.</p>
+      <p><a href="/manual/">Manual</a> · <a href="/privacy/">Privacy</a> ·
+        <a href="/support/">Support</a> · <a href="mailto:contact@secretdoor.fyi">contact@secretdoor.fyi</a></p>
+    </div>
+  </footer>
+</body>
+</html>

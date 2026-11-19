@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manual · SecretDoor</title>
+  <meta name="description" content="How SecretDoor works: creating a vault, adding items, the generator, autofill, backups and settings, with screenshots.">
+  <link rel="canonical" href="https://secretdoor.fyi/manual/">
+  <meta property="og:title" content="Manual · SecretDoor">
+  <meta property="og:description" content="How SecretDoor works: creating a vault, adding items, the generator, autofill, backups and settings, with screenshots.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://secretdoor.fyi/manual/">
+  <meta property="og:image" content="https://secretdoor.fyi/assets/img/og.png">
+  <meta name="theme-color" content="#14171c">
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+  <link rel="apple-touch-icon" href="/assets/img/icon-180.png">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="bar">
+      <a class="brand" href="/"><img src="/assets/img/favicon.png" alt="" width="32" height="32"><span>SecretDoor</span></a>
+      <nav aria-label="Main">
+        <a href="/">Home</a>
+        <a href="/manual/" aria-current="page">Manual</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="/support/">Support</a>
+        <a class="ext" href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main" class="">
+
+    <article class="doc">
+      <h1>SecretDoor manual</h1>
+      <p class="lead">How SecretDoor works, from creating your vault to backing it up. The screens
+        below are from the Android app. An iPhone version may be coming soon.</p>
+
+      <nav class="toc" aria-label="On this page">
+        <strong>On this page</strong>
+        <ol>
+          <li><a href="#how-it-works">How it works</a></li>
+          <li><a href="#create-vault">Create your vault</a></li>
+          <li><a href="#unlock">Unlock with a PIN or biometrics</a></li>
+          <li><a href="#your-vault">Your vault</a></li>
+          <li><a href="#add-items">Add items</a></li>
+          <li><a href="#generator">Generate passwords</a></li>
+          <li><a href="#autofill">Turn on autofill</a></li>
+          <li><a href="#backup">Back up your vault</a></li>
+          <li><a href="#settings">Settings</a></li>
+          <li><a href="#topics">More topics</a></li>
+        </ol>
+      </nav>
+
+      <h2 id="how-it-works">How it works</h2>
+      <p>SecretDoor is a password manager with <strong>no server</strong>. Your vault is a set of
+        encrypted records stored in the app on your phone. You unlock it with a master password
+        that only you know; the password is never stored and never sent anywhere.</p>
+      <ul>
+        <li>There is <strong>no account</strong> and no sign-in. Installing the app and creating a
+          vault is all it takes.</li>
+        <li>Items are encrypted before they are saved. Names, usernames, notes and everything else
+          are unreadable without your master password.</li>
+        <li>Because nothing is stored online, <strong>a lost phone means a lost vault</strong>
+          unless you made a backup. SecretDoor cannot recover it for you.</li>
+      </ul>
+
+      <h2 id="create-vault">Create your vault</h2>
+      <p>On first launch you choose a <strong>master password</strong> for a new vault. Pick a long
+        one, preferably a few random words: it is the only thing protecting your data, and anyone
+        who gets a copy of your backup can try to guess it. You can add an optional hint, which is
+        stored only on your phone and shown on the unlock screen if you tap
+        &ldquo;Show master password hint&rdquo;.</p>
+      <p>If you already have a SecretDoor backup (from an old phone, or from the other platform),
+        choose <strong>Restore from backup</strong> instead and enter that vault&rsquo;s master
+        password.</p>
+      <div class="note"><strong>Don&rsquo;t forget it.</strong> There is no &ldquo;forgot password&rdquo;
+        link. Nobody, including the developers, can reset or recover a master password.</div>
+
+      <h2 id="unlock">Unlock with a PIN or biometrics</h2>
+      <div class="side">
+        <figure class="shot"><img src="/assets/img/shots/unlock.webp" alt="The Set up unlock screen with switches for biometrics and PIN" width="540" height="1080" loading="lazy"></figure>
+        <div>
+          <p>Typing a long master password every time is tiring, so SecretDoor offers two
+            shortcuts: <strong>biometrics</strong> (fingerprint or face) and a <strong>PIN
+            code</strong>. Both are optional and you can turn them on during setup or later in
+            <em>Settings &gt; Account security</em>.</p>
+          <p>They are convenient but a little weaker than the master password: someone who knows
+            your PIN and has your phone could unlock the vault. The master password always works,
+            and the vault locks itself after the timeout you choose. After a restart the master
+            password is required.</p>
+          <p>More in <a href="/manual/security/">Security</a>.</p>
+        </div>
+      </div>
+
+      <h2 id="your-vault">Your vault</h2>
+      <div class="side">
+        <figure class="shot"><img src="/assets/img/shots/vault.webp" alt="The My vault screen" width="540" height="1080" loading="lazy"></figure>
+        <div>
+          <p>The <strong>My vault</strong> tab lists everything you have saved. At the top the
+            <strong>Types</strong> section counts items by kind: logins, cards, identities, secure
+            notes and SSH keys. Below that are your folders and the items that are not in a folder.</p>
+          <ul>
+            <li>Tap an item to see its details, copy a value, or open its website.</li>
+            <li>Use the <strong>search</strong> icon to find items by name, username or website.</li>
+            <li>The <strong>+</strong> button adds a new item.</li>
+            <li>Mark items as <strong>favorites</strong> and sort them into <strong>folders</strong>
+              to keep things tidy. Deleted items go to the <strong>trash</strong> first.</li>
+            <li>The vault picker next to the title appears when you have more than one vault. See
+              <a href="/manual/managing-vaults/">Managing vaults</a>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 id="add-items">Add items</h2>
+      <div class="side">
+        <figure class="shot"><img src="/assets/img/shots/add-login.webp" alt="The Add login screen" width="540" height="1080" loading="lazy"></figure>
+        <div>
+          <p>Tap <strong>+</strong> and choose the kind of item. A <strong>login</strong> has a name,
+            an optional folder, a username, a password and one or more websites. Next to the
+            username and password fields you will find buttons to <strong>generate</strong> a new
+            value and to <strong>show or hide</strong> it.</p>
+          <ul>
+            <li><strong>Authenticator key</strong>: paste or scan the key from a website&rsquo;s
+              two-step setup and SecretDoor shows the live six-digit codes.
+              <a href="/manual/authenticator-codes/">Learn more</a>.</li>
+            <li><strong>Website (URI)</strong>: tells autofill when to offer this login. The gear
+              icon sets how strictly addresses must match.
+              <a href="/manual/uri-match-detection/">Learn more</a>.</li>
+            <li><strong>Check password for data breaches</strong>: an optional lookup that sends only
+              a short partial hash, never the password.</li>
+          </ul>
+          <p>Other item types are cards, identities, secure notes, SSH keys, bank accounts,
+            driver&rsquo;s licenses and passports. You can also add custom fields, attachments and
+            ask for the master password again before a sensitive item is shown
+            (<a href="/manual/master-password-reprompt/">re-prompt</a>).</p>
+        </div>
+      </div>
+
+      <h2 id="generator">Generate passwords</h2>
+      <div class="side">
+        <figure class="shot"><img src="/assets/img/shots/generator.webp" alt="The Generator tab" width="540" height="1080" loading="lazy"></figure>
+        <div>
+          <p>The <strong>Generator</strong> tab creates strong random values. Choose
+            <strong>Password</strong>, <strong>Passphrase</strong> (random words, easier to type) or
+            <strong>Username</strong>. Set the length and which character types to include, tap the
+            circular arrows for a new one and the copy icon to copy it.</p>
+          <p><strong>Create login</strong> saves the generated value straight into a new login.
+            Earlier values are kept in the generator history from the menu.
+            <a href="/manual/generator/">More about the generator</a>.</p>
+        </div>
+      </div>
+
+      <h2 id="autofill">Turn on autofill</h2>
+      <div class="side">
+        <figure class="shot"><img src="/assets/img/shots/autofill.webp" alt="The Turn on autofill screen" width="540" height="1080" loading="lazy"></figure>
+        <div>
+          <p>With autofill on, SecretDoor offers your saved login when you tap a username or
+            password field in an app or browser, so you don&rsquo;t have to switch apps and copy.
+            Android asks you to choose SecretDoor as the autofill service. You can do this during
+            setup, or later in <em>Settings &gt; Autofill</em>.</p>
+          <p>Browsers need an extra step, and a few apps don&rsquo;t support autofill and need the
+            optional accessibility method. Both are covered in
+            <a href="/manual/autofill/">Autofill</a>.</p>
+        </div>
+      </div>
+
+      <h2 id="backup">Back up your vault</h2>
+      <div class="side">
+        <figure class="shot"><img src="/assets/img/shots/backup.webp" alt="The Backup screen" width="540" height="1080" loading="lazy"></figure>
+        <div>
+          <p>Open <em>Settings &gt; Vault &gt; Backup</em>. A backup is one <code>.secretdoor</code>
+            file holding your whole vault, encrypted as a whole.</p>
+          <ul>
+            <li><strong>Save backup file</strong> writes a backup wherever you choose: a Google Drive
+              folder, a USB drive, another phone.</li>
+            <li><strong>Automatic backup</strong>: pick a file once and a frequency (daily or
+              weekly). SecretDoor then rewrites it on schedule, even while the vault is locked. A
+              cloud folder that keeps old versions gives you several restore points.</li>
+            <li><strong>Import backup</strong> adds the items from a backup to this vault or as a
+              separate vault. On a new phone, use <em>Restore from backup</em> when you create your
+              vault.</li>
+          </ul>
+          <p>Keep at least one backup that is not on the phone, and try a restore once to make sure
+            it works. Details in <a href="/manual/backups/">Backups</a>.</p>
+        </div>
+      </div>
+      <div class="note warn"><strong>Exports are different.</strong> If you export your vault as a
+        plain file (for example to move to another app), that file is <em>not</em> encrypted: anyone
+        who gets it can read all of your passwords. Delete it when you are done.</div>
+
+      <h2 id="settings">Settings</h2>
+      <div class="side">
+        <figure class="shot"><img src="/assets/img/shots/settings.webp" alt="The Settings tab in the dark theme" width="540" height="1080" loading="lazy"></figure>
+        <div>
+          <p>The <strong>Settings</strong> tab has these sections:</p>
+          <ul>
+            <li><strong>Account security</strong>: unlock with biometrics or a PIN, the vault timeout
+              and what happens when it expires, and changing your master password.</li>
+            <li><strong>Autofill</strong>: autofill service, browser and accessibility options.</li>
+            <li><strong>Vault</strong>: backups, import, export, folders and managing vaults.</li>
+            <li><strong>Appearance</strong>: language, theme (light, dark or system) and more.</li>
+            <li><strong>Other</strong>: clipboard clearing and similar options.</li>
+            <li><strong>About</strong>: version, this manual, the privacy policy, the source code
+              and the license.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 id="topics">More topics</h2>
+      <h3>Basics</h3><ul class="topics"><li><a href="/manual/backups/">Backups</a><span>Protect yourself against losing your phone.</span></li><li><a href="/manual/managing-vaults/">Managing vaults</a><span>Rename, delete and add vaults.</span></li><li><a href="/manual/security/">Security</a><span>How the vault is encrypted and what it cannot protect you from.</span></li></ul>
+<h3>Using SecretDoor</h3><ul class="topics"><li><a href="/manual/autofill/">Autofill</a><span>Fill logins and cards in apps and browsers.</span></li><li><a href="/manual/generator/">Generator</a><span>Passwords, passphrases and usernames.</span></li><li><a href="/manual/authenticator-codes/">Authenticator codes</a><span>Two-step verification codes.</span></li><li><a href="/manual/ssh-keys/">SSH keys</a><span>Generate or import SSH keys.</span></li><li><a href="/manual/uri-match-detection/">URI match detection</a><span>Which logins show up for a website or app.</span></li><li><a href="/manual/master-password-reprompt/">Master password re-prompt</a><span>Ask again before sensitive items are used.</span></li><li><a href="/manual/importing-data/">Importing data</a><span>Bring in items from a backup or another app.</span></li><li><a href="/manual/flight-recorder/">Flight recorder</a><span>Diagnostic logs for bug reports.</span></li><li><a href="/manual/premium/">Premium</a><span>What “Premium” means in SecretDoor.</span></li></ul>
+    </article>
+    
+  </main>
+  <footer class="site-footer">
+    <div class="bar">
+      <p><strong>SecretDoor</strong> is free software under the
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html" rel="noopener">GNU GPL v3</a>.
+        <a href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code on GitHub</a>.</p>
+      <p>It is based on the open source Bitwarden apps and is not affiliated with or endorsed by
+        Bitwarden Inc. SecretDoor is provided &ldquo;as is&rdquo;, without warranty. The authors are
+        not liable for any loss, exposure or unauthorized access of your personal data that results
+        from using the app. Keep your own backups.</p>
+      <p><a href="/manual/">Manual</a> · <a href="/privacy/">Privacy</a> ·
+        <a href="/support/">Support</a> · <a href="mailto:contact@secretdoor.fyi">contact@secretdoor.fyi</a></p>
+    </div>
+  </footer>
+</body>
+</html>

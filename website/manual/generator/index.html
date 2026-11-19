@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Generator · SecretDoor</title>
+  <meta name="description" content="Passwords, passphrases and usernames.">
+  <link rel="canonical" href="https://secretdoor.fyi/manual/generator/">
+  <meta property="og:title" content="Generator · SecretDoor">
+  <meta property="og:description" content="Passwords, passphrases and usernames.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://secretdoor.fyi/manual/generator/">
+  <meta property="og:image" content="https://secretdoor.fyi/assets/img/og.png">
+  <meta name="theme-color" content="#14171c">
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+  <link rel="apple-touch-icon" href="/assets/img/icon-180.png">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="bar">
+      <a class="brand" href="/"><img src="/assets/img/favicon.png" alt="" width="32" height="32"><span>SecretDoor</span></a>
+      <nav aria-label="Main">
+        <a href="/">Home</a>
+        <a href="/manual/" aria-current="page">Manual</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="/support/">Support</a>
+        <a class="ext" href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main" class="">
+
+    <article class="doc">
+      <p class="crumbs"><a href="/manual/">Manual</a> &rsaquo; Generator</p>
+      <h1>Generator</h1>
+      <p>The generator creates strong random passwords, passphrases and usernames. Open it from the <strong>Generator</strong> tab, or tap the generate button while editing a login.</p>
+<h2 id="password">Password</h2>
+<p>Random characters. You can choose the length and which kinds of characters to include (upper case, lower case, numbers, special characters), a minimum number of numbers and special characters, and whether to avoid look-alike characters such as <code>l</code> and <code>1</code>.</p>
+<p>Longer is stronger. 16 or more characters is a good default for accounts you protect with a password manager.</p>
+<h2 id="passphrase">Passphrase</h2>
+<p>Several random words joined by a separator, for example <code>canal-ruby-opens-4-lumber</code>. You can choose the number of words, the separator, capitalization, and whether to add a number. Passphrases are easier to type and remember than random characters, so they suit your master password or a device you have to type into.</p>
+<h2 id="username-types">Username types</h2>
+<p>The username generator can create:</p>
+<ul><li><strong>Plus addressed email</strong>: <code>you+random@example.com</code>. Mail still reaches <code>you@example.com</code>, but each site gets its own address so you can tell where spam comes from.</li><li><strong>Catch-all email</strong>: <code>random@yourdomain.com</code>, for domains where you receive all mail.</li><li><strong>Random word</strong>: a random word, for sites that want a username rather than an email.</li><li><strong>Forwarded email alias</strong>: asks an outside email-forwarding service (for example SimpleLogin or Firefox Relay) to create an alias. This needs an internet connection and an account with that service, and SecretDoor does not connect to such services, so this type does not work in the app.</li></ul>
+<h2 id="history">History</h2>
+<p>Passwords you generate are kept in <strong>Password history</strong> (in the generator menu) so that you can recover one you did not save. The history is encrypted in your vault and is deleted with it.</p>
+<h2 id="related">Related</h2>
+<ul><li><a href="/manual/security/">Security</a></li></ul>
+      <p class="back"><a href="/manual/">&larr; Back to the manual</a></p>
+    </article>
+    
+  </main>
+  <footer class="site-footer">
+    <div class="bar">
+      <p><strong>SecretDoor</strong> is free software under the
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html" rel="noopener">GNU GPL v3</a>.
+        <a href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code on GitHub</a>.</p>
+      <p>It is based on the open source Bitwarden apps and is not affiliated with or endorsed by
+        Bitwarden Inc. SecretDoor is provided &ldquo;as is&rdquo;, without warranty. The authors are
+        not liable for any loss, exposure or unauthorized access of your personal data that results
+        from using the app. Keep your own backups.</p>
+      <p><a href="/manual/">Manual</a> · <a href="/privacy/">Privacy</a> ·
+        <a href="/support/">Support</a> · <a href="mailto:contact@secretdoor.fyi">contact@secretdoor.fyi</a></p>
+    </div>
+  </footer>
+</body>
+</html>

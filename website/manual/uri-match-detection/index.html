@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>URI match detection · SecretDoor</title>
+  <meta name="description" content="Which logins show up for a website or app.">
+  <link rel="canonical" href="https://secretdoor.fyi/manual/uri-match-detection/">
+  <meta property="og:title" content="URI match detection · SecretDoor">
+  <meta property="og:description" content="Which logins show up for a website or app.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://secretdoor.fyi/manual/uri-match-detection/">
+  <meta property="og:image" content="https://secretdoor.fyi/assets/img/og.png">
+  <meta name="theme-color" content="#14171c">
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+  <link rel="apple-touch-icon" href="/assets/img/icon-180.png">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="bar">
+      <a class="brand" href="/"><img src="/assets/img/favicon.png" alt="" width="32" height="32"><span>SecretDoor</span></a>
+      <nav aria-label="Main">
+        <a href="/">Home</a>
+        <a href="/manual/" aria-current="page">Manual</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="/support/">Support</a>
+        <a class="ext" href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main" class="">
+
+    <article class="doc">
+      <p class="crumbs"><a href="/manual/">Manual</a> &rsaquo; URI match detection</p>
+      <h1>URI match detection</h1>
+      <p>A login can have one or more <strong>websites or apps</strong> (URIs) saved with it. When you open a website or app and use autofill, SecretDoor suggests the logins whose saved URI <strong>matches</strong> the one you are on. <em>Match detection</em> is the rule that decides what "matches" means. You can set a default for all logins and change it for a single URI.</p>
+<h2 id="the-options">The options</h2>
+<div class="table-wrap"><table><thead><tr><th>Option</th><th>A saved URI matches when...</th></tr></thead><tbody><tr><td><strong>Base domain</strong> (default)</td><td>the top-level and second-level domain are the same. <code>https://login.example.com</code> matches <code>https://www.example.com</code>.</td></tr><tr><td><strong>Host</strong></td><td>the host name (and port, if given) is the same. <code>https://login.example.com</code> does not match <code>https://www.example.com</code>.</td></tr><tr><td><strong>Starts with</strong></td><td>the address you are on begins with the saved text.</td></tr><tr><td><strong>Exact</strong></td><td>the address is identical.</td></tr><tr><td><strong>Regular expression</strong></td><td>the address matches the pattern you saved. Advanced; a wrong pattern can match too much.</td></tr><tr><td><strong>Never</strong></td><td>never. The URI is kept for reference only.</td></tr></tbody></table></div>
+<h2 id="choosing-a-setting">Choosing a setting</h2>
+<ul><li><strong>Base domain</strong> is convenient but also the broadest. A login saved for <code>example.com</code> is offered on every subdomain of it.</li><li>Use <strong>Host</strong> or <strong>Exact</strong> for sites where different subdomains are different services, or when you want fewer, safer suggestions.</li><li>Use <strong>Never</strong> to keep a URI on a login without ever offering it for autofill.</li></ul>
+<h2 id="where-to-set-it">Where to set it</h2>
+<ul><li>Default for all logins: <strong>Settings &gt; Autofill &gt; Default URI match detection</strong>.</li><li>For one URI: edit the login, tap the gear next to the website, and pick a match detection.</li></ul>
+<h2 id="related">Related</h2>
+<ul><li><a href="/manual/autofill/">Autofill</a></li></ul>
+      <p class="back"><a href="/manual/">&larr; Back to the manual</a></p>
+    </article>
+    
+  </main>
+  <footer class="site-footer">
+    <div class="bar">
+      <p><strong>SecretDoor</strong> is free software under the
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html" rel="noopener">GNU GPL v3</a>.
+        <a href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code on GitHub</a>.</p>
+      <p>It is based on the open source Bitwarden apps and is not affiliated with or endorsed by
+        Bitwarden Inc. SecretDoor is provided &ldquo;as is&rdquo;, without warranty. The authors are
+        not liable for any loss, exposure or unauthorized access of your personal data that results
+        from using the app. Keep your own backups.</p>
+      <p><a href="/manual/">Manual</a> · <a href="/privacy/">Privacy</a> ·
+        <a href="/support/">Support</a> · <a href="mailto:contact@secretdoor.fyi">contact@secretdoor.fyi</a></p>
+    </div>
+  </footer>
+</body>
+</html>

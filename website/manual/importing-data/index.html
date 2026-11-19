@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Importing data · SecretDoor</title>
+  <meta name="description" content="Bring in items from a backup or another app.">
+  <link rel="canonical" href="https://secretdoor.fyi/manual/importing-data/">
+  <meta property="og:title" content="Importing data · SecretDoor">
+  <meta property="og:description" content="Bring in items from a backup or another app.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://secretdoor.fyi/manual/importing-data/">
+  <meta property="og:image" content="https://secretdoor.fyi/assets/img/og.png">
+  <meta name="theme-color" content="#14171c">
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+  <link rel="apple-touch-icon" href="/assets/img/icon-180.png">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="bar">
+      <a class="brand" href="/"><img src="/assets/img/favicon.png" alt="" width="32" height="32"><span>SecretDoor</span></a>
+      <nav aria-label="Main">
+        <a href="/">Home</a>
+        <a href="/manual/" aria-current="page">Manual</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="/support/">Support</a>
+        <a class="ext" href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main" class="">
+
+    <article class="doc">
+      <p class="crumbs"><a href="/manual/">Manual</a> &rsaquo; Importing data</p>
+      <h1>Importing data</h1>
+      <p>There are three ways to bring items into SecretDoor.</p>
+<h2 id="1-restore-or-import-a-secretdoor-backup">1. Restore or import a SecretDoor backup</h2>
+<p>Backups made by SecretDoor (<code>.secretdoor</code> files, see <a href="/manual/backups/">Backups</a>) can be brought back in three ways:</p>
+<ul><li><strong>On a fresh install</strong>, choose <strong>Restore from backup</strong> on the Create vault screen. Pick the file and enter the vault's master password. The vault is restored as it was.</li><li><strong>Into your current vault</strong>: in Settings &gt; Vault &gt; Backup (or the menu on the My vault screen) choose <strong>Import backup</strong>, then <strong>Add to this vault</strong>. The items of the backup are added to the vault.</li><li><strong>As another vault</strong>: choose <strong>Import backup</strong>, then <strong>Add as a separate vault</strong>, and give it a name. The backup keeps its own master password. See <a href="/manual/managing-vaults/">Managing vaults</a>.</li></ul>
+<p>You always need the master password of the vault that created the backup.</p>
+<h2 id="2-credential-exchange-from-another-password-manager-on-the-same-phone">2. Credential Exchange (from another password manager on the same phone)</h2>
+<p>On phones that support it (Android 14 or newer with a compatible app), another password manager can send its items to SecretDoor directly through Android's Credential Exchange. Start the transfer in the other app and choose SecretDoor, or open <strong>Settings &gt; Vault &gt; Import items</strong> in SecretDoor. Nothing is sent over the internet; the transfer happens on the device.</p>
+<h2 id="3-add-items-yourself">3. Add items yourself</h2>
+<p>Tap the <strong>+</strong> button on My vault and choose the type of item. Passwords can be generated with the <a href="/manual/generator/">generator</a>; <a href="/manual/ssh-keys/">SSH keys</a> can be generated or imported.</p>
+<h2 id="what-is-not-supported-yet">What is not supported yet</h2>
+<ul><li>Importing CSV or JSON files exported from other password managers.</li><li>Importing from a Bitwarden account. SecretDoor has no connection to Bitwarden servers. Export from Bitwarden to a file, then use a Credential Exchange capable app, or add items by hand.</li></ul>
+<p>If you need file import, please say so in an <a href="https://github.com/secretdoorapp/secretdoor/issues" rel="noopener">issue</a>.</p>
+<h2 id="exporting">Exporting</h2>
+<p><strong>Settings &gt; Vault &gt; Export vault</strong> writes your items to a file (CSV, JSON, or a password-protected JSON) that other password managers can read. The file is <strong>not</strong> protected like a backup unless you pick the password-protected format; delete it when you are done.</p>
+      <p class="back"><a href="/manual/">&larr; Back to the manual</a></p>
+    </article>
+    
+  </main>
+  <footer class="site-footer">
+    <div class="bar">
+      <p><strong>SecretDoor</strong> is free software under the
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html" rel="noopener">GNU GPL v3</a>.
+        <a href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code on GitHub</a>.</p>
+      <p>It is based on the open source Bitwarden apps and is not affiliated with or endorsed by
+        Bitwarden Inc. SecretDoor is provided &ldquo;as is&rdquo;, without warranty. The authors are
+        not liable for any loss, exposure or unauthorized access of your personal data that results
+        from using the app. Keep your own backups.</p>
+      <p><a href="/manual/">Manual</a> · <a href="/privacy/">Privacy</a> ·
+        <a href="/support/">Support</a> · <a href="mailto:contact@secretdoor.fyi">contact@secretdoor.fyi</a></p>
+    </div>
+  </footer>
+</body>
+</html>

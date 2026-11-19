@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SecretDoor</title>
+  <meta name="description" content="SecretDoor is an offline password manager for Android, with an iPhone version that may be coming soon. Your vault is encrypted on your device, with no account, no server and no tracking.">
+  <link rel="canonical" href="https://secretdoor.fyi/">
+  <meta property="og:title" content="SecretDoor">
+  <meta property="og:description" content="SecretDoor is an offline password manager for Android, with an iPhone version that may be coming soon. Your vault is encrypted on your device, with no account, no server and no tracking.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://secretdoor.fyi/">
+  <meta property="og:image" content="https://secretdoor.fyi/assets/img/og.png">
+  <meta name="theme-color" content="#14171c">
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+  <link rel="apple-touch-icon" href="/assets/img/icon-180.png">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="bar">
+      <a class="brand" href="/"><img src="/assets/img/favicon.png" alt="" width="32" height="32"><span>SecretDoor</span></a>
+      <nav aria-label="Main">
+        <a href="/">Home</a>
+        <a href="/manual/">Manual</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="/support/">Support</a>
+        <a class="ext" href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main" class="wide">
+
+    <section class="hero">
+      <div class="hero-text">
+        <p class="eyebrow">Offline password manager</p>
+        <h1>Your passwords stay on your phone.</h1>
+        <p class="lead">SecretDoor keeps your logins, cards, notes and keys in a vault that is
+          encrypted on your device. No account, no server, no sync service, no tracking.</p>
+        <p class="actions">
+          <a class="btn primary" href="#download">Get SecretDoor</a>
+          <a class="btn" href="/manual/">Read the manual</a>
+          <a class="btn ghost" href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code</a>
+        </p>
+      </div>
+      <div class="hero-art">
+        <img src="/assets/img/icon-512.png" alt="SecretDoor icon: a steel vault door with a padlock" width="320" height="320">
+      </div>
+    </section>
+
+    <section>
+      <h2>Why SecretDoor</h2>
+      <div class="cards">
+        <div class="card"><h3>Local only</h3>
+          <p>Your vault lives on your phone and nowhere else. There is nothing to sign in to and
+            no company that holds a copy of your data.</p></div>
+        <div class="card"><h3>Strongly encrypted</h3>
+          <p>Everything is encrypted with a key that only your master password can unlock, using
+            Argon2id and AES-256 through the audited Bitwarden SDK.</p></div>
+        <div class="card"><h3>Backups you control</h3>
+          <p>Save an encrypted backup file anywhere, or schedule daily or weekly backups to a file
+            or cloud folder you choose, such as Google Drive.</p></div>
+        <div class="card"><h3>More than passwords</h3>
+          <p>Logins, cards, identities, secure notes, SSH keys, bank accounts, driver&rsquo;s
+            licenses, passports and passkeys, with built-in authenticator codes.</p></div>
+        <div class="card"><h3>Autofill</h3>
+          <p>Fill logins in apps and browsers, unlocking with your fingerprint or face.</p></div>
+        <div class="card"><h3>Free and open source</h3>
+          <p>Every feature is free. The code is public under the GNU GPL v3, so anyone can check
+            what the app does.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>A look inside</h2>
+      <div class="shots">
+        <figure class="shot"><img src="/assets/img/shots/vault.webp" alt="The My vault screen listing item types and saved items" width="540" height="1080" loading="lazy"></figure>
+        <figure class="shot"><img src="/assets/img/shots/generator.webp" alt="The password generator" width="540" height="1080" loading="lazy"></figure>
+        <figure class="shot"><img src="/assets/img/shots/backup.webp" alt="The Backup screen" width="540" height="1080" loading="lazy"></figure>
+      </div>
+      <p class="center"><a href="/manual/">See how it works in the manual &rarr;</a></p>
+    </section>
+
+    <section class="split">
+      <div>
+        <h2>What leaves your phone?</h2>
+        <p>Almost nothing. SecretDoor has no analytics and no crash reporting, and it never downloads
+          website icons, because that would tell a server which sites you use. The only optional
+          network use is a breach check for a new master password, which is off by default and
+          sends just the first five characters of a hash, never the password.</p>
+        <p><a href="/privacy/">Read the full privacy policy &rarr;</a></p>
+      </div>
+      <div>
+        <h2>One thing to know</h2>
+        <p>Because there is no server, <strong>nobody can recover your vault or reset your master
+          password</strong>, not even us. Make a backup and keep it somewhere other than your phone.</p>
+        <p><a href="/manual/backups/">How backups work &rarr;</a></p>
+      </div>
+    </section>
+
+    <section id="download">
+      <h2>Get SecretDoor</h2>
+      <p><strong>Android:</strong> coming soon to Google Play.</p>
+      <p><strong>iPhone:</strong> may follow.</p>
+      <p>SecretDoor is open source, so you can also read the
+        <a href="https://github.com/secretdoorapp/secretdoor" rel="noopener">source code</a> and build the app yourself.</p>
+    </section>
+    
+  </main>
+  <footer class="site-footer">
+    <div class="bar">
+      <p><strong>SecretDoor</strong> is free software under the
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html" rel="noopener">GNU GPL v3</a>.
+        <a href="https://github.com/secretdoorapp/secretdoor" rel="noopener">Source code on GitHub</a>.</p>
+      <p>It is based on the open source Bitwarden apps and is not affiliated with or endorsed by
+        Bitwarden Inc. SecretDoor is provided &ldquo;as is&rdquo;, without warranty. The authors are
+        not liable for any loss, exposure or unauthorized access of your personal data that results
+        from using the app. Keep your own backups.</p>
+      <p><a href="/manual/">Manual</a> · <a href="/privacy/">Privacy</a> ·
+        <a href="/support/">Support</a> · <a href="mailto:contact@secretdoor.fyi">contact@secretdoor.fyi</a></p>
+    </div>
+  </footer>
+</body>
+</html>
