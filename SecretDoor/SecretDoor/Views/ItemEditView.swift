@@ -132,9 +132,19 @@ struct ItemEditView: View {
         }
     }
 
+    /// The fields to edit. Passport and license numbers have their own item types, so an
+    /// identity only offers them when the item already holds a value (so nothing is lost).
+    private var editableSectionFields: [SectionField] {
+        cipher.type.sectionFields.filter { field in
+            guard cipher.type == .identity,
+                  field.key == "passportNumber" || field.key == "licenseNumber" else { return true }
+            return !(original.section[field.key] ?? "").isEmpty
+        }
+    }
+
     @ViewBuilder private var sectionFields: some View {
         Section(cipher.type.title) {
-            ForEach(cipher.type.sectionFields) { field in
+            ForEach(editableSectionFields) { field in
                 let binding = Binding(
                     get: { cipher.section[field.key] ?? "" },
                     set: { cipher.section[field.key] = $0 }

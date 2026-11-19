@@ -25,11 +25,15 @@ import kotlinx.collections.immutable.toImmutableList
 
 /**
  * The UI for adding and editing an identity cipher.
+ *
+ * Passport and license numbers have their own item types, so [showLegacyIdentityIds] is only
+ * `true` for existing identities that already contain one of those values.
  */
 @Suppress("LongMethod")
 fun LazyListScope.vaultAddEditIdentityItems(
     identityState: VaultAddEditState.ViewState.Content.ItemType.Identity,
     identityItemTypeHandlers: VaultAddEditIdentityTypeHandlers,
+    showLegacyIdentityIds: Boolean,
 ) {
     item {
         Spacer(modifier = Modifier.height(16.dp))
@@ -131,36 +135,38 @@ fun LazyListScope.vaultAddEditIdentityItems(
             onValueChange = identityItemTypeHandlers.onSsnTextChange,
             showPasswordTestTag = "IdentityShowSsnNumberButton",
             passwordFieldTestTag = "IdentitySsnEntry",
-            cardStyle = CardStyle.Top(),
+            cardStyle = if (showLegacyIdentityIds) CardStyle.Top() else CardStyle.Full,
             modifier = Modifier
                 .fillMaxWidth()
                 .standardHorizontalMargin(),
         )
     }
-    item {
-        BitwardenPasswordField(
-            label = stringResource(id = BitwardenString.passport_number),
-            value = identityState.passportNumber,
-            onValueChange = identityItemTypeHandlers.onPassportNumberTextChange,
-            showPasswordTestTag = "IdentityShowPassportNumberButton",
-            passwordFieldTestTag = "IdentityPassportNumberEntry",
-            cardStyle = CardStyle.Middle(),
-            modifier = Modifier
-                .fillMaxWidth()
-                .standardHorizontalMargin(),
-        )
-    }
-    item {
-        BitwardenTextField(
-            label = stringResource(id = BitwardenString.license_number),
-            value = identityState.licenseNumber,
-            onValueChange = identityItemTypeHandlers.onLicenseNumberTextChange,
-            textFieldTestTag = "IdentityLicenseNumberEntry",
-            cardStyle = CardStyle.Bottom,
-            modifier = Modifier
-                .fillMaxWidth()
-                .standardHorizontalMargin(),
-        )
+    if (showLegacyIdentityIds) {
+        item {
+            BitwardenPasswordField(
+                label = stringResource(id = BitwardenString.passport_number),
+                value = identityState.passportNumber,
+                onValueChange = identityItemTypeHandlers.onPassportNumberTextChange,
+                showPasswordTestTag = "IdentityShowPassportNumberButton",
+                passwordFieldTestTag = "IdentityPassportNumberEntry",
+                cardStyle = CardStyle.Middle(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .standardHorizontalMargin(),
+            )
+        }
+        item {
+            BitwardenTextField(
+                label = stringResource(id = BitwardenString.license_number),
+                value = identityState.licenseNumber,
+                onValueChange = identityItemTypeHandlers.onLicenseNumberTextChange,
+                textFieldTestTag = "IdentityLicenseNumberEntry",
+                cardStyle = CardStyle.Bottom,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .standardHorizontalMargin(),
+            )
+        }
     }
     item {
         Spacer(modifier = Modifier.height(height = 16.dp))

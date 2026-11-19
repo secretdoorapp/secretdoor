@@ -2015,72 +2015,51 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
             .assertTextContains("NewSsn")
     }
 
+    @Test
+    fun `in ItemType_Identity passport and license number fields are hidden when both are empty`() {
+        mutableStateFlow.value = DEFAULT_STATE_IDENTITY
+        composeTestRule.onNodeWithText(text = "Passport number").assertDoesNotExist()
+        composeTestRule.onNodeWithText(text = "License number").assertDoesNotExist()
+    }
+
     @Suppress("MaxLineLength")
     @Test
-    fun `in ItemType_Identity changing passport number text field should trigger PassportNumberTextChange`() {
-        mutableStateFlow.value = DEFAULT_STATE_IDENTITY
+    fun `in ItemType_Identity existing passport number should be shown and changing it should trigger PassportNumberTextChange`() {
+        mutableStateFlow.value = updateIdentityType(DEFAULT_STATE_IDENTITY) {
+            copy(passportNumber = "OldPassportNumber")
+        }
         composeTestRule
             .onNodeWithTextAfterScroll(text = "Passport number")
+            .assertTextContains("OldPassportNumber")
             .performTextInput(text = "TestPassportNumber")
 
         verify {
             viewModel.trySendAction(
-                VaultAddEditAction.ItemType.IdentityType.PassportNumberTextChange(
-                    passportNumber = "TestPassportNumber",
-                ),
+                match {
+                    it is VaultAddEditAction.ItemType.IdentityType.PassportNumberTextChange
+                },
             )
         }
     }
 
     @Suppress("MaxLineLength")
     @Test
-    fun `in ItemType_Identity the passport number text field should display the text provided by the state`() {
-        mutableStateFlow.value = DEFAULT_STATE_IDENTITY
-        composeTestRule
-            .onNodeWithTextAfterScroll(text = "Passport number")
-            .assertTextContains("")
-
-        mutableStateFlow.update { currentState ->
-            updateIdentityType(currentState) { copy(passportNumber = "NewPassportNumber") }
+    fun `in ItemType_Identity existing license number should be shown and changing it should trigger LicenseNumberTextChange`() {
+        mutableStateFlow.value = updateIdentityType(DEFAULT_STATE_IDENTITY) {
+            copy(licenseNumber = "OldLicenseNumber")
         }
-
-        composeTestRule
-            .onNodeWithTextAfterScroll(text = "Passport number")
-            .assertTextContains("NewPassportNumber")
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `in ItemType_Identity changing license number text field should trigger LicenseNumberTextChange`() {
-        mutableStateFlow.value = DEFAULT_STATE_IDENTITY
         composeTestRule
             .onNodeWithTextAfterScroll(text = "License number")
+            .assertTextContains("OldLicenseNumber")
             .performTextInput(text = "TestLicenseNumber")
 
         verify {
             viewModel.trySendAction(
-                VaultAddEditAction.ItemType.IdentityType.LicenseNumberTextChange(
-                    licenseNumber = "TestLicenseNumber",
-                ),
+                match {
+                    it is VaultAddEditAction.ItemType.IdentityType.LicenseNumberTextChange
+                },
             )
         }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `in ItemType_Identity the license number text field should display the text provided by the state`() {
-        mutableStateFlow.value = DEFAULT_STATE_IDENTITY
-        composeTestRule
-            .onNodeWithTextAfterScroll(text = "License number")
-            .assertTextContains("")
-
-        mutableStateFlow.update { currentState ->
-            updateIdentityType(currentState) { copy(licenseNumber = "NewLicenseNumber") }
-        }
-
-        composeTestRule
-            .onNodeWithTextAfterScroll(text = "License number")
-            .assertTextContains("NewLicenseNumber")
     }
 
     @Test

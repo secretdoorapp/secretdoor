@@ -94,6 +94,16 @@ fun CoachMarkScope<AddEditItemCoachMark>.VaultAddEditContent(
 
     val focusManager = LocalFocusManager.current
     val isAdditionalOptionsExpanded = rememberSaveable { mutableStateOf(value = false) }
+    // Passport and license numbers now have their own item types, so these Identity fields are
+    // only shown when the item already holds a value (decided once, so editing can't hide them).
+    val showLegacyIdentityIds = rememberSaveable(state.type::class) {
+        val identity = state.type as? VaultAddEditState.ViewState.Content.ItemType.Identity
+        mutableStateOf(
+            value = identity?.let {
+                it.passportNumber.isNotBlank() || it.licenseNumber.isNotBlank()
+            } == true,
+        )
+    }
     val windowAdaptiveInfo = currentWindowAdaptiveInfoV2()
     LazyColumn(modifier = modifier, state = lazyListState) {
         item {
@@ -250,6 +260,7 @@ fun CoachMarkScope<AddEditItemCoachMark>.VaultAddEditContent(
                 vaultAddEditIdentityItems(
                     identityState = state.type,
                     identityItemTypeHandlers = identityItemTypeHandlers,
+                    showLegacyIdentityIds = showLegacyIdentityIds.value,
                 )
             }
 
