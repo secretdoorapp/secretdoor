@@ -399,6 +399,16 @@ MANUAL_TOPICS = [
 ]
 
 
+def side(shots, text, duo=False):
+    """A screenshot (or two) beside explanatory text."""
+    if isinstance(shots, str):
+        shots = [shots]
+    inner = "".join(shots)
+    if len(shots) > 1:
+        inner = '<div class="phones">%s</div>' % inner
+    return '<div class="side%s">%s<div>%s</div></div>' % (" duo" if len(shots) > 1 else "", inner, text)
+
+
 def manual_index():
     sections = []
     for heading, topics in MANUAL_TOPICS:
@@ -407,23 +417,34 @@ def manual_index():
         sections.append("<h3>%s</h3><ul class=\"topics\">%s</ul>" % (heading, items))
     topics_html = "\n".join(sections)
 
-    body = """
+    S = lambda n, alt, cap=None: shot(n + ".webp", alt, cap)
+    parts = []
+    add = parts.append
+
+    add("""
     <article class="doc">
       <h1>SecretDoor manual</h1>
-      <p class="lead">How SecretDoor works, from creating your vault to backing it up. The screens
-        below are from the Android app. An iPhone version may be coming soon.</p>
+      <p class="lead">Everything you need to know to use SecretDoor, from creating your vault to
+        backing it up. The screenshots are from the Android app, which is the version available now.
+        An iPhone version may be coming soon.</p>
 
       <nav class="toc" aria-label="On this page">
         <strong>On this page</strong>
         <ol>
           <li><a href="#how-it-works">How it works</a></li>
           <li><a href="#create-vault">Create your vault</a></li>
-          <li><a href="#unlock">Unlock with a PIN or biometrics</a></li>
+          <li><a href="#first-setup">First-time setup</a></li>
           <li><a href="#your-vault">Your vault</a></li>
-          <li><a href="#add-items">Add items</a></li>
-          <li><a href="#generator">Generate passwords</a></li>
-          <li><a href="#autofill">Turn on autofill</a></li>
-          <li><a href="#backup">Back up your vault</a></li>
+          <li><a href="#item-types">Item types</a></li>
+          <li><a href="#logins">Add and edit a login</a></li>
+          <li><a href="#cards-identities">Cards, identities and notes</a></li>
+          <li><a href="#folders">Folders</a></li>
+          <li><a href="#generator">The password generator</a></li>
+          <li><a href="#autofill">Autofill</a></li>
+          <li><a href="#locking">Locking and unlocking</a></li>
+          <li><a href="#backup">Backups</a></li>
+          <li><a href="#export">Export and import</a></li>
+          <li><a href="#vaults">Several vaults</a></li>
           <li><a href="#settings">Settings</a></li>
           <li><a href="#topics">More topics</a></li>
         </ol>
@@ -431,175 +452,290 @@ def manual_index():
 
       <h2 id="how-it-works">How it works</h2>
       <p>SecretDoor is a password manager with <strong>no server</strong>. Your vault is a set of
-        encrypted records stored in the app on your phone. You unlock it with a master password
-        that only you know; the password is never stored and never sent anywhere.</p>
+        encrypted records stored in the app on your phone. You unlock it with a master password that
+        only you know; the password is never stored and never sent anywhere.</p>
       <ul>
-        <li>There is <strong>no account</strong> and no sign-in. Installing the app and creating a
-          vault is all it takes.</li>
+        <li>There is <strong>no account</strong> and no sign-in. Install the app, create a vault and
+          start saving.</li>
         <li>Items are encrypted before they are saved. Names, usernames, notes and everything else
           are unreadable without your master password.</li>
         <li>Because nothing is stored online, <strong>a lost phone means a lost vault</strong>
           unless you made a backup. SecretDoor cannot recover it for you.</li>
       </ul>
+      <p>That is also why SecretDoor is private: there is no company holding a copy of your data. The
+        trade-off is that you are responsible for your master password and your backups.</p>
+""")
 
-      <h2 id="create-vault">Create your vault</h2>
-      <p>On first launch you choose a <strong>master password</strong> for a new vault. Pick a long
-        one, preferably a few random words: it is the only thing protecting your data, and anyone
-        who gets a copy of your backup can try to guess it. You can add an optional hint, which is
-        stored only on your phone and shown on the unlock screen if you tap
-        &ldquo;Show master password hint&rdquo;.</p>
-      <p>If you already have a SecretDoor backup (from an old phone, or from the other platform),
-        choose <strong>Restore from backup</strong> instead and enter that vault&rsquo;s master
-        password.</p>
-      <div class="note"><strong>Don&rsquo;t forget it.</strong> There is no &ldquo;forgot password&rdquo;
-        link. Nobody, including the developers, can reset or recover a master password.</div>
+    add("""
+      <h2 id="create-vault">Create your vault</h2>""")
+    add(side(S("create-vault", "The Create vault screen with a strong master password entered"), """
+        <p>The first time you open the app you create a vault by choosing a
+          <strong>master password</strong>. It is the only thing protecting your data, so make it
+          long. A few random words work better than a short, complicated password.</p>
+        <ul>
+          <li>The meter under the field tells you how strong the password is. Aim for
+            <strong>Strong</strong>.</li>
+          <li>Type it twice to avoid typos. Tap the eye icon to check what you typed.</li>
+          <li>The <strong>hint</strong> is optional. It is stored only on your phone and shown on the
+            unlock screen when you tap &ldquo;Show master password hint&rdquo;. Never put the password
+            itself in it.</li>
+          <li><strong>Check known data breaches</strong> is off by default. If you turn it on, the
+            app sends the first five characters of a hash of your password to a breach database,
+            never the password itself. See <a href="/privacy/">Privacy</a>.</li>
+        </ul>
+        <p>Tap <strong>Create vault</strong>. If you already have a SecretDoor backup, choose
+          <strong>Restore from backup</strong> instead and enter that vault&rsquo;s master
+          password.</p>"""))
+    add("""
+      <div class="note warn"><strong>Don&rsquo;t forget it.</strong> There is no &ldquo;forgot
+        password&rdquo; button. Nobody, including the developers, can reset or recover a master
+        password. Write it down and keep it somewhere safe.</div>
+""")
 
-      <h2 id="unlock">Unlock with a PIN or biometrics</h2>
-      <div class="side">
-        %(unlock)s
-        <div>
-          <p>Typing a long master password every time is tiring, so SecretDoor offers two
-            shortcuts: <strong>biometrics</strong> (fingerprint or face) and a <strong>PIN
-            code</strong>. Both are optional and you can turn them on during setup or later in
-            <em>Settings &gt; Account security</em>.</p>
-          <p>They are convenient but a little weaker than the master password: someone who knows
-            your PIN and has your phone could unlock the vault. The master password always works,
-            and the vault locks itself after the timeout you choose. After a restart the master
-            password is required.</p>
-          <p>More in <a href="/manual/security/">Security</a>.</p>
-        </div>
-      </div>
+    add("""
+      <h2 id="first-setup">First-time setup</h2>
+      <p>After creating the vault, a short setup offers three optional steps. You can skip any of
+        them and come back later in Settings.</p>""")
+    add(side([S("setup-unlock", "Set up unlock screen", "Quick unlock"),
+              S("setup-autofill", "Turn on autofill screen", "Autofill"),
+              S("setup-done", "You're all set screen", "Done")], """
+        <ul>
+          <li><strong>Set up unlock.</strong> Choose <strong>biometrics</strong> (fingerprint or face,
+            when your phone supports it) or a <strong>PIN code</strong> so you don&rsquo;t have to
+            type the long master password every time. These are convenient but weaker than the master
+            password: someone who knows your PIN and has your phone could unlock the vault.</li>
+          <li><strong>Turn on autofill.</strong> Lets SecretDoor fill in logins in other apps and in
+            your browser. See <a href="#autofill">Autofill</a>.</li>
+          <li><strong>You&rsquo;re all set.</strong> Tap Continue and your empty vault opens.</li>
+        </ul>"""))
 
-      <h2 id="your-vault">Your vault</h2>
-      <div class="side">
-        %(vault)s
-        <div>
-          <p>The <strong>My vault</strong> tab lists everything you have saved. At the top the
-            <strong>Types</strong> section counts items by kind: logins, cards, identities, secure
-            notes and SSH keys. Below that are your folders and the items that are not in a folder.</p>
-          <ul>
-            <li>Tap an item to see its details, copy a value, or open its website.</li>
-            <li>Use the <strong>search</strong> icon to find items by name, username or website.</li>
-            <li>The <strong>+</strong> button adds a new item.</li>
-            <li>Mark items as <strong>favorites</strong> and sort them into <strong>folders</strong>
-              to keep things tidy. Deleted items go to the <strong>trash</strong> first.</li>
-            <li>The vault picker next to the title appears when you have more than one vault. See
-              <a href="/manual/managing-vaults/">Managing vaults</a>.</li>
-          </ul>
-        </div>
-      </div>
+    add("""
+      <h2 id="your-vault">Your vault</h2>""")
+    add(side([S("vault-empty", "The empty My vault screen", "A new vault"),
+              S("vault-top", "My vault with item types and counts", "With items")], """
+        <p>The <strong>My vault</strong> tab is home. At the top the <strong>Types</strong> list shows
+          each kind of item with a count, and tapping a type lists just those items. Below are your
+          <strong>folders</strong>, the items that are not in a folder, and two special places:
+          <strong>Archive</strong> and <strong>Trash</strong>.</p>
+        <ul>
+          <li>Tap the <strong>+</strong> button to add an item.</li>
+          <li>Tap an item to open it. The <strong>&hellip;</strong> button beside it offers quick
+            actions such as copying the username or password.</li>
+          <li>Deleted items go to the <strong>Trash</strong> first, so you can bring them back.
+            <strong>Archive</strong> keeps items you don&rsquo;t need right now out of the way.</li>
+        </ul>"""))
+    add(side([S("vault-folders", "My vault showing folders, items without a folder and hidden items"),
+              S("search", "Searching the vault for \"net\"")], """
+        <p>Use the <strong>search</strong> icon at the top to find items by name, username or website
+          as you type. Everything is searched on your phone; nothing is sent anywhere.</p>
+        <p>Folders (here Finance, Personal and Work) group related items, and the number beside each
+          one tells you how many it holds.</p>"""))
 
-      <h2 id="add-items">Add items</h2>
-      <div class="side">
-        %(addlogin)s
-        <div>
-          <p>Tap <strong>+</strong> and choose the kind of item. A <strong>login</strong> has a name,
-            an optional folder, a username, a password and one or more websites. Next to the
-            username and password fields you will find buttons to <strong>generate</strong> a new
-            value and to <strong>show or hide</strong> it.</p>
-          <ul>
-            <li><strong>Authenticator key</strong>: paste or scan the key from a website&rsquo;s
-              two-step setup and SecretDoor shows the live six-digit codes.
-              <a href="/manual/authenticator-codes/">Learn more</a>.</li>
-            <li><strong>Website (URI)</strong>: tells autofill when to offer this login. The gear
-              icon sets how strictly addresses must match.
-              <a href="/manual/uri-match-detection/">Learn more</a>.</li>
-            <li><strong>Check password for data breaches</strong>: an optional lookup that sends only
-              a short partial hash, never the password.</li>
-          </ul>
-          <p>Other item types are cards, identities, secure notes, SSH keys, bank accounts,
-            driver&rsquo;s licenses and passports. You can also add custom fields, attachments and
-            ask for the master password again before a sensitive item is shown
-            (<a href="/manual/master-password-reprompt/">re-prompt</a>).</p>
-        </div>
-      </div>
+    add("""
+      <h2 id="item-types">Item types</h2>""")
+    add(side(S("add-menu", "The Type menu listing the item types"), """
+        <p>Tap <strong>+</strong> and choose what you want to save:</p>
+        <ul>
+          <li><strong>Login</strong>: a username and password for a website or app, with optional
+            authenticator codes and website addresses.</li>
+          <li><strong>Card</strong>: credit or debit card details.</li>
+          <li><strong>Bank account</strong>: account, routing, IBAN and similar numbers.</li>
+          <li><strong>Identity</strong>: your name, address, contact details and Social Security
+            number.</li>
+          <li><strong>Driver&rsquo;s license</strong> and <strong>Passport</strong>: their own item
+            types, with fields for numbers, issuing country and dates.</li>
+          <li><strong>Secure note</strong>: any private text, such as a Wi-Fi password or a safe
+            combination.</li>
+          <li><strong>SSH key</strong>: a private and public key pair.
+            <a href="/manual/ssh-keys/">Learn more</a>.</li>
+          <li><strong>Folder</strong>: to organize your items.</li>
+        </ul>
+        <p>Every item can also hold custom fields, file attachments and a note, and can be marked as a
+          favorite with the star.</p>"""))
 
-      <h2 id="generator">Generate passwords</h2>
-      <div class="side">
-        %(generator)s
-        <div>
-          <p>The <strong>Generator</strong> tab creates strong random values. Choose
-            <strong>Password</strong>, <strong>Passphrase</strong> (random words, easier to type) or
-            <strong>Username</strong>. Set the length and which character types to include, tap the
-            circular arrows for a new one and the copy icon to copy it.</p>
-          <p><strong>Create login</strong> saves the generated value straight into a new login.
-            Earlier values are kept in the generator history from the menu.
-            <a href="/manual/generator/">More about the generator</a>.</p>
-        </div>
-      </div>
+    add("""
+      <h2 id="logins">Add and edit a login</h2>""")
+    add(side([S("add-login", "The Add login screen", "Add login"),
+              S("view-login", "A saved login in view mode", "View login")], """
+        <p>A login has a name, an optional folder, a <strong>username</strong>, a
+          <strong>password</strong> and one or more <strong>websites</strong>. Next to the username
+          and password are buttons to <strong>generate</strong> a new value and to
+          <strong>show or hide</strong> it. When you are happy, tap <strong>Save</strong>.</p>
+        <ul>
+          <li><strong>Authenticator key</strong>: paste or scan the key from a website&rsquo;s
+            two-step setup and SecretDoor shows the live six-digit codes.
+            <a href="/manual/authenticator-codes/">Learn more</a>.</li>
+          <li><strong>Website (URI)</strong>: tells autofill when to offer this login. The gear icon
+            sets how strictly addresses must match.
+            <a href="/manual/uri-match-detection/">Learn more</a>.</li>
+          <li><strong>Check password for data breaches</strong>: an optional lookup that sends only a
+            short partial hash, never the password.</li>
+        </ul>
+        <p>Open a saved login to see it. Tap a copy icon to copy the username or password, the eye to
+          reveal the password, the arrow beside the website to open it, and the pencil to edit. Copied
+          values are cleared from the clipboard after the time you choose in <em>Settings &gt;
+          Other</em>.</p>"""))
+    add("""
+      <p>To protect a sensitive item further, turn on <strong>master password re-prompt</strong> in its
+        additional options: the app then asks for your master password again before showing or copying
+        it. <a href="/manual/master-password-reprompt/">Learn more</a>.</p>
+""")
 
-      <h2 id="autofill">Turn on autofill</h2>
-      <div class="side">
-        %(autofill)s
-        <div>
-          <p>With autofill on, SecretDoor offers your saved login when you tap a username or
-            password field in an app or browser, so you don&rsquo;t have to switch apps and copy.
-            Android asks you to choose SecretDoor as the autofill service. You can do this during
-            setup, or later in <em>Settings &gt; Autofill</em>.</p>
-          <p>Browsers need an extra step, and a few apps don&rsquo;t support autofill and need the
-            optional accessibility method. Both are covered in
-            <a href="/manual/autofill/">Autofill</a>.</p>
-        </div>
-      </div>
+    add("""
+      <h2 id="cards-identities">Cards, identities and notes</h2>""")
+    add(side([S("add-card", "The Add card screen", "Add card"),
+              S("view-card", "A saved card in view mode", "View card"),
+              S("add-identity", "The Add identity screen", "Add identity")], """
+        <p>These work the same way as logins: fill in the fields you need, then save. The number and
+          security code of a card are hidden until you tap the eye.</p>
+        <p>An <strong>identity</strong> holds personal details. Its <strong>Identification</strong>
+          section has the Social Security number. Passport and driver&rsquo;s license numbers live in
+          their own item types, so they only appear on an identity that already contained them.</p>
+        <p>A <strong>secure note</strong> is a title and free text. Use it for anything you want
+          encrypted that doesn&rsquo;t fit another type.</p>"""))
 
-      <h2 id="backup">Back up your vault</h2>
-      <div class="side">
-        %(backup)s
-        <div>
-          <p>Open <em>Settings &gt; Vault &gt; Backup</em>. A backup is one <code>.secretdoor</code>
-            file holding your whole vault, encrypted as a whole.</p>
-          <ul>
-            <li><strong>Save backup file</strong> writes a backup wherever you choose: a Google Drive
-              folder, a USB drive, another phone.</li>
-            <li><strong>Automatic backup</strong>: pick a file once and a frequency (daily or
-              weekly). SecretDoor then rewrites it on schedule, even while the vault is locked. A
-              cloud folder that keeps old versions gives you several restore points.</li>
-            <li><strong>Import backup</strong> adds the items from a backup to this vault or as a
-              separate vault. On a new phone, use <em>Restore from backup</em> when you create your
-              vault.</li>
-          </ul>
-          <p>Keep at least one backup that is not on the phone, and try a restore once to make sure
-            it works. Details in <a href="/manual/backups/">Backups</a>.</p>
-        </div>
-      </div>
-      <div class="note warn"><strong>Exports are different.</strong> If you export your vault as a
-        plain file (for example to move to another app), that file is <em>not</em> encrypted: anyone
-        who gets it can read all of your passwords. Delete it when you are done.</div>
+    add("""
+      <h2 id="folders">Folders</h2>""")
+    add(side(S("folder-picker", "Choosing a folder for an item"), """
+        <p>Create folders from <em>Settings &gt; Vault &gt; Folders</em> or with <strong>+ &gt;
+          Folder</strong>. To put an item in a folder, edit it, tap the <strong>Folder</strong> box,
+          choose the folder and tap <strong>Save</strong> in the sheet, then <strong>Save</strong>
+          again on the item. You can also create a new folder from that sheet with <strong>Add
+          folder</strong>.</p>
+        <p>Deleting a folder does not delete the items in it; they move back to &ldquo;No
+          folder&rdquo;.</p>"""))
 
-      <h2 id="settings">Settings</h2>
-      <div class="side">
-        %(settings)s
-        <div>
-          <p>The <strong>Settings</strong> tab has these sections:</p>
-          <ul>
-            <li><strong>Account security</strong>: unlock with biometrics or a PIN, the vault timeout
-              and what happens when it expires, and changing your master password.</li>
-            <li><strong>Autofill</strong>: autofill service, browser and accessibility options.</li>
-            <li><strong>Vault</strong>: backups, import, export, folders and managing vaults.</li>
-            <li><strong>Appearance</strong>: language, theme (light, dark or system) and more.</li>
-            <li><strong>Other</strong>: clipboard clearing and similar options.</li>
-            <li><strong>About</strong>: version, this manual, the privacy policy, the source code
-              and the license.</li>
-          </ul>
-        </div>
-      </div>
+    add("""
+      <h2 id="generator">The password generator</h2>""")
+    add(side([S("generator", "The password generator", "Password"),
+              S("generator-passphrase", "The passphrase generator", "Passphrase"),
+              S("generator-username", "The username generator", "Username")], """
+        <p>The <strong>Generator</strong> tab creates strong random values. Pick a type with the tabs
+          at the top:</p>
+        <ul>
+          <li><strong>Password</strong>: set the length and which character types to include.</li>
+          <li><strong>Passphrase</strong>: random words, easier to type and remember. Choose the number
+            of words, a separator and whether to capitalize or add a number.</li>
+          <li><strong>Username</strong>: a random username or a plus-addressed email.</li>
+        </ul>
+        <p>Tap the circular arrows for a new value and the copy icon to copy it. <strong>Create
+          login</strong> saves the generated value into a new login, and the menu at the top keeps a
+          history of recent values. <a href="/manual/generator/">More about the generator</a>.</p>"""))
 
+    add("""
+      <h2 id="autofill">Autofill</h2>""")
+    add(side(S("settings-autofill", "The Autofill settings screen"), """
+        <p>With autofill on, SecretDoor offers your saved login when you tap a username or password
+          field in an app or a browser, so you don&rsquo;t have to switch apps and copy and paste.</p>
+        <ul>
+          <li><strong>Autofill services</strong>: turn it on, and Android asks you to choose SecretDoor
+            as your autofill service.</li>
+          <li><strong>Use accessibility</strong>: an optional fallback for apps and browsers that don&rsquo;t
+            support autofill.</li>
+          <li><strong>Copy TOTP automatically</strong>: when a login has an authenticator key, copy
+            its current code to the clipboard after autofilling.</li>
+          <li><strong>Passkey management</strong> and <strong>Privileged apps</strong>: for passkeys
+            and trusted browsers.</li>
+        </ul>
+        <p>Browsers need an extra step. See <a href="/manual/autofill/">Autofill</a> for setup and
+          troubleshooting.</p>"""))
+
+    add("""
+      <h2 id="locking">Locking and unlocking</h2>""")
+    add(side([S("account-security", "The Account security settings", "Account security"),
+              S("unlock-hint", "The unlock screen showing the master password hint", "Unlock")], """
+        <p>Open <em>Settings &gt; Account security</em> to choose how the vault locks and unlocks.</p>
+        <ul>
+          <li><strong>Unlock with PIN code</strong> (and biometrics, if your phone supports them).</li>
+          <li><strong>Session timeout</strong>: how long the app waits before locking. It is set to
+            <strong>Never</strong> by default, which keeps the vault unlocked until you lock it, so
+            <strong>choose a shorter timeout</strong> if others might use your phone.
+            <strong>Session timeout action</strong> is what happens when it expires: Lock.</li>
+          <li><strong>Lock now</strong> locks the vault immediately.</li>
+          <li><strong>Change master password</strong> and <strong>Delete vault</strong>.</li>
+        </ul>
+        <p>On the unlock screen, type your master password, or tap <strong>Show master password
+          hint</strong> if you need a reminder. More in <a href="/manual/security/">Security</a>.</p>"""))
+    add("""
+      <div class="note"><strong>Be careful with Delete vault.</strong> It erases the vault from the
+        phone for good, after you confirm with the master password. Backups you made earlier are
+        not affected.</div>
+""")
+
+    add("""
+      <h2 id="backup">Backups</h2>""")
+    add(side(S("backup", "The Backup screen"), """
+        <p>Open <em>Settings &gt; Vault &gt; Backup</em>. A backup is one <code>.secretdoor</code> file
+          that holds your whole vault, encrypted as a whole. You need your master password to restore
+          it.</p>
+        <ul>
+          <li><strong>Save backup file</strong> writes a backup wherever you choose: a Google Drive
+            folder, a USB drive, another phone.</li>
+          <li><strong>Automatic backup</strong>: pick a file once under <em>Backup file</em> and a
+            <em>Frequency</em> (off, daily or weekly). SecretDoor then rewrites that file on
+            schedule, even while the vault is locked. <strong>Back up now</strong> runs it
+            immediately. A cloud folder that keeps old versions (Google Drive does) gives you several
+            restore points.</li>
+          <li><strong>Import backup</strong> adds the items from a backup file to this vault. On a new
+            phone, use <strong>Restore from backup</strong> when you create your vault.</li>
+        </ul>
+        <p>Keep at least one backup that is not on the phone, and try a restore once to make sure it
+          works. Details in <a href="/manual/backups/">Backups</a>.</p>"""))
+
+    add("""
+      <h2 id="export">Export and import</h2>""")
+    add(side(S("export", "The Export vault screen"), """
+        <p><strong>Export vault</strong> (<em>Settings &gt; Vault</em>) writes your items to a file
+          that other password managers can read. You choose the file format and confirm with your
+          master password.</p>
+        <div class="note warn"><strong>Exports are different from backups.</strong> A plain export is
+          <em>not</em> encrypted: anyone who gets the file can read all your passwords. Delete it when
+          you are done, and never send it over email or chat.</div>
+        <p><strong>Import items</strong> restores a SecretDoor backup, or receives items from another
+          password manager on the same phone through Android&rsquo;s Credential Exchange. Importing CSV
+          or JSON files from other managers is not supported yet.
+          <a href="/manual/importing-data/">Learn more</a>.</p>"""))
+
+    add("""
+      <h2 id="vaults">Several vaults</h2>""")
+    add(side(S("manage-vaults", "The Manage vaults screen"), """
+        <p>One phone can hold several vaults, for example a personal one and a work one. Each has its
+          own master password and is encrypted separately. Open <em>Settings &gt; Vault &gt; Manage
+          vaults</em> to rename or delete a vault, create a new one, or import a backup as a separate
+          vault. When you have more than one, a vault picker appears on the My vault and unlock
+          screens. <a href="/manual/managing-vaults/">Learn more</a>.</p>"""))
+
+    add("""
+      <h2 id="settings">Settings</h2>""")
+    add(side([S("settings", "The Settings screen", "Settings"),
+              S("settings-vault", "The Vault settings", "Vault")], """
+        <ul>
+          <li><strong>Account security</strong>: unlocking, timeout, master password.</li>
+          <li><strong>Autofill</strong>: autofill, accessibility, passkeys.</li>
+          <li><strong>Vault</strong>: manage vaults, folders, backup, export and import.</li>
+          <li><strong>Appearance</strong>: language, theme and dynamic colors.</li>
+          <li><strong>Other</strong>: clear the clipboard after a delay, and allow or block screen
+            capture.</li>
+          <li><strong>About</strong>: the version, this manual, the privacy policy, the source code, the
+            license and open source notices, and the flight recorder for bug reports
+            (<a href="/manual/flight-recorder/">learn more</a>).</li>
+        </ul>"""))
+    add(side([S("appearance-dark", "Appearance settings with the dark theme", "Theme"),
+              S("vault-dark", "My vault in the dark theme", "Dark theme")], """
+        <p>Under <strong>Appearance</strong> you can pick the <strong>Dark</strong> or
+          <strong>Light</strong> theme, or follow your phone&rsquo;s setting (the default). Here is
+          the vault in the dark theme.</p>"""))
+
+    add("""
       <h2 id="topics">More topics</h2>
-      %(topics)s
+      %s
+      <p class="back">Questions? Visit <a href="/support/">Support</a>.</p>
     </article>
-    """ % {
-        "unlock": shot("unlock.webp", "The Set up unlock screen with switches for biometrics and PIN"),
-        "vault": shot("vault.webp", "The My vault screen"),
-        "addlogin": shot("add-login.webp", "The Add login screen"),
-        "generator": shot("generator.webp", "The Generator tab"),
-        "autofill": shot("autofill.webp", "The Turn on autofill screen"),
-        "backup": shot("backup.webp", "The Backup screen"),
-        "settings": shot("settings.webp", "The Settings tab in the dark theme"),
-        "topics": topics_html,
-    }
-    page("/manual/", "Manual", body,
-         "How SecretDoor works: creating a vault, adding items, the generator, autofill, backups "
-         "and settings, with screenshots.", section="/manual/")
+    """ % topics_html)
+
+    page("/manual/", "Manual", "".join(parts),
+         "How SecretDoor works: creating a vault, adding items, folders, the generator, autofill, "
+         "locking, backups and settings, with screenshots.", section="/manual/")
 
 
 def topic_pages():

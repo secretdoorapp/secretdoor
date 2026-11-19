@@ -197,17 +197,17 @@ section > h2:first-child { margin-top: 0; }
 .shots { display: flex; gap: 26px; justify-content: center; flex-wrap: wrap; padding: 10px 0 0; }
 .shot { margin: 0; }
 .phone {
-  position: relative; padding: 7px; border-radius: 34px; width: 240px; max-width: 100%;
+  position: relative; padding: 20px 7px 7px; border-radius: 34px; width: 240px; max-width: 100%;
   background: linear-gradient(160deg, #2b3442, #0c1118 55%, #202938);
   border: 1px solid rgba(160, 190, 230, .25);
   box-shadow: 0 22px 60px rgba(0, 0, 0, .6), 0 0 0 1px rgba(0, 0, 0, .6), 0 0 50px rgba(255, 130, 20, .12);
   transition: transform .3s, box-shadow .3s;
 }
 .phone::before { /* camera dot */
-  content: ""; position: absolute; top: 14px; left: 50%; width: 9px; height: 9px; margin-left: -4px; border-radius: 50%;
+  content: ""; position: absolute; top: 7px; left: 50%; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%;
   background: #05070a; box-shadow: 0 0 0 2px rgba(255, 255, 255, .06); z-index: 2;
 }
-.phone img { display: block; width: 100%; border-radius: 27px; }
+.phone img { display: block; width: 100%; border-radius: 22px 22px 27px 27px; }
 .shots .shot:nth-child(odd) .phone { transform: translateY(14px); }
 .shot:hover .phone { transform: translateY(-6px) !important; box-shadow: 0 28px 70px rgba(0, 0, 0, .65), 0 0 70px rgba(255, 130, 20, .28); }
 .shot figcaption { color: var(--muted); font-size: .85rem; margin-top: 12px; text-align: center; max-width: 240px; }
@@ -262,6 +262,12 @@ h2[id], h3[id] { scroll-margin-top: 84px; }
 
 .side { display: grid; grid-template-columns: 240px 1fr; gap: 34px; align-items: start; margin: 22px 0 10px; }
 .side > div > :first-child { margin-top: 0; }
+.side.duo { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+.side.duo > div:last-child { max-width: 46em; }
+.phones { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; }
+.phones .phone { width: 200px; }
+.phones .shot:nth-child(even) .phone { transform: translateY(14px); }
+.side .shot:not(:only-child) figcaption { max-width: 200px; }
 
 /* ---------- Motion ---------- */
 @keyframes spin { to { transform: rotate(360deg); } }
