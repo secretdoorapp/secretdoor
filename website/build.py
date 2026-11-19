@@ -191,7 +191,7 @@ TEMPLATE = """<!doctype html>
   <meta property="og:type" content="website">
   <meta property="og:url" content="{canonical}">
   <meta property="og:image" content="https://secretdoor.fyi/assets/img/og.png">
-  <meta name="theme-color" content="#14171c">
+  <meta name="theme-color" content="#06080c">
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
   <link rel="apple-touch-icon" href="/assets/img/icon-180.png">
   <link rel="stylesheet" href="/assets/style.css">
@@ -230,8 +230,27 @@ TEMPLATE = """<!doctype html>
 
 def shot(name, alt, caption=None):
     cap = "<figcaption>%s</figcaption>" % caption if caption else ""
-    return ('<figure class="shot"><img src="/assets/img/shots/%s" alt="%s" width="540" height="1080" '
-            'loading="lazy">%s</figure>' % (name, html.escape(alt, quote=True), cap))
+    return ('<figure class="shot"><div class="phone"><img src="/assets/img/shots/%s" alt="%s" '
+            'width="540" height="1080" loading="lazy"></div>%s</figure>'
+            % (name, html.escape(alt, quote=True), cap))
+
+
+ICONS = {
+    "lock": '<path d="M5 11h14v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+    "shield": '<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',
+    "backup": '<path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/>',
+    "layers": '<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>',
+    "key": '<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/>',
+    "code": '<path d="M8 8l-5 4 5 4M16 8l5 4-5 4M14 5l-4 14"/>',
+}
+
+
+def icon(name):
+    return '<span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true">%s</svg></span>' % ICONS[name]
+
+
+def card(ic, title, text, cyan=False):
+    return '<div class="card%s">%s<h3>%s</h3><p>%s</p></div>' % (" cyan" if cyan else "", icon(ic), title, text)
 
 
 def home():
@@ -239,64 +258,87 @@ def home():
     <section class="hero">
       <div class="hero-text">
         <p class="eyebrow">Offline password manager</p>
-        <h1>Your passwords stay on your phone.</h1>
+        <h1>Your passwords <span class="glow-text">never leave</span> your phone.</h1>
         <p class="lead">SecretDoor keeps your logins, cards, notes and keys in a vault that is
-          encrypted on your device. No account, no server, no sync service, no tracking.</p>
+          encrypted on your device. No account. No server. No sync service. No tracking.</p>
         <p class="actions">
           <a class="btn primary" href="#download">Get SecretDoor</a>
           <a class="btn" href="/manual/">Read the manual</a>
           <a class="btn ghost" href="%(github)s" rel="noopener">Source code</a>
         </p>
       </div>
-      <div class="hero-art">
-        <img src="/assets/img/icon-512.png" alt="SecretDoor icon: a steel vault door with a padlock" width="320" height="320">
+      <div class="orb">
+        <img src="/assets/img/icon-512.png" alt="SecretDoor icon: a steel vault door with a padlock" width="380" height="380">
+        <span class="chip c1"><b>&#9679;</b>AES-256</span>
+        <span class="chip c2"><b>&#9679;</b>ARGON2ID</span>
+        <span class="chip c3"><b>&#9679;</b>OFFLINE</span>
+        <span class="chip c4"><b>&#9679;</b>OPEN SOURCE</span>
       </div>
     </section>
 
+    <div class="stats" role="list">
+      <div class="stat" role="listitem"><strong>0</strong><span>accounts to create</span></div>
+      <div class="stat" role="listitem"><strong>0</strong><span>servers holding your data</span></div>
+      <div class="stat" role="listitem"><strong>0</strong><span>trackers or analytics</span></div>
+      <div class="stat" role="listitem"><strong>256</strong><span>bit AES encryption</span></div>
+    </div>
+
     <section>
-      <h2>Why SecretDoor</h2>
+      <div class="section-head">
+        <p class="kicker">Built different</p>
+        <h2>A vault, not a service.</h2>
+        <p>Most password managers keep a copy of your vault on their servers. SecretDoor has no
+          servers, so there is nothing to breach, sell or switch off.</p>
+      </div>
       <div class="cards">
-        <div class="card"><h3>Local only</h3>
-          <p>Your vault lives on your phone and nowhere else. There is nothing to sign in to and
-            no company that holds a copy of your data.</p></div>
-        <div class="card"><h3>Strongly encrypted</h3>
-          <p>Everything is encrypted with a key that only your master password can unlock, using
-            Argon2id and AES-256 through the audited Bitwarden SDK.</p></div>
-        <div class="card"><h3>Backups you control</h3>
-          <p>Save an encrypted backup file anywhere, or schedule daily or weekly backups to a file
-            or cloud folder you choose, such as Google Drive.</p></div>
-        <div class="card"><h3>More than passwords</h3>
-          <p>Logins, cards, identities, secure notes, SSH keys, bank accounts, driver&rsquo;s
-            licenses, passports and passkeys, with built-in authenticator codes.</p></div>
-        <div class="card"><h3>Autofill</h3>
-          <p>Fill logins in apps and browsers, unlocking with your fingerprint or face.</p></div>
-        <div class="card"><h3>Free and open source</h3>
-          <p>Every feature is free. The code is public under the GNU GPL v3, so anyone can check
-            what the app does.</p></div>
+        %(c1)s %(c2)s %(c3)s %(c4)s %(c5)s %(c6)s
       </div>
     </section>
 
     <section>
-      <h2>A look inside</h2>
+      <div class="section-head">
+        <p class="kicker">How your data is protected</p>
+        <h2>From master password to encrypted vault.</h2>
+        <p>Everything happens on your phone. Your master password is never stored and never sent
+          anywhere.</p>
+      </div>
+      <div class="flow">
+        <div class="step"><strong>Master password</strong><span>Only you know it</span></div>
+        <div class="step"><strong>Argon2id</strong><span>Slow and memory-hungry on purpose, to make guessing costly</span></div>
+        <div class="step"><strong>Vault key</strong><span>A random key that only the master key can unlock</span></div>
+        <div class="step"><strong>AES-256</strong><span>Every item is encrypted with it</span></div>
+        <div class="step end"><strong>Your phone</strong><span>The encrypted vault stays here</span></div>
+      </div>
+      <p class="flow-note"><strong>Zero knowledge, literally.</strong> We can&rsquo;t read your vault, reset your
+        password or recover it, because we never have any of it. See
+        <a href="/manual/security/">Security</a> for the details.</p>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <p class="kicker">Inside the app</p>
+        <h2>Simple on the surface.</h2>
+      </div>
       <div class="shots">
         %(s1)s
         %(s2)s
         %(s3)s
+        %(s4)s
       </div>
-      <p class="center"><a href="/manual/">See how it works in the manual &rarr;</a></p>
+      <p class="center" style="margin-top:44px"><a href="/manual/">See how it works in the manual &rarr;</a></p>
     </section>
 
     <section class="split">
-      <div>
+      <div class="panel">
         <h2>What leaves your phone?</h2>
-        <p>Almost nothing. SecretDoor has no analytics and no crash reporting, and it never downloads
-          website icons, because that would tell a server which sites you use. The only optional
-          network use is a breach check for a new master password, which is off by default and
+        <p>Almost nothing. SecretDoor has no analytics and no crash reporting, and it never
+          downloads website icons, because that would tell a server which sites you use. The only
+          optional network use is a breach check for a new master password. It is off by default and
           sends just the first five characters of a hash, never the password.</p>
         <p><a href="/privacy/">Read the full privacy policy &rarr;</a></p>
       </div>
-      <div>
-        <h2>One thing to know</h2>
+      <div class="panel hot">
+        <h2>One thing to know.</h2>
         <p>Because there is no server, <strong>nobody can recover your vault or reset your master
           password</strong>, not even us. Make a backup and keep it somewhere other than your phone.</p>
         <p><a href="/manual/backups/">How backups work &rarr;</a></p>
@@ -304,21 +346,37 @@ def home():
     </section>
 
     <section id="download">
-      <h2>Get SecretDoor</h2>
-      <p><strong>Android:</strong> coming soon to Google Play.</p>
-      <p><strong>iPhone:</strong> may follow.</p>
-      <p>SecretDoor is open source, so you can also read the
-        <a href="%(github)s" rel="noopener">source code</a> and build the app yourself.</p>
+      <div class="cta-band">
+        <p class="kicker">Get SecretDoor</p>
+        <h2>Take your passwords back.</h2>
+        <p class="lead" style="margin:0 auto">Free and open source. No account needed.</p>
+        <div class="badges">
+          <div class="badge"><small>Android</small>Coming soon to Google Play</div>
+          <div class="badge"><small>iPhone</small>May follow</div>
+        </div>
+        <p class="actions" style="justify-content:center">
+          <a class="btn" href="%(github)s" rel="noopener">Read the source code</a>
+          <a class="btn ghost" href="/manual/">Read the manual</a>
+        </p>
+      </div>
     </section>
     """ % {
         "github": GITHUB,
-        "s1": shot("vault.webp", "The My vault screen listing item types and saved items"),
-        "s2": shot("generator.webp", "The password generator"),
-        "s3": shot("backup.webp", "The Backup screen"),
+        "c1": card("lock", "Local only", "Your vault lives on your phone and nowhere else. There is nothing to sign in to and no company that holds a copy of your data."),
+        "c2": card("shield", "Strongly encrypted", "A key only your master password can unlock, using Argon2id and AES-256 through the audited Bitwarden SDK.", True),
+        "c3": card("backup", "Backups you control", "Save an encrypted backup file anywhere, or schedule daily or weekly backups to a file or cloud folder you choose, such as Google Drive."),
+        "c4": card("layers", "More than passwords", "Logins, cards, identities, secure notes, SSH keys, bank accounts, driver&rsquo;s licenses, passports and passkeys, with built-in authenticator codes.", True),
+        "c5": card("key", "Autofill and biometrics", "Fill logins in apps and browsers, and unlock with your fingerprint or face."),
+        "c6": card("code", "Free and open source", "Every feature is free. The code is public under the GNU GPL v3, so anyone can check what the app does.", True),
+        "s1": shot("vault.webp", "The My vault screen listing item types and saved items", "Your vault"),
+        "s2": shot("generator.webp", "The password generator", "Password generator"),
+        "s3": shot("add-login.webp", "The Add login screen", "Add a login"),
+        "s4": shot("backup.webp", "The Backup screen", "Backups you control"),
     }
     page("/", "SecretDoor", body,
-         "SecretDoor is an offline password manager for Android, with an iPhone version that may be coming soon. Your vault is encrypted "
-         "on your device, with no account, no server and no tracking.", wide=True)
+         "SecretDoor is an offline password manager for Android, with an iPhone version that may be "
+         "coming soon. Your vault is encrypted on your device, with no account, no server and no "
+         "tracking.", wide=True)
 
 
 MANUAL_TOPICS = [
@@ -344,7 +402,7 @@ MANUAL_TOPICS = [
 def manual_index():
     sections = []
     for heading, topics in MANUAL_TOPICS:
-        items = "".join('<li><a href="/manual/%s/">%s</a><span>%s</span></li>' % (s, t, d)
+        items = "".join('<li><a href="/manual/%s/">%s<span>%s</span></a></li>' % (s, t, d)
                         for s, t, d in topics)
         sections.append("<h3>%s</h3><ul class=\"topics\">%s</ul>" % (heading, items))
     topics_html = "\n".join(sections)
