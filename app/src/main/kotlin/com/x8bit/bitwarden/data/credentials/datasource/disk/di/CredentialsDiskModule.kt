@@ -20,6 +20,13 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object CredentialsDiskModule {
 
+    /**
+     * Provides the database of apps the user chose to trust.
+     *
+     * There is intentionally no destructive-migration fallback: a missing migration must fail
+     * loudly instead of silently erasing what the user has set up. Every schema change needs a
+     * migration (see `PrivilegedAppDatabaseMigrationTest`).
+     */
     @Provides
     @Singleton
     fun providePrivilegedAppDatabase(
@@ -30,7 +37,6 @@ object CredentialsDiskModule {
                 context = app,
                 name = "privileged_apps_database",
             )
-            .fallbackToDestructiveMigration(dropAllTables = true)
             .setDriver(driver = AndroidSQLiteDriver())
             .build()
 
