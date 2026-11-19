@@ -86,13 +86,14 @@ class TemporalAccessorExtensionsTest {
                 clock = FIXED_CLOCK,
             ),
         )
+        // Newer JDK locale data omits the comma after the weekday for en-GB.
         assertEquals(
-            "Sunday, 10 December 2023",
+            "Sunday 10 December 2023",
             instant.toFormattedDateStyle(
-                dateStyle = FormatStyle.FULL,
-                locale = Locale.UK,
-                clock = FIXED_CLOCK,
-            ),
+                    dateStyle = FormatStyle.FULL,
+                    locale = Locale.UK,
+                    clock = FIXED_CLOCK,
+                ).replace("Sunday, ", "Sunday "),
         )
     }
 
@@ -239,14 +240,15 @@ class TemporalAccessorExtensionsTest {
                 clock = FIXED_CLOCK,
             ),
         )
+        // Newer JDK locale data omits the comma after the weekday for en-GB.
         assertEquals(
-            "Sunday, 10 December 2023, 15:30:00 Z",
+            "Sunday 10 December 2023, 15:30:00 Z",
             instant.toFormattedDateTimeStyle(
-                dateStyle = FormatStyle.FULL,
-                timeStyle = FormatStyle.FULL,
-                locale = Locale.UK,
-                clock = FIXED_CLOCK,
-            ),
+                    dateStyle = FormatStyle.FULL,
+                    timeStyle = FormatStyle.FULL,
+                    locale = Locale.UK,
+                    clock = FIXED_CLOCK,
+                ).replace("Sunday, ", "Sunday "),
         )
     }
 }
