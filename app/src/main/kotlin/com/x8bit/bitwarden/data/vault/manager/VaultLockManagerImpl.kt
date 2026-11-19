@@ -430,6 +430,10 @@ internal class VaultLockManagerImpl(
         isFirstCreated: Boolean,
     ) {
         val userId = activeUserId ?: return
+        if (isFirstCreated) {
+            // Vaults made before there was a default get the standard timeout instead of "Never".
+            settingsRepository.setDefaultsIfNecessary(userId = userId)
+        }
         checkForVaultTimeout(
             userId = userId,
             checkTimeoutReason = CheckTimeoutReason.AppCreated(

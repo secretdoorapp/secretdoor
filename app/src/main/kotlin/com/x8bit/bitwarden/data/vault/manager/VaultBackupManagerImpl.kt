@@ -325,6 +325,7 @@ class VaultBackupManagerImpl(
                 )
             }
         }
+        settingsRepository.setDefaultsIfNecessary(userId = userId)
         settingsRepository.hasUserLoggedInOrCreatedAccount = true
         clearRestoreCache()
         return RestoreBackupResult.Success(itemCount = contents.ciphers.size)

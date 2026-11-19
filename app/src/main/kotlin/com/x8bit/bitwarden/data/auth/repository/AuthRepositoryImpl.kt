@@ -454,6 +454,7 @@ internal class AuthRepositoryImpl(
         }
         return when (unlockResult) {
             is VaultUnlockResult.Success -> {
+                settingsRepository.setDefaultsIfNecessary(userId = userId)
                 settingsRepository.hasUserLoggedInOrCreatedAccount = true
                 RegisterResult.Success
             }

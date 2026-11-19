@@ -99,7 +99,7 @@ class SettingsRepositoryTest {
 
         // Calling once sets values
         assertEquals(
-            15,
+            10,
             fakeSettingsDiskSource.getVaultTimeoutInMinutes(userId = USER_ID),
         )
         assertEquals(
@@ -150,7 +150,7 @@ class SettingsRepositoryTest {
         settingsRepository.setDefaultsIfNecessary(userId = USER_ID)
 
         // Calling once sets values
-        assertEquals(15, fakeSettingsDiskSource.getVaultTimeoutInMinutes(userId = USER_ID))
+        assertEquals(10, fakeSettingsDiskSource.getVaultTimeoutInMinutes(userId = USER_ID))
         assertEquals(
             VaultTimeoutAction.LOCK,
             fakeSettingsDiskSource.getVaultTimeoutAction(userId = USER_ID),
@@ -186,7 +186,7 @@ class SettingsRepositoryTest {
         settingsRepository.setDefaultsIfNecessary(userId = USER_ID)
 
         // Calling once sets values
-        assertEquals(15, fakeSettingsDiskSource.getVaultTimeoutInMinutes(userId = USER_ID))
+        assertEquals(10, fakeSettingsDiskSource.getVaultTimeoutInMinutes(userId = USER_ID))
         assertEquals(
             VaultTimeoutAction.LOGOUT,
             fakeSettingsDiskSource.getVaultTimeoutAction(userId = USER_ID),
@@ -226,7 +226,7 @@ class SettingsRepositoryTest {
         settingsRepository.setDefaultsIfNecessary(userId = USER_ID)
 
         // Calling once sets values
-        assertEquals(15, fakeSettingsDiskSource.getVaultTimeoutInMinutes(userId = USER_ID))
+        assertEquals(10, fakeSettingsDiskSource.getVaultTimeoutInMinutes(userId = USER_ID))
         assertEquals(
             VaultTimeoutAction.LOGOUT,
             fakeSettingsDiskSource.getVaultTimeoutAction(userId = USER_ID),
@@ -247,7 +247,7 @@ class SettingsRepositoryTest {
         // This will reset the setting because the user does not have a method to unlock the vault
         // so you cannot use the "lock" timeout action, it must be "logout".
         settingsRepository.setDefaultsIfNecessary(userId = USER_ID)
-        assertEquals(15, fakeSettingsDiskSource.getVaultTimeoutInMinutes(userId = USER_ID))
+        assertEquals(10, fakeSettingsDiskSource.getVaultTimeoutInMinutes(userId = USER_ID))
         assertEquals(
             VaultTimeoutAction.LOGOUT,
             fakeSettingsDiskSource.getVaultTimeoutAction(userId = USER_ID),

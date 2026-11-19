@@ -110,6 +110,7 @@ class VaultLockManagerTest {
     private val settingsRepository: SettingsRepository = mockk {
         every { getVaultTimeoutStateFlow(any()) } returns mutableVaultTimeoutStateFlow
         every { getVaultTimeoutActionStateFlow(any()) } returns mutableVaultTimeoutActionStateFlow
+        every { setDefaultsIfNecessary(any()) } just runs
     }
     private val testDispatcher = UnconfinedTestDispatcher()
     private val fakeDispatcherManager = FakeDispatcherManager(unconfined = testDispatcher)

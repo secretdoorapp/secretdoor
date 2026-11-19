@@ -38,6 +38,11 @@ import javax.crypto.Cipher
 private val DEFAULT_IS_SCREEN_CAPTURE_ALLOWED = BuildConfig.DEBUG
 
 /**
+ * The vault timeout (in minutes) given to a vault that has never had one chosen.
+ */
+private const val DEFAULT_VAULT_TIMEOUT_MINUTES: Int = 10
+
+/**
  * Primary implementation of [SettingsRepository].
  */
 @Suppress("LargeClass", "LongParameterList", "TooManyFunctions")
@@ -382,7 +387,12 @@ class SettingsRepositoryImpl(
             !hasBiometrics &&
             !hasMasterPassword
         if (!isVaultTimeoutActionSet(userId = userId) || hasInvalidTimeoutAction) {
-            storeVaultTimeout(userId, VaultTimeout.FifteenMinutes)
+            storeVaultTimeout(
+                userId = userId,
+                vaultTimeout = VaultTimeout.Custom(
+                    vaultTimeoutInMinutes = DEFAULT_VAULT_TIMEOUT_MINUTES,
+                ),
+            )
             storeVaultTimeoutAction(
                 userId = userId,
                 vaultTimeoutAction = if (!hasMasterPassword) {

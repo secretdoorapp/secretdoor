@@ -668,6 +668,7 @@ class AuthRepositoryTest {
                 ),
             )
             verify(exactly = 1) {
+                settingsRepository.setDefaultsIfNecessary(userId = userId)
                 settingsRepository.hasUserLoggedInOrCreatedAccount = true
             }
             coVerify(exactly = 0) {

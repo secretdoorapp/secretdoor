@@ -138,6 +138,7 @@ class VaultBackupManagerTest {
     }
     private val settingsRepository: SettingsRepository = mockk {
         every { hasUserLoggedInOrCreatedAccount = any() } just runs
+        every { setDefaultsIfNecessary(any()) } just runs
     }
 
     private lateinit var filesDirectory: File
@@ -257,6 +258,7 @@ class VaultBackupManagerTest {
             vaultDiskSource.saveFolders(userId = USER_ID, folders = FOLDERS)
             vaultDiskSource.saveCiphers(userId = USER_ID, ciphers = CIPHERS)
         }
+        verify { settingsRepository.setDefaultsIfNecessary(userId = USER_ID) }
         verify { settingsRepository.hasUserLoggedInOrCreatedAccount = true }
     }
 

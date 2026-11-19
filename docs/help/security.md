@@ -27,7 +27,7 @@ vault cannot be opened, and nobody, including the developers, can recover it.
 - **PIN** and **biometrics** (optional): the app keeps a copy of the vault key encrypted with a key
   held in the Android hardware keystore. These are convenient but weaker than the master password;
   for example, someone who knows your PIN and has your phone can unlock. SecretDoor locks the vault
-  after the timeout you pick in **Settings > Account security**.
+  after the timeout you pick in **Settings > Account security** (new vaults start with 10 minutes).
 
 ## Backups
 
