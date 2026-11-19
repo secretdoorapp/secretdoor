@@ -32,6 +32,13 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class VaultDiskModule {
 
+    /**
+     * Provides the vault database.
+     *
+     * There is intentionally no destructive-migration fallback: SecretDoor has no server to sync
+     * from, so a missing migration must fail loudly instead of silently erasing the user's
+     * vault. Every schema change needs a migration (see `VaultDatabaseMigrationTest`).
+     */
     @Provides
     @Singleton
     fun provideVaultDatabase(
@@ -40,7 +47,6 @@ class VaultDiskModule {
     ): VaultDatabase =
         Room
             .databaseBuilder<VaultDatabase>(context = app, name = "vault_database")
-            .fallbackToDestructiveMigration(dropAllTables = false)
             .addCallback(DatabaseSchemeCallback(databaseSchemeManager = databaseSchemeManager))
             .addColumnTypeConverter(typeConverter = InstantTypeConverter())
             .setDriver(driver = AndroidSQLiteDriver())
