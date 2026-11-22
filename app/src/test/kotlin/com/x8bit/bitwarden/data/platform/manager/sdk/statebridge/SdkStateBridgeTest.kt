@@ -215,6 +215,31 @@ class SdkStateBridgeTest {
     }
 
     @Test
+    fun `setPinLength should store the pin length`() = runTest {
+        stateBridge.setPinLength(value = 6u)
+
+        assertEquals(6, authDiskSource.getPinLength(userId = USER_ID))
+    }
+
+    @Test
+    fun `getPinLength should return the stored pin length`() = runTest {
+        assertNull(stateBridge.getPinLength())
+
+        authDiskSource.storePinLength(userId = USER_ID, pinLength = 8)
+
+        assertEquals(8u, stateBridge.getPinLength())
+    }
+
+    @Test
+    fun `clearPinLength should clear the pin length`() = runTest {
+        authDiskSource.storePinLength(userId = USER_ID, pinLength = 8)
+
+        stateBridge.clearPinLength()
+
+        assertNull(authDiskSource.getPinLength(userId = USER_ID))
+    }
+
+    @Test
     fun `setV2EncryptedMigrationsGracePeriodStart should store the grace period start`() = runTest {
         stateBridge.setV2EncryptedMigrationsGracePeriodStart(value = GRACE_PERIOD_START)
 

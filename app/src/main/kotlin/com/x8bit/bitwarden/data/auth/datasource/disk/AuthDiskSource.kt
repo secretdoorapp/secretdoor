@@ -465,4 +465,14 @@ interface AuthDiskSource : AppIdProvider {
         userId: String,
         gracePeriodStart: Instant?,
     )
+
+    /**
+     * Gets the length of the PIN for the given [userId], if known.
+     */
+    fun getPinLength(userId: String): Int?
+
+    /**
+     * Stores the length of the PIN for the given [userId]. Storing `null` clears the value.
+     */
+    fun storePinLength(userId: String, pinLength: Int?)
 }

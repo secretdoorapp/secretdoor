@@ -75,6 +75,7 @@ class FakeAuthDiskSource : AuthDiskSource {
         mutableMapOf<String, MutableSharedFlow<String?>>()
     private val storedV2UpgradeTokens = mutableMapOf<String, V2UpgradeTokenJson?>()
     private val storedUserKeyIds = mutableMapOf<String, String?>()
+    private val storedPinLengths = mutableMapOf<String, Int?>()
     private val storedV2EncryptedMigrationsGracePeriodStarts = mutableMapOf<String, Instant?>()
 
     override var userState: UserStateJson? = null
@@ -102,6 +103,7 @@ class FakeAuthDiskSource : AuthDiskSource {
         storedEphemeralPinProtectedUserKeyEnvelopes.remove(userId)
         storedPersistentPinProtectedUserKeyEnvelopes.remove(userId)
         storedEncryptedPins.remove(userId)
+        storedPinLengths.remove(userId)
         storedPinProtectedUserKeys.remove(userId)
         storedV2UpgradeTokens.remove(userId)
         storedUserKeyIds.remove(userId)
@@ -186,6 +188,12 @@ class FakeAuthDiskSource : AuthDiskSource {
 
     override fun storeV2UpgradeToken(userId: String, v2UpgradeToken: V2UpgradeTokenJson?) {
         storedV2UpgradeTokens[userId] = v2UpgradeToken
+    }
+
+    override fun getPinLength(userId: String): Int? = storedPinLengths[userId]
+
+    override fun storePinLength(userId: String, pinLength: Int?) {
+        storedPinLengths[userId] = pinLength
     }
 
     override fun getV2EncryptedMigrationsGracePeriodStart(userId: String): Instant? =

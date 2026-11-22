@@ -64,6 +64,7 @@ private const val LAST_LOCK_TIMESTAMP = "lastLockTimestamp"
 private const val PROFILE_ACCOUNT_KEYS_KEY = "profileAccountKeys"
 private const val V2_UPGRADE_TOKEN = "v2UpgradeToken"
 private const val USER_KEY_ID_KEY = "userKeyId"
+private const val PIN_LENGTH_KEY = "pinLength"
 private const val V2_ENCRYPTED_MIGRATIONS_GRACE_PERIOD_START =
     "v2EncryptedMigrationsGracePeriodStart"
 
@@ -190,6 +191,7 @@ class AuthDiskSourceImpl(
         storeShowImportLogins(userId = userId, showImportLogins = null)
         storeLastLockTimestamp(userId = userId, lastLockTimestamp = null)
         storeEncryptedPin(userId = userId, encryptedPin = null)
+        storePinLength(userId = userId, pinLength = null)
         storePinProtectedUserKey(userId = userId, pinProtectedUserKey = null)
         storeEphemeralPinProtectedUserKeyEnvelope(
             userId = userId,
@@ -657,6 +659,13 @@ class AuthDiskSourceImpl(
             key = V2_ENCRYPTED_MIGRATIONS_GRACE_PERIOD_START.appendIdentifier(userId),
             value = gracePeriodStart?.toEpochMilli(),
         )
+    }
+
+    override fun getPinLength(userId: String): Int? =
+        getInt(key = PIN_LENGTH_KEY.appendIdentifier(userId))
+
+    override fun storePinLength(userId: String, pinLength: Int?) {
+        putInt(key = PIN_LENGTH_KEY.appendIdentifier(userId), value = pinLength)
     }
 
     private fun generateAndStoreUniqueAppId(): String =

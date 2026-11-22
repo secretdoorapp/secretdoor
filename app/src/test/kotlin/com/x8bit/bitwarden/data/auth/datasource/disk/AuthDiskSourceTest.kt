@@ -1576,6 +1576,18 @@ class AuthDiskSourceTest {
     }
 
     @Test
+    fun `storePinLength and getPinLength should round trip and clear on null`() {
+        val mockUserId = "mockUserId"
+        assertNull(authDiskSource.getPinLength(userId = mockUserId))
+
+        authDiskSource.storePinLength(userId = mockUserId, pinLength = 6)
+        assertEquals(6, authDiskSource.getPinLength(userId = mockUserId))
+
+        authDiskSource.storePinLength(userId = mockUserId, pinLength = null)
+        assertNull(authDiskSource.getPinLength(userId = mockUserId))
+    }
+
+    @Test
     fun `getV2EncryptedMigrationsGracePeriodStart should pull from SharedPreferences`() {
         val storeKey = "bwPreferencesStorage:v2EncryptedMigrationsGracePeriodStart"
         val mockUserId = "mockUserId"
