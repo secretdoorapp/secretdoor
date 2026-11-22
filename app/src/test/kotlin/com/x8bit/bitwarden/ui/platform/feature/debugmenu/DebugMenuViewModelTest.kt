@@ -40,7 +40,6 @@ class DebugMenuViewModelTest : BaseViewModelTest() {
         coEvery { resetFeatureFlagOverrides() } just runs
         every { updateFeatureFlag<Boolean>(any(), any()) } just runs
         every { resetOnboardingStatusForCurrentUser() } just runs
-        every { resetAccessibilityDisclaimer() } just runs
         every {
             modifyStateToShowOnboardingCarousel(userStateUpdateTrigger = any())
         } answers {
@@ -152,15 +151,6 @@ class DebugMenuViewModelTest : BaseViewModelTest() {
         verify(exactly = 1) {
             mockDebugMenuRepository.modifyStateToShowOnboardingCarousel(any())
             mockAuthRepository.hasPendingAccountAddition = true
-        }
-    }
-
-    @Test
-    fun `ResetAccessibilityDisclaimer should call repository to reset values`() {
-        val viewModel = createViewModel()
-        viewModel.trySendAction(DebugMenuAction.ResetAccessibilityDisclaimer)
-        verify(exactly = 1) {
-            mockDebugMenuRepository.resetAccessibilityDisclaimer()
         }
     }
 

@@ -205,19 +205,6 @@ class DebugMenuScreenTest : BitwardenComposeTest() {
     }
 
     @Test
-    fun `reset accessibility disclaimer should send ResetAccessibilityDisclaimer action`() {
-        mutableStateFlow.update { it.copy(mainTypeOption = DebugMenuState.MainTypeOption.OPTIONS) }
-        composeTestRule
-            .onNodeWithText("Reset accessibility disclaimer")
-            .performScrollTo()
-            .performClick()
-
-        verify(exactly = 1) {
-            viewModel.trySendAction(DebugMenuAction.ResetAccessibilityDisclaimer)
-        }
-    }
-
-    @Test
     fun `reset all coach mark tours should send ResetCoachMarkTourStatuses action`() {
         mutableStateFlow.update { it.copy(mainTypeOption = DebugMenuState.MainTypeOption.OPTIONS) }
         composeTestRule

@@ -224,14 +224,6 @@ private fun OnboardingSection(
         )
         Spacer(modifier = Modifier.height(height = 16.dp))
         BitwardenFilledButton(
-            label = stringResource(id = BitwardenString.reset_accessibility_disclaimer),
-            onClick = handler.onResetAccessibilityDisclaimer,
-            modifier = Modifier
-                .fillMaxWidth()
-                .standardHorizontalMargin(),
-        )
-        Spacer(modifier = Modifier.height(height = 12.dp))
-        BitwardenFilledButton(
             label = stringResource(id = BitwardenString.reset_coach_mark_tour_status),
             onClick = handler.onResetCoachMarkTourStatuses,
             isEnabled = true,

@@ -75,7 +75,6 @@ class DebugMenuViewModel @Inject constructor(
             DebugMenuAction.ClearSsoCookies -> handleClearSsoCookies()
             DebugMenuAction.ResetPremiumUpgradeBanner -> handleResetPremiumUpgradeBanner()
             DebugMenuAction.ShowUpgradedToPremiumCard -> handleShowUpgradedToPremiumCard()
-            DebugMenuAction.ResetAccessibilityDisclaimer -> handleResetAccessibilityDisclaimer()
             DebugMenuAction.ShareSettingsClick -> onShareSettingsClick()
             is DebugMenuAction.MainTypeOptionClick -> handleMainTypeOptionClick(action)
         }
@@ -83,10 +82,6 @@ class DebugMenuViewModel @Inject constructor(
 
     private fun handleMainTypeOptionClick(action: DebugMenuAction.MainTypeOptionClick) {
         mutableStateFlow.update { it.copy(mainTypeOption = action.option) }
-    }
-
-    private fun handleResetAccessibilityDisclaimer() {
-        debugMenuRepository.resetAccessibilityDisclaimer()
     }
 
     private fun onShareSettingsClick() {
@@ -229,11 +224,6 @@ sealed class DebugMenuAction {
      * The user has clicked the restart onboarding button for the onboarding section.
      */
     data object RestartOnboarding : DebugMenuAction()
-
-    /**
-     * The user has clicked the reset accessibility disclaimer button.
-     */
-    data object ResetAccessibilityDisclaimer : DebugMenuAction()
 
     /**
      * The user has clicked the restart onboarding button for the onboarding section.

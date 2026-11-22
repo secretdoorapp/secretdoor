@@ -163,15 +163,6 @@ interface SettingsRepository : FlightRecorderManager {
     var blockedAutofillUris: List<String>
 
     /**
-     * Emits updates whenever there is a change in the app's status for accessibility-based
-     * autofill.
-     *
-     * Note that the correct value is only populated upon subscription so calling [StateFlow.value]
-     * may result in an out-of-date value.
-     */
-    val isAccessibilityEnabledStateFlow: StateFlow<Boolean>
-
-    /**
      * Emits updates whenever there is a change in the app's status for supporting autofill.
      *
      * Note that the correct value is only populated upon subscription so calling [StateFlow.value]
@@ -188,16 +179,6 @@ interface SettingsRepository : FlightRecorderManager {
      * Whether screen capture is allowed for the current user.
      */
     val isScreenCaptureAllowedStateFlow: StateFlow<Boolean>
-
-    /**
-     * Whether the accessibility disclaimer has been displayed to the user.
-     */
-    val hasShownAccessibilityDisclaimerFlow: StateFlow<Boolean>
-
-    /**
-     * Stores that the accessibility disclaimer has been displayed to the user.
-     */
-    fun accessibilityDisclaimerHasBeenShown()
 
     /**
      * Disables autofill if it is currently enabled.

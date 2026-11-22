@@ -21,13 +21,6 @@ fun IntentManager.startSystemAutofillSettingsActivity(): Boolean {
 }
 
 /**
- * Attempts to start the system accessibility settings activity.
- */
-fun IntentManager.startSystemAccessibilitySettingsActivity(): Boolean {
-    return startActivity(intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-}
-
-/**
  * Starts the application's settings activity.
  */
 fun IntentManager.startAppSettingsActivity(): Boolean {

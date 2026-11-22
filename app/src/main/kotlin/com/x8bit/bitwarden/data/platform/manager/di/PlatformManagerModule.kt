@@ -18,7 +18,6 @@ import com.bitwarden.network.BitwardenServiceClient
 import com.bitwarden.network.model.BitwardenServiceClientConfig
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
-import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilityEnabledManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillEnabledManager
 import com.x8bit.bitwarden.data.autofill.manager.browser.BrowserThirdPartyAutofillEnabledManager
 import com.x8bit.bitwarden.data.platform.datasource.disk.CookieDiskSource
@@ -282,12 +281,10 @@ object PlatformManagerModule {
         authDiskSource: AuthDiskSource,
         settingsDiskSource: SettingsDiskSource,
         autofillEnabledManager: AutofillEnabledManager,
-        accessibilityEnabledManager: AccessibilityEnabledManager,
     ): ReviewPromptManager = ReviewPromptManagerImpl(
         authDiskSource = authDiskSource,
         settingsDiskSource = settingsDiskSource,
         autofillEnabledManager = autofillEnabledManager,
-        accessibilityEnabledManager = accessibilityEnabledManager,
     )
 
     @Provides
@@ -403,13 +400,11 @@ object PlatformManagerModule {
         settingsRepository: SettingsRepository,
         logsManager: LogsManager,
         autofillEnabledManager: AutofillEnabledManager,
-        accessibilityEnabledManager: AccessibilityEnabledManager,
         browserThirdPartyAutofillEnabledManager: BrowserThirdPartyAutofillEnabledManager,
     ): SettingsLogManager = SettingsLogManagerImpl(
         settingsRepository = settingsRepository,
         logsManager = logsManager,
         autofillEnabledManager = autofillEnabledManager,
-        accessibilityEnabledManager = accessibilityEnabledManager,
         browserThirdPartyAutofillEnabledManager = browserThirdPartyAutofillEnabledManager,
     )
 

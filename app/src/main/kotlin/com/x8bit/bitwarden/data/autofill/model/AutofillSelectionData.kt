@@ -30,7 +30,6 @@ data class AutofillSelectionData(
      * The type of framework to use with this autofill.
      */
     enum class Framework {
-        ACCESSIBILITY,
         AUTOFILL,
     }
 }

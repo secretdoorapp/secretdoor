@@ -18,7 +18,6 @@ class DebugMenuHandler(
     val onResetFeatureFlagValues: () -> Unit,
     val onRestartOnboarding: () -> Unit,
     val onRestartOnboardingCarousel: () -> Unit,
-    val onResetAccessibilityDisclaimer: () -> Unit,
     val onResetCoachMarkTourStatuses: () -> Unit,
     val onTriggerCookieAcquisition: () -> Unit,
     val onClearSsoCookies: () -> Unit,
@@ -47,9 +46,6 @@ class DebugMenuHandler(
             onRestartOnboarding = { viewModel.trySendAction(DebugMenuAction.RestartOnboarding) },
             onRestartOnboardingCarousel = {
                 viewModel.trySendAction(DebugMenuAction.RestartOnboardingCarousel)
-            },
-            onResetAccessibilityDisclaimer = {
-                viewModel.trySendAction(DebugMenuAction.ResetAccessibilityDisclaimer)
             },
             onResetCoachMarkTourStatuses = {
                 viewModel.trySendAction(DebugMenuAction.ResetCoachMarkTourStatuses)
@@ -82,7 +78,6 @@ class DebugMenuHandler(
             onResetFeatureFlagValues = { },
             onRestartOnboarding = { },
             onRestartOnboardingCarousel = { },
-            onResetAccessibilityDisclaimer = { },
             onResetCoachMarkTourStatuses = { },
             onTriggerCookieAcquisition = { },
             onClearSsoCookies = { },

@@ -15,7 +15,6 @@ import com.bitwarden.ui.platform.feature.settings.appearance.model.AppTheme
 import com.bitwarden.ui.platform.model.TotpData
 import com.bitwarden.vault.CipherView
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
-import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilitySelectionManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillSelectionManager
 import com.x8bit.bitwarden.data.autofill.util.getAutofillSaveItemOrNull
 import com.x8bit.bitwarden.data.autofill.util.getAutofillSelectionDataOrNull
@@ -66,7 +65,6 @@ private const val ANIMATION_DEBOUNCE_DELAY_MS = 500L
 @Suppress("LongParameterList", "TooManyFunctions")
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    accessibilitySelectionManager: AccessibilitySelectionManager,
     autofillSelectionManager: AutofillSelectionManager,
     private val specialCircumstanceManager: SpecialCircumstanceManager,
     private val garbageCollectionManager: GarbageCollectionManager,
@@ -102,12 +100,6 @@ class MainViewModel @Inject constructor(
         specialCircumstanceManager
             .specialCircumstanceStateFlow
             .onEach { specialCircumstance = it }
-            .launchIn(viewModelScope)
-
-        accessibilitySelectionManager
-            .accessibilitySelectionFlow
-            .map { MainAction.Internal.AccessibilitySelectionReceive(it) }
-            .onEach(::sendAction)
             .launchIn(viewModelScope)
 
         autofillSelectionManager
@@ -191,10 +183,6 @@ class MainViewModel @Inject constructor(
 
     private fun handleInternalAction(action: MainAction.Internal) {
         when (action) {
-            is MainAction.Internal.AccessibilitySelectionReceive -> {
-                handleAccessibilitySelectionReceive(action)
-            }
-
             is MainAction.Internal.AutofillSelectionReceive -> {
                 handleAutofillSelectionReceive(action)
             }
@@ -234,13 +222,6 @@ class MainViewModel @Inject constructor(
 
     private fun handleOpenDebugMenu() {
         sendEvent(MainEvent.NavigateToDebugMenu)
-    }
-
-    private fun handleAccessibilitySelectionReceive(
-        action: MainAction.Internal.AccessibilitySelectionReceive,
-    ) {
-        specialCircumstanceManager.specialCircumstance = null
-        sendEvent(MainEvent.CompleteAccessibilityAutofill(cipherView = action.cipherView))
     }
 
     private fun handleAutofillSelectionReceive(
@@ -474,14 +455,6 @@ sealed class MainAction {
      */
     sealed class Internal : MainAction() {
         /**
-         * Indicates the user has manually selected the given [cipherView] for accessibility
-         * autofill.
-         */
-        data class AccessibilitySelectionReceive(
-            val cipherView: CipherView,
-        ) : Internal()
-
-        /**
          * Indicates the user has manually selected the given [cipherView] for autofill.
          */
         data class AutofillSelectionReceive(
@@ -532,12 +505,6 @@ sealed class MainAction {
  * Represents events that are emitted by the [MainViewModel].
  */
 sealed class MainEvent {
-    /**
-     * Event indicating that the user has chosen the given [cipherView] for accessibility autofill
-     * and that the process is ready to complete.
-     */
-    data class CompleteAccessibilityAutofill(val cipherView: CipherView) : MainEvent()
-
     /**
      * Event indicating that the user has chosen the given [cipherView] for autofill and that the
      * process is ready to complete.

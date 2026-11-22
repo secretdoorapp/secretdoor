@@ -39,7 +39,6 @@ import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.LogoutReason
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePinResult
-import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilitySelectionManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillSelectionManager
 import com.x8bit.bitwarden.data.autofill.model.AutofillSelectionData
 import com.x8bit.bitwarden.data.autofill.util.isActiveWithFido2Credentials
@@ -131,7 +130,6 @@ class VaultItemListingViewModel @Inject constructor(
     private val environmentRepository: EnvironmentRepository,
     private val settingsRepository: SettingsRepository,
     private val privilegedAppRepository: PrivilegedAppRepository,
-    private val accessibilitySelectionManager: AccessibilitySelectionManager,
     private val autofillSelectionManager: AutofillSelectionManager,
     private val cipherMatchingManager: CipherMatchingManager,
     private val specialCircumstanceManager: SpecialCircumstanceManager,
@@ -1972,12 +1970,6 @@ class VaultItemListingViewModel @Inject constructor(
         viewModelScope.launch {
             val cipherView = getCipherViewOrNull(cipherId = itemId) ?: return@launch
             when (autofillSelectionData.framework) {
-                AutofillSelectionData.Framework.ACCESSIBILITY -> {
-                    accessibilitySelectionManager.emitAccessibilitySelection(
-                        cipherView = cipherView,
-                    )
-                }
-
                 AutofillSelectionData.Framework.AUTOFILL -> {
                     autofillSelectionManager.emitAutofillSelection(cipherView = cipherView)
                 }

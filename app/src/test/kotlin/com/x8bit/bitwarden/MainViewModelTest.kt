@@ -28,8 +28,6 @@ import com.x8bit.bitwarden.data.auth.datasource.disk.model.OnboardingStatus
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.SwitchAccountResult
 import com.x8bit.bitwarden.data.auth.repository.model.UserState
-import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilitySelectionManager
-import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilitySelectionManagerImpl
 import com.x8bit.bitwarden.data.autofill.manager.AutofillSelectionManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillSelectionManagerImpl
 import com.x8bit.bitwarden.data.autofill.model.AutofillSaveItem
@@ -89,8 +87,6 @@ import java.time.ZoneOffset
 class MainViewModelTest : BaseViewModelTest() {
 
     private val autofillSelectionManager: AutofillSelectionManager = AutofillSelectionManagerImpl()
-    private val accessibilitySelectionManager: AccessibilitySelectionManager =
-        AccessibilitySelectionManagerImpl()
     private val mutableUserStateFlow = MutableStateFlow<UserState?>(null)
     private val mutableAppThemeFlow = MutableStateFlow(AppTheme.DEFAULT)
     private val mutableAppLanguageFlow = MutableStateFlow(AppLanguage.DEFAULT)
@@ -304,24 +300,6 @@ class MainViewModelTest : BaseViewModelTest() {
             }
             verify(exactly = 1) {
                 garbageCollectionManager.tryCollect()
-            }
-        }
-
-    @Test
-    fun `accessibility selection updates should emit CompleteAccessibilityAutofill events`() =
-        runTest {
-            val viewModel = createViewModel()
-            val cipherView = mockk<CipherView>()
-            viewModel.eventFlow.test {
-                // We skip the first 2 events because they are the default appTheme and appLanguage
-                awaitItem()
-                awaitItem()
-
-                accessibilitySelectionManager.emitAccessibilitySelection(cipherView = cipherView)
-                assertEquals(
-                    MainEvent.CompleteAccessibilityAutofill(cipherView = cipherView),
-                    awaitItem(),
-                )
             }
         }
 
@@ -957,7 +935,6 @@ class MainViewModelTest : BaseViewModelTest() {
     private fun createViewModel(
         initialSpecialCircumstance: SpecialCircumstance? = null,
     ): MainViewModel = MainViewModel(
-        accessibilitySelectionManager = accessibilitySelectionManager,
         autofillSelectionManager = autofillSelectionManager,
         specialCircumstanceManager = specialCircumstanceManager,
         garbageCollectionManager = garbageCollectionManager,

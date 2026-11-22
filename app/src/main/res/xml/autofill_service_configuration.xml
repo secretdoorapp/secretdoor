@@ -4,8 +4,7 @@
     android:supportsInlineSuggestions="true"
     tools:ignore="UnusedAttribute">
     <!--
-    Maintain alphabetical order for these compatibility packages and ensure synchronization with
-    the ACCESSIBILITY_SUPPORTED_BROWSERS list within Browsers.kt.
+    Maintain alphabetical order for these compatibility packages.
     -->
     <compatibility-package
         android:name="alook.browser"

@@ -101,7 +101,6 @@ class FakeSettingsDiskSource(
     private var hasSeenAddLoginCoachMark: Boolean? = null
     private var hasSeenGeneratorCoachMark: Boolean? = null
     private var storedIsDynamicColorsEnabled: Boolean? = null
-    private var storedHasShownAccessibilityDisclaimer: Boolean? = null
     private var storedBrowserAutofillDialogReshowTime: Instant? = null
 
     private val mutableShowAutoFillSettingBadgeFlowMap =
@@ -118,8 +117,6 @@ class FakeSettingsDiskSource(
 
     private val mutableIsDynamicColorsEnabled =
         bufferedMutableSharedFlow<Boolean?>()
-
-    private val mutableHasShownAccessibilityDisclaimerFlow = bufferedMutableSharedFlow<Boolean?>()
 
     private val mutableVaultRegisteredForExportFlow =
         bufferedMutableSharedFlow<Boolean?>()
@@ -177,18 +174,6 @@ class FakeSettingsDiskSource(
     override val isDynamicColorsEnabledFlow: Flow<Boolean?>
         get() = mutableIsDynamicColorsEnabled.onSubscription {
             emit(isDynamicColorsEnabled)
-        }
-
-    override var hasShownAccessibilityDisclaimer: Boolean?
-        get() = storedHasShownAccessibilityDisclaimer
-        set(value) {
-            storedHasShownAccessibilityDisclaimer = value
-            mutableHasShownAccessibilityDisclaimerFlow.tryEmit(value)
-        }
-
-    override val hasShownAccessibilityDisclaimerFlow: Flow<Boolean?>
-        get() = mutableHasShownAccessibilityDisclaimerFlow.onSubscription {
-            emit(hasShownAccessibilityDisclaimer)
         }
 
     override var screenCaptureAllowed: Boolean?

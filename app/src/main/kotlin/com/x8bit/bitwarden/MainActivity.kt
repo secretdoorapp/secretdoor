@@ -30,7 +30,6 @@ import com.bitwarden.ui.platform.theme.BitwardenTheme
 import com.bitwarden.ui.platform.util.setHorizonOSAppLayout
 import com.bitwarden.ui.platform.util.setupEdgeToEdge
 import com.bitwarden.ui.platform.util.validate
-import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilityCompletionManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillActivityManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillCompletionManager
 import com.x8bit.bitwarden.data.platform.manager.util.ObserveScreenDataEffect
@@ -63,9 +62,6 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var autofillCompletionManager: AutofillCompletionManager
-
-    @Inject
-    lateinit var accessibilityCompletionManager: AccessibilityCompletionManager
 
     @Inject
     lateinit var settingsRepository: SettingsRepository
@@ -188,10 +184,6 @@ class MainActivity : AppCompatActivity() {
     private fun SetupEventsEffect(navController: NavController) {
         EventsEffect(viewModel = mainViewModel) { event ->
             when (event) {
-                is MainEvent.CompleteAccessibilityAutofill -> {
-                    handleCompleteAccessibilityAutofill(event)
-                }
-
                 is MainEvent.CompleteAutofill -> handleCompleteAutofill(event)
                 MainEvent.Recreate -> handleRecreate()
                 MainEvent.NavigateToDebugMenu -> navController.navigateToDebugMenuScreen()
@@ -208,15 +200,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun sendOpenDebugMenuEvent() {
         mainViewModel.trySendAction(MainAction.OpenDebugMenu)
-    }
-
-    private fun handleCompleteAccessibilityAutofill(
-        event: MainEvent.CompleteAccessibilityAutofill,
-    ) {
-        accessibilityCompletionManager.completeAccessibilityAutofill(
-            activity = this,
-            cipherView = event.cipherView,
-        )
     }
 
     private fun handleCompleteAutofill(event: MainEvent.CompleteAutofill) {

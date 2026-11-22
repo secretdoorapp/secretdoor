@@ -11,8 +11,8 @@ interface AppStateManager {
     /**
      * Emits whenever there are changes to the app creation state.
      *
-     * This is required because the Accessibility Service will keep the app process alive when the
-     * app would otherwise be destroyed.
+     * This is required because the app process can stay alive after its activities have been
+     * destroyed.
      */
     val appCreatedStateFlow: StateFlow<AppCreationState>
 

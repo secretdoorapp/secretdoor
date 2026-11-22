@@ -23,7 +23,6 @@ import com.bitwarden.vault.CipherView
 import com.bitwarden.vault.LoginUriView
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePasswordResult
-import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilitySelectionManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillSelectionManager
 import com.x8bit.bitwarden.data.autofill.model.AutofillSelectionData
 import com.x8bit.bitwarden.data.autofill.util.login
@@ -82,7 +81,6 @@ class SearchViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val clock: Clock,
     private val clipboardManager: BitwardenClipboardManager,
-    private val accessibilitySelectionManager: AccessibilitySelectionManager,
     private val autofillSelectionManager: AutofillSelectionManager,
     private val vaultRepo: VaultRepository,
     private val authRepo: AuthRepository,
@@ -857,10 +855,6 @@ class SearchViewModel @Inject constructor(
         viewModelScope.launch {
             decryptCipherViewOrNull(cipherId)?.let {
                 when (state.autofillSelectionData?.framework) {
-                    AutofillSelectionData.Framework.ACCESSIBILITY -> {
-                        accessibilitySelectionManager.emitAccessibilitySelection(cipherView = it)
-                    }
-
                     AutofillSelectionData.Framework.AUTOFILL -> {
                         autofillSelectionManager.emitAutofillSelection(cipherView = it)
                     }

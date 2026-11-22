@@ -25,10 +25,9 @@ account (one-time US$25 fee, identity verification).
   Data is encrypted in transit and users can delete it (delete vault or uninstall).
 - **App access**: no login needed; reviewers create a local vault with any master password.
 - **Permissions**: Camera (QR scan), Biometrics, Internet, Network state.
-- **Accessibility API declaration (the hard one)**: the optional accessibility service fills
-  credentials in apps and browsers without autofill support. State that it is off by default, user
-  enabled, never stores or transmits screen content, and needs a short demo video of enabling and
-  using it. If this declaration is rejected, remove the service from the Play build.
+- **Accessibility API declaration**: not needed. The accessibility service was removed (version
+  code 3), so the app does not request `BIND_ACCESSIBILITY_SERVICE`. Do not add it back without
+  planning the Play declaration and demo video.
 - **Credential Manager / autofill**: declared via the manifest, no extra form.
 - **Name and trademark**: the description says it is not affiliated with Bitwarden Inc. Keep it.
 

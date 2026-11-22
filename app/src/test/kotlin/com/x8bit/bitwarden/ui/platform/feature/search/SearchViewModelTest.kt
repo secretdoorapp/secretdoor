@@ -25,8 +25,6 @@ import com.x8bit.bitwarden.data.auth.datasource.disk.model.OnboardingStatus
 import com.x8bit.bitwarden.data.auth.repository.AuthRepository
 import com.x8bit.bitwarden.data.auth.repository.model.UserState
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePasswordResult
-import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilitySelectionManager
-import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilitySelectionManagerImpl
 import com.x8bit.bitwarden.data.autofill.manager.AutofillSelectionManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillSelectionManagerImpl
 import com.x8bit.bitwarden.data.autofill.model.AutofillSelectionData
@@ -95,8 +93,6 @@ import java.time.ZoneOffset
 @Suppress("LargeClass")
 class SearchViewModelTest : BaseViewModelTest() {
 
-    private val accessibilitySelectionManager: AccessibilitySelectionManager =
-        AccessibilitySelectionManagerImpl()
     private val autofillSelectionManager: AutofillSelectionManager =
         AutofillSelectionManagerImpl()
 
@@ -500,22 +496,6 @@ class SearchViewModelTest : BaseViewModelTest() {
         }
 
     @Test
-    fun `AutofillItemClick should call emitAccessibilitySelection`() = runTest {
-        val cipherView = setupForAutofill(
-            autofillSelectionData = AUTOFILL_SELECTION_DATA.copy(
-                framework = AutofillSelectionData.Framework.ACCESSIBILITY,
-            ),
-        )
-        val cipherId = CIPHER_ID
-        val viewModel = createViewModel()
-
-        accessibilitySelectionManager.accessibilitySelectionFlow.test {
-            viewModel.trySendAction(SearchAction.AutofillItemClick(itemId = cipherId))
-            assertEquals(cipherView, awaitItem())
-        }
-    }
-
-    @Test
     fun `AutofillItemClick should call emitAutofillSelection`() = runTest {
         val cipherView = setupForAutofill()
         val cipherId = CIPHER_ID
@@ -579,64 +559,6 @@ class SearchViewModelTest : BaseViewModelTest() {
             )
         }
     }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `AutofillAndSaveItemClick with request success should post to the AccessibilitySelectionManager`() =
-        runTest {
-            val autofillSelectionData = AUTOFILL_SELECTION_DATA.copy(
-                framework = AutofillSelectionData.Framework.ACCESSIBILITY,
-            )
-            val cipherView = setupForAutofill(autofillSelectionData = autofillSelectionData)
-            val cipherId = CIPHER_ID
-            val updatedCipherView = cipherView.copy(
-                login = createMockLoginView(number = 1, clock = clock).copy(
-                    uris = listOf(createMockUriView(number = 1)) +
-                        LoginUriView(
-                            uri = AUTOFILL_URI,
-                            match = null,
-                            uriChecksum = null,
-                        ),
-                ),
-            )
-            val initialState = INITIAL_STATE_FOR_AUTOFILL.copy(
-                autofillSelectionData = autofillSelectionData,
-            )
-            val viewModel = createViewModel()
-            coEvery {
-                vaultRepository.updateCipher(
-                    cipherId = cipherId,
-                    cipherView = updatedCipherView,
-                )
-            } returns UpdateCipherResult.Success
-
-            turbineScope {
-                val stateTurbine = viewModel
-                    .stateFlow
-                    .testIn(backgroundScope)
-                val selectionTurbine = accessibilitySelectionManager
-                    .accessibilitySelectionFlow
-                    .testIn(backgroundScope)
-
-                assertEquals(initialState, stateTurbine.awaitItem())
-
-                viewModel.trySendAction(SearchAction.AutofillAndSaveItemClick(itemId = cipherId))
-
-                assertEquals(
-                    initialState.copy(
-                        dialogState = SearchState.DialogState.Loading(
-                            message = BitwardenString.loading.asText(),
-                        ),
-                    ),
-                    stateTurbine.awaitItem(),
-                )
-
-                assertEquals(initialState, stateTurbine.awaitItem())
-
-                // Autofill flow is completed
-                assertEquals(cipherView, selectionTurbine.awaitItem())
-            }
-        }
 
     @Suppress("MaxLineLength")
     @Test
@@ -767,36 +689,6 @@ class SearchViewModelTest : BaseViewModelTest() {
                 ),
                 viewModel.stateFlow.value,
             )
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `MasterPasswordRepromptSubmit for a request Success with a valid password for autofill should post to the AccessibilitySelectionManager`() =
-        runTest {
-            setupMockUri()
-            val cipherView = setupForAutofill(
-                autofillSelectionData = AUTOFILL_SELECTION_DATA.copy(
-                    framework = AutofillSelectionData.Framework.ACCESSIBILITY,
-                ),
-            )
-            val cipherId = CIPHER_ID
-            val password = "password"
-            coEvery {
-                authRepository.validatePassword(password = password)
-            } returns ValidatePasswordResult.Success(isValid = true)
-            val viewModel = createViewModel()
-
-            accessibilitySelectionManager.accessibilitySelectionFlow.test {
-                viewModel.trySendAction(
-                    SearchAction.MasterPasswordRepromptSubmit(
-                        password = password,
-                        masterPasswordRepromptData = MasterPasswordRepromptData.Autofill(
-                            cipherId = cipherId,
-                        ),
-                    ),
-                )
-                assertEquals(cipherView, awaitItem())
-            }
         }
 
     @Suppress("MaxLineLength")
@@ -2077,7 +1969,6 @@ class SearchViewModelTest : BaseViewModelTest() {
         settingsRepo = settingsRepository,
         clipboardManager = clipboardManager,
         specialCircumstanceManager = specialCircumstanceManager,
-        accessibilitySelectionManager = accessibilitySelectionManager,
         autofillSelectionManager = autofillSelectionManager,
         premiumStateManager = premiumStateManager,
         featureFlagManager = featureFlagManager,

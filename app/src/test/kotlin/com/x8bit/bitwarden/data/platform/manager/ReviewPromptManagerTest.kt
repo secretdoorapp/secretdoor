@@ -2,7 +2,6 @@ package com.x8bit.bitwarden.data.platform.manager
 
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.UserStateJson
 import com.x8bit.bitwarden.data.auth.datasource.disk.util.FakeAuthDiskSource
-import com.x8bit.bitwarden.data.autofill.accessibility.manager.FakeAccessibilityEnabledManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillEnabledManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillEnabledManagerImpl
 import com.x8bit.bitwarden.data.platform.datasource.disk.util.FakeSettingsDiskSource
@@ -15,13 +14,11 @@ import org.junit.jupiter.api.Test
 
 class ReviewPromptManagerTest {
     private val autofillEnabledManager: AutofillEnabledManager = AutofillEnabledManagerImpl()
-    private val fakeAccessibilityEnabledManager = FakeAccessibilityEnabledManager()
     private val fakeAuthDiskSource = FakeAuthDiskSource()
     private val fakeSettingsDiskSource = FakeSettingsDiskSource()
 
     private val reviewPromptManager = ReviewPromptManagerImpl(
         autofillEnabledManager = autofillEnabledManager,
-        accessibilityEnabledManager = fakeAccessibilityEnabledManager,
         authDiskSource = fakeAuthDiskSource,
         settingsDiskSource = fakeSettingsDiskSource,
     )
@@ -109,10 +106,9 @@ class ReviewPromptManagerTest {
 
     @Suppress("MaxLineLength")
     @Test
-    fun `shouldPromptForAppReview should return true if one auto fill service is enabled and one actions requirement is met`() {
+    fun `shouldPromptForAppReview should return true if the auto fill service is enabled and one actions requirement is met`() {
         fakeAuthDiskSource.userState = MOCK_USER_STATE
-        fakeAccessibilityEnabledManager.isAccessibilityEnabled = true
-        autofillEnabledManager.isAutofillEnabled = false
+        autofillEnabledManager.isAutofillEnabled = true
         fakeSettingsDiskSource.storeGeneratedResultActionCount(count = 0)
         fakeSettingsDiskSource.storeCreateSendActionCount(count = 0)
         fakeSettingsDiskSource.storeAddCipherActionCount(count = 4)
@@ -120,9 +116,8 @@ class ReviewPromptManagerTest {
     }
 
     @Test
-    fun `shouldPromptForAppReview should return false if no auto fill service is enabled`() {
+    fun `shouldPromptForAppReview should return false if the auto fill service is not enabled`() {
         fakeAuthDiskSource.userState = MOCK_USER_STATE
-        fakeAccessibilityEnabledManager.isAccessibilityEnabled = false
         autofillEnabledManager.isAutofillEnabled = false
         fakeSettingsDiskSource.storeGeneratedResultActionCount(count = 0)
         fakeSettingsDiskSource.storeCreateSendActionCount(count = 0)
@@ -133,7 +128,6 @@ class ReviewPromptManagerTest {
     @Test
     fun `shouldPromptForAppReview should return false if no action count is met`() {
         fakeAuthDiskSource.userState = MOCK_USER_STATE
-        fakeAccessibilityEnabledManager.isAccessibilityEnabled = true
         autofillEnabledManager.isAutofillEnabled = true
         fakeSettingsDiskSource.storeGeneratedResultActionCount(count = 1)
         fakeSettingsDiskSource.storeCreateSendActionCount(count = 0)

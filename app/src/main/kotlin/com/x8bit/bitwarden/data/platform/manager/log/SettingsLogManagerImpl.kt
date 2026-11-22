@@ -1,6 +1,5 @@
 package com.x8bit.bitwarden.data.platform.manager.log
 
-import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilityEnabledManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillEnabledManager
 import com.x8bit.bitwarden.data.autofill.manager.browser.BrowserThirdPartyAutofillEnabledManager
 import com.x8bit.bitwarden.data.platform.manager.LogsManager
@@ -14,7 +13,6 @@ internal class SettingsLogManagerImpl(
     private val settingsRepository: SettingsRepository,
     private val logsManager: LogsManager,
     private val autofillEnabledManager: AutofillEnabledManager,
-    private val accessibilityEnabledManager: AccessibilityEnabledManager,
     private val browserThirdPartyAutofillEnabledManager: BrowserThirdPartyAutofillEnabledManager,
 ) : SettingsLogManager {
     override val data: String
@@ -35,7 +33,6 @@ internal class SettingsLogManagerImpl(
                     list.forEach { appendLine("    $it") }
                 }
             }
-            .appendLine("  $accessibilityEnabledString")
             .appendLine("  $copyTotpString")
             .appendLine("  $askToAddItemString")
             .appendLine("  $defaultUriMatchString")
@@ -108,13 +105,6 @@ internal class SettingsLogManagerImpl(
             .browserThirdPartyAutofillStatus
             .toBrowserAutoFillSettingsOptions()
             .map { "${it.browserPackage}: ${if (it.isEnabled) "On" else "Off"}" }
-
-    private val accessibilityEnabledString: String
-        get() = if (accessibilityEnabledManager.isAccessibilityEnabledStateFlow.value) {
-            "Use accessibility: Enabled"
-        } else {
-            "Use accessibility: Disabled"
-        }
 
     private val copyTotpString: String
         get() = if (settingsRepository.isAutoCopyTotpDisabled) {

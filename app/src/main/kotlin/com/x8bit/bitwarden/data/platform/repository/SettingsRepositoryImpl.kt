@@ -1,7 +1,6 @@
 package com.x8bit.bitwarden.data.platform.repository
 
 import android.view.autofill.AutofillManager
-import com.bitwarden.core.data.manager.BuildInfoManager
 import com.bitwarden.core.data.manager.dispatcher.DispatcherManager
 import com.bitwarden.data.manager.flightrecorder.FlightRecorderManager
 import com.bitwarden.ui.platform.feature.settings.appearance.model.AppLanguage
@@ -9,7 +8,6 @@ import com.bitwarden.ui.platform.feature.settings.appearance.model.AppTheme
 import com.x8bit.bitwarden.BuildConfig
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
 import com.x8bit.bitwarden.data.auth.repository.model.UserFingerprintResult
-import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilityEnabledManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillEnabledManager
 import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.data.platform.error.NoActiveUserException
@@ -50,11 +48,9 @@ class SettingsRepositoryImpl(
     private val autofillManager: AutofillManager,
     private val autofillEnabledManager: AutofillEnabledManager,
     private val authDiskSource: AuthDiskSource,
-    private val buildInfoManager: BuildInfoManager,
     private val settingsDiskSource: SettingsDiskSource,
     private val vaultSdkSource: VaultSdkSource,
     flightRecorderManager: FlightRecorderManager,
-    accessibilityEnabledManager: AccessibilityEnabledManager,
     dispatcherManager: DispatcherManager,
 ) : SettingsRepository,
     FlightRecorderManager by flightRecorderManager {
@@ -312,9 +308,6 @@ class SettingsRepositoryImpl(
             )
         }
 
-    override val isAccessibilityEnabledStateFlow: StateFlow<Boolean> =
-        accessibilityEnabledManager.isAccessibilityEnabledStateFlow
-
     override val isAutofillEnabledStateFlow: StateFlow<Boolean> =
         autofillEnabledManager.isAutofillEnabledStateFlow
 
@@ -333,21 +326,6 @@ class SettingsRepositoryImpl(
                 started = SharingStarted.Lazily,
                 initialValue = isScreenCaptureAllowed,
             )
-
-    override val hasShownAccessibilityDisclaimerFlow: StateFlow<Boolean>
-        get() = settingsDiskSource
-            .hasShownAccessibilityDisclaimerFlow
-            .map { buildInfoManager.isFdroid || it ?: false }
-            .stateIn(
-                scope = unconfinedScope,
-                started = SharingStarted.Lazily,
-                initialValue = buildInfoManager.isFdroid ||
-                    settingsDiskSource.hasShownAccessibilityDisclaimer ?: false,
-            )
-
-    override fun accessibilityDisclaimerHasBeenShown() {
-        settingsDiskSource.hasShownAccessibilityDisclaimer = true
-    }
 
     override fun disableAutofill() {
         autofillManager.disableAutofillServices()

@@ -63,7 +63,6 @@ import com.bitwarden.ui.platform.components.toggle.BitwardenSwitch
 import com.bitwarden.ui.platform.components.util.rememberVectorPainter
 import com.bitwarden.ui.platform.composition.LocalIntentManager
 import com.bitwarden.ui.platform.manager.IntentManager
-import com.bitwarden.ui.platform.manager.util.startSystemAccessibilitySettingsActivity
 import com.bitwarden.ui.platform.manager.util.startSystemAutofillSettingsActivity
 import com.bitwarden.ui.platform.resource.BitwardenDrawable
 import com.bitwarden.ui.platform.resource.BitwardenString
@@ -99,10 +98,6 @@ fun AutoFillScreen(
     EventsEffect(viewModel = viewModel) { event ->
         when (event) {
             AutoFillEvent.NavigateBack -> onNavigateBack.invoke()
-
-            AutoFillEvent.NavigateToAccessibilitySettings -> {
-                intentManager.startSystemAccessibilitySettingsActivity()
-            }
 
             AutoFillEvent.NavigateToAutofillSettings -> {
                 val isSuccess = intentManager.startSystemAutofillSettingsActivity()
@@ -289,14 +284,6 @@ private fun AutoFillScreenContent(
             )
             Spacer(modifier = Modifier.height(height = 8.dp))
         }
-        AccessibilityAutofillSwitch(
-            isAccessibilityAutoFillEnabled = state.isAccessibilityAutofillEnabled,
-            onCheckedChange = autoFillHandlers.onUseAccessibilityServiceClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .standardHorizontalMargin(),
-        )
-        Spacer(modifier = Modifier.height(16.dp))
         BitwardenListHeaderText(
             label = stringResource(id = BitwardenString.additional_options),
             modifier = Modifier
@@ -442,44 +429,6 @@ private fun FillStyleSelector(
         cardStyle = CardStyle.Full,
         modifier = modifier.testTag(tag = "InlineAutofillSelector"),
     )
-}
-
-@Composable
-private fun AccessibilityAutofillSwitch(
-    isAccessibilityAutoFillEnabled: Boolean,
-    onCheckedChange: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    var shouldShowDialog by rememberSaveable { mutableStateOf(value = false) }
-    BitwardenSwitch(
-        label = stringResource(id = BitwardenString.accessibility),
-        supportingText = stringResource(id = BitwardenString.accessibility_description5),
-        isChecked = isAccessibilityAutoFillEnabled,
-        onCheckedChange = {
-            if (isAccessibilityAutoFillEnabled) {
-                onCheckedChange()
-            } else {
-                shouldShowDialog = true
-            }
-        },
-        cardStyle = CardStyle.Full,
-        modifier = modifier.testTag(tag = "AccessibilityAutofillSwitch"),
-    )
-
-    if (shouldShowDialog) {
-        BitwardenTwoButtonDialog(
-            title = stringResource(id = BitwardenString.accessibility_service_disclosure),
-            message = stringResource(id = BitwardenString.accessibility_disclosure_text),
-            confirmButtonText = stringResource(id = BitwardenString.accept),
-            dismissButtonText = stringResource(id = BitwardenString.decline),
-            onConfirmClick = {
-                onCheckedChange()
-                shouldShowDialog = false
-            },
-            onDismissClick = { shouldShowDialog = false },
-            onDismissRequest = { shouldShowDialog = false },
-        )
-    }
 }
 
 @Composable

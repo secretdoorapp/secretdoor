@@ -37,7 +37,6 @@ private const val ACCOUNT_BIOMETRIC_INTEGRITY_VALID_KEY = "accountBiometricInteg
 private const val CRASH_LOGGING_ENABLED_KEY = "crashLoggingEnabled"
 private const val CLEAR_CLIPBOARD_INTERVAL_KEY = "clearClipboard"
 private const val INITIAL_AUTOFILL_DIALOG_SHOWN = "addSitePromptShown"
-private const val HAS_SHOWN_ACCESSIBILITY_DISCLAIMER_KEY = "hasShownAccessibilityDisclaimer"
 private const val HAS_USER_LOGGED_IN_OR_CREATED_AN_ACCOUNT_KEY = "hasUserLoggedInOrCreatedAccount"
 private const val SHOW_AUTOFILL_SETTING_BADGE = "showAutofillSettingBadge"
 private const val SHOW_BROWSER_AUTOFILL_SETTING_BADGE = "showBrowserAutofillSettingBadge"
@@ -138,8 +137,6 @@ class SettingsDiskSourceImpl(
 
     private val mutableIsDynamicColorsEnabledFlow = bufferedMutableSharedFlow<Boolean?>()
 
-    private val mutableHasShownAccessibilityDisclaimerFlow = bufferedMutableSharedFlow<Boolean?>()
-
     init {
         migrateScreenCaptureSetting()
     }
@@ -178,17 +175,6 @@ class SettingsDiskSourceImpl(
                 value = value,
             )
         }
-
-    override var hasShownAccessibilityDisclaimer: Boolean?
-        set(value) {
-            putBoolean(HAS_SHOWN_ACCESSIBILITY_DISCLAIMER_KEY, value)
-            mutableHasShownAccessibilityDisclaimerFlow.tryEmit(value)
-        }
-        get() = getBoolean(HAS_SHOWN_ACCESSIBILITY_DISCLAIMER_KEY)
-
-    override val hasShownAccessibilityDisclaimerFlow: Flow<Boolean?>
-        get() = mutableHasShownAccessibilityDisclaimerFlow
-            .onSubscription { emit(hasShownAccessibilityDisclaimer) }
 
     override var systemBiometricIntegritySource: String?
         get() = getString(key = SYSTEM_BIOMETRIC_INTEGRITY_SOURCE_KEY)
@@ -296,7 +282,6 @@ class SettingsDiskSourceImpl(
         // - Upgraded to Premium action card consumed
         // - Upgraded to Premium action card pending
         // - Premium upgrade pending
-        // - Has shown accessibility disclaimer dialog
     }
 
     override fun getIntroducingArchiveActionCardDismissed(userId: String): Boolean? =

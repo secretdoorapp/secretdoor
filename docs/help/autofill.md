@@ -23,14 +23,9 @@ extra setting before they allow third-party autofill:
 2. Follow the prompt to open the browser's settings and enable "Autofill services" or "Third-party
    autofill".
 
-If your browser is not supported, the optional **accessibility** method can fill it. See below.
-
-## Accessibility (optional)
-
-The accessibility service is a second way to fill apps and browsers that do not support Android's
-autofill. It reads what is on the screen to find login fields, so Android shows a warning when you
-turn it on. SecretDoor only uses it to detect login fields and fill them. Leave it off if autofill
-works for you.
+If your browser is not supported, SecretDoor cannot fill it. Copy the username and password from
+the item instead. SecretDoor does not use an accessibility service and never reads what is on your
+screen.
 
 ## Troubleshooting {#troubleshooting}
 
@@ -38,7 +33,7 @@ works for you.
   settings and that the vault is unlocked. Check the login's website matches ([URI match
   detection](uri-match-detection.md)).
 - **It works in some apps but not others.** Some apps block autofill on purpose, mostly banking
-  apps. Use the accessibility method, or copy and paste from the item.
+  apps. Copy and paste from the item instead.
 - **The browser ignores autofill.** Enable third-party autofill in the browser's settings (see
   above), and restart the browser.
 - **Suggestions show for the wrong site.** Tighten the login's [match detection](uri-match-detection.md)

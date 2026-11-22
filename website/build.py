@@ -630,8 +630,6 @@ def manual_index():
         <ul>
           <li><strong>Autofill services</strong>: turn it on, and Android asks you to choose SecretDoor
             as your autofill service.</li>
-          <li><strong>Use accessibility</strong>: an optional fallback for apps and browsers that don&rsquo;t
-            support autofill.</li>
           <li><strong>Copy TOTP automatically</strong>: when a login has an authenticator key, copy
             its current code to the clipboard after autofilling.</li>
           <li><strong>Passkey management</strong> and <strong>Privileged apps</strong>: for passkeys
@@ -711,7 +709,7 @@ def manual_index():
               S("settings-vault", "The Vault settings", "Vault")], """
         <ul>
           <li><strong>Account security</strong>: unlocking, timeout, master password.</li>
-          <li><strong>Autofill</strong>: autofill, accessibility, passkeys.</li>
+          <li><strong>Autofill</strong>: autofill and passkeys.</li>
           <li><strong>Vault</strong>: manage vaults, folders, backup, export and import.</li>
           <li><strong>Appearance</strong>: language, theme and dynamic colors.</li>
           <li><strong>Other</strong>: clear the clipboard after a delay, and allow or block screen

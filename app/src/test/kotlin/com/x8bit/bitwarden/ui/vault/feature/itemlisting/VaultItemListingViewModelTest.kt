@@ -48,8 +48,6 @@ import com.x8bit.bitwarden.data.auth.repository.model.UserState
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePasswordResult
 import com.x8bit.bitwarden.data.auth.repository.model.ValidatePinResult
 import com.x8bit.bitwarden.data.auth.repository.model.VaultUnlockType
-import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilitySelectionManager
-import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilitySelectionManagerImpl
 import com.x8bit.bitwarden.data.autofill.manager.AutofillSelectionManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillSelectionManagerImpl
 import com.x8bit.bitwarden.data.autofill.model.AutofillSaveItem
@@ -146,8 +144,6 @@ import java.time.ZoneOffset
 @Suppress("LargeClass")
 class VaultItemListingViewModelTest : BaseViewModelTest() {
 
-    private val accessibilitySelectionManager: AccessibilitySelectionManager =
-        AccessibilitySelectionManagerImpl()
     private val autofillSelectionManager: AutofillSelectionManager = AutofillSelectionManagerImpl()
 
     private var mockFilteredCiphers: List<CipherListView>? = null
@@ -434,7 +430,7 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
     fun `BackClick with AutofillSelectionData should emit ExitApp`() = runTest {
         specialCircumstanceManager.specialCircumstance = SpecialCircumstance.AutofillSelection(
             autofillSelectionData = AutofillSelectionData(
-                framework = AutofillSelectionData.Framework.ACCESSIBILITY,
+                framework = AutofillSelectionData.Framework.AUTOFILL,
                 type = AutofillSelectionData.Type.LOGIN,
                 uri = null,
             ),
@@ -477,7 +473,7 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
     fun `SearchIconClick should emit NavigateToVaultSearchScreen with all search type`() = runTest {
         specialCircumstanceManager.specialCircumstance = SpecialCircumstance.AutofillSelection(
             autofillSelectionData = AutofillSelectionData(
-                framework = AutofillSelectionData.Framework.ACCESSIBILITY,
+                framework = AutofillSelectionData.Framework.AUTOFILL,
                 type = AutofillSelectionData.Type.LOGIN,
                 uri = null,
             ),
@@ -647,54 +643,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
             vaultRepository.sync(forced = true)
         }
     }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `ItemClick for vault item when accessibility autofill should post to the accessibilitySelectionManager`() =
-        runTest {
-            setupMockUri()
-            val cipherListView = createMockCipherListView(number = 1)
-            val cipherView = createMockCipherView(
-                number = 1,
-                fido2Credentials = createMockSdkFido2CredentialList(number = 1),
-            )
-
-            coEvery {
-                vaultRepository.getCipher("mockId-1")
-            } returns GetCipherResult.Success(cipherView)
-
-            specialCircumstanceManager.specialCircumstance = SpecialCircumstance.AutofillSelection(
-                autofillSelectionData = AutofillSelectionData(
-                    type = AutofillSelectionData.Type.LOGIN,
-                    framework = AutofillSelectionData.Framework.ACCESSIBILITY,
-                    uri = "https://www.test.com",
-                ),
-                shouldFinishWhenComplete = true,
-            )
-            mutableVaultDataStateFlow.value = DataState.Loaded(
-                data = VaultData(
-                    decryptCipherListResult = createMockDecryptCipherListResult(
-                        number = 1,
-                        successes = listOf(cipherListView),
-                    ),
-                    folderViewList = emptyList(),
-                    collectionViewList = emptyList(),
-                ),
-            )
-            val viewModel = createVaultItemListingViewModel()
-
-            accessibilitySelectionManager.accessibilitySelectionFlow.test {
-                viewModel.trySendAction(
-                    VaultItemListingsAction.ItemClick(
-                        id = "mockId-1",
-                        type = VaultItemListingState.DisplayItem.ItemType.Vault(
-                            type = CipherType.LOGIN,
-                        ),
-                    ),
-                )
-                assertEquals(cipherView, awaitItem())
-            }
-        }
 
     @Test
     fun `ItemClick for vault item when autofill should post to the AutofillSelectionManager`() =
@@ -1509,52 +1457,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
                     cipherView,
                     awaitItem(),
                 )
-            }
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `MasterPasswordRepromptSubmit for a request Success with a valid password for accessibility autofill should post to the AccessibilitySelectionManager`() =
-        runTest {
-            setupMockUri()
-            val cipherListView = createMockCipherListView(number = 1)
-            val cipherView = createMockCipherView(number = 1)
-            val cipherId = "mockId-1"
-            val password = "password"
-            mutableVaultDataStateFlow.value = DataState.Loaded(
-                data = VaultData(
-                    decryptCipherListResult = createMockDecryptCipherListResult(
-                        number = 1,
-                        successes = listOf(cipherListView),
-                    ),
-                    folderViewList = emptyList(),
-                    collectionViewList = emptyList(),
-                ),
-            )
-            specialCircumstanceManager.specialCircumstance =
-                SpecialCircumstance.AutofillSelection(
-                    autofillSelectionData = AutofillSelectionData(
-                        type = AutofillSelectionData.Type.LOGIN,
-                        framework = AutofillSelectionData.Framework.ACCESSIBILITY,
-                        uri = "https://www.test.com",
-                    ),
-                    shouldFinishWhenComplete = true,
-                )
-            val viewModel = createVaultItemListingViewModel()
-            coEvery {
-                authRepository.validatePassword(password = password)
-            } returns ValidatePasswordResult.Success(isValid = true)
-
-            accessibilitySelectionManager.accessibilitySelectionFlow.test {
-                viewModel.trySendAction(
-                    VaultItemListingsAction.MasterPasswordRepromptSubmit(
-                        password = password,
-                        masterPasswordRepromptData = MasterPasswordRepromptData.Autofill(
-                            cipherId = cipherId,
-                        ),
-                    ),
-                )
-                assertEquals(cipherView, awaitItem())
             }
         }
 
@@ -6270,7 +6172,6 @@ class VaultItemListingViewModelTest : BaseViewModelTest() {
             vaultRepository = vaultRepository,
             environmentRepository = environmentRepository,
             settingsRepository = settingsRepository,
-            accessibilitySelectionManager = accessibilitySelectionManager,
             autofillSelectionManager = autofillSelectionManager,
             cipherMatchingManager = cipherMatchingManager,
             specialCircumstanceManager = specialCircumstanceManager,

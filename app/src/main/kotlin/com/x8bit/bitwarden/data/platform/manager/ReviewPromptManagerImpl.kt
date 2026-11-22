@@ -1,7 +1,6 @@
 package com.x8bit.bitwarden.data.platform.manager
 
 import com.x8bit.bitwarden.data.auth.datasource.disk.AuthDiskSource
-import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilityEnabledManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillEnabledManager
 import com.x8bit.bitwarden.data.platform.datasource.disk.SettingsDiskSource
 import com.x8bit.bitwarden.ui.platform.util.orZero
@@ -17,7 +16,6 @@ class ReviewPromptManagerImpl(
     private val authDiskSource: AuthDiskSource,
     private val settingsDiskSource: SettingsDiskSource,
     private val autofillEnabledManager: AutofillEnabledManager,
-    private val accessibilityEnabledManager: AccessibilityEnabledManager,
 ) : ReviewPromptManager {
 
     override fun registerAddCipherAction() {
@@ -52,11 +50,10 @@ class ReviewPromptManagerImpl(
     override fun shouldPromptForAppReview(): Boolean {
         authDiskSource.userState?.activeUserId ?: return false
         val autofillEnabled = autofillEnabledManager.isAutofillEnabledStateFlow.value
-        val accessibilityEnabled = accessibilityEnabledManager.isAccessibilityEnabledStateFlow.value
         val minAddActionsMet = isMinimumAddActionsMet()
         val minCopyActionsMet = isMinimumCopyActionsMet()
         val minCreateActionsMet = isMinimumCreateActionsMet()
-        return (autofillEnabled || accessibilityEnabled) &&
+        return autofillEnabled &&
             (minAddActionsMet || minCopyActionsMet || minCreateActionsMet)
     }
 

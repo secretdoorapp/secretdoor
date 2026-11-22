@@ -3,7 +3,6 @@ package com.x8bit.bitwarden.ui.platform.feature.overlaynav
 import com.bitwarden.core.data.repository.util.bufferedMutableSharedFlow
 import com.bitwarden.ui.platform.base.createMockNavHostController
 import com.x8bit.bitwarden.ui.platform.base.BitwardenComposeTest
-import com.x8bit.bitwarden.ui.platform.feature.accessibilitydisclosure.AccessibilityDisclosureRoute
 import com.x8bit.bitwarden.ui.platform.feature.biometrics.UpdateBiometricsRoute
 import com.x8bit.bitwarden.ui.platform.feature.localnetworkaccess.LocalNetworkAccessRoute
 import io.mockk.every
@@ -48,20 +47,6 @@ class OverlayNavScreenTest : BitwardenComposeTest() {
         composeTestRule.runOnIdle {
             verify(exactly = 1) {
                 mockNavHostController.navigate(route = LocalNetworkAccessRoute, builder = any())
-            }
-        }
-    }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `on NavigateToAccessibilityDisclosure should navigate to the accessibility disclosure screen`() {
-        mutableEventFlow.tryEmit(OverlayNavEvent.NavigateToAccessibilityDisclosure)
-        composeTestRule.runOnIdle {
-            verify(exactly = 1) {
-                mockNavHostController.navigate(
-                    route = AccessibilityDisclosureRoute,
-                    builder = any(),
-                )
             }
         }
     }

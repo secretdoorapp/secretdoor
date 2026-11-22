@@ -3,7 +3,6 @@ package com.x8bit.bitwarden.data.platform.repository
 import android.view.autofill.AutofillManager
 import app.cash.turbine.test
 import com.bitwarden.core.EnrollPinResponse
-import com.bitwarden.core.data.manager.BuildInfoManager
 import com.bitwarden.core.data.manager.dispatcher.FakeDispatcherManager
 import com.bitwarden.core.data.util.asFailure
 import com.bitwarden.core.data.util.asSuccess
@@ -18,7 +17,6 @@ import com.x8bit.bitwarden.data.auth.datasource.disk.model.AccountJson
 import com.x8bit.bitwarden.data.auth.datasource.disk.model.UserStateJson
 import com.x8bit.bitwarden.data.auth.datasource.disk.util.FakeAuthDiskSource
 import com.x8bit.bitwarden.data.auth.repository.model.UserFingerprintResult
-import com.x8bit.bitwarden.data.autofill.accessibility.manager.FakeAccessibilityEnabledManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillEnabledManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillEnabledManagerImpl
 import com.x8bit.bitwarden.data.platform.datasource.disk.util.FakeSettingsDiskSource
@@ -56,14 +54,10 @@ class SettingsRepositoryTest {
         every { disableAutofillServices() } just runs
     }
     private val autofillEnabledManager: AutofillEnabledManager = AutofillEnabledManagerImpl()
-    private val fakeAccessibilityEnabledManager = FakeAccessibilityEnabledManager()
     private val fakeAuthDiskSource = FakeAuthDiskSource()
     private val fakeSettingsDiskSource = FakeSettingsDiskSource()
     private val vaultSdkSource: VaultSdkSource = mockk()
     private val flightRecorderManager = mockk<FlightRecorderManager>()
-    private val buildInfoManager: BuildInfoManager = mockk {
-        every { isFdroid } returns false
-    }
 
     private val settingsRepository = SettingsRepositoryImpl(
         autofillManager = autofillManager,
@@ -71,10 +65,8 @@ class SettingsRepositoryTest {
         authDiskSource = fakeAuthDiskSource,
         settingsDiskSource = fakeSettingsDiskSource,
         vaultSdkSource = vaultSdkSource,
-        accessibilityEnabledManager = fakeAccessibilityEnabledManager,
         dispatcherManager = FakeDispatcherManager(),
         flightRecorderManager = flightRecorderManager,
-        buildInfoManager = buildInfoManager,
     )
 
     @BeforeEach
@@ -758,21 +750,6 @@ class SettingsRepositoryTest {
         )
     }
 
-    @Suppress("MaxLineLength")
-    @Test
-    fun `isAccessibilityEnabledStateFlow should emit whenever the accessibilityEnabledManager does`() =
-        runTest {
-            settingsRepository.isAccessibilityEnabledStateFlow.test {
-                assertFalse(awaitItem())
-
-                fakeAccessibilityEnabledManager.isAccessibilityEnabled = true
-                assertTrue(awaitItem())
-
-                fakeAccessibilityEnabledManager.isAccessibilityEnabled = false
-                assertFalse(awaitItem())
-            }
-        }
-
     @Test
     fun `isAutofillEnabledStateFlow should emit whenever the AutofillEnabledManager does`() =
         runTest {
@@ -1201,48 +1178,6 @@ class SettingsRepositoryTest {
                 assertEquals(false, fakeSettingsDiskSource.screenCaptureAllowed)
             }
         }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `hasShownAccessibilityDisclaimerFlow should emit changes from SettingsDiskSource when fdroid is false`() =
-        runTest {
-            fakeSettingsDiskSource.hasShownAccessibilityDisclaimer = null
-            settingsRepository.hasShownAccessibilityDisclaimerFlow.test {
-                assertFalse(awaitItem())
-
-                fakeSettingsDiskSource.hasShownAccessibilityDisclaimer = true
-                assertTrue(awaitItem())
-
-                fakeSettingsDiskSource.hasShownAccessibilityDisclaimer = false
-                assertFalse(awaitItem())
-            }
-        }
-
-    @Suppress("MaxLineLength")
-    @Test
-    fun `hasShownAccessibilityDisclaimerFlow should emit changes from SettingsDiskSource when fdroid is true`() =
-        runTest {
-            every { buildInfoManager.isFdroid } returns true
-            fakeSettingsDiskSource.hasShownAccessibilityDisclaimer = null
-            settingsRepository.hasShownAccessibilityDisclaimerFlow.test {
-                assertTrue(awaitItem())
-
-                fakeSettingsDiskSource.hasShownAccessibilityDisclaimer = true
-                expectNoEvents()
-
-                fakeSettingsDiskSource.hasShownAccessibilityDisclaimer = false
-                expectNoEvents()
-            }
-        }
-
-    @Test
-    fun `accessibilityDisclaimerHasBeenShown should update SettingsDiskSource`() {
-        assertNull(fakeSettingsDiskSource.hasShownAccessibilityDisclaimer)
-
-        settingsRepository.accessibilityDisclaimerHasBeenShown()
-
-        assertTrue(fakeSettingsDiskSource.hasShownAccessibilityDisclaimer == true)
-    }
 
     @Test
     fun `clearClipboardFrequency should pull from and update SettingsDiskSource`() = runTest {

@@ -3,7 +3,6 @@ package com.x8bit.bitwarden.data.platform.manager.log
 import com.bitwarden.data.datasource.disk.model.FlightRecorderDataSet
 import com.bitwarden.ui.platform.feature.settings.appearance.model.AppLanguage
 import com.bitwarden.ui.platform.feature.settings.appearance.model.AppTheme
-import com.x8bit.bitwarden.data.autofill.accessibility.manager.AccessibilityEnabledManager
 import com.x8bit.bitwarden.data.autofill.manager.AutofillEnabledManager
 import com.x8bit.bitwarden.data.autofill.manager.browser.BrowserThirdPartyAutofillEnabledManager
 import com.x8bit.bitwarden.data.autofill.model.browser.BrowserThirdPartyAutoFillData
@@ -46,9 +45,6 @@ class SettingsLogManagerTest {
     private val autofillEnabledManager = mockk<AutofillEnabledManager> {
         every { isAutofillEnabled } returns false
     }
-    private val accessibilityEnabledManager = mockk<AccessibilityEnabledManager> {
-        every { isAccessibilityEnabledStateFlow } returns MutableStateFlow(false)
-    }
     private val browserThirdPartyAutofillEnabledManager =
         mockk<BrowserThirdPartyAutofillEnabledManager> {
             every { browserThirdPartyAutofillStatus } returns UNAVAILABLE_BROWSER_AUTOFILL_STATUS
@@ -58,7 +54,6 @@ class SettingsLogManagerTest {
         settingsRepository = settingsRepository,
         logsManager = logsManager,
         autofillEnabledManager = autofillEnabledManager,
-        accessibilityEnabledManager = accessibilityEnabledManager,
         browserThirdPartyAutofillEnabledManager = browserThirdPartyAutofillEnabledManager,
     )
 
@@ -74,7 +69,6 @@ class SettingsLogManagerTest {
               Session timeout action: LOCK
             Autofill:
               Autofill Service: Disabled
-              Use accessibility: Disabled
               Copy TOTP automatically: Disabled
               Ask to add item: Disabled
               Default URI match detection: DOMAIN
@@ -120,9 +114,6 @@ class SettingsLogManagerTest {
         every { logsManager.isEnabled } returns true
         every { autofillEnabledManager.isAutofillEnabled } returns true
         every {
-            accessibilityEnabledManager.isAccessibilityEnabledStateFlow
-        } returns MutableStateFlow(true)
-        every {
             browserThirdPartyAutofillEnabledManager.browserThirdPartyAutofillStatus
         } returns ENABLED_BROWSER_AUTOFILL_STATUS
 
@@ -143,7 +134,6 @@ class SettingsLogManagerTest {
                 CHROME_STABLE: On
                 CHROME_BETA: On
                 VIVALDI_STABLE: On
-              Use accessibility: Enabled
               Copy TOTP automatically: Enabled
               Ask to add item: Enabled
               Default URI match detection: EXACT
@@ -182,7 +172,6 @@ class SettingsLogManagerTest {
               Session timeout action: LOCK
             Autofill:
               Autofill Service: Disabled
-              Use accessibility: Disabled
               Copy TOTP automatically: Disabled
               Ask to add item: Disabled
               Default URI match detection: DOMAIN
@@ -219,7 +208,6 @@ class SettingsLogManagerTest {
               Session timeout action: LOCK
             Autofill:
               Autofill Service: Disabled
-              Use accessibility: Disabled
               Copy TOTP automatically: Disabled
               Ask to add item: Disabled
               Default URI match detection: DOMAIN
@@ -258,7 +246,6 @@ class SettingsLogManagerTest {
             Autofill:
               Autofill Service: Enabled
                 Display autofill suggestions: Popup
-              Use accessibility: Disabled
               Copy TOTP automatically: Disabled
               Ask to add item: Disabled
               Default URI match detection: DOMAIN
@@ -311,7 +298,6 @@ class SettingsLogManagerTest {
               Browser integration:
                 BRAVE_RELEASE: Off
                 CHROME_STABLE: On
-              Use accessibility: Disabled
               Copy TOTP automatically: Disabled
               Ask to add item: Disabled
               Default URI match detection: DOMAIN

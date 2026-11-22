@@ -22,7 +22,6 @@ class AutoFillHandlers(
     val onPasskeyManagementClick: () -> Unit,
     val onPrivilegedAppsClick: () -> Unit,
     val onPrivilegedAppsHelpLinkClick: () -> Unit,
-    val onUseAccessibilityServiceClick: () -> Unit,
     val onCopyTotpAutomaticallyClick: (isEnabled: Boolean) -> Unit,
     val onAskToAddLoginClick: (isEnabled: Boolean) -> Unit,
     val onDefaultUriMatchTypeSelect: (defaultUriMatchType: UriMatchType) -> Unit,
@@ -68,9 +67,6 @@ class AutoFillHandlers(
             },
             onPrivilegedAppsHelpLinkClick = {
                 viewModel.trySendAction(AutoFillAction.AboutPrivilegedAppsClick)
-            },
-            onUseAccessibilityServiceClick = {
-                viewModel.trySendAction(AutoFillAction.UseAccessibilityAutofillClick)
             },
             onCopyTotpAutomaticallyClick = {
                 viewModel.trySendAction(AutoFillAction.CopyTotpAutomaticallyClick(it))

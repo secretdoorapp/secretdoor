@@ -46,10 +46,10 @@ app.
 | Biometrics | Unlock with fingerprint or face if you turn it on. |
 | Local network | Declared by the upstream app for self-hosted servers. SecretDoor does not use it. |
 
-SecretDoor can also act as an Android **autofill service**, an **accessibility service** (an
-optional way to fill apps and browsers that do not support autofill) and a **credential provider**
-(passkeys and passwords through Android Credential Manager). Each of these is switched on by you in
-Android's settings, and you can switch it off there at any time.
+SecretDoor can also act as an Android **autofill service** and a **credential provider** (passkeys
+and passwords through Android Credential Manager). Each of these is switched on by you in Android's
+settings, and you can switch it off there at any time. SecretDoor does not use an accessibility
+service and never reads what is on your screen.
 
 ## Your data and the law
 
